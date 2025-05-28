@@ -574,5 +574,49 @@ public List<User> searchUsersByNameRoleStatusWithPaging(String search, Integer r
     return list;
 }
 
+public List<User> getUsersWithLoginInfo() throws SQLException {
+    List<User> users = new ArrayList<>();
+
+    String sql = "SELECT u.username, u.password_hash, r.role_id, r.role_name " +
+                 "FROM Users u JOIN Roles r ON u.role_id = r.role_id " +
+                 "WHERE u.status = 'active'";
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+
+        while (rs.next()) {
+            User user = new User();
+            user.setUsername(rs.getString("username"));
+            user.setPassword(rs.getString("password_hash")); 
+
+            Role role = new Role();
+            role.setRoleId(rs.getInt("role_id"));
+            role.setRoleName(rs.getString("role_name"));
+            user.setRole(role);
+
+            users.add(user);
+        }
+    }
+
+    return users;
+}
+public String getRoleNameByUsername(String username) throws SQLException {
+    String sql = "SELECT r.role_name " +
+                 "FROM Users u JOIN Roles r ON u.role_id = r.role_id " +
+                 "WHERE u.username = ? AND u.status = 'active'";
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, username);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getString("role_name");
+            }
+        }
+    }
+
+    return null;
+}
+
 
 }

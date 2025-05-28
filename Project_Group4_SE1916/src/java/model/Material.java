@@ -13,6 +13,7 @@ import java.util.List;
 public class Material {
 
     private int materialId;
+    private String code;
     private String name;
     private String description;
     private String unit;
@@ -23,8 +24,9 @@ public class Material {
     public Material() {
     }
 
-    public Material(int materialId, String name, String description, String unit, String imageUrl, MaterialBrand brand, List<Supplier> suppliers) {
+    public Material(int materialId, String code, String name, String description, String unit, String imageUrl, MaterialBrand brand, List<Supplier> suppliers) {
         this.materialId = materialId;
+        this.code = code;
         this.name = name;
         this.description = description;
         this.unit = unit;
@@ -39,6 +41,14 @@ public class Material {
 
     public void setMaterialId(int materialId) {
         this.materialId = materialId;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getName() {
@@ -88,5 +98,7 @@ public class Material {
     public void setSuppliers(List<Supplier> suppliers) {
         this.suppliers = suppliers;
     }
+
+    
     
 }
