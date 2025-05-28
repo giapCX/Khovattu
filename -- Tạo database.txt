@@ -1,0 +1,259 @@
+﻿-- 1. Tạo database
+CREATE DATABASE IF NOT EXISTS quan_ly_vat_tu;
+USE quan_ly_vat_tu;
+
+
+-- 2. Roles & Users
+CREATE TABLE Roles (
+    role_id INT AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL UNIQUE
+);
+
+
+CREATE TABLE Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(50) UNIQUE NOT NULL,           -- Mã user có ý nghĩa
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(20),
+    imageUrl VARCHAR(255) NOT NULL,
+    date_of_birth DATE,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    role_id INT, 
+    FOREIGN KEY (role_id) REFERENCES Roles(role_id) ON DELETE SET NULL 
+);
+
+
+-- 3. Nhà cung cấp
+CREATE TABLE Suppliers (
+    supplier_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    address TEXT,
+    email VARCHAR(100),
+    status ENUM('active', 'inactive') DEFAULT 'active'
+);
+
+
+-- 4. Phân cấp vật tư (3 cấp)
+CREATE TABLE MaterialCategories (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+
+CREATE TABLE MaterialBrands (
+    brand_id INT AUTO_INCREMENT PRIMARY KEY,
+    category_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    FOREIGN KEY (category_id) REFERENCES MaterialCategories(category_id)
+);
+
+
+CREATE TABLE Materials (
+    material_id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(50) UNIQUE NOT NULL,            -- Mã vật tư có ý nghĩa
+    brand_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    unit VARCHAR(20) NOT NULL,
+    image_url VARCHAR(255),
+    FOREIGN KEY (brand_id) REFERENCES MaterialBrands(brand_id)
+);
+
+
+-- 5. Nhà cung cấp cung cấp vật tư
+CREATE TABLE SupplierMaterials (
+    supplier_id INT,
+    material_id INT,
+    PRIMARY KEY (supplier_id, material_id),
+    FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id) ON DELETE CASCADE,
+    FOREIGN KEY (material_id) REFERENCES Materials(material_id) ON DELETE CASCADE
+);
+
+
+-- 6. Phiếu nhập kho
+CREATE TABLE ImportReceipts (
+    import_id INT AUTO_INCREMENT PRIMARY KEY,
+    supplier_id INT,
+    user_id INT,
+    import_date DATE NOT NULL,
+    note TEXT,
+    FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+
+CREATE TABLE ImportDetails (
+    import_detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    import_id INT NOT NULL,
+    material_id INT NOT NULL,
+    quantity DECIMAL(10,2) NOT NULL,
+    price_per_unit DECIMAL(15,2) NOT NULL,
+    material_condition ENUM('new', 'used', 'damaged') NOT NULL DEFAULT 'new',
+    FOREIGN KEY (import_id) REFERENCES ImportReceipts(import_id),
+    FOREIGN KEY (material_id) REFERENCES Materials(material_id)
+);
+
+
+-- 7. Phiếu xuất kho
+CREATE TABLE ExportReceipts (
+    export_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    export_date DATE NOT NULL,
+    note TEXT,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+
+CREATE TABLE ExportDetails (
+    export_detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    export_id INT NOT NULL,
+    material_id INT NOT NULL,
+    quantity DECIMAL(10,2) NOT NULL,
+    material_condition ENUM('new', 'used', 'damaged') NOT NULL DEFAULT 'new',
+    reason VARCHAR(255),
+    FOREIGN KEY (export_id) REFERENCES ExportReceipts(export_id),
+    FOREIGN KEY (material_id) REFERENCES Materials(material_id)
+);
+
+
+-- 8. Yêu cầu
+CREATE TABLE Requests (
+    request_id INT AUTO_INCREMENT PRIMARY KEY,
+    request_type ENUM('export','import','repair') NOT NULL,
+    requester_id INT NOT NULL,
+    request_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    approver_id INT,
+    approval_date DATETIME,
+    reason TEXT,
+    note TEXT,
+    FOREIGN KEY (requester_id) REFERENCES Users(user_id),
+    FOREIGN KEY (approver_id) REFERENCES Users(user_id)
+);
+
+
+CREATE TABLE RequestDetails (
+    request_detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    request_id INT NOT NULL,
+    material_id INT NOT NULL,
+    quantity DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (request_id) REFERENCES Requests(request_id),
+    FOREIGN KEY (material_id) REFERENCES Materials(material_id)
+);
+
+
+-- 9. Tồn kho
+CREATE TABLE Inventory (
+    material_id INT NOT NULL,
+    material_condition ENUM('new', 'used', 'damaged') NOT NULL DEFAULT 'new',
+    quantity_in_stock DECIMAL(10,2) NOT NULL DEFAULT 0,
+    last_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (material_id, material_condition),
+    FOREIGN KEY (material_id) REFERENCES Materials(material_id)
+);
+
+
+-- 10. Chi phí sửa chữa
+CREATE TABLE RepairCosts (
+    repair_id INT AUTO_INCREMENT PRIMARY KEY,
+    material_id INT NOT NULL,
+    request_id INT NOT NULL,
+    cost DECIMAL(15,2) NOT NULL,
+    repair_date DATE NOT NULL,
+    note TEXT,
+    FOREIGN KEY (material_id) REFERENCES Materials(material_id),
+    FOREIGN KEY (request_id) REFERENCES Requests(request_id)
+);
+
+
+
+
+
+
+
+
+
+
+-- Thêm dữ liệu
+
+
+INSERT INTO Roles (role_name) VALUES
+('admin'),
+('direction'),
+('warehouse'),
+('employee');
+
+
+
+
+-- Thêm dữ liệu Users (có cột code)
+INSERT INTO Users (code, username, password_hash, full_name, address, email, phone_number, imageUrl, date_of_birth, status, role_id) VALUES
+('admin001', 'admin1', '123456', 'Admin One', '123 Admin St', 'admin1@example.com', '0123456789', 'images/admin1.jpg', '1990-01-01', 'active', 1),
+('admin002', 'admin2', '123456', 'Admin Two', '124 Admin St', 'admin2@example.com', '0123456790', 'images/admin2.jpg', '1991-02-02', 'active', 1),
+
+
+('dir001', 'dir1', '123456', 'Direction One', '10 Dir Ave', 'dir1@example.com', '0111111111', 'images/dir1.jpg', '1985-05-05', 'active', 2),
+('dir002', 'dir2', '123456', 'Direction Two', '11 Dir Ave', 'dir2@example.com', '0111111112', 'images/dir2.jpg', '1986-06-06', 'active', 2),
+
+
+('ware001', 'ware1', '123456', 'Warehouse One', '20 Ware Rd', 'ware1@example.com', '0222222222', 'images/ware1.jpg', '1987-07-07', 'active', 3),
+('ware002', 'ware2', '123456', 'Warehouse Two', '21 Ware Rd', 'ware2@example.com', '0222222223', 'images/ware2.jpg', '1988-08-08', 'active', 3),
+
+
+('emp001', 'emp1', '123456', 'Employee One', '30 Emp Blvd', 'emp1@example.com', '0333333333', 'images/emp1.jpg', '1992-03-03', 'active', 4),
+('emp002', 'emp2', '123456', 'Employee Two', '31 Emp Blvd', 'emp2@example.com', '0333333334', 'images/emp2.jpg', '1993-04-04', 'active', 4);
+
+
+
+
+
+
+
+
+INSERT INTO Suppliers (name, phone, address, email, status) VALUES
+('Công ty VLXD Minh Hạnh', '0901234567', 'Hà Nội', 'minhhanh@example.com', 'active'),
+('Công ty TNHH Điện Tr', '0902345678', 'TP.HCM', 'dientr@example.com', 'active'),
+('Công ty TNHH Sơn DULUX', '0903456789', 'Đà Nẵng', 'dulux@example.com', 'active'),
+('Công ty Gạch Prime', '0904567890', 'Cần Thơ', 'prime@example.com', 'active'),
+('Công ty Cơ Điện Hải Âu', '0905678901', 'Hải Phòng', 'haiau@example.com', 'active');
+
+
+INSERT INTO MaterialCategories (name) VALUES
+('Xi măng'),
+('Ống nhựa'),
+('Sơn'),
+('Gạch'),
+('Dây điện');
+
+
+INSERT INTO MaterialBrands (category_id, name) VALUES
+(1, 'Xuân Thành'),
+(2, 'Vanlock'),
+(3, 'DULUX'),
+(4, 'Prime'),
+(5, 'Cadivi');
+
+
+INSERT INTO Materials (code, brand_id, name, description, unit, image_url) VALUES
+('XM-XT-001', 1, 'Xi măng Xuân Thành PCB40', 'Xi măng chất lượng cao', 'bao', 'images/ximang_xuanthanh.jpg'),
+('ON-VL-001', 2, 'Ống nhựa PVC D20 Vanlock VL9020', 'Ống nhựa PVC D20', 'mét', 'images/ong_nhua_pvc.jpg'),
+('S-DL-001', 3, 'Sơn DULUX EASYCLEAN', 'Sơn nội thất cao cấp', 'lít', 'images/son_dulux_easyclean.jpg'),
+('G-PR-001', 4, 'Gạch Prime 30x30 Ce2703', 'Gạch lát nền 30x30', 'viên', 'images/gach_prime_30x30.jpg'),
+('DD-CD-001', 5, 'Dây cáp điện Cadivi CVV-2x1.5', 'Dây cáp điện 2 lõi', 'mét', 'images/day_cap_dien_cadivi.jpg');
+
+
+
+
+
+
+INSERT INTO SupplierMaterials (supplier_id, material_id) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5);
