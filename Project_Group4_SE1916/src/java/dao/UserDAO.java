@@ -1,5 +1,6 @@
 package dao;
 
+import Dal.DBContext;
 import model.Role;
 import model.User;
 import java.sql.*;
@@ -13,6 +14,7 @@ public class UserDAO {
     private Connection conn;
 
     public UserDAO() {
+        this.conn = DBContext.getConnection();
     }
 
     public UserDAO(Connection conn) {
@@ -82,6 +84,27 @@ public class UserDAO {
         }
         return user;
     }
+    
+    public String getUserRoleName(String username) {
+    String sql = "SELECT r.role_name " +
+                 "FROM users u " +
+                 "JOIN roles r ON u.role_id = r.role_id " +
+                 "WHERE u.username = ?";
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, username);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            return rs.getString("role_name");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace(); // Có thể thay bằng ghi log
+    }
+
+    return null;
+}
+
 
     public void updateUserRoleAndStatus(int userId, int roleId, String status) throws SQLException {
         String sql = "UPDATE Users SET status = ?, role_id = ? WHERE user_id = ?";

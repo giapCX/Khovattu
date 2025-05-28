@@ -13,70 +13,195 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="../Assets/css/styleLogin.css"/>
         <link rel="icon" href="../Assets/icon/favicon.png"/>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
         <title>Forget Password</title>
         <style>
-            .login{
-                border-radius: 12px;
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Poppins', sans-serif;
+            }
+
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                background: linear-gradient(135deg, #6e8efb, #a777e3);
+                padding: 20px;
+            }
+
+            .login {
                 background: white;
+                padding: 40px 30px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                max-width: 400px;
+                transition: transform 0.3s ease;
             }
-            .login-label{
-                color: black;
+
+            .login:hover {
+                transform: translateY(-5px);
             }
+
+            .login-heading {
+                text-align: center;
+                font-size: 1.8rem;
+                color: #333;
+                margin-bottom: 20px;
+                font-weight: 600;
+            }
+
+            .alert-danger {
+                background-color: #ffe6e6;
+                color: #d32f2f;
+                padding: 10px;
+                border-radius: 8px;
+                text-align: center;
+                margin-bottom: 20px;
+                font-size: 0.9rem;
+            }
+
+            .login-label {
+                color: #555;
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+                display: block;
+                font-weight: 500;
+            }
+
+            .login-input {
+                width: 100%;
+                padding: 12px;
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                font-size: 1rem;
+                outline: none;
+                transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .login-input:focus {
+                border-color: #6e8efb;
+                box-shadow: 0 0 8px rgba(110, 142, 251, 0.3);
+            }
+
+            .login-submit {
+                width: 100%;
+                padding: 12px;
+                background: #6e8efb;
+                border: none;
+                border-radius: 8px;
+                color: white;
+                font-size: 1rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background 0.3s ease, transform 0.2s ease;
+            }
+
+            .login-submit:hover {
+                background: #5a78e0;
+                transform: translateY(-2px);
+            }
+
+            .login-submit:active {
+                transform: translateY(0);
+            }
+
+            .login-already {
+                text-align: center;
+                margin-top: 20px;
+                font-size: 0.9rem;
+                color: #555;
+            }
+
+            .login-signup-link {
+                color: #6e8efb;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+            .login-signup-link:hover {
+                text-decoration: underline;
+            }
+
             #loading {
                 display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 10000;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .loader {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #6e8efb;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .login {
+                    padding: 20px;
+                }
+
+                .login-heading {
+                    font-size: 1.5rem;
+                }
+
+                .login-input, .login-submit {
+                    font-size: 0.9rem;
+                }
             }
         </style>
     </head>
     <body>
         <div id="loading">
-            <img src="https://img.pikbest.com/png-images/20190918/cartoon-snail-loading-loading-gif-animation_2734139.png!bw700" 
-                 style="position: fixed;
-                 z-index: 10000;
-                 top: 50%;
-                 left: 50%;
-                 width: 200px;
-                 height: 200px;
-                 background: wheat;
-                 border-radius: 15px;
-                 transform: translateX(-50%) translateY(-50%)">
+            <div class="loader"></div>
         </div>
         <div class="login">
-            <h1 class="login-heading">Quên mật khẩu</h1>
-            <div class="alert alert-danger" role="alert" style="color: red; margin-bottom: 1em; text-align: center"">
+            <h1 class="login-heading">Reset Password</h1>
+            <div class="alert alert-danger" role="alert">
                 ${mess}
             </div>
-            <!-- <button class="signup-social">
-              <i class="fa fa-google signup-social-icon"></i>
-              <span class="signup-social-text">Sign up with Google</span>
-            </button>
-            -->
-            <form id="myForm" action="./forget" method="POST" class="login-form" autocomplete="off">
-                <!-- <label for="username" class="login-label">Nhập tên đăng nhập và địa chỉ Email (địa chỉ email này phải đúng với địa chỉ email đã đăng kí trong trang cá nhân). Sau đó chúng tôi sẽ gửi mật khẩu mới vào Email của bạn!</label> -->
+            <form id="myForm" action="./forgetPassword/forget_password" method="POST" class="login-form" autocomplete="off">
+                <label for="username" class="login-label">Username</label>
+                <input type="text" name="username" class="login-input" placeholder="VD: abc" required>
 
-                <!-- username -->
-                <label for="username" class="login-label">Nickname</label>
-                <input type="text" name="username" class="login-input" placeholder="VD: HoangPongPayVoCungLuon">
-
-                <!-- Email -->
                 <label for="Email" class="login-label">Email</label>
-                <input type="email" name="Email" class="login-input" placeholder="VD: KhanhCute@gmail.com">
-                <input class="login-submit" type="submit" value="Lấy lại mật khẩu">
+                <input type="email" name="Email" class="login-input" placeholder="VD: abc@gmail.com" required>
+
+                <input class="login-submit" type="submit" value="Retrieve Password">
             </form>
             <p class="login-already">
-
-                <a href="../login.jsp" class="login-signup-link">Về đăng nhập</a>
+                <a href="../login.jsp" class="login-signup-link">Back to login</a>
             </p>
         </div>
-    </body>
         <script>
-        // Lấy đối tượng giao diện loading và form
-        const loading = document.getElementById("loading");
-        const form = document.getElementById("myForm");
+            const loading = document.getElementById("loading");
+            const form = document.getElementById("myForm");
 
-        // Gán sự kiện cho form
-        form.addEventListener("submit", function () {
-            // Hiển thị giao diện loading
-            loading.style.display = "block";
-        });
-
-
+            form.addEventListener("submit", function () {
+                loading.style.display = "flex";
+            });
+        </script>
+    </body>
+</html>

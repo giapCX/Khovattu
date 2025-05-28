@@ -62,6 +62,8 @@
             .signup-submit {
                 width: 100%;
                 padding: 0.75rem;
+                margin-top:1.75rem;
+                margin-bottom: 0.75rem;
                 background: #3B82F6;
                 color: white;
                 font-weight: 600;
@@ -88,10 +90,16 @@
                 font-weight: 500;
                 text-decoration: none;
                 transition: color 0.2s ease;
-            }
+                }
             .signup-login-link:hover {
                 color: #2563EB;
                 text-decoration: underline;
+            }
+            
+            .signup-cancel:hover {
+                color: red;
+                text-decoration: underline;
+                
             }
         </style>
     </head>
@@ -116,22 +124,22 @@
             <% } %>
             <%
                 String role = (String) session.getAttribute("role");
-                String redirectUrl = "home.jsp"; // Default fallback
+                String redirectUrl = "../login.jsp"; // Default fallback
                 if (role != null) {
                     switch (role.toLowerCase()) {
                         case "director":
-                            redirectUrl = "view/direction/directionDashboard.jsp";
+                            redirectUrl = request.getContextPath() + "/view/direction/directionDashboard.jsp";
                             break;
                         case "employee":
-                            redirectUrl = "view/employee/employeeDashboard.jsp";
+                            redirectUrl = request.getContextPath() + "/view/employee/employeeDashboard.jsp";
                             break;
                         case "warehouse":
-                            redirectUrl = "view/warehouse/warehouseDashboard.jsp";
+                            redirectUrl = request.getContextPath() + "/view/warehouse/warehouseDashboard.jsp";
                             break;
                     }
                 }
             %>
-            <a href="<%= redirectUrl%>" class="signup-submit">Hủy</a>
+            <a href="<%= redirectUrl%>" class="signup-cancel">Hủy</a>
         </div>
     </body>
 </html>

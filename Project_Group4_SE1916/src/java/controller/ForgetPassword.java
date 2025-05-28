@@ -27,7 +27,7 @@ import javax.mail.internet.MimeMessage;
 import model.Account;
 import model.User;
 
-@WebServlet("/forgetPassword/forget")
+//@WebServlet("/forgetPassword/forget")
 public class ForgetPassword extends HttpServlet {
 
     @Override

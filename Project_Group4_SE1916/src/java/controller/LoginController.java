@@ -24,7 +24,7 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
     }
 
     @Override
@@ -52,6 +52,9 @@ public class LoginController extends HttpServlet {
                 session.setAttribute("role", roleName);
                 session.setMaxInactiveInterval(30 * 60);
 
+                String roleName1 = userDAO.getUserRoleName(username);
+                session.setAttribute("role", roleName1);
+                
                 switch (roleName) {
                     case "admin":
                         response.sendRedirect("view/admin/adminDashboard.jsp");
