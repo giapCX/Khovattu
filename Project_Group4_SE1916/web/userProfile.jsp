@@ -42,6 +42,8 @@
     </script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -72,6 +74,16 @@
             box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
         }
 
+        .btn-secondary {
+            background: linear-gradient(to right, #9ca3af, #6b7280);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(107, 114, 128, 0.3), 0 4px 6px -2px rgba(107, 114, 128, 0.1);
+        }
+
         .dark-mode {
             background-color: #1a202c;
             color: #e2e8f0;
@@ -80,6 +92,18 @@
         .dark-mode .card {
             background-color: #2d3748;
             color: #e2e8f0;
+            border-color: #4a5568;
+        }
+
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border: 4px solid #e5e7eb;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .profile-pic {
             border-color: #4a5568;
         }
     </style>
@@ -95,9 +119,12 @@
     %>
 
     <!-- Main Content -->
-    <main class="flex-1 p-8">
-        <div class="max-w-md mx-auto card bg-white dark:bg-gray-800 p-6">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">Hồ sơ Người dùng</h2>
+    <main class="flex-1 p-6 md:p-8">
+        <div class="max-w-3xl mx-auto card bg-white dark:bg-gray-800 p-6 md:p-8">
+            <div class="flex flex-col items-center mb-6">
+                <img src="https://via.placeholder.com/120" alt="Ảnh đại diện" class="profile-pic rounded-full mb-4">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white text-center">Hồ sơ Người dùng</h2>
+            </div>
 
             <%
                 String fullName = "", email = "", phone = "", address = "", status = "", roleName = "";
@@ -107,7 +134,7 @@
                 try {
                     conn = new DBContext().getConnection();
                     if (conn == null) {
-                        throw new SQLException("Database connection failed.");
+                        throw new SQLException("Kết nối cơ sở dữ liệu thất bại.");
                     }
 
                     String sql = "SELECT u.full_name, u.email, u.phone_number, u.address, u.date_of_birth, u.status, r.role_name " +
@@ -127,17 +154,17 @@
                             status = rs.getString("status");
                             roleName = rs.getString("role_name");
                         } else {
-                            throw new SQLException("User not found.");
+                            throw new SQLException("Không tìm thấy người dùng.");
                         }
                     }
                 } catch (SQLException e) {
-                    request.setAttribute("error", "Error fetching profile: " + e.getMessage());
+                    request.setAttribute("error", "Lỗi khi lấy thông tin hồ sơ: " + e.getMessage());
                 } finally {
                     if (conn != null) {
                         try {
                             conn.close();
                         } catch (SQLException e) {
-                            System.err.println("Error closing connection: " + e.getMessage());
+                            System.err.println("Lỗi khi đóng kết nối: " + e.getMessage());
                         }
                     }
                 }
@@ -154,73 +181,93 @@
                 }
             %>
 
-            <% if (request.getAttribute("error") != null) { %>
-                <div class="text-red-500 mb-4 text-center"><%= request.getAttribute("error") %></div>
-            <% } %>
-            <% if (request.getAttribute("message") != null) { %>
-                <div class="text-green-500 mb-4 text-center"><%= request.getAttribute("message") %></div>
-            <% } %>
+            <form action="userprofile" method="post" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tên người dùng</label>
+                        <input type="text" id="username" name="username" value="<%= username %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" readonly>
+                    </div>
 
-            <form action="Update_profile_servlet" method="post" class="space-y-4">
-                <div class="space-y-2">
-                    <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tên người dùng</label>
-                    <input type="text" id="username" name="username" value="<%= username %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" readonly>
+                    <div class="space-y-2">
+                        <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Họ và tên</label>
+                        <input type="text" id="fullName" name="fullName" value="<%= fullName != null ? fullName : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                        <input type="email" id="email" name="email" value="<%= email != null ? email : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Số điện thoại</label>
+                        <input type="text" id="phone" name="phone" value="<%= phone != null ? phone : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                    </div>
+
+                    <div class="space-y-2 md:col-span-2">
+                        <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Địa chỉ</label>
+                        <input type="text" id="address" name="address" value="<%= address != null ? address : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="dob" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ngày sinh</label>
+                        <input type="date" id="dob" name="dob" value="<%= dob != null ? sdf.format(dob) : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Trạng thái</label>
+                        <select id="status" name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                            <option value="active" <%= "active".equals(status) ? "selected" : "" %>>Active</option>
+                            <option value="inactive" <%= "inactive".equals(status) ? "selected" : "" %>>Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vai trò</label>
+                        <input type="text" id="role" name="role" value="<%= roleName != null ? roleName : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" readonly>
+                    </div>
                 </div>
 
-                <div class="space-y-2">
-                    <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Họ và tên</label>
-                    <input type="text" id="fullName" name="fullName" value="<%= fullName != null ? fullName : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
+                <div class="flex space-x-4">
+                    <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg flex-1">Lưu thay đổi</button>
+                    <a href="<%= homePage %>" class="btn-secondary text-white px-6 py-3 rounded-lg flex-1 text-center">Hủy</a>
                 </div>
-
-                <div class="space-y-2">
-                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                    <input type="email" id="email" name="email" value="<%= email != null ? email : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
-                </div>
-
-                <div class="space-y-2">
-                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Số điện thoại</label>
-                    <input type="text" id="phone" name="phone" value="<%= phone != null ? phone : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                </div>
-
-                <div class="space-y-2">
-                    <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Địa chỉ</label>
-                    <input type="text" id="address" name="address" value="<%= address != null ? address : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
-                </div>
-
-                <div class="space-y-2">
-                    <label for="dob" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ngày sinh</label>
-                    <input type="date" id="dob" name="dob" value="<%= dob != null ? sdf.format(dob) : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                </div>
-
-                <div class="space-y-2">
-                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Trạng thái</label>
-                    <select id="status" name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                        <option value="active" <%= "active".equals(status) ? "selected" : "" %>>Active</option>
-                        <option value="inactive" <%= "inactive".equals(status) ? "selected" : "" %>>Inactive</option>
-                    </select>
-                </div>
-
-                <div class="space-y-2">
-                    <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vai trò</label>
-                    <input type="text" id="role" name="role" value="<%= roleName != null ? roleName : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" readonly>
-                </div>
-
-                <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg w-full">Lưu thay đổi</button>
             </form>
 
-            <div class="mt-4 flex justify-center space-x-4">
+            <div class="mt-6 flex justify-center space-x-4">
                 <a href="<%= homePage %>" class="text-primary-600 dark:text-primary-400 hover:underline">Quay lại Trang chủ</a>
                 <a href="logout" class="text-red-500 hover:underline">Đăng xuất</a>
             </div>
         </div>
     </main>
 
-    <!-- JavaScript for Dark Mode -->
+    <!-- Toastify JS -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
+        // Show toast notifications for errors or messages
+        <% if (request.getAttribute("error") != null) { %>
+            Toastify({
+                text: "<%= request.getAttribute("error").toString().replaceAll("\"", "'") %>",
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                backgroundColor: "#ef4444",
+                stopOnFocus: true
+            }).showToast();
+        <% } else if (request.getAttribute("message") != null) { %>
+            Toastify({
+                text: "<%= request.getAttribute("message").toString().replaceAll("\"", "'") %>",
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                backgroundColor: "#22c55e",
+                stopOnFocus: true
+            }).showToast();
+        <% } %>
+
         // Dark Mode Toggle
         const toggleDarkMode = document.createElement('button');
         toggleDarkMode.id = 'toggleDarkMode';
-        toggleDarkMode.className = 'bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 fixed top-4 right-4 z-50';
+        toggleDarkMode.className = 'bg-gray-100 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 fixed top-4 right-4 z-50';
         toggleDarkMode.innerHTML = '<i class="fas fa-moon text-gray-700 dark:text-yellow-300 text-xl"></i>';
         document.body.appendChild(toggleDarkMode);
 

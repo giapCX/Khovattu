@@ -78,7 +78,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>UserProfileController</servlet-name>
-        <url-pattern>/user_profile</url-pattern>
+        <url-pattern>/userprofile</url-pattern>
     </servlet-mapping>
     <jsp-config>
     <jsp-property-group>
