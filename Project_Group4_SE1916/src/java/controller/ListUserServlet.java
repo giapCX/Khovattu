@@ -42,7 +42,7 @@ public class ListUserServlet extends HttpServlet {
         String pageParam = request.getParameter("page");
 
         int currentPage = 1;
-        int recordsPerPage = 8;
+        int recordsPerPage = 6;
 
         if (pageParam != null) {
             try {

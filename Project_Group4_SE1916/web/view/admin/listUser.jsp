@@ -364,7 +364,7 @@
             </c:if>
 
             <div class="mt-6 flex justify-center">
-                <a href="${pageContext.request.contextPath}/home.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay lại Trang chủ</a>
+                <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay lại Trang chủ</a>
             </div>
         </div>
     </main>
