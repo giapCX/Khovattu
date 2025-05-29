@@ -272,7 +272,7 @@
                     <span class="text-lg">Quản lý kho</span>
                     <span class="ml-auto bg-white bg-opacity-20 text-sm px-2 py-1 rounded-full">5</span>
                 </a>
-                <a href="${pageContext.request.contextPath}/ListUserServlet" class="nav-item flex items-center p-3">
+                <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="nav-item flex items-center p-3">
                     <i class="fas fa-box-open mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh sách nhà cung cấp</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>

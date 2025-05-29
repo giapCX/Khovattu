@@ -240,7 +240,7 @@
                     <span class="text-lg">Danh mục vật tư</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-               <a href="${pageContext.request.contextPath}/ListUserServlet" class="nav-item flex items-center p-3">
+               <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="nav-item flex items-center p-3">
                     <i class="fas fa-box-open mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh sách nhà cung cấp</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
