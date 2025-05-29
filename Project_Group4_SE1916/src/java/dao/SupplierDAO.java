@@ -1,9 +1,400 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dao;
 
+import Dal.DBContext;
+
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import model.Material;
+import model.MaterialBrand;
+import model.MaterialCategory;
+import model.Supplier;
+import java.sql.*;
+
 public class SupplierDAO {
+
+    private Connection conn;
+
+    public SupplierDAO(Connection conn) {
+        this.conn = conn;
+    }
+
+    public List<Supplier> getSuppliers() {
+        List<Supplier> suppliers = new ArrayList<>();
+
+        String sql = "SELECT s.supplier_id, s.name AS supplier_name, s.phone AS supplier_phone, "
+                + "s.address AS supplier_address, s.email AS supplier_email, s.status AS supplier_status, "
+                + "m.material_id, m.code AS material_code, m.name AS material_name, m.description AS material_description, "
+                + "m.unit AS material_unit, m.image_url AS material_image_url, "
+                + "mb.brand_id, mb.name AS brand_name, mc.category_id, mc.name AS category_name "
+                + "FROM Suppliers s "
+                + "LEFT JOIN SupplierMaterials sm ON s.supplier_id = sm.supplier_id "
+                + "LEFT JOIN Materials m ON sm.material_id = m.material_id "
+                + "LEFT JOIN MaterialBrands mb ON m.brand_id = mb.brand_id "
+                + "LEFT JOIN MaterialCategories mc ON mb.category_id = mc.category_id "
+                + "ORDER BY s.supplier_id";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            Map<Integer, Supplier> supplierMap = new LinkedHashMap<>();
+
+            while (rs.next()) {
+                int supplierId = rs.getInt("supplier_id");
+                Supplier supplier = supplierMap.get(supplierId);
+
+                if (supplier == null) {
+                    supplier = new Supplier();
+                    supplier.setSupplierId(supplierId);
+                    supplier.setSupplierName(rs.getString("supplier_name"));
+                    supplier.setSupplierPhone(rs.getString("supplier_phone"));
+                    supplier.setSupplierAddress(rs.getString("supplier_address"));
+                    supplier.setSupplierEmail(rs.getString("supplier_email"));
+                    supplier.setSupplierStatus(rs.getString("supplier_status"));
+                    supplier.setMaterials(new ArrayList<>());
+                    supplierMap.put(supplierId, supplier);
+                }
+
+                int materialId = rs.getInt("material_id");
+                if (materialId > 0) {
+                    Material material = new Material();
+                    material.setMaterialId(materialId);
+                    material.setCode(rs.getString("material_code"));
+                    material.setName(rs.getString("material_name"));
+                    material.setDescription(rs.getString("material_description"));
+                    material.setUnit(rs.getString("material_unit"));
+                    material.setImageUrl(rs.getString("material_image_url"));
+
+                    MaterialBrand brand = new MaterialBrand();
+                    brand.setBrandId(rs.getInt("brand_id"));
+                    brand.setName(rs.getString("brand_name"));
+
+                    MaterialCategory category = new MaterialCategory();
+                    category.setCategoryId(rs.getInt("category_id"));
+                    category.setName(rs.getString("category_name"));
+
+                    brand.setCategory(category);
+                    material.setBrand(brand);
+
+                    supplier.getMaterials().add(material);
+                }
+            }
+            suppliers.addAll(supplierMap.values());
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return suppliers;
+    }
+
+    public List<Supplier> searchSuppliersByNameContains(String searchString) {
+        List<Supplier> suppliers = new ArrayList<>();
+
+        String sql = "SELECT s.supplier_id, s.name AS supplier_name, s.phone AS supplier_phone, "
+                + "s.address AS supplier_address, s.email AS supplier_email, s.status AS supplier_status, "
+                + "m.material_id, m.code AS material_code, m.name AS material_name, m.description AS material_description, "
+                + "m.unit AS material_unit, m.image_url AS material_image_url, "
+                + "mb.brand_id, mb.name AS brand_name, mc.category_id, mc.name AS category_name "
+                + "FROM Suppliers s "
+                + "LEFT JOIN SupplierMaterials sm ON s.supplier_id = sm.supplier_id "
+                + "LEFT JOIN Materials m ON sm.material_id = m.material_id "
+                + "LEFT JOIN MaterialBrands mb ON m.brand_id = mb.brand_id "
+                + "LEFT JOIN MaterialCategories mc ON mb.category_id = mc.category_id "
+                + "WHERE LOWER(s.name) LIKE ? "
+                + "ORDER BY s.supplier_id";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // Chuẩn bị câu truy vấn với wildcard '%searchString%'
+            stmt.setString(1, "%" + searchString.toLowerCase() + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                Map<Integer, Supplier> supplierMap = new LinkedHashMap<>();
+
+                while (rs.next()) {
+                    int supplierId = rs.getInt("supplier_id");
+                    Supplier supplier = supplierMap.get(supplierId);
+
+                    if (supplier == null) {
+                        supplier = new Supplier();
+                        supplier.setSupplierId(supplierId);
+                        supplier.setSupplierName(rs.getString("supplier_name"));
+                        supplier.setSupplierPhone(rs.getString("supplier_phone"));
+                        supplier.setSupplierAddress(rs.getString("supplier_address"));
+                        supplier.setSupplierEmail(rs.getString("supplier_email"));
+                        supplier.setSupplierStatus(rs.getString("supplier_status"));
+                        supplier.setMaterials(new ArrayList<>());
+                        supplierMap.put(supplierId, supplier);
+                    }
+
+                    int materialId = rs.getInt("material_id");
+                    if (materialId > 0) {
+                        Material material = new Material();
+                        material.setMaterialId(materialId);
+                        material.setCode(rs.getString("material_code"));
+                        material.setName(rs.getString("material_name"));
+                        material.setDescription(rs.getString("material_description"));
+                        material.setUnit(rs.getString("material_unit"));
+                        material.setImageUrl(rs.getString("material_image_url"));
+
+                        MaterialBrand brand = new MaterialBrand();
+                        brand.setBrandId(rs.getInt("brand_id"));
+                        brand.setName(rs.getString("brand_name"));
+
+                        MaterialCategory category = new MaterialCategory();
+                        category.setCategoryId(rs.getInt("category_id"));
+                        category.setName(rs.getString("category_name"));
+
+                        brand.setCategory(category);
+                        material.setBrand(brand);
+
+                        supplier.getMaterials().add(material);
+                    }
+                }
+                suppliers.addAll(supplierMap.values());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return suppliers;
+    }
+
+    public List<Supplier> searchSuppliersByPhoneContains(String searchPhone) {
+        List<Supplier> suppliers = new ArrayList<>();
+
+        String sql = "SELECT s.supplier_id, s.name AS supplier_name, s.phone AS supplier_phone, "
+                + "s.address AS supplier_address, s.email AS supplier_email, s.status AS supplier_status, "
+                + "m.material_id, m.code AS material_code, m.name AS material_name, m.description AS material_description, "
+                + "m.unit AS material_unit, m.image_url AS material_image_url, "
+                + "mb.brand_id, mb.name AS brand_name, mc.category_id, mc.name AS category_name "
+                + "FROM Suppliers s "
+                + "LEFT JOIN SupplierMaterials sm ON s.supplier_id = sm.supplier_id "
+                + "LEFT JOIN Materials m ON sm.material_id = m.material_id "
+                + "LEFT JOIN MaterialBrands mb ON m.brand_id = mb.brand_id "
+                + "LEFT JOIN MaterialCategories mc ON mb.category_id = mc.category_id "
+                + "WHERE s.phone LIKE ? "
+                + "ORDER BY s.supplier_id";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // Thêm wildcard cho tìm kiếm chứa
+            stmt.setString(1, "%" + searchPhone + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                Map<Integer, Supplier> supplierMap = new LinkedHashMap<>();
+
+                while (rs.next()) {
+                    int supplierId = rs.getInt("supplier_id");
+                    Supplier supplier = supplierMap.get(supplierId);
+
+                    if (supplier == null) {
+                        supplier = new Supplier();
+                        supplier.setSupplierId(supplierId);
+                        supplier.setSupplierName(rs.getString("supplier_name"));
+                        supplier.setSupplierPhone(rs.getString("supplier_phone"));
+                        supplier.setSupplierAddress(rs.getString("supplier_address"));
+                        supplier.setSupplierEmail(rs.getString("supplier_email"));
+                        supplier.setSupplierStatus(rs.getString("supplier_status"));
+                        supplier.setMaterials(new ArrayList<>());
+                        supplierMap.put(supplierId, supplier);
+                    }
+
+                    int materialId = rs.getInt("material_id");
+                    if (materialId > 0) {
+                        Material material = new Material();
+                        material.setMaterialId(materialId);
+                        material.setCode(rs.getString("material_code"));
+                        material.setName(rs.getString("material_name"));
+                        material.setDescription(rs.getString("material_description"));
+                        material.setUnit(rs.getString("material_unit"));
+                        material.setImageUrl(rs.getString("material_image_url"));
+
+                        MaterialBrand brand = new MaterialBrand();
+                        brand.setBrandId(rs.getInt("brand_id"));
+                        brand.setName(rs.getString("brand_name"));
+
+                        MaterialCategory category = new MaterialCategory();
+                        category.setCategoryId(rs.getInt("category_id"));
+                        category.setName(rs.getString("category_name"));
+
+                        brand.setCategory(category);
+                        material.setBrand(brand);
+
+                        supplier.getMaterials().add(material);
+                    }
+                }
+                suppliers.addAll(supplierMap.values());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return suppliers;
+    }
+
+    public List<Supplier> searchSuppliersByCategoryNameContains(String categoryName) {
+        List<Supplier> suppliers = new ArrayList<>();
+
+        String sql = "SELECT s.supplier_id, s.name AS supplier_name, s.phone AS supplier_phone, "
+                + "s.address AS supplier_address, s.email AS supplier_email, s.status AS supplier_status, "
+                + "m.material_id, m.code AS material_code, m.name AS material_name, m.description AS material_description, "
+                + "m.unit AS material_unit, m.image_url AS material_image_url, "
+                + "mb.brand_id, mb.name AS brand_name, mc.category_id, mc.name AS category_name "
+                + "FROM Suppliers s "
+                + "LEFT JOIN SupplierMaterials sm ON s.supplier_id = sm.supplier_id "
+                + "LEFT JOIN Materials m ON sm.material_id = m.material_id "
+                + "LEFT JOIN MaterialBrands mb ON m.brand_id = mb.brand_id "
+                + "LEFT JOIN MaterialCategories mc ON mb.category_id = mc.category_id "
+                + "WHERE LOWER(mc.name) LIKE ? "
+                + "ORDER BY s.supplier_id";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "%" + categoryName.toLowerCase() + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                Map<Integer, Supplier> supplierMap = new LinkedHashMap<>();
+
+                while (rs.next()) {
+                    int supplierId = rs.getInt("supplier_id");
+                    Supplier supplier = supplierMap.get(supplierId);
+
+                    if (supplier == null) {
+                        supplier = new Supplier();
+                        supplier.setSupplierId(supplierId);
+                        supplier.setSupplierName(rs.getString("supplier_name"));
+                        supplier.setSupplierPhone(rs.getString("supplier_phone"));
+                        supplier.setSupplierAddress(rs.getString("supplier_address"));
+                        supplier.setSupplierEmail(rs.getString("supplier_email"));
+                        supplier.setSupplierStatus(rs.getString("supplier_status"));
+                        supplier.setMaterials(new ArrayList<>());
+                        supplierMap.put(supplierId, supplier);
+                    }
+
+                    int materialId = rs.getInt("material_id");
+                    if (materialId > 0) {
+                        Material material = new Material();
+                        material.setMaterialId(materialId);
+                        material.setCode(rs.getString("material_code"));
+                        material.setName(rs.getString("material_name"));
+                        material.setDescription(rs.getString("material_description"));
+                        material.setUnit(rs.getString("material_unit"));
+                        material.setImageUrl(rs.getString("material_image_url"));
+
+                        MaterialBrand brand = new MaterialBrand();
+                        brand.setBrandId(rs.getInt("brand_id"));
+                        brand.setName(rs.getString("brand_name"));
+
+                        MaterialCategory category = new MaterialCategory();
+                        category.setCategoryId(rs.getInt("category_id"));
+                        category.setName(rs.getString("category_name"));
+
+                        brand.setCategory(category);
+                        material.setBrand(brand);
+
+                        supplier.getMaterials().add(material);
+                    }
+                }
+                suppliers.addAll(supplierMap.values());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return suppliers;
+    }
+    public Supplier getSupplierById(int supplierId) {
+    Supplier supplier = null;
+
+    String sql = "SELECT s.supplier_id, s.name AS supplier_name, s.phone AS supplier_phone, "
+            + "s.address AS supplier_address, s.email AS supplier_email, s.status AS supplier_status, "
+            + "m.material_id, m.code AS material_code, m.name AS material_name, m.description AS material_description, "
+            + "m.unit AS material_unit, m.image_url AS material_image_url, "
+            + "mb.brand_id, mb.name AS brand_name, mc.category_id, mc.name AS category_name "
+            + "FROM Suppliers s "
+            + "LEFT JOIN SupplierMaterials sm ON s.supplier_id = sm.supplier_id "
+            + "LEFT JOIN Materials m ON sm.material_id = m.material_id "
+            + "LEFT JOIN MaterialBrands mb ON m.brand_id = mb.brand_id "
+            + "LEFT JOIN MaterialCategories mc ON mb.category_id = mc.category_id "
+            + "WHERE s.supplier_id = ? "
+            + "ORDER BY m.material_id";
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, supplierId);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                if (supplier == null) {
+                    supplier = new Supplier();
+                    supplier.setSupplierId(rs.getInt("supplier_id"));
+                    supplier.setSupplierName(rs.getString("supplier_name"));
+                    supplier.setSupplierPhone(rs.getString("supplier_phone"));
+                    supplier.setSupplierAddress(rs.getString("supplier_address"));
+                    supplier.setSupplierEmail(rs.getString("supplier_email"));
+                    supplier.setSupplierStatus(rs.getString("supplier_status"));
+                    supplier.setMaterials(new ArrayList<>());
+                }
+
+                int materialId = rs.getInt("material_id");
+                if (materialId > 0) {
+                    Material material = new Material();
+                    material.setMaterialId(materialId);
+                    material.setCode(rs.getString("material_code"));
+                    material.setName(rs.getString("material_name"));
+                    material.setDescription(rs.getString("material_description"));
+                    material.setUnit(rs.getString("material_unit"));
+                    material.setImageUrl(rs.getString("material_image_url"));
+
+                    MaterialBrand brand = new MaterialBrand();
+                    brand.setBrandId(rs.getInt("brand_id"));
+                    brand.setName(rs.getString("brand_name"));
+
+                    MaterialCategory category = new MaterialCategory();
+                    category.setCategoryId(rs.getInt("category_id"));
+                    category.setName(rs.getString("category_name"));
+
+                    brand.setCategory(category);
+                    material.setBrand(brand);
+
+                    supplier.getMaterials().add(material);
+                }
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return supplier;
+}
     
+public boolean updateSupplier(Supplier supplier) {
+    String sql = "UPDATE Suppliers SET name = ?, phone = ?, address = ?, email = ?, status = ? WHERE supplier_id = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, supplier.getSupplierName());
+        stmt.setString(2, supplier.getSupplierPhone());
+        stmt.setString(3, supplier.getSupplierAddress());
+        stmt.setString(4, supplier.getSupplierEmail());
+        stmt.setString(5, supplier.getSupplierStatus());
+        stmt.setInt(6, supplier.getSupplierId());
+
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+public boolean addSupplier(Supplier supplier) {
+    String sql = "INSERT INTO Suppliers (name, phone, address, email, status) VALUES (?, ?, ?, ?, ?)";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, supplier.getSupplierName());
+        stmt.setString(2, supplier.getSupplierPhone());
+        stmt.setString(3, supplier.getSupplierAddress());
+        stmt.setString(4, supplier.getSupplierEmail());
+        stmt.setString(5, supplier.getSupplierStatus());
+
+        int rows = stmt.executeUpdate();
+        return rows > 0; 
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+
 }
