@@ -12,7 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 public class UserProfileController extends HttpServlet {
 
     @Override
@@ -29,6 +28,7 @@ public class UserProfileController extends HttpServlet {
         Connection conn = null;
         try {
             conn = new DBContext().getConnection();
+            System.out.println("doGet: Connection status: " + (conn != null ? "Connected" : "Null"));
             if (conn == null) {
                 System.out.println("doGet: Database connection is null!");
                 request.setAttribute("error", "Không thể kết nối cơ sở dữ liệu.");
@@ -36,25 +36,17 @@ public class UserProfileController extends HttpServlet {
                 return;
             }
 
-            String sql = "SELECT u.*, r.role_name FROM users u " +
-                         "LEFT JOIN roles r ON u.role_id = r.role_id " +
-                         "WHERE u.username = ?";
+            String sql = "SELECT u.*, r.role_name FROM users u "
+                    + "LEFT JOIN roles r ON u.role_id = r.role_id "
+                    + "WHERE u.username = ?";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, username);
+                System.out.println("doGet: Executing query for username: " + username);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
                     System.out.println("doGet: User found: " + rs.getString("username"));
                     request.setAttribute("userId", rs.getInt("user_id"));
-                    request.setAttribute("code", rs.getString("code"));
-                    request.setAttribute("username", rs.getString("username"));
-                    request.setAttribute("fullName", rs.getString("full_name"));
-                    request.setAttribute("address", rs.getString("address"));
-                    request.setAttribute("email", rs.getString("email"));
-                    request.setAttribute("phone", rs.getString("phone_number"));
-                    request.setAttribute("img", rs.getString("imageUrl")); // Ánh xạ imageUrl thành img
-                    request.setAttribute("dateOfBirth", rs.getString("date_of_birth"));
-                    request.setAttribute("status", rs.getString("status"));
-                    request.setAttribute("roleName", rs.getString("role_name"));
+                    // ... (các setAttribute khác)
                 } else {
                     System.out.println("doGet: No user found for username: " + username);
                     request.setAttribute("error", "Không tìm thấy người dùng.");
@@ -73,6 +65,7 @@ public class UserProfileController extends HttpServlet {
                 }
             }
         }
+        System.out.println("doGet: Forwarding to userProfile.jsp");
         request.getRequestDispatcher("userProfile.jsp").forward(request, response);
     }
 
@@ -126,9 +119,9 @@ public class UserProfileController extends HttpServlet {
                 }
             }
 
-            String fetchSql = "SELECT u.*, r.role_name FROM users u " +
-                             "LEFT JOIN roles r ON u.role_id = r.role_id " +
-                             "WHERE u.username = ?";
+            String fetchSql = "SELECT u.*, r.role_name FROM users u "
+                    + "LEFT JOIN roles r ON u.role_id = r.role_id "
+                    + "WHERE u.username = ?";
             try (PreparedStatement stmt = conn.prepareStatement(fetchSql)) {
                 stmt.setString(1, username);
                 ResultSet rs = stmt.executeQuery();
@@ -143,7 +136,10 @@ public class UserProfileController extends HttpServlet {
                     request.setAttribute("img", rs.getString("imageUrl"));
                     request.setAttribute("dateOfBirth", rs.getString("date_of_birth"));
                     request.setAttribute("status", rs.getString("status"));
-                    request.setAttribute("roleName", rs.getString("role_name"));
+                    String roleName = rs.getString("role_name");
+                    request.setAttribute("roleName", roleName);
+                    request.getSession().setAttribute("role", roleName); // Update role in session
+                    System.out.println("doPost: Role updated in session: " + roleName);
                 }
             }
         } catch (SQLException e) {
