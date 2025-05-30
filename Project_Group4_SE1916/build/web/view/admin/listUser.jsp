@@ -318,6 +318,7 @@
                             <tr class="bg-primary-600 text-white">
                                 <th class="p-4 text-left">Tên người dùng</th>
                                 <th class="p-4 text-left">Họ và tên</th>
+                                <th class="p-4 text-left">Mã người dùng</th>
                                 <th class="p-4 text-left">Địa chỉ</th>
                                 <th class="p-4 text-left">Email</th>
                                 <th class="p-4 text-left">Số điện thoại</th>
@@ -331,6 +332,7 @@
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="p-4 font-medium">${item.username}</td>
                                     <td class="p-4">${item.fullName}</td>
+                                    <td class="p-4">${item.code}</td>
                                     <td class="p-4">${item.address}</td>
                                     <td class="p-4">${item.email}</td>
                                     <td class="p-4">${item.phone}</td>
