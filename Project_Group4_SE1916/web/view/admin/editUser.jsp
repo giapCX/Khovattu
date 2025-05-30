@@ -85,6 +85,17 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans antialiased">
+    <%
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        if (request.getAttribute("data") == null && request.getParameter("fromServlet") == null) {
+            response.sendRedirect("listuser?fromServlet=true");
+            return;
+        }
+    %>
     <!-- Main Content -->
     <main class="flex-1 p-8">
         <div class="max-w-md mx-auto card bg-white dark:bg-gray-800 p-6">
