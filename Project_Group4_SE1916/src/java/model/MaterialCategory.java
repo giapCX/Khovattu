@@ -47,5 +47,9 @@ public class MaterialCategory {
     public void setBrands(List<MaterialBrand> brands) {
         this.brands = brands;
     }
+
+    public void setDescription(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     
 }

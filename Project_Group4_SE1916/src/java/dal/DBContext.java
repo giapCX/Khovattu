@@ -18,14 +18,9 @@ public class DBContext {
         }
     }
 
-   public static Connection getConnection() {
+    public static Connection getConnection() {
         Connection conn = null;
         try {
-            // Nạp driver (nếu dùng JDBC thuần)
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            // Mở kết nối
-
             conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
         } catch (Exception e) {
             e.printStackTrace();
@@ -33,7 +28,6 @@ public class DBContext {
         return conn;
     }
 
-    // Để kiểm tra
     public static void main(String[] args) {
         try (Connection conn = getConnection()) {
             System.out.println("Kết nối thành công tới MySQL!");

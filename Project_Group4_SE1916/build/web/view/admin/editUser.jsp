@@ -85,6 +85,17 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans antialiased">
+    <%
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        if (request.getAttribute("data") == null && request.getParameter("fromServlet") == null) {
+            response.sendRedirect("listuser?fromServlet=true");
+            return;
+        }
+    %>
     <!-- Main Content -->
     <main class="flex-1 p-8">
         <div class="max-w-md mx-auto card bg-white dark:bg-gray-800 p-6">
@@ -129,28 +140,5 @@
         </div>
     </main>
 
-    <!-- JavaScript for Dark Mode -->
-    <script>
-        // Dark Mode Toggle
-        const toggleDarkMode = document.createElement('button');
-        toggleDarkMode.id = 'toggleDarkMode';
-        toggleDarkMode.className = 'bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 fixed top-4 right-4 z-50';
-        toggleDarkMode.innerHTML = '<i class="fas fa-moon text-gray-700 dark:text-yellow-300 text-xl"></i>';
-        document.body.appendChild(toggleDarkMode);
-
-        toggleDarkMode.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const icon = toggleDarkMode.querySelector('i');
-            icon.classList.toggle('fa-moon');
-            icon.classList.toggle('fa-sun');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-        });
-
-        // Load Dark Mode Preference
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            toggleDarkMode.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-        }
-    </script>
 </body>
 </html>

@@ -318,6 +318,7 @@
                             <tr class="bg-primary-600 text-white">
                                 <th class="p-4 text-left">Tên người dùng</th>
                                 <th class="p-4 text-left">Họ và tên</th>
+                                <th class="p-4 text-left">Mã người dùng</th>
                                 <th class="p-4 text-left">Địa chỉ</th>
                                 <th class="p-4 text-left">Email</th>
                                 <th class="p-4 text-left">Số điện thoại</th>
@@ -331,6 +332,7 @@
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="p-4 font-medium">${item.username}</td>
                                     <td class="p-4">${item.fullName}</td>
+                                    <td class="p-4">${item.code}</td>
                                     <td class="p-4">${item.address}</td>
                                     <td class="p-4">${item.email}</td>
                                     <td class="p-4">${item.phone}</td>
@@ -369,73 +371,5 @@
         </div>
     </main>
 
-    <!-- JavaScript -->
-    <script>
-        // Toggle Sidebar
-        const sidebar = document.getElementById('sidebar');
-        const toggleSidebar = document.getElementById('toggleSidebar');
-        const toggleSidebarMobile = document.getElementById('toggleSidebarMobile');
-
-        function toggleSidebarVisibility() {
-            sidebar.classList.toggle('active');
-            sidebar.classList.toggle('hidden');
-        }
-
-        toggleSidebar.addEventListener('click', toggleSidebarVisibility);
-        toggleSidebarMobile.addEventListener('click', toggleSidebarVisibility);
-
-        // Initialize sidebar as hidden
-        sidebar.classList.add('hidden');
-
-        // Dark Mode Toggle
-        const toggleDarkMode = document.createElement('button');
-        toggleDarkMode.id = 'toggleDarkMode';
-        toggleDarkMode.className = 'bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 fixed top-4 right-4 z-50';
-        toggleDarkMode.innerHTML = '<i class="fas fa-moon text-gray-700 dark:text-yellow-300 text-xl"></i>';
-        document.body.appendChild(toggleDarkMode);
-
-        toggleDarkMode.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const icon = toggleDarkMode.querySelector('i');
-            icon.classList.toggle('fa-moon');
-            icon.classList.toggle('fa-sun');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-        });
-
-        // Load Dark Mode Preference
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            toggleDarkMode.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-        }
-
-        // Table Sorting
-        document.querySelectorAll('th').forEach(th => {
-            th.addEventListener('click', () => {
-                const table = th.closest('table');
-                const tbody = table.querySelector('tbody');
-                const rows = Array.from(tbody.querySelectorAll('tr'));
-                const columnIndex = th.cellIndex;
-                const isNumeric = columnIndex === 4; // Phone number might be numeric
-                const isAsc = th.classList.toggle('asc');
-                th.classList.toggle('desc', !isAsc);
-                table.querySelectorAll('th').forEach(header => {
-                    if (header !== th)
-                        header.classList.remove('asc', 'desc');
-                });
-                rows.sort((a, b) => {
-                    let aValue = a.cells[columnIndex].textContent;
-                    let bValue = b.cells[columnIndex].textContent;
-                    if (isNumeric) {
-                        aValue = parseFloat(aValue) || 0;
-                        bValue = parseFloat(bValue) || 0;
-                        return isAsc ? aValue - bValue : bValue - aValue;
-                    }
-                    return isAsc ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-                });
-                tbody.innerHTML = '';
-                rows.forEach(row => tbody.appendChild(row));
-            });
-        });
-    </script>
 </body>
 </html>

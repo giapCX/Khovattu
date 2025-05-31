@@ -137,7 +137,7 @@
 
 
                 <div class="mt-4 flex justify-center">
-                    <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay lại Danh sách</a>
+                    <a href="${pageContext.request.contextPath}/FilterSupplierServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay lại Danh sách</a>
                 </div>
             </div>
         </main>

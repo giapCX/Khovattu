@@ -60,6 +60,11 @@ public class EditUserServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+        String username = (String) request.getSession().getAttribute("username");
+        if (username == null) {
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+            return;
+        }
         int userId = Integer.parseInt(request.getParameter("userId"));
 
         try (Connection conn = DBContext.getConnection()) {

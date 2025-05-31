@@ -234,7 +234,7 @@
             </div>
         </div>
         <nav class="space-y-2">
-            <a href="${pageContext.request.contextPath}/userProfile.jsp" class="nav-item flex items-center p-3 justify-between">
+            <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-3 justify-between">
                 <div class="flex items-center">
                     <i class="fas fa-user mr-3 w-6 text-center"></i>
                     <span class="text-lg">Thông tin cá nhân</span>

@@ -1,13 +1,6 @@
-<%-- 
-    Document   : user_profile
-    Created on : 26 May 2025, 02:00 PM
-    Author     : YourName
---%>
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.sql.*" %>
-<%@ page import="Dal.DBContext" %>
-<%@ page import="java.text.SimpleDateFormat" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -110,132 +103,137 @@
 </head>
 <body class="bg-gray-50 min-h-screen font-sans antialiased">
     <!-- Session Check -->
-    <%
-        String username = (String) session.getAttribute("username");
-        if (username == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-    %>
+    <c:if test="${empty sessionScope.username}">
+        <c:redirect url="login.jsp"/>
+    </c:if>
 
     <!-- Main Content -->
     <main class="flex-1 p-6 md:p-8">
         <div class="max-w-3xl mx-auto card bg-white dark:bg-gray-800 p-6 md:p-8">
+            <c:set var="isEditMode" value="${param.edit == 'true'}"/>
+            <c:set var="profilePicUrl" value="${empty user.img ? 'https://via.placeholder.com/120' : user.img}"/>
+
             <div class="flex flex-col items-center mb-6">
-                <img src="https://via.placeholder.com/120" alt="Ảnh đại diện" class="profile-pic rounded-full mb-4">
+                <img id="profilePicPreview" src="${profilePicUrl}" alt="Ảnh đại diện" class="profile-pic rounded-full mb-4">
+                <div id="profilePicInput" class="space-y-2 ${isEditMode ? '' : 'hidden'}">
+                    <label for="profilePic" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ảnh đại diện</label>
+                    <input type="file" id="profilePic" name="profilePic" accept="image/*" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                </div>
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white text-center">Hồ sơ Người dùng</h2>
             </div>
 
-            <%
-                String fullName = "", email = "", phone = "", address = "", status = "", roleName = "";
-                java.sql.Date dob = null;
+            <!-- Determine the homepage based on the user's role -->
+            <c:set var="homePage" value="${pageContext.request.contextPath}/home.jsp"/>
+            <c:choose>
+                <c:when test="${user.role.roleName == 'direction'}">
+                    <c:set var="homePage" value="${pageContext.request.contextPath}/view/direction/directionDashboard.jsp"/>
+                </c:when>
+                <c:when test="${user.role.roleName == 'admin'}">
+                    <c:set var="homePage" value="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp"/>
+                </c:when>
+                <c:when test="${user.role.roleName == 'employee'}">
+                    <c:set var="homePage" value="${pageContext.request.contextPath}/view/employee/employeeDashboard.jsp"/>
+                </c:when>
+                <c:when test="${user.role.roleName == 'warehouse'}">
+                    <c:set var="homePage" value="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp"/>
+                </c:when>
+                <c:otherwise>
+                    <c:set var="error" value="Không thể xác định vai trò cho người dùng: ${sessionScope.username}"/>
+                </c:otherwise>
+            </c:choose>
 
-                Connection conn = null;
-                try {
-                    conn = new DBContext().getConnection();
-                    if (conn == null) {
-                        throw new SQLException("Kết nối cơ sở dữ liệu thất bại.");
-                    }
-
-                    String sql = "SELECT u.full_name, u.email, u.phone_number, u.address, u.date_of_birth, u.status, r.role_name " +
-                                 "FROM Users u " +
-                                 "JOIN UserRoles ur ON u.user_id = ur.user_id " +
-                                 "JOIN Roles r ON ur.role_id = r.role_id " +
-                                 "WHERE u.username = ?";
-                    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                        stmt.setString(1, username);
-                        ResultSet rs = stmt.executeQuery();
-                        if (rs.next()) {
-                            fullName = rs.getString("full_name");
-                            email = rs.getString("email");
-                            phone = rs.getString("phone_number");
-                            address = rs.getString("address");
-                            dob = rs.getDate("date_of_birth");
-                            status = rs.getString("status");
-                            roleName = rs.getString("role_name");
-                        } else {
-                            throw new SQLException("Không tìm thấy người dùng.");
-                        }
-                    }
-                } catch (SQLException e) {
-                    request.setAttribute("error", "Lỗi khi lấy thông tin hồ sơ: " + e.getMessage());
-                } finally {
-                    if (conn != null) {
-                        try {
-                            conn.close();
-                        } catch (SQLException e) {
-                            System.err.println("Lỗi khi đóng kết nối: " + e.getMessage());
-                        }
-                    }
-                }
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-                // Determine the homepage based on role
-                String homePage = "${pageContext.request.contextPath}/home.jsp"; // Default fallback
-                if ("Direction".equalsIgnoreCase(roleName)) {
-                    homePage = "${pageContext.request.contextPath}/view/direction/directionDashboard.jsp";
-                } else if ("Employee".equalsIgnoreCase(roleName)) {
-                    homePage = "${pageContext.request.contextPath}/view/employee/employeeDashboard.jsp";
-                } else if ("Warehouse".equalsIgnoreCase(roleName)) {
-                    homePage = "${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp";
-                }
-            %>
-
-            <form action="userprofile" method="post" class="space-y-6">
+            <form id="profileForm" action="${pageContext.request.contextPath}/userprofile" method="post" enctype="multipart/form-data" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tên người dùng</label>
-                        <input type="text" id="username" name="username" value="<%= username %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" readonly>
+                        <input type="text" id="username" name="username" value="${user.username}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" readonly>
                     </div>
 
                     <div class="space-y-2">
-                        <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Họ và tên</label>
-                        <input type="text" id="fullName" name="fullName" value="<%= fullName != null ? fullName : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
+                        <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Họ và tên *</label>
+                        <input type="text" id="fullName" name="fullName" value="${user.fullName != null ? user.fullName : 'Chưa cập nhật'}" 
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
+                               ${isEditMode ? 'required' : 'readonly'}>
                     </div>
 
                     <div class="space-y-2">
-                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                        <input type="email" id="email" name="email" value="<%= email != null ? email : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email *</label>
+                        <input type="email" id="email" name="email" value="${user.email}" 
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
+                               ${isEditMode ? 'required' : 'readonly'}>
                     </div>
 
                     <div class="space-y-2">
                         <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Số điện thoại</label>
-                        <input type="text" id="phone" name="phone" value="<%= phone != null ? phone : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" id="phone" name="phone" value="${user.phone}" 
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
+                               ${isEditMode ? '' : 'readonly'}>
                     </div>
 
                     <div class="space-y-2 md:col-span-2">
-                        <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Địa chỉ</label>
-                        <input type="text" id="address" name="address" value="<%= address != null ? address : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
+                        <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Địa chỉ *</label>
+                        <input type="text" id="address" name="address" value="${user.address}" 
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
+                               ${isEditMode ? 'required' : 'readonly'}>
                     </div>
 
                     <div class="space-y-2">
-                        <label for="dob" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ngày sinh</label>
-                        <input type="date" id="dob" name="dob" value="<%= dob != null ? sdf.format(dob) : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ngày sinh</label>
+                        <input type="date" id="dateOfBirth" name="dateOfBirth" value="${user.dateOfBirth}" 
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
+                               ${isEditMode ? '' : 'readonly'}>
                     </div>
 
                     <div class="space-y-2">
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Trạng thái</label>
-                        <select id="status" name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                            <option value="active" <%= "active".equals(status) ? "selected" : "" %>>Active</option>
-                            <option value="inactive" <%= "inactive".equals(status) ? "selected" : "" %>>Inactive</option>
+                        <select id="status" name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" ${isEditMode ? '' : 'disabled'}>
+                            <option value="active" ${user.status == 'active' ? 'selected' : ''}>Active</option>
+                            <option value="inactive" ${user.status == 'inactive' ? 'selected' : ''}>Inactive</option>
                         </select>
                     </div>
 
                     <div class="space-y-2">
                         <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vai trò</label>
-                        <input type="text" id="role" name="role" value="<%= roleName != null ? roleName : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" readonly>
+                        <input type="text" id="role" name="role" value="${user.role.roleName}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" readonly>
                     </div>
                 </div>
 
                 <div class="flex space-x-4">
-                    <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg flex-1">Lưu thay đổi</button>
-                    <a href="<%= homePage %>" class="btn-secondary text-white px-6 py-3 rounded-lg flex-1 text-center">Hủy</a>
+                    <c:choose>
+                        <c:when test="${isEditMode}">
+                            <button type="submit" id="saveButton" class="btn-primary text-white px-6 py-3 rounded-lg flex-1">Lưu</button>
+                            <button type="button" id="cancelButton" class="btn-secondary text-white px-6 py-3 rounded-lg flex-1 text-center" onclick="window.location.href='${pageContext.request.contextPath}/userprofile'">Hủy</button>
+                        </c:when>
+                        <c:otherwise>
+                            <button type="button" id="editButton" class="btn-primary text-white px-6 py-3 rounded-lg flex-1" onclick="window.location.href='${pageContext.request.contextPath}/userprofile?edit=true'">Sửa</button>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </form>
 
             <div class="mt-6 flex justify-center space-x-4">
-                <a href="<%= homePage %>" class="text-primary-600 dark:text-primary-400 hover:underline">Quay lại Trang chủ</a>
-                <a href="logout" class="text-red-500 hover:underline">Đăng xuất</a>
+                <%
+                String role = (String) session.getAttribute("role");
+                String redirectUrl = "../login.jsp"; // Default fallback
+                if (role != null) {
+                    switch (role.toLowerCase()) {
+                        case "director":
+                            redirectUrl = request.getContextPath() + "/view/direction/directionDashboard.jsp";
+                            break;
+                        case "admin":
+                            redirectUrl = request.getContextPath() + "/view/admin/adminDashboard.jsp";
+                            break;
+                        case "employee":
+                            redirectUrl = request.getContextPath() + "/view/employee/employeeDashboard.jsp";
+                            break;
+                        case "warehouse":
+                            redirectUrl = request.getContextPath() + "/view/warehouse/warehouseDashboard.jsp";
+                            break;
+                    }
+                }
+                %>
+                <a href="<%= redirectUrl%>" class="text-primary-600 dark:text-primary-400 hover:underline">Quay lại Trang chủ</a>
+                <a href="${pageContext.request.contextPath}/logout" class="text-red-500 hover:underline">Đăng xuất</a>
             </div>
         </div>
     </main>
@@ -244,25 +242,115 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
         // Show toast notifications for errors or messages
-        <% if (request.getAttribute("error") != null) { %>
+        <c:if test="${not empty error}">
             Toastify({
-                text: "<%= request.getAttribute("error").toString().replaceAll("\"", "'") %>",
+                text: "${error.replaceAll("\"", "'")}",
                 duration: 3000,
                 gravity: "top",
                 position: "center",
                 backgroundColor: "#ef4444",
                 stopOnFocus: true
             }).showToast();
-        <% } else if (request.getAttribute("message") != null) { %>
+        </c:if>
+        <c:if test="${not empty message}">
             Toastify({
-                text: "<%= request.getAttribute("message").toString().replaceAll("\"", "'") %>",
+                text: "${message.replaceAll("\"", "'")}",
                 duration: 3000,
                 gravity: "top",
                 position: "center",
                 backgroundColor: "#22c55e",
                 stopOnFocus: true
             }).showToast();
-        <% } %>
+        </c:if>
+
+        // Image Preview on File Selection
+        const profilePic = document.getElementById('profilePic');
+        const profilePicPreview = document.getElementById('profilePicPreview');
+        profilePic.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    Toastify({
+                        text: "Vui lòng chọn file ảnh (JPEG, PNG, GIF)!",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "center",
+                        backgroundColor: "#ef4444",
+                        stopOnFocus: true
+                    }).showToast();
+                    profilePic.value = '';
+                    return;
+                }
+
+                // Validate file size (e.g., max 5MB)
+                const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                if (file.size > maxSize) {
+                    Toastify({
+                        text: "Kích thước ảnh tối đa là 5MB!",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "center",
+                        backgroundColor: "#ef4444",
+                        stopOnFocus: true
+                    }).showToast();
+                    profilePic.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    profilePicPreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Form Validation on Submit
+        const profileForm = document.getElementById('profileForm');
+        profileForm.addEventListener('submit', (event) => {
+            const requiredFields = [
+                { id: 'fullName', label: 'Họ và tên' },
+                { id: 'email', label: 'Email' },
+                { id: 'address', label: 'Địa chỉ' }
+            ];
+
+            for (const field of requiredFields) {
+                const input = document.getElementById(field.id);
+                const value = input.value;
+                if (!value || value.trim() === '') {
+                    event.preventDefault();
+                    Toastify({
+                        text: `Vui lòng nhập ${field.label}!`,
+                        duration: 3000,
+                        gravity: "top",
+                        position: "center",
+                        backgroundColor: "#ef4444",
+                        stopOnFocus: true
+                    }).showToast();
+                    input.focus();
+                    return;
+                }
+            }
+
+            // Additional email format validation
+            const emailInput = document.getElementById('email');
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(emailInput.value)) {
+                event.preventDefault();
+                Toastify({
+                    text: "Vui lòng nhập email hợp lệ!",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "center",
+                    backgroundColor: "#ef4444",
+                    stopOnFocus: true
+                }).showToast();
+                emailInput.focus();
+                return;
+            }
+        });
 
         // Dark Mode Toggle
         const toggleDarkMode = document.createElement('button');
