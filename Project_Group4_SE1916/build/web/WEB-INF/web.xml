@@ -41,16 +41,16 @@
         <servlet-class>controller.AddUserServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ListSupplierServlet</servlet-name>
-        <servlet-class>controller.supplier.ListSupplierServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>EditSupplierServlet</servlet-name>
         <servlet-class>controller.supplier.EditSupplierServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AddSupplierServlet</servlet-name>
         <servlet-class>controller.supplier.AddSupplierServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FilterSupplierServlet</servlet-name>
+        <servlet-class>controller.supplier.FilterSupplierServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
@@ -93,16 +93,16 @@
         <url-pattern>/userprofile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListSupplierServlet</servlet-name>
-        <url-pattern>/ListSupplierServlet</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>EditSupplierServlet</servlet-name>
         <url-pattern>/EditSupplierServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AddSupplierServlet</servlet-name>
         <url-pattern>/AddSupplierServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FilterSupplierServlet</servlet-name>
+        <url-pattern>/FilterSupplierServlet</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>
