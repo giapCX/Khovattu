@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserDAO {
 
@@ -23,9 +24,9 @@ public class UserDAO {
 
     public List<User> getAllUsersWithRoles() throws SQLException {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT u.*, r.role_id, r.role_name " +
-                     "FROM Users u " +
-                     "LEFT JOIN Roles r ON u.role_id = r.role_id";
+        String sql = "SELECT u.*, r.role_id, r.role_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
@@ -51,12 +52,28 @@ public class UserDAO {
         return users;
     }
 
+    public void updateUser(User user) throws SQLException {
+        String sql = "UPDATE Users SET full_name = ?, address = ?, email = ?, phone_number = ?, date_of_birth = ?, imageUrl = ?, status = ? WHERE username = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, user.getFullName());
+            stmt.setString(2, user.getAddress());
+            stmt.setString(3, user.getEmail());
+            stmt.setString(4, user.getPhone() != null && !user.getPhone().isEmpty() ? user.getPhone() : null);
+            stmt.setString(5, user.getDateOfBirth() != null && !user.getDateOfBirth().isEmpty() ? user.getDateOfBirth() : null);
+            stmt.setString(6, user.getImg() != null && !user.getImg().isEmpty() ? user.getImg() : null);
+            stmt.setString(7, user.getStatus()); // Thêm status
+            stmt.setString(8, user.getUsername());
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("updateUser: Rows affected: " + rowsAffected);
+        }
+    }
+
     public User getUserByUsername(String username) {
         User user = null;
-        String sql = "SELECT u.*, r.role_id, r.role_name " +
-                     "FROM Users u " +
-                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-                     "WHERE u.username = ?";
+        String sql = "SELECT u.*, r.role_id, r.role_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE u.username = ?";
         try (PreparedStatement stm = conn.prepareStatement(sql)) {
             stm.setString(1, username);
             ResultSet rs = stm.executeQuery();
@@ -84,27 +101,26 @@ public class UserDAO {
         }
         return user;
     }
-    
+
     public String getUserRoleName(String username) {
-    String sql = "SELECT r.role_name " +
-                 "FROM users u " +
-                 "JOIN roles r ON u.role_id = r.role_id " +
-                 "WHERE u.username = ?";
+        String sql = "SELECT r.role_name "
+                + "FROM users u "
+                + "JOIN roles r ON u.role_id = r.role_id "
+                + "WHERE u.username = ?";
 
-    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, username);
-        ResultSet rs = stmt.executeQuery();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
 
-        if (rs.next()) {
-            return rs.getString("role_name");
+            if (rs.next()) {
+                return rs.getString("role_name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace(); // Có thể thay bằng ghi log
+
+        return null;
     }
-
-    return null;
-}
-
 
     public void updateUserRoleAndStatus(int userId, int roleId, String status) throws SQLException {
         String sql = "UPDATE Users SET status = ?, role_id = ? WHERE user_id = ?";
@@ -117,10 +133,10 @@ public class UserDAO {
     }
 
     public User getUserById(int userId) throws SQLException {
-        String sql = "SELECT u.*, r.role_id, r.role_name " +
-                     "FROM Users u " +
-                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-                     "WHERE u.user_id = ?";
+        String sql = "SELECT u.*, r.role_id, r.role_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE u.user_id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
@@ -151,13 +167,14 @@ public class UserDAO {
     }
 
     public void insertUserWithRole(User user, int roleId) throws SQLException {
-        String insertUserSql = "INSERT INTO Users (code, username, password_hash, full_name, address, email, phone_number, imageUrl, date_of_birth, status, role_id) " +
-                              "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        String insertUserSql = "INSERT INTO Users (code, username, password_hash, full_name, address, email, phone_number, imageUrl, date_of_birth, status, role_id) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(insertUserSql)) {
             stmt.setString(1, user.getCode());
             stmt.setString(2, user.getUsername());
-            stmt.setString(3, user.getPassword());
+            stmt.setString(3, hashedPassword); // Mật khẩu đã mã hóa
             stmt.setString(4, user.getFullName());
             stmt.setString(5, user.getAddress());
             stmt.setString(6, user.getEmail());
@@ -177,10 +194,10 @@ public class UserDAO {
 
     public List<User> searchUsersByName(String keyword) throws SQLException {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT u.*, r.role_id, r.role_name " +
-                     "FROM Users u " +
-                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-                     "WHERE u.username LIKE ? OR u.full_name LIKE ?";
+        String sql = "SELECT u.*, r.role_id, r.role_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE u.username LIKE ? OR u.full_name LIKE ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             String likeKeyword = "%" + keyword + "%";
@@ -215,11 +232,11 @@ public class UserDAO {
 
     public List<User> searchUsersByNameAndRole(String name, Integer roleId) throws SQLException {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT u.*, r.role_id, r.role_name " +
-                     "FROM Users u " +
-                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-                     "WHERE (? IS NULL OR u.full_name LIKE ?) " +
-                     "AND (? IS NULL OR r.role_id = ?)";
+        String sql = "SELECT u.*, r.role_id, r.role_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE (? IS NULL OR u.full_name LIKE ?) "
+                + "AND (? IS NULL OR r.role_id = ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, name == null || name.isEmpty() ? null : name);
@@ -259,10 +276,10 @@ public class UserDAO {
     }
 
     public List<User> getUsersByPage(int offset, int limit) throws SQLException {
-        String sql = "SELECT u.*, r.role_id, r.role_name " +
-                     "FROM Users u " +
-                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-                     "LIMIT ? OFFSET ?";
+        String sql = "SELECT u.*, r.role_id, r.role_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "LIMIT ? OFFSET ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, limit);
             stmt.setInt(2, offset);
@@ -272,18 +289,17 @@ public class UserDAO {
 
     public int countAllUsers() throws SQLException {
         String sql = "SELECT COUNT(*) FROM Users";
-        try (PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             return rs.next() ? rs.getInt(1) : 0;
         }
     }
 
     public List<User> searchUsersByName(String keyword, int offset, int limit) throws SQLException {
-        String sql = "SELECT u.*, r.role_id, r.role_name " +
-                     "FROM Users u " +
-                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-                     "WHERE u.username LIKE ? OR u.full_name LIKE ? " +
-                     "LIMIT ? OFFSET ?";
+        String sql = "SELECT u.*, r.role_id, r.role_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE u.username LIKE ? OR u.full_name LIKE ? "
+                + "LIMIT ? OFFSET ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             String like = "%" + keyword + "%";
             stmt.setString(1, like);
@@ -331,16 +347,11 @@ public class UserDAO {
         return list;
     }
 
-
-    
-
-    
-
     public int countUsersByNameRoleStatus(String search, Integer roleId, String status) throws SQLException {
         StringBuilder sql = new StringBuilder(
-            "SELECT COUNT(*) FROM Users u " +
-            "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-            "WHERE 1=1 "
+                "SELECT COUNT(*) FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE 1=1 "
         );
 
         List<Object> params = new ArrayList<>();
@@ -373,9 +384,9 @@ public class UserDAO {
 
     public List<User> searchUsersByNameRoleStatusWithPaging(String search, Integer roleId, String status, int offset, int limit) throws SQLException {
         StringBuilder sql = new StringBuilder(
-            "SELECT u.*, r.role_id, r.role_name FROM Users u " +
-            "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-            "WHERE 1=1 "
+                "SELECT u.*, r.role_id, r.role_name FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE 1=1 "
         );
 
         List<Object> params = new ArrayList<>();
@@ -431,12 +442,11 @@ public class UserDAO {
 
     public List<User> getUsersWithLoginInfo() throws SQLException {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT u.username, u.password_hash, r.role_id, r.role_name " +
-                     "FROM Users u JOIN Roles r ON u.role_id = r.role_id " +
-                     "WHERE u.status = 'active'";
+        String sql = "SELECT u.username, u.password_hash, r.role_id, r.role_name "
+                + "FROM Users u JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE u.status = 'active'";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 User user = new User();
                 user.setUsername(rs.getString("username"));
@@ -454,9 +464,9 @@ public class UserDAO {
     }
 
     public String getRoleNameByUsername(String username) throws SQLException {
-        String sql = "SELECT r.role_name " +
-                     "FROM Users u JOIN Roles r ON u.role_id = r.role_id " +
-                     "WHERE u.username = ? AND u.status = 'active'";
+        String sql = "SELECT r.role_name "
+                + "FROM Users u JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE u.username = ? AND u.status = 'active'";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);

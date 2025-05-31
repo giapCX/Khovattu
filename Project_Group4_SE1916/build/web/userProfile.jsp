@@ -126,10 +126,11 @@
                 if (profilePicUrl == null || profilePicUrl.trim().isEmpty()) {
                     profilePicUrl = "https://via.placeholder.com/120"; // Fallback image
                 }
+                boolean isEditMode = "true".equals(request.getParameter("edit"));
             %>
             <div class="flex flex-col items-center mb-6">
                 <img id="profilePicPreview" src="<%= profilePicUrl %>" alt="Ảnh đại diện" class="profile-pic rounded-full mb-4">
-                <div id="profilePicInput" class="space-y-2 hidden">
+                <div id="profilePicInput" class="space-y-2 <%= isEditMode ? "" : "hidden" %>">
                     <label for="profilePic" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ảnh đại diện</label>
                     <input type="file" id="profilePic" name="profilePic" accept="image/*" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                 </div>
@@ -157,9 +158,9 @@
                         case "direction":
                             homePage = request.getContextPath() + "/view/direction/directionDashboard.jsp";
                             break;
-                            case "admin":
+                        case "admin":
                             homePage = request.getContextPath() + "/view/admin/adminDashboard.jsp";
-                            break; 
+                            break;
                         case "employee":
                             homePage = request.getContextPath() + "/view/employee/employeeDashboard.jsp";
                             break;
@@ -193,32 +194,32 @@
 
                     <div class="space-y-2">
                         <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Họ và tên</label>
-                        <input type="text" id="fullName" name="fullName" value="<%= fullName != null ? fullName : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" readonly required>
+                        <input type="text" id="fullName" name="fullName" value="<%= fullName != null ? fullName.trim() : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" <%= isEditMode ? "required oninput=\"this.value = this.value.trimStart()\"" : "readonly" %>>
                     </div>
 
                     <div class="space-y-2">
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                        <input type="email" id="email" name="email" value="<%= email != null ? email : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" readonly required>
+                        <input type="email" id="email" name="email" value="<%= email != null ? email.trim() : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" <%= isEditMode ? "required" : "readonly" %>>
                     </div>
 
                     <div class="space-y-2">
                         <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Số điện thoại</label>
-                        <input type="text" id="phone" name="phone" value="<%= phone != null ? phone : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" readonly>
+                        <input type="text" id="phone" name="phone" value="<%= phone != null ? phone.trim() : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" <%= isEditMode ? "" : "readonly" %>>
                     </div>
 
                     <div class="space-y-2 md:col-span-2">
                         <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Địa chỉ</label>
-                        <input type="text" id="address" name="address" value="<%= address != null ? address : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" readonly required>
+                        <input type="text" id="address" name="address" value="<%= address != null ? address.trim() : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" <%= isEditMode ? "required oninput=\"this.value = this.value.trimStart()\"" : "readonly" %>>
                     </div>
 
                     <div class="space-y-2">
                         <label for="dob" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ngày sinh</label>
-                        <input type="date" id="dob" name="dob" value="<%= dob != null ? sdf.format(dob) : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" readonly>
+                        <input type="date" id="dob" name="dob" value="<%= dob != null ? sdf.format(dob) : "" %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" <%= isEditMode ? "" : "readonly" %>>
                     </div>
 
                     <div class="space-y-2">
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Trạng thái</label>
-                        <select id="status" name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" disabled>
+                        <select id="status" name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" <%= isEditMode ? "" : "disabled" %>>
                             <option value="active" <%= "active".equals(status) ? "selected" : "" %>>Active</option>
                             <option value="inactive" <%= "inactive".equals(status) ? "selected" : "" %>>Inactive</option>
                         </select>
@@ -231,9 +232,12 @@
                 </div>
 
                 <div class="flex space-x-4">
-                    <button type="button" id="editButton" class="btn-primary text-white px-6 py-3 rounded-lg flex-1">Sửa</button>
-                    <button type="submit" id="saveButton" class="btn-primary text-white px-6 py-3 rounded-lg flex-1 hidden">Lưu</button>
-                    <button type="button" id="cancelButton" class="btn-secondary text-white px-6 py-3 rounded-lg flex-1 text-center hidden">Hủy</button>
+                    <% if (isEditMode) { %>
+                        <button type="submit" id="saveButton" class="btn-primary text-white px-6 py-3 rounded-lg flex-1">Lưu</button>
+                        <button type="button" id="cancelButton" class="btn-secondary text-white px-6 py-3 rounded-lg flex-1 text-center" onclick="window.location.href='userprofile'">Hủy</button>
+                    <% } else { %>
+                        <button type="button" id="editButton" class="btn-primary text-white px-6 py-3 rounded-lg flex-1" onclick="window.location.href='userprofile?edit=true'">Sửa</button>
+                    <% } %>
                 </div>
             </form>
 
@@ -268,47 +272,9 @@
             }).showToast();
         <% } %>
 
-        // Edit Mode Toggle
-        const editButton = document.getElementById('editButton');
-        const saveButton = document.getElementById('saveButton');
-        const cancelButton = document.getElementById('cancelButton');
-        const profileForm = document.getElementById('profileForm');
-        const profilePicInput = document.getElementById('profilePicInput');
+        // Image Preview on File Selection
         const profilePic = document.getElementById('profilePic');
         const profilePicPreview = document.getElementById('profilePicPreview');
-        const inputs = profileForm.querySelectorAll('input:not([id="username"]):not([id="role"]):not([id="status"]):not([type="file"])');
-
-        // Store initial form values
-        const initialValues = {};
-        inputs.forEach(input => {
-            initialValues[input.id] = input.value;
-        });
-        const initialProfilePic = profilePicPreview.src;
-
-        editButton.addEventListener('click', () => {
-            editButton.classList.add('hidden');
-            saveButton.classList.remove('hidden');
-            cancelButton.classList.remove('hidden');
-            profilePicInput.classList.remove('hidden');
-            inputs.forEach(input => {
-                input.removeAttribute('readonly');
-            });
-        });
-
-        cancelButton.addEventListener('click', () => {
-            editButton.classList.remove('hidden');
-            saveButton.classList.add('hidden');
-            cancelButton.classList.add('hidden');
-            profilePicInput.classList.add('hidden');
-            inputs.forEach(input => {
-                input.setAttribute('readonly', 'readonly');
-                input.value = initialValues[input.id];
-            });
-            profilePic.value = ''; // Reset file input
-            profilePicPreview.src = initialProfilePic; // Reset preview
-        });
-
-        // Image Preview on File Selection
         profilePic.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -351,6 +317,7 @@
         });
 
         // Form Validation on Submit
+        const profileForm = document.getElementById('profileForm');
         profileForm.addEventListener('submit', (event) => {
             const requiredFields = [
                 { id: 'fullName', label: 'Họ và tên' },
@@ -360,7 +327,8 @@
 
             for (const field of requiredFields) {
                 const input = document.getElementById(field.id);
-                if (!input.value.trim()) {
+                const trimmedValue = input.value.trim();
+                if (!trimmedValue) {
                     event.preventDefault();
                     Toastify({
                         text: `Vui lòng nhập ${field.label}!`,

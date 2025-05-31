@@ -309,7 +309,7 @@
                 </div>
             </div>
             <nav class="space-y-3">
-                <a href="${pageContext.request.contextPath}/userProfile.jsp" class="nav-item flex items-center p-4 rounded-lg hover:bg-white hover:bg-opacity-10 hover:text-white transition-all duration-200">
+                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-4 rounded-lg hover:bg-white hover:bg-opacity-10 hover:text-white transition-all duration-200">
                     <i class="fas fa-user mr-4 text-xl"></i>
                     <span class="text-lg font-medium">Thông tin cá nhân</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50 transition-transform duration-200 group-hover:translate-x-1"></i>
