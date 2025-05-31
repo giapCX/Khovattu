@@ -232,7 +232,7 @@
                     }
                 }
             %>
-                <a href="${redirectUrl}" class="text-primary-600 dark:text-primary-400 hover:underline">Quay lại Trang chủ</a>
+                <a href="<%= redirectUrl%>" class="text-primary-600 dark:text-primary-400 hover:underline">Quay lại Trang chủ</a>
                 <a href="${pageContext.request.contextPath}/logout" class="text-red-500 hover:underline">Đăng xuất</a>
             </div>
         </div>
