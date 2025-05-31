@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-
+@MultipartConfig(maxFileSize = 5242880) 
 public class UserProfileController extends HttpServlet {
 
     @Override

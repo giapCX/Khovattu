@@ -153,7 +153,7 @@
                         <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Họ và tên *</label>
                         <input type="text" id="fullName" name="fullName" value="${user.fullName != null ? user.fullName : 'Chưa cập nhật'}" 
                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
-                               ${isEditMode ? 'required oninput="this.value = this.value.trim()"' : 'readonly'}>
+                               ${isEditMode ? 'required' : 'readonly'}>
                     </div>
 
                     <div class="space-y-2">
@@ -174,7 +174,7 @@
                         <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Địa chỉ *</label>
                         <input type="text" id="address" name="address" value="${user.address}" 
                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
-                               ${isEditMode ? 'required oninput="this.value = this.value.trim()"' : 'readonly'}>
+                               ${isEditMode ? 'required' : 'readonly'}>
                     </div>
 
                     <div class="space-y-2">
@@ -220,7 +220,7 @@
                         case "director":
                             redirectUrl = request.getContextPath() + "/view/direction/directionDashboard.jsp";
                             break;
-                            case "admin":
+                        case "admin":
                             redirectUrl = request.getContextPath() + "/view/admin/adminDashboard.jsp";
                             break;
                         case "employee":
@@ -231,7 +231,7 @@
                             break;
                     }
                 }
-            %>
+                %>
                 <a href="<%= redirectUrl%>" class="text-primary-600 dark:text-primary-400 hover:underline">Quay lại Trang chủ</a>
                 <a href="${pageContext.request.contextPath}/logout" class="text-red-500 hover:underline">Đăng xuất</a>
             </div>
@@ -318,8 +318,8 @@
 
             for (const field of requiredFields) {
                 const input = document.getElementById(field.id);
-                const trimmedValue = input.value.trim();
-                if (!trimmedValue) {
+                const value = input.value;
+                if (!value || value.trim() === '') {
                     event.preventDefault();
                     Toastify({
                         text: `Vui lòng nhập ${field.label}!`,
@@ -337,7 +337,7 @@
             // Additional email format validation
             const emailInput = document.getElementById('email');
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(emailInput.value.trim())) {
+            if (!emailPattern.test(emailInput.value)) {
                 event.preventDefault();
                 Toastify({
                     text: "Vui lòng nhập email hợp lệ!",
