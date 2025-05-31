@@ -1,4 +1,4 @@
-//changepass.java
+
 package controller;
 
 import dao.AccountDAO;
@@ -14,7 +14,11 @@ import jakarta.servlet.http.HttpSession;
 import model.Account;
 import model.User;
 
-public class ChangePassword extends HttpServlet {
+/**
+ *
+ * @author ASUS
+ */
+public class ChangePasswordByForget extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -22,14 +26,9 @@ public class ChangePassword extends HttpServlet {
         HttpSession session = request.getSession();
         String newPass = request.getParameter("password");
         String newCfPass = request.getParameter("cfpassword");
-//        Account acc =  (Account) request.getSession().getAttribute("accountForgetPass");
-//        String username = acc.getUsername();
-        
 
-        String username = (String) session.getAttribute("username");
-        UserDAO userDAO = new UserDAO();
-        String roleName = userDAO.getUserRoleName(username);
-        session.setAttribute("role", roleName);
+        Account acc =  (Account) request.getSession().getAttribute("accountForgetPass");
+        String username = acc.getUsername();
 
         String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$";
 
@@ -37,10 +36,10 @@ public class ChangePassword extends HttpServlet {
         String oldPassword = accdb.getPasswordByUsername(username); // Lấy mật khẩu hiện tại
         if (!newPass.equals(newCfPass)) {
             request.setAttribute("mess2", "Mật khẩu không khớp. Vui lòng nhập lại!");
-            request.getRequestDispatcher("./changePassword.jsp").forward(request, response);
+            request.getRequestDispatcher("./changePasswordByForget.jsp").forward(request, response);
         } else if (newPass.equals(oldPassword)) {
             request.setAttribute("mess2", "Mật khẩu mới không được trùng với mật khẩu cũ!");
-            request.getRequestDispatcher("./changePassword.jsp").forward(request, response);
+            request.getRequestDispatcher("./changePasswordByForget.jsp").forward(request, response);
         } else {
             if (newPass.matches(passwordRegex)) {
 //                AccountDAO accdb = new AccountDAO();
@@ -49,7 +48,7 @@ public class ChangePassword extends HttpServlet {
 
             } else {
                 request.setAttribute("mess1", "Mật khẩu phải bao gồm 8 ký tự trở lên và phải bao gồm chữ hoa, chữ thường, số từ 0 đến 9 và bao gồm ký tự đặc biệt");
-                request.getRequestDispatcher("./changePassword.jsp").forward(request, response);
+                request.getRequestDispatcher("./changePasswordByForget.jsp").forward(request, response);
             }
 
         }

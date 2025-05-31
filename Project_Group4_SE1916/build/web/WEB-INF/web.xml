@@ -52,6 +52,10 @@
         <servlet-name>AddSupplierServlet</servlet-name>
         <servlet-class>controller.supplier.AddSupplierServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ChangePasswordByForget</servlet-name>
+        <servlet-class>controller.ChangePasswordByForget</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -82,7 +86,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>VerifyCode</servlet-name>
-        <url-pattern>/verify_code</url-pattern>
+        <url-pattern>/forgetPassword/verifyCode</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>LogoutController</servlet-name>
@@ -104,11 +108,14 @@
         <servlet-name>AddSupplierServlet</servlet-name>
         <url-pattern>/AddSupplierServlet</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChangePasswordByForget</servlet-name>
+        <url-pattern>/forgetPassword/changePasswordByForget</url-pattern>
+    </servlet-mapping>
     <jsp-config>
         <jsp-property-group>
             <url-pattern>*.jsp</url-pattern>
             <page-encoding>UTF-8</page-encoding>
         </jsp-property-group>
     </jsp-config>
-    
 </web-app>

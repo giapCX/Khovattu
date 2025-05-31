@@ -1,8 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
+//sendmail
 package controller;
 
 import jakarta.servlet.ServletException;
@@ -66,8 +62,10 @@ public class SendMail extends HttpServlet {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.starttls.required", "true");
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 
         Session mailSession = Session.getInstance(props, new Authenticator() {
             @Override
@@ -104,4 +102,3 @@ public class SendMail extends HttpServlet {
                 "Mã xác nhận của bạn là: " + verifyCode;
     }
 }
-

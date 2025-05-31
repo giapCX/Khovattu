@@ -1,13 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 
 package controller;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
+//import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,7 +23,7 @@ import javax.mail.internet.MimeMessage;
 import model.Account;
 import model.User;
 
-//@WebServlet("/forgetPassword/forget")
+
 public class ForgetPassword extends HttpServlet {
 
     @Override
@@ -112,17 +108,18 @@ public class ForgetPassword extends HttpServlet {
     }
 
     private boolean sendEmail(String to, String newPassword) {
-        String from = "duongnthe180949@fpt.edu.vn";
+        String from = "Ngtungduong04@gmail.com";
         String host = "smtp.gmail.com";
-        String port = "465";
-        String authPassword = "pxod qvhl bmej vgqv"; // Use a secure method to store this
+        String port = "587";
+        String authPassword = "khxx zrrf jadi eize"; // Use a secure method to store this
 
         Properties props = new Properties();
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.socketFactory.port", port);
-        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.starttls.required", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 
         Session emailSession = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
             @Override
@@ -149,7 +146,7 @@ public class ForgetPassword extends HttpServlet {
     private void setErrorAndForward(HttpServletRequest request, HttpServletResponse response, String message)
             throws ServletException, IOException {
         request.setAttribute("mess", message);
-        request.getRequestDispatcher("/forgetPassword/forgetPassword.jsp").forward(request, response);
+        request.getRequestDispatcher("./forgetPassword.jsp").forward(request, response);
     }
 
     private String generateRandomPassword(int length) {

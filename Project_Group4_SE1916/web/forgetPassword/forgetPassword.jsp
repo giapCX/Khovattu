@@ -182,14 +182,14 @@
             <div class="alert alert-danger" role="alert">
                 ${mess}
             </div>
-            <form id="myForm" action="./forgetPassword/forget_password" method="POST" class="login-form" autocomplete="off">
+            <form id="myForm" action="./forget_password" method="POST" class="login-form" autocomplete="off">
                 <label for="username" class="login-label">Username</label>
                 <input type="text" name="username" class="login-input" placeholder="VD: abc" required>
 
                 <label for="Email" class="login-label">Email</label>
                 <input type="email" name="Email" class="login-input" placeholder="VD: abc@gmail.com" required>
 
-                <input class="login-submit" type="submit" value="Retrieve Password">
+                <input class="login-submit" type="submit" value="Lấy lại mật khẩu">
             </form>
             <p class="login-already">
                 <a href="../login.jsp" class="login-signup-link">Back to login</a>
