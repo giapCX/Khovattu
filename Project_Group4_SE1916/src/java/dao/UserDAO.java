@@ -61,10 +61,9 @@ public class UserDAO {
             stmt.setString(4, user.getPhone() != null && !user.getPhone().isEmpty() ? user.getPhone() : null);
             stmt.setString(5, user.getDateOfBirth() != null && !user.getDateOfBirth().isEmpty() ? user.getDateOfBirth() : null);
             stmt.setString(6, user.getImg() != null && !user.getImg().isEmpty() ? user.getImg() : null);
-            stmt.setString(7, user.getStatus()); // Thêm status
+            stmt.setString(7, user.getStatus());
             stmt.setString(8, user.getUsername());
-            int rowsAffected = stmt.executeUpdate();
-            System.out.println("updateUser: Rows affected: " + rowsAffected);
+            stmt.executeUpdate();
         }
     }
 
@@ -74,27 +73,28 @@ public class UserDAO {
                 + "FROM Users u "
                 + "LEFT JOIN Roles r ON u.role_id = r.role_id "
                 + "WHERE u.username = ?";
-        try (PreparedStatement stm = conn.prepareStatement(sql)) {
-            stm.setString(1, username);
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                user = new User();
-                user.setUserId(rs.getInt("user_id"));
-                user.setCode(rs.getString("code"));
-                user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password_hash"));
-                user.setFullName(rs.getString("full_name"));
-                user.setAddress(rs.getString("address"));
-                user.setEmail(rs.getString("email"));
-                user.setPhone(rs.getString("phone_number"));
-                user.setImg(rs.getString("imageUrl"));
-                user.setDateOfBirth(rs.getString("date_of_birth"));
-                user.setStatus(rs.getString("status"));
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setCode(rs.getString("code"));
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password_hash"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setAddress(rs.getString("address"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPhone(rs.getString("phone_number"));
+                    user.setImg(rs.getString("imageUrl"));
+                    user.setDateOfBirth(rs.getString("date_of_birth"));
+                    user.setStatus(rs.getString("status"));
 
-                Role role = new Role();
-                role.setRoleId(rs.getInt("role_id"));
-                role.setRoleName(rs.getString("role_name"));
-                user.setRole(role);
+                    Role role = new Role();
+                    role.setRoleId(rs.getInt("role_id"));
+                    role.setRoleName(rs.getString("role_name"));
+                    user.setRole(role);
+                }
             }
         } catch (SQLException ex) {
             Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -110,15 +110,14 @@ public class UserDAO {
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getString("role_name");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("role_name");
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return null;
     }
 
@@ -174,7 +173,7 @@ public class UserDAO {
         try (PreparedStatement stmt = conn.prepareStatement(insertUserSql)) {
             stmt.setString(1, user.getCode());
             stmt.setString(2, user.getUsername());
-            stmt.setString(3, hashedPassword); // Mật khẩu đã mã hóa
+            stmt.setString(3, hashedPassword);
             stmt.setString(4, user.getFullName());
             stmt.setString(5, user.getAddress());
             stmt.setString(6, user.getEmail());
