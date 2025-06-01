@@ -1,3 +1,4 @@
+//verisucess.jsp
 <%-- 
     Document   : verifySuccessful
     Created on : May 24, 2025, 10:19:48 PM
@@ -107,10 +108,10 @@
                 <!--            <div class="payment-item">
                                 <img src="../Assets/icon/icon (74).png" alt="Success Icon">
                             </div>-->
-                <div class="payment-item title">Xác nhận email thành công!</div>
+                <div class="payment-item title">Account verification successful!</div>
                 <div class="payment-item button-container">
                     <a href="./changePasswordByForget">
-                        <button type="button">Đổi mật khẩu</button>
+                        <button type="button">Change Password</button>
                     </a>
                 </div>
             </div>

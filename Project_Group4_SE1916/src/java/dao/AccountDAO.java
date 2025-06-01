@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -11,6 +12,7 @@ import model.Account;
 import model.Role;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
@@ -28,21 +30,18 @@ public class AccountDAO extends DBContext {
         this.connection = connection;
     }
 
-    public void updatePassword(String username, String newpassword) {
+    public void updatePassword(String username, String newPassword) {
         String sql = "UPDATE users SET password_hash = ?, status = 'active' WHERE username = ?";
-//        securityProcessorCore spc = new securityProcessorCore();
+
         try {
+            String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+
             PreparedStatement stm = connection.prepareStatement(sql);
-//            stm.setString(1, spc.md5EncodePassword(newpassword));
-            stm.setString(1, newpassword);
+            stm.setString(1, hashedPassword);
             stm.setString(2, username);
             stm.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(AccountDAO.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (NoSuchAlgorithmException ex) {
-//            Logger.getLogger(AccountDBContext.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-
         }
     }
 
@@ -80,30 +79,6 @@ public class AccountDAO extends DBContext {
             System.out.println(e);
         }
         return null;
-    }
-
-    public int getNumberOfPremiumUser() {
-        int premium;
-        String sql = "SELECT COUNT(*) AS premium FROM [Users] u\n"
-                + "JOIN Account a ON a.username = u.username AND a.classify_account = 'premium'";
-        try {
-            PreparedStatement stm = connection.prepareStatement(sql);
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                premium = rs.getInt("premium");
-                return premium;
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(AccountDAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return 0;
-    }
-
-    
-
-    public static void main(String[] args) {
-        AccountDAO dBContext = new AccountDAO();
-        System.out.println(dBContext.getNumberOfPremiumUser());
     }
 
 }

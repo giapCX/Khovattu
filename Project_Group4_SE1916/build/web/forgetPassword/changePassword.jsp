@@ -1,3 +1,4 @@
+
 <%-- 
     Document   : changePassword
     Created on : May 24, 2025, 10:17:31 PM
@@ -107,14 +108,14 @@
         <div class="signup">
             <h1 class="signup-heading">Change Password</h1>
             <form action="change_password" method="POST" class="signup-form" autocomplete="off">
-                <label for="password" class="signup-label">Mật khẩu mới</label>
+                <label for="password" class="signup-label">new password</label>
                 <input type="password" name="password" class="signup-input" required>
 
-                <label for="cfpassword" class="signup-label">Nhập lại mật khẩu mới</label>
+                <label for="cfpassword" class="signup-label">Re-enter new password</label>
                 <input type="password" name="cfpassword" class="signup-input" required>
                
 
-                <input class="signup-submit" type="submit" value="Xác nhận">
+                <input class="signup-submit" type="submit" value="OK">
             </form>
             <% if (request.getAttribute("mess1") != null) { %>
             <div class="alert alert-danger" role="alert">${mess1}</div>
@@ -127,7 +128,7 @@
                 String redirectUrl = "../login.jsp"; // Default fallback
                 if (role != null) {
                     switch (role.toLowerCase()) {
-                        case "director":
+                        case "direction":
                             redirectUrl = request.getContextPath() + "/view/direction/directionDashboard.jsp";
                             break;
                         case "employee":
@@ -139,7 +140,7 @@
                     }
                 }
             %>
-            <a href="<%= redirectUrl%>" class="signup-cancel">Hủy</a>
+            <a href="<%= redirectUrl%>" class="signup-cancel">Cancel</a>
         </div>
     </body>
 </html>
