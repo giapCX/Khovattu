@@ -85,37 +85,27 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans antialiased">
-    <%
-        String username = (String) session.getAttribute("username");
-        if (username == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-        if (request.getAttribute("data") == null && request.getParameter("fromServlet") == null) {
-            response.sendRedirect("listuser?fromServlet=true");
-            return;
-        }
-    %>
+    
     <!-- Main Content -->
     <main class="flex-1 p-8">
         <div class="max-w-md mx-auto card bg-white dark:bg-gray-800 p-6">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">Chỉnh sửa Người dùng</h2>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">Edit user</h2>
 
             <form action="edituser" method="post" class="space-y-4">
                 <input type="hidden" name="userId" value="${user.userId}" />
 
                 <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tên người dùng</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
                     <p class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white">${user.username}</p>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Họ và tên</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
                     <p class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white">${user.fullName}</p>
                 </div>
 
                 <div class="space-y-2">
-                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Trạng thái</label>
+                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                     <select id="status" name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                         <option value="active" ${user.status == 'active' ? 'selected' : ''}>Active</option>
                         <option value="inactive" ${user.status == 'inactive' ? 'selected' : ''}>Inactive</option>
@@ -123,7 +113,7 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label for="roleId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vai trò</label>
+                    <label for="roleId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
                     <select id="roleId" name="roleId" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                         <c:forEach var="role" items="${roles}">
                             <option value="${role.roleId}" ${user.role.roleId == role.roleId ? 'selected' : ''}>${role.roleName}</option>
@@ -131,11 +121,11 @@
                     </select>
                 </div>
 
-                <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg w-full">Cập nhật</button>
+                <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg w-full">Update</button>
             </form>
 
             <div class="mt-4 flex justify-center">
-                <a href="${pageContext.request.contextPath}/listUser.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay lại Danh sách</a>
+                <a href="${pageContext.request.contextPath}/listUser.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to List</a>
             </div>
         </div>
     </main>

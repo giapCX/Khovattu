@@ -220,7 +220,7 @@
             <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
                 <i class="fas fa-boxes text-primary-600 text-2xl"></i>
             </div>
-            <h2 class="text-2xl font-bold">QL Vật Tư</h2>
+            <h2 class="text-2xl font-bold">Material Management</h2>
             <button id="toggleSidebar" class="ml-auto text-white opacity-70 hover:opacity-100">
                 <i class="fas fa-times"></i>
             </button>
@@ -228,44 +228,44 @@
         <nav class="space-y-2">
             <a href="${pageContext.request.contextPath}/home.jsp" class="nav-item flex items-center p-3">
                 <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
-                <span class="text-lg">Tổng quan</span>
+                <span class="text-lg">Overview</span>
                 <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
             </a>
             <a href="${pageContext.request.contextPath}/inventory.jsp" class="nav-item flex items-center p-3">
                 <i class="fas fa-warehouse mr-3 w-6 text-center"></i>
-                <span class="text-lg">Quản lý kho</span>
+                <span class="text-lg">Warehouse Management</span>
                 <span class="ml-auto bg-white bg-opacity-20 text-sm px-2 py-1 rounded-full">5</span>
             </a>
             <a href="${pageContext.request.contextPath}/items.jsp" class="nav-item flex items-center p-3">
                 <i class="fas fa-box-open mr-3 w-6 text-center"></i>
-                <span class="text-lg">Danh mục vật tư</span>
+                <span class="text-lg">List of materials</span>
                 <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
             </a>
             <a href="${pageContext.request.contextPath}/orders.jsp" class="nav-item flex items-center p-3">
                 <i class="fas fa-clipboard-list mr-3 w-6 text-center"></i>
-                <span class="text-lg">Đơn hàng</span>
+                <span class="text-lg">Order</span>
                 <span class="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full">3</span>
             </a>
             <a href="${pageContext.request.contextPath}/reports.jsp" class="nav-item flex items-center p-3">
                 <i class="fas fa-chart-bar mr-3 w-6 text-center"></i>
-                <span class="text-lg">Báo cáo</span>
+                <span class="text-lg">Report</span>
                 <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
             </a>
             <a href="${pageContext.request.contextPath}/listuser" class="nav-item active flex items-center p-3">
                 <i class="fas fa-users mr-3 w-6 text-center"></i>
-                <span class="text-lg">Danh sách người dùng</span>
+                <span class="text-lg">User Management</span>
                 <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
             </a>
             <a href="${pageContext.request.contextPath}/userProfile.jsp" class="nav-item flex items-center p-3">
                 <i class="fas fa-user mr-3 w-6 text-center"></i>
-                <span class="text-lg">Thông tin cá nhân</span>
+                <span class="text-lg">Information</span>
                 <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
             </a>
         </nav>
         <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">
             <a href="${pageContext.request.contextPath}/logout" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
                 <i class="fas fa-sign-out-alt mr-3"></i>
-                <span class="text-lg">Đăng xuất</span>
+                <span class="text-lg">Logout</span>
             </a>
         </div>
     </aside>
@@ -278,10 +278,10 @@
                     <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Danh sách Người dùng</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">List User</h2>
                 </div>
                 <a href="adduser" class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
-                    <i class="fas fa-plus-circle mr-2"></i> Thêm Người dùng Mới
+                    <i class="fas fa-plus-circle mr-2"></i> Add User
                 </a>
             </div>
 
@@ -292,7 +292,7 @@
                 </div>
                 <div class="flex-1 min-w-[150px]">
                     <select name="roleId" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                        <option value="">Tất cả Vai trò</option>
+                        <option value="">All roles</option>
                         <c:forEach var="role" items="${roles}">
                             <option value="${role.roleId}" ${param.roleId == role.roleId ? "selected" : ""}>${role.roleName}</option>
                         </c:forEach>
@@ -300,7 +300,7 @@
                 </div>
                 <div class="flex-1 min-w-[150px]">
                     <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                        <option value="">Tất cả Trạng thái</option>
+                        <option value="">All status</option>
                         <option value="active" ${param.status == 'active' ? 'selected' : ''}>Active</option>
                         <option value="inactive" ${param.status == 'inactive' ? 'selected' : ''}>Inactive</option>
                     </select>
@@ -316,15 +316,15 @@
                     <table class="w-full table-auto">
                         <thead>
                             <tr class="bg-primary-600 text-white">
-                                <th class="p-4 text-left">Tên người dùng</th>
-                                <th class="p-4 text-left">Họ và tên</th>
-                                <th class="p-4 text-left">Mã người dùng</th>
-                                <th class="p-4 text-left">Địa chỉ</th>
+                                <th class="p-4 text-left">Username</th>
+                                <th class="p-4 text-left">Full Name</th>
+                                <th class="p-4 text-left">Code</th>
+                                <th class="p-4 text-left">Address</th>
                                 <th class="p-4 text-left">Email</th>
-                                <th class="p-4 text-left">Số điện thoại</th>
-                                <th class="p-4 text-left">Vai trò</th>
-                                <th class="p-4 text-left">Trạng thái</th>
-                                <th class="p-4 text-left">Hành động</th>
+                                <th class="p-4 text-left">Phone number</th>
+                                <th class="p-4 text-left">Role</th>
+                                <th class="p-4 text-left">Status</th>
+                                <th class="p-4 text-left">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -339,7 +339,7 @@
                                     <td class="p-4">${item.role.roleName}</td>
                                     <td class="p-4">${item.status}</td>
                                     <td class="p-4 flex gap-2">
-                                        <a href="edituser?userId=${item.userId}" class="text-primary-600 dark:text-primary-400 hover:underline">Chỉnh sửa</a>
+                                        <a href="edituser?userId=${item.userId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
                                        
                                     </td>
                                 </tr>
@@ -366,7 +366,7 @@
             </c:if>
 
             <div class="mt-6 flex justify-center">
-                <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay lại Trang chủ</a>
+                <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
             </div>
         </div>
     </main>

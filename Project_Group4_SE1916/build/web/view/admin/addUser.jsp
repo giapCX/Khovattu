@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thêm Người dùng Mới - Hệ thống Quản lý Vật tư</title>
+    <title>Add new user</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -147,7 +147,7 @@
             <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
                 <i class="fas fa-boxes text-primary-600 text-2xl"></i>
             </div>
-            <h2 class="text-2xl font-bold">QL Vật Tư</h2>
+            <h2 class="text-2xl font-bold">Material Management</h2>
             <button id="toggleSidebar" class="ml-auto text-white opacity-70 hover:opacity-100">
                 <i class="fas fa-times"></i>
             </button>
@@ -155,44 +155,44 @@
         <nav class="space-y-2">
             <a href="${pageContext.request.contextPath}/home.jsp" class="nav-item flex items-center p-3">
                 <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
-                <span class="text-lg">Tổng quan</span>
+                <span class="text-lg">Overview</span>
                 <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
             </a>
             <a href="${pageContext.request.contextPath}/inventory.jsp" class="nav-item flex items-center p-3">
                 <i class="fas fa-warehouse mr-3 w-6 text-center"></i>
-                <span class="text-lg">Quản lý kho</span>
+                <span class="text-lg">Warehouse Management</span>
                 <span class="ml-auto bg-white bg-opacity-20 text-sm px-2 py-1 rounded-full">5</span>
             </a>
             <a href="${pageContext.request.contextPath}/items.jsp" class="nav-item flex items-center p-3">
                 <i class="fas fa-box-open mr-3 w-6 text-center"></i>
-                <span class="text-lg">Danh mục vật tư</span>
+                <span class="text-lg">List of materials</span>
                 <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
             </a>
             <a href="${pageContext.request.contextPath}/orders.jsp" class="nav-item flex items-center p-3">
                 <i class="fas fa-clipboard-list mr-3 w-6 text-center"></i>
-                <span class="text-lg">Đơn hàng</span>
+                <span class="text-lg">Order</span>
                 <span class="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full">3</span>
             </a>
             <a href="${pageContext.request.contextPath}/reports.jsp" class="nav-item flex items-center p-3">
                 <i class="fas fa-chart-bar mr-3 w-6 text-center"></i>
-                <span class="text-lg">Báo cáo</span>
+                <span class="text-lg">Report</span>
                 <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
             </a>
             <a href="${pageContext.request.contextPath}/listuser" class="nav-item active flex items-center p-3">
                 <i class="fas fa-users mr-3 w-6 text-center"></i>
-                <span class="text-lg">Danh sách người dùng</span>
+                <span class="text-lg">List User</span>
                 <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
             </a>
             <a href="${pageContext.request.contextPath}/userProfile.jsp" class="nav-item flex items-center p-3">
                 <i class="fas fa-user mr-3 w-6 text-center"></i>
-                <span class="text-lg">Thông tin cá nhân</span>
+                <span class="text-lg">Information</span>
                 <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
             </a>
         </nav>
         <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">
             <a href="logout" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
                 <i class="fas fa-sign-out-alt mr-3"></i>
-                <span class="text-lg">Đăng xuất</span>
+                <span class="text-lg">Logout</span>
             </a>
         </div>
     </aside>
@@ -204,30 +204,30 @@
                 <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                     <i class="fas fa-bars text-2xl"></i>
                 </button>
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Thêm Người dùng Mới</h2>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Add new user</h2>
             </div>
 
             <form action="adduser" method="post" class="space-y-4">
                 <div class="space-y-2">
-                    <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tên người dùng</label>
+                    <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
                     <input type="text" id="username" name="username" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                 </div>
 
                 <div class="space-y-2">
-                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Mật khẩu</label>
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
                     <input type="password" id="password" name="password" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                 </div>
                 <div class="space-y-2">
-                    <label for="code" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Mã người dùng</label>
+                    <label for="code" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Code</label>
                     <input type="text" id="code" name="code" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                 </div>
                 <div class="space-y-2">
-                    <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Họ và tên</label>
+                    <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
                     <input type="text" id="fullName" name="fullName" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                 </div>
 
                 <div class="space-y-2">
-                    <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Địa chỉ</label>
+                    <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
                     <input type="text" id="address" name="address" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                 </div>
 
@@ -237,17 +237,17 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Số điện thoại</label>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
                     <input type="text" id="phone" name="phone" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                 </div>
 
                 <div class="space-y-2">
-                    <label for="dob" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ngày sinh</label>
+                    <label for="dob" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date of Birth</label>
                     <input type="date" id="dob" name="dob" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                 </div>
 
                 <div class="space-y-2">
-                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Trạng thái</label>
+                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                     <select id="status" name="status" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
@@ -255,7 +255,7 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label for="roleId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vai trò</label>
+                    <label for="roleId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
                     <select id="roleId" name="roleId" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                         <c:forEach var="role" items="${roles}">
                             <option value="${role.roleId}">${role.roleName}</option>
@@ -264,12 +264,12 @@
                 </div>
 
                 <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg w-full flex items-center justify-center">
-                    <i class="fas fa-plus-circle mr-2"></i> Thêm Người dùng
+                    <i class="fas fa-plus-circle mr-2"></i> Add user
                 </button>
             </form>
 
             <div class="mt-4 flex justify-center">
-                <a href="listuser" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay lại Danh sách</a>
+                <a href="listuser" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to list user</a>
             </div>
         </div>
     </main>
