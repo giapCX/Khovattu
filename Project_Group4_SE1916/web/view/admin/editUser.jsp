@@ -125,7 +125,7 @@
             </form>
 
             <div class="mt-4 flex justify-center">
-                <a href="${pageContext.request.contextPath}/listUser.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to List</a>
+                <a href="${pageContext.request.contextPath}/listuser" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to List</a>
             </div>
         </div>
     </main>
