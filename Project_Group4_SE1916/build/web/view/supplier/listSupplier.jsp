@@ -276,17 +276,16 @@
                 <!-- Search and Filter Form -->
                 <form action="ListSupplierServlet" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchName" placeholder="Tìm kiếm theo tên nhà cung cấp" value="${param.search}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="searchName" placeholder="Tìm kiếm theo tên nhà cung cấp"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchPhone" placeholder="Tìm kiếm theo SĐT nhà cung cấp" value="${param.search}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="searchPhone" placeholder="Tìm kiếm theo SĐT nhà cung cấp"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchMaterial" placeholder="Tìm kiếm theo tên vật tư" value="${param.search}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="searchAddress" placeholder="Tìm kiếm theo địa chỉ "  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <div class="flex-1 min-w-[150px]">
-                        <select name="supplierStatus" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                            <option value="">Tất cả Trạng thái</option>
+                        <select name="searchStatus" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">                            <option value="">Tất cả Trạng thái</option>
                             <option value="active" ${param.status == 'active' ? 'selected' : ''}>Active</option>
                             <option value="inactive" ${param.status == 'inactive' ? 'selected' : ''}>Inactive</option>
                         </select>
@@ -341,7 +340,7 @@
                                     <span>[${i}]</span>
                                 </c:when>
                                 <c:otherwise>
-                                    <a href="listuser?page=${i}&search=${param.search}&roleId=${param.roleId}&status=${param.status}">${i}</a>
+                                     <a href="ListSupplierServlet?page=${i}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}">${i}</a>
                                 </c:otherwise>
                             </c:choose>
                         </c:forEach>
@@ -351,7 +350,7 @@
                 <div class="mt-6 flex justify-center">
                     <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay lại Trang chủ</a>
                 </div>
-                
+
             </div>
         </main>
 
