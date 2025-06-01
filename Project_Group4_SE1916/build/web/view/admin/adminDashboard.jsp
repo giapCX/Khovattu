@@ -48,9 +48,9 @@
             }
 
             .sidebar {
-                background: linear-gradient(to bottom, #1e3a8a, #3b82f6);
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 0 7px 10px -5px rgba(59, 130, 246, 0.4);
-                transition: transform 0.3s ease-in-out;
+                background: linear-gradient(195deg, #1e3a8a, #3b82f6);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(59, 130, 246, 0.4);
+                transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
                 transform: translateX(-100%);
             }
 
@@ -69,19 +69,16 @@
 
             .nav-item {
                 transition: all 0.2s ease;
-                border-radius: 0.75rem;
-                color: rgba(255, 255, 255, 0.9);
+                border-radius: 0.5rem;
             }
 
-            .nav-item:hover,
-            .nav-item.active {
+            .nav-item:hover {
                 background-color: rgba(255, 255, 255, 0.1);
-                color: white;
-                transform: translateX(8px);
+                transform: translateX(5px);
             }
 
             .nav-item.active {
-                background-color: rgba(255, 255, 255, 0.15);
+                background-color: rgba(255, 255, 255, 0.2);
                 font-weight: 600;
             }
 
@@ -183,7 +180,7 @@
             }
 
             .dark-mode .sidebar {
-                background: linear-gradient(to bottom, #111827, #1f2937);
+                background: linear-gradient(195deg, #111827, #1f2937);
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(31, 41, 55, 0.4);
             }
 
@@ -229,55 +226,6 @@
                     z-index: 50;
                 }
             }
-
-            /* New Sidebar Styles */
-            .sidebar {
-                background: linear-gradient(to bottom, #1e3a8a, #3b82f6);
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 0 7px 10px -5px rgba(59, 130, 246, 0.4);
-                transition: transform 0.3s ease-in-out;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            .nav-item {
-                transition: all 0.2s ease;
-                border-radius: 0.75rem;
-                color: rgba(255, 255, 255, 0.9);
-            }
-
-            .nav-item:hover,
-            .nav-item.active {
-                background-color: rgba(255, 255, 255, 0.1);
-                color: white;
-                transform: translateX(8px);
-            }
-
-            .nav-item.active {
-                background-color: rgba(255, 255, 255, 0.15);
-                font-weight: 600;
-            }
-
-            .search-input {
-                transition: all 0.3s ease;
-                border-radius: 0.75rem;
-                padding-left: 3rem;
-            }
-
-            .search-input:focus {
-                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-            }
-
-            .animate-pulse-slow {
-                animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-            }
-
-            @keyframes pulse {
-                0%, 100% { opacity: 1; }
-                50% { opacity: 0.6; }
-            }
         </style>
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
@@ -285,75 +233,75 @@
         <%
             String username = (String) session.getAttribute("username");
             if (username == null) {
-                response.sendRedirect("login.jsp");
+                response.sendRedirect("Login.jsp");
                 return;
             }
         %>
 
         <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50 bg-gradient-to-b from-indigo-900 to-indigo-700 shadow-2xl transform transition-transform duration-300 ease-in-out -translate-x-full md:translate-x-0">
+        <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50">
             <div class="flex items-center mb-8">
-                <div class="w-14 h-14 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center mr-4 shadow-lg">
-                    <i class="fas fa-boxes text-white text-3xl animate-pulse-slow"></i>
+                <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
+                    <i class="fas fa-boxes text-primary-600 text-2xl"></i>
                 </div>
-                <h2 class="text-3xl font-extrabold tracking-tight">QL Vật Tư</h2>
-                <button id="toggleSidebar" class="ml-auto text-white opacity-80 hover:opacity-100 transition-opacity duration-200">
-                    <i class="fas fa-times text-2xl"></i>
+                <h2 class="text-2xl font-bold">QL Vật Tư</h2>
+                <button id="toggleSidebar" class="ml-auto text-white opacity-70 hover:opacity-100">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="mb-6 px-3">
+            <div class="mb-6 px-2">
                 <div class="relative">
                     <input type="text" placeholder="Tìm kiếm..." 
-                           class="w-full bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 search-input transition-all duration-200">
-                    <i class="fas fa-search absolute left-4 top-3.5 text-white opacity-70"></i>
+                           class="w-full bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 search-input">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-white opacity-70"></i>
                 </div>
             </div>
-            <nav class="space-y-3">
-                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-4 rounded-lg hover:bg-white hover:bg-opacity-10 hover:text-white transition-all duration-200">
-                    <i class="fas fa-user mr-4 text-xl"></i>
-                    <span class="text-lg font-medium">Thông tin cá nhân</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50 transition-transform duration-200 group-hover:translate-x-1"></i>
+            <nav class="space-y-2">
+                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-3">
+                    <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Thông tin cá nhân</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="nav-item flex items-center p-4 rounded-lg bg-white bg-opacity-15 text-white font-semibold transition-all duration-200">
-                    <i class="fas fa-tachometer-alt mr-4 text-xl"></i>
+                <a href="${pageContext.request.contextPath}/home.jsp" class="nav-item active flex items-center p-3">
+                    <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
                     <span class="text-lg">Tổng quan</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50 transition-transform duration-200 group-hover:translate-x-1"></i>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/inventory.jsp" class="nav-item flex items-center p-4 rounded-lg hover:bg-white hover:bg-opacity-10 hover:text-white transition-all duration-200">
-                    <i class="fas fa-warehouse mr-4 text-xl"></i>
-                    <span class="text-lg font-medium">Quản lý kho</span>
-                    <span class="ml-auto bg-white bg-opacity-20 text-sm px-3 py-1 rounded-full flex items-center">5</span>
+                <a href="${pageContext.request.contextPath}/inventory.jsp" class="nav-item flex items-center p-3">
+                    <i class="fas fa-warehouse mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Quản lý kho</span>
+                    <span class="ml-auto bg-white bg-opacity-20 text-sm px-2 py-1 rounded-full">5</span>
                 </a>
-                <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="nav-item flex items-center p-4 rounded-lg hover:bg-white hover:bg-opacity-10 hover:text-white transition-all duration-200">
-                    <i class="fas fa-box-open mr-4 text-xl"></i>
-                    <span class="text-lg font-medium">Danh sách nhà cung cấp</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50 transition-transform duration-200 group-hover:translate-x-1"></i>
+                <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="nav-item flex items-center p-3">
+                    <i class="fas fa-box-open mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Danh sách nhà cung cấp</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/items.jsp" class="nav-item flex items-center p-4 rounded-lg hover:bg-white hover:bg-opacity-10 hover:text-white transition-all duration-200">
-                    <i class="fas fa-box-open mr-4 text-xl"></i>
-                    <span class="text-lg font-medium">Danh mục vật tư</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50 transition-transform duration-200 group-hover:translate-x-1"></i>
+                <a href="${pageContext.request.contextPath}/items.jsp" class="nav-item flex items-center p-3">
+                    <i class="fas fa-box-open mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Danh mục vật tư</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/orders.jsp" class="nav-item flex items-center p-4 rounded-lg hover:bg-white hover:bg-opacity-10 hover:text-white transition-all duration-200">
-                    <i class="fas fa-clipboard-list mr-4 text-xl"></i>
-                    <span class="text-lg font-medium">Đơn hàng</span>
-                    <span class="ml-auto bg-red-500 text-white text-sm px-3 py-1 rounded-full flex items-center">3</span>
+                <a href="${pageContext.request.contextPath}/orders.jsp" class="nav-item flex items-center p-3">
+                    <i class="fas fa-clipboard-list mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Đơn hàng</span>
+                    <span class="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full">3</span>
                 </a>
-                <a href="${pageContext.request.contextPath}/reports.jsp" class="nav-item flex items-center p-4 rounded-lg hover:bg-white hover:bg-opacity-10 hover:text-white transition-all duration-200">
-                    <i class="fas fa-chart-bar mr-4 text-xl"></i>
-                    <span class="text-lg font-medium">Báo cáo</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50 transition-transform duration-200 group-hover:translate-x-1"></i>
+                <a href="${pageContext.request.contextPath}/reports.jsp" class="nav-item flex items-center p-3">
+                    <i class="fas fa-chart-bar mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Báo cáo</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/listuser" class="nav-item flex items-center p-4 rounded-lg hover:bg-white hover:bg-opacity-10 hover:text-white transition-all duration-200">
-                    <i class="fas fa-cog mr-4 text-xl"></i>
-                    <span class="text-lg font-medium">Danh sách người dùng</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50 transition-transform duration-200 group-hover:translate-x-1"></i>
+                <a href="${pageContext.request.contextPath}/listuser" class="nav-item flex items-center p-3">
+                    <i class="fas fa-cog mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Danh sách người dùng</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
             </nav>
-            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-indigo-800 to-indigo-700">
-                <a href="${pageContext.request.contextPath}/logout" class="flex items-center p-4 rounded-lg hover:bg-white hover:bg-opacity-10 hover:text-white transition-all duration-200">
-                    <i class="fas fa-sign-out-alt mr-4 text-xl"></i>
-                    <span class="text-lg font-medium">Đăng xuất</span>
+            <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">
+                <a href="${pageContext.request.contextPath}/logout" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
+                    <i class="fas fa-sign-out-alt mr-3"></i>
+                    <span class="text-lg">Đăng xuất</span>
                 </a>
             </div>
         </aside>
@@ -640,17 +588,14 @@
 
             function toggleSidebarVisibility() {
                 sidebar.classList.toggle('active');
-                sidebar.classList.toggle('-translate-x-full');
-                sidebar.classList.toggle('translate-x-0', sidebar.classList.contains('active'));
+                sidebar.classList.toggle('hidden');
             }
 
             toggleSidebar.addEventListener('click', toggleSidebarVisibility);
             toggleSidebarMobile.addEventListener('click', toggleSidebarVisibility);
 
-            // Initialize sidebar as hidden on mobile
-            if (window.innerWidth <= 768) {
-                sidebar.classList.add('-translate-x-full');
-            }
+            // Initialize sidebar as hidden
+            sidebar.classList.add('hidden');
 
             // Dark Mode Toggle
             const toggleDarkMode = document.getElementById('toggleDarkMode');

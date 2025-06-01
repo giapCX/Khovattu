@@ -63,12 +63,12 @@ public class LoginController extends HttpServlet {
                                 break;
                         }
                     } else {
-                        request.setAttribute("error", "Tên người dùng hoặc mật khẩu không đúng.");
+                        request.setAttribute("error", "The username or password is incorrect..");
                         RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
                         rd.forward(request, response);
                     }
                 } else {
-                    request.setAttribute("error", "Mật khẩu trong cơ sở dữ liệu không hợp lệ. Vui lòng liên hệ quản trị viên.");
+                    request.setAttribute("error", "The password in the database is invalid. Please contact the administrator..");
                     RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
                     rd.forward(request, response);
                 }
@@ -78,12 +78,12 @@ public class LoginController extends HttpServlet {
                 rd.forward(request, response);
             }
         } catch (Exception e) {
-            throw new ServletException("Lỗi đăng nhập: " + e.getMessage(), e);
+            throw new ServletException("Login error: " + e.getMessage(), e);
         }
     }
 
     @Override
     public String getServletInfo() {
-        return "Servlet xử lý đăng nhập với mã hóa mật khẩu bằng BCrypt";
+        return "Servlet for handling login with password encryption using BCrypt.";
     }
 }
