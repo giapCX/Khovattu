@@ -106,7 +106,7 @@
     <body>
         <div class="signup">
             <h1 class="signup-heading">Change Password</h1>
-            <form action="change_password" method="POST" class="signup-form" autocomplete="off">
+            <form action="changePasswordByForget" method="POST" class="signup-form" autocomplete="off">
                 <label for="password" class="signup-label">Mật khẩu mới</label>
                 <input type="password" name="password" class="signup-input" required>
 

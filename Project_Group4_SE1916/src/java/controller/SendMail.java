@@ -45,7 +45,7 @@ public class SendMail extends HttpServlet {
 
             try {
                 sendEmail(recipient, message);
-                req.getRequestDispatcher("/forgetPassword/confirmEmail.jsp").forward(req, resp);
+                req.getRequestDispatcher("./confirmEmail.jsp").forward(req, resp);
             } catch (MessagingException e) {
                 setErrorAndForward(req, resp, "Chúng tôi không thể gửi mã code đến email của bạn.");
             }
@@ -86,7 +86,7 @@ public class SendMail extends HttpServlet {
     private void setErrorAndForward(HttpServletRequest req, HttpServletResponse resp, String message)
     throws ServletException, IOException {
         req.setAttribute("mess", message);
-        req.getRequestDispatcher("/forgetPassword/forgetPassword.jsp").forward(req, resp);
+        req.getRequestDispatcher("./forgetPassword.jsp").forward(req, resp);
     }
 
     public static String getRandomNumberString() {

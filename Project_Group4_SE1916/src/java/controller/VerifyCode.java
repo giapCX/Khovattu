@@ -33,9 +33,9 @@ public class VerifyCode extends HttpServlet {
         String generatedCode = (String) session.getAttribute("passGen");
         
         if (verifyCode.equals(generatedCode)) {
-            req.getRequestDispatcher("/forgetPassword/verifySuccessful.jsp").forward(req, resp);
+            req.getRequestDispatcher("../forgetPassword/verifySuccessful.jsp").forward(req, resp);
         } else {
-            req.getRequestDispatcher("/forgetPassword/verifyFail.jsp").forward(req, resp);
+            req.getRequestDispatcher("../forgetPassword/verifyFail.jsp").forward(req, resp);
         }
     }
 }

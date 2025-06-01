@@ -29,7 +29,7 @@ public class ForgetPassword extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/forgetPassword/forgetPassword.jsp").forward(request, response);
+        request.getRequestDispatcher("./forgetPassword.jsp").forward(request, response);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class ForgetPassword extends HttpServlet {
             return;
         }
 
-        RequestDispatcher dispatcher = request.getRequestDispatcher("forgetPassword/confirmEmail.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("../forgetPassword/confirmEmail.jsp");
         request.setAttribute("message", "Mật khẩu mới đã được gửi đến bạn, vui lòng kiểm tra email.");
         session.setAttribute("passGen", newPassword);
          session.setAttribute("accountForgetPass", account);
