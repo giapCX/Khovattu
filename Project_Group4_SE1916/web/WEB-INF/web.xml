@@ -56,6 +56,18 @@
         <servlet-name>ChangePasswordByForget</servlet-name>
         <servlet-class>controller.ChangePasswordByForget</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AddMaterialController</servlet-name>
+        <servlet-class>controller.material.AddMaterialController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditMaterialController</servlet-name>
+        <servlet-class>controller.material.EditMaterialController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ListMaterialController</servlet-name>
+        <servlet-class>controller.material.ListMaterialController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -111,6 +123,18 @@
     <servlet-mapping>
         <servlet-name>ChangePasswordByForget</servlet-name>
         <url-pattern>/forgetPassword/changePasswordByForget</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddMaterialController</servlet-name>
+        <url-pattern>/AddMaterialController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditMaterialController</servlet-name>
+        <url-pattern>/EditMaterialController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ListMaterialController</servlet-name>
+        <url-pattern>/ListMaterialController</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

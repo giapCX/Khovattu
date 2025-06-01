@@ -349,5 +349,28 @@ public class SupplierDAO {
 
         return list;
     }
+    
+    
+     public SupplierDAO() {
+        this.conn = DBContext.getConnection();
+    }
+
+public List<Supplier> getAllSuppliers() throws SQLException {
+        List<Supplier> suppliers = new ArrayList<>();
+        String sql = "SELECT supplier_id, name, phone, address, email, status FROM Suppliers";
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Supplier supplier = new Supplier();
+                supplier.setSupplierId(rs.getInt("supplier_id"));
+                supplier.setSupplierName(rs.getString("name"));
+                supplier.setSupplierPhone(rs.getString("phone"));
+                supplier.setSupplierAddress(rs.getString("address"));
+                supplier.setSupplierEmail(rs.getString("email"));
+                supplier.setSupplierStatus(rs.getString("status"));
+                suppliers.add(supplier);
+            }
+        }
+        return suppliers;
+    }
 
 }
