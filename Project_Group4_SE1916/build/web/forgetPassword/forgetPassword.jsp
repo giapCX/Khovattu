@@ -189,7 +189,7 @@
                 <label for="Email" class="login-label">Email</label>
                 <input type="email" name="Email" class="login-input" placeholder="VD: abc@gmail.com" required>
 
-                <input class="login-submit" type="submit" value="Retrieve Password">
+                <input class="login-submit" type="submit" value="Lấy lại mật khẩu">
             </form>
             <p class="login-already">
                 <a href="../login.jsp" class="login-signup-link">Back to login</a>

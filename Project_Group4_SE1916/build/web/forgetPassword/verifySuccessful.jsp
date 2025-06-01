@@ -107,10 +107,10 @@
                 <!--            <div class="payment-item">
                                 <img src="../Assets/icon/icon (74).png" alt="Success Icon">
                             </div>-->
-                <div class="payment-item title">Account verification successful!</div>
+                <div class="payment-item title">Xác nhận email thành công!</div>
                 <div class="payment-item button-container">
                     <a href="./changePasswordByForget">
-                        <button type="button">Change Password</button>
+                        <button type="button">Đổi mật khẩu</button>
                     </a>
                 </div>
             </div>

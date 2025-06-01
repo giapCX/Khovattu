@@ -107,14 +107,14 @@
         <div class="signup">
             <h1 class="signup-heading">Change Password</h1>
             <form action="change_password" method="POST" class="signup-form" autocomplete="off">
-                <label for="password" class="signup-label">new password</label>
+                <label for="password" class="signup-label">Mật khẩu mới</label>
                 <input type="password" name="password" class="signup-input" required>
 
-                <label for="cfpassword" class="signup-label">Re-enter new password</label>
+                <label for="cfpassword" class="signup-label">Nhập lại mật khẩu mới</label>
                 <input type="password" name="cfpassword" class="signup-input" required>
                
 
-                <input class="signup-submit" type="submit" value="OK">
+                <input class="signup-submit" type="submit" value="Xác nhận">
             </form>
             <% if (request.getAttribute("mess1") != null) { %>
             <div class="alert alert-danger" role="alert">${mess1}</div>
@@ -127,7 +127,7 @@
                 String redirectUrl = "../login.jsp"; // Default fallback
                 if (role != null) {
                     switch (role.toLowerCase()) {
-                        case "direction":
+                        case "director":
                             redirectUrl = request.getContextPath() + "/view/direction/directionDashboard.jsp";
                             break;
                         case "employee":
@@ -139,7 +139,7 @@
                     }
                 }
             %>
-            <a href="<%= redirectUrl%>" class="signup-cancel">Cancel</a>
+            <a href="<%= redirectUrl%>" class="signup-cancel">Hủy</a>
         </div>
     </body>
 </html>
