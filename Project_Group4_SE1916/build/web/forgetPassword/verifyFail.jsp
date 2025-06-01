@@ -135,20 +135,20 @@
 <!--            <div class="payment-item">
                 <img src="../Assets/icon/icon (79).png" alt="Failure Icon">
             </div>-->
-            <div class="payment-item title">Xác nhận tài khoản thất bại!</div>
+            <div class="payment-item title">Account verification failed!</div>
             <div class="payment-item message">
-                Mã xác nhận không đúng, ấn "Thử lại" để nhận mã xác nhận mới!
+                The verification code is incorrect, click "Try again" to get a new verification code!
             </div>
             <div class="payment-item-one">
                 <ul class="payment-item-one-list">
                     <li class="payment-item-one-list-item">
                         <a href="./forget_password">
-                            <button class="retry" type="button">Thử lại</button>
+                            <button class="retry" type="button">Try again</button>
                         </a>
                     </li>
                     <li class="payment-item-one-list-item">
                         <a href="../login.jsp">
-                            <button class="cancel" type="button">Hủy bỏ</button>
+                            <button class="cancel" type="button">Cancel</button>
                         </a>
                     </li>
                 </ul>

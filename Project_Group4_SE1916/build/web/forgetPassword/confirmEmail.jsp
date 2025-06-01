@@ -12,7 +12,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../Assets/icon/favicon.png"/>
-    <title>Xác nhận tài khoản</title>
+    <title>Confirm Account</title>
     <style>
         body {
             position: fixed;
@@ -100,17 +100,17 @@
     <body>
         <div class="container">
             <img src="../Assets/images/email.png" alt="">
-            <h1>Xác nhận tài khoản</h1>
-            <p class="mess">Chúng tôi vừa gửi 1 mã xác nhận vào email của bạn. Vui lòng kiểm tra email rồi nhập mã xác nhận đó vào phần bên dưới!</p>
+            <h1>Confirm Accounts</h1>
+            <p class="mess">We've just sent a verification code to your email. Please check your email and enter the verification code below!</p>
 
             <div class="input">
                 <form action="./verifyCode" method="POST">
                     <input type="text" id="verify-code-input" name="confirm" class="signup-input" maxlength="10" placeholder="XXX-XXX">
-                    <p style="font-size: 0.75em;">(*)Lưu ý: Mã xác nhận chỉ có hiệu lực trong 2 phút</p>
-                    <input class="login-submit" type="submit" value="Hoàn tất">
+                    <p style="font-size: 0.75em;">(*)Note: The confirmation code is only valid for 2 minutes.</p>
+                    <input class="login-submit" type="submit" value="Complete">
 
 
-                    <a  href="./forgetPassword.jsp" class="cancel">Hủy bỏ</a>
+                    <a  href="./forgetPassword.jsp" class="cancel">Cancel</a>
 
                 </form>
             </div>

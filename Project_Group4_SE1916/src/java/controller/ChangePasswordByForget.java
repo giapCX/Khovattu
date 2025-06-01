@@ -35,10 +35,10 @@ public class ChangePasswordByForget extends HttpServlet {
         AccountDAO accdb = new AccountDAO();
         String oldPassword = accdb.getPasswordByUsername(username); // Lấy mật khẩu hiện tại
         if (!newPass.equals(newCfPass)) {
-            request.setAttribute("mess2", "Mật khẩu không khớp. Vui lòng nhập lại!");
+            request.setAttribute("mess2", "Password do not match.Please re-enter!");
             request.getRequestDispatcher("./changePasswordByForget.jsp").forward(request, response);
         } else if (newPass.equals(oldPassword)) {
-            request.setAttribute("mess2", "Mật khẩu mới không được trùng với mật khẩu cũ!");
+            request.setAttribute("mess2", "New password cannot be the same as old password!");
             request.getRequestDispatcher("./changePasswordByForget.jsp").forward(request, response);
         } else {
             if (newPass.matches(passwordRegex)) {
@@ -47,7 +47,7 @@ public class ChangePasswordByForget extends HttpServlet {
                 response.sendRedirect("./changePasswordSuccess.jsp");
 
             } else {
-                request.setAttribute("mess1", "Mật khẩu phải bao gồm 8 ký tự trở lên và phải bao gồm chữ hoa, chữ thường, số từ 0 đến 9 và bao gồm ký tự đặc biệt");
+                request.setAttribute("mess1", "Password must be 8 or more characters and must include uppercase letters, lowercase letters, numbers from 0 to 9 and include special characters!");
                 request.getRequestDispatcher("./changePasswordByForget.jsp").forward(request, response);
             }
 
