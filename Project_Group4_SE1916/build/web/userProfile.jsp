@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hồ sơ Người dùng - Hệ thống Quản lý Vật tư</title>
+    <title>User Profile - Material Management System</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -116,10 +116,10 @@
             <div class="flex flex-col items-center mb-6">
                 <img id="profilePicPreview" src="${profilePicUrl}" alt="Ảnh đại diện" class="profile-pic rounded-full mb-4">
                 <div id="profilePicInput" class="space-y-2 ${isEditMode ? '' : 'hidden'}">
-                    <label for="profilePic" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ảnh đại diện</label>
+                    <label for="profilePic" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Profile picture</label>
                     <input type="file" id="profilePic" name="profilePic" accept="image/*" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white text-center">Hồ sơ Người dùng</h2>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white text-center">User Profile</h2>
             </div>
 
             <!-- Determine the homepage based on the user's role -->
@@ -145,12 +145,12 @@
             <form id="profileForm" action="${pageContext.request.contextPath}/userprofile" method="post" enctype="multipart/form-data" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tên người dùng</label>
+                        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
                         <input type="text" id="username" name="username" value="${user.username}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" readonly>
                     </div>
 
                     <div class="space-y-2">
-                        <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Họ và tên *</label>
+                        <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name*</label>
                         <input type="text" id="fullName" name="fullName" value="${user.fullName != null ? user.fullName : 'Chưa cập nhật'}" 
                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
                                ${isEditMode ? 'required' : 'readonly'}>
@@ -164,28 +164,28 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Số điện thoại</label>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone number</label>
                         <input type="text" id="phone" name="phone" value="${user.phone}" 
                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
                                ${isEditMode ? '' : 'readonly'}>
                     </div>
 
                     <div class="space-y-2 md:col-span-2">
-                        <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Địa chỉ *</label>
+                        <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Address *</label>
                         <input type="text" id="address" name="address" value="${user.address}" 
                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
                                ${isEditMode ? 'required' : 'readonly'}>
                     </div>
 
                     <div class="space-y-2">
-                        <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ngày sinh</label>
+                        <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date of birth</label>
                         <input type="date" id="dateOfBirth" name="dateOfBirth" value="${user.dateOfBirth}" 
                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
                                ${isEditMode ? '' : 'readonly'}>
                     </div>
 
                     <div class="space-y-2">
-                        <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Trạng thái</label>
+                        <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                         <select id="status" name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" ${isEditMode ? '' : 'disabled'}>
                             <option value="active" ${user.status == 'active' ? 'selected' : ''}>Active</option>
                             <option value="inactive" ${user.status == 'inactive' ? 'selected' : ''}>Inactive</option>
@@ -193,7 +193,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vai trò</label>
+                        <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
                         <input type="text" id="role" name="role" value="${user.role.roleName}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" readonly>
                     </div>
                 </div>
@@ -201,11 +201,11 @@
                 <div class="flex space-x-4">
                     <c:choose>
                         <c:when test="${isEditMode}">
-                            <button type="submit" id="saveButton" class="btn-primary text-white px-6 py-3 rounded-lg flex-1">Lưu</button>
-                            <button type="button" id="cancelButton" class="btn-secondary text-white px-6 py-3 rounded-lg flex-1 text-center" onclick="window.location.href='${pageContext.request.contextPath}/userprofile'">Hủy</button>
+                            <button type="submit" id="saveButton" class="btn-primary text-white px-6 py-3 rounded-lg flex-1">Save</button>
+                            <button type="button" id="cancelButton" class="btn-secondary text-white px-6 py-3 rounded-lg flex-1 text-center" onclick="window.location.href='${pageContext.request.contextPath}/userprofile'">Cancel</button>
                         </c:when>
                         <c:otherwise>
-                            <button type="button" id="editButton" class="btn-primary text-white px-6 py-3 rounded-lg flex-1" onclick="window.location.href='${pageContext.request.contextPath}/userprofile?edit=true'">Sửa</button>
+                            <button type="button" id="editButton" class="btn-primary text-white px-6 py-3 rounded-lg flex-1" onclick="window.location.href='${pageContext.request.contextPath}/userprofile?edit=true'">Edit</button>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -232,8 +232,8 @@
                     }
                 }
                 %>
-                <a href="<%= redirectUrl%>" class="text-primary-600 dark:text-primary-400 hover:underline">Quay lại Trang chủ</a>
-                <a href="${pageContext.request.contextPath}/logout" class="text-red-500 hover:underline">Đăng xuất</a>
+                <a href="<%= redirectUrl%>" class="text-primary-600 dark:text-primary-400 hover:underline">Return to the Homepage</a>
+                <a href="${pageContext.request.contextPath}/logout" class="text-red-500 hover:underline">Logout</a>
             </div>
         </div>
     </main>

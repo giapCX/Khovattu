@@ -6,11 +6,11 @@
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chủ - Hệ thống Quản lý Vật tư</title>
+    <title>Home - Material Management System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -115,7 +115,7 @@
                 <div class="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center mr-3">
                     <i class="fas fa-boxes text-white text-xl"></i>
                 </div>
-                <h1 class="text-xl font-bold text-gray-800 dark:text-white">Hệ thống Quản lý Vật tư</h1>
+                <h1 class="text-xl font-bold text-gray-800 dark:text-white">Material Management System</h1>
             </div>
             <div class="flex items-center space-x-4">
                 <button id="toggleDarkMode" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
@@ -123,7 +123,7 @@
                 </button>
                 <a href="login.jsp" class="btn-primary text-white px-6 py-2 rounded-lg flex items-center hover:shadow-lg transition-all">
                     <i class="fas fa-sign-in-alt mr-2"></i>
-                    Đăng nhập
+                    Login
                 </a>
             </div>
         </div>
@@ -132,46 +132,46 @@
     <!-- Hero Section -->
     <section class="hero-bg text-white py-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center hero-content">
-            <h2 class="text-4xl md:text-5xl font-bold mb-6 animate-fadeInUp">Chào mừng đến với Hệ thống Quản lý Vật tư</h2>
-            <p class="text-lg md:text-xl mb-8 animate-fadeInUp delay-100">Quản lý vật tư hiệu quả, dễ dàng và thông minh. Đăng nhập ngay để bắt đầu!</p>
+            <h2 class="text-4xl md:text-5xl font-bold mb-6 animate-fadeInUp">Welcome to the Material Management System</h2>
+            <p class="text-lg md:text-xl mb-8 animate-fadeInUp delay-100">Manage materials efficiently, easily, and intelligently. Log in now to get started!</p>
             <a href="login.jsp" class="btn-primary text-white px-8 py-3 rounded-lg text-lg font-medium inline-flex items-center animate-fadeInUp delay-200">
                 <i class="fas fa-sign-in-alt mr-2"></i>
-                Đăng nhập ngay
+                Login Now
             </a>
         </div>
     </section>
 
     <!-- Features Section -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 class="text-3xl font-bold text-gray-800 dark:text-white text-center mb-12">Tính năng nổi bật</h2>
+        <h2 class="text-3xl font-bold text-gray-800 dark:text-white text-center mb-12">Key Features</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="card bg-white dark:bg-gray-800 p-6 animate-fadeInUp">
                 <div class="flex items-center mb-4">
                     <i class="fas fa-boxes text-primary-600 text-3xl mr-3"></i>
-                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Quản lý vật tư</h3>
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Material Management</h3>
                 </div>
-                <p class="text-gray-600 dark:text-gray-300">Theo dõi và quản lý toàn bộ vật tư trong kho với giao diện trực quan và dễ sử dụng.</p>
+                <p class="text-gray-600 dark:text-gray-300">Track and manage all materials in the warehouse with an intuitive and easy-to-use interface.</p>
             </div>
             <div class="card bg-white dark:bg-gray-800 p-6 animate-fadeInUp delay-100">
                 <div class="flex items-center mb-4">
                     <i class="fas fa-clipboard-list text-primary-600 text-3xl mr-3"></i>
-                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Yêu cầu & Phê duyệt</h3>
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Requests & Approvals</h3>
                 </div>
-                <p class="text-gray-600 dark:text-gray-300">Tạo và theo dõi yêu cầu xuất, mua, sửa vật tư với quy trình phê duyệt nhanh chóng.</p>
+                <p class="text-gray-600 dark:text-gray-300">Create and track material withdrawal, purchase, and repair requests with fast approval processes.</p>
             </div>
             <div class="card bg-white dark:bg-gray-800 p-6 animate-fadeInUp delay-200">
                 <div class="flex items-center mb-4">
                     <i class="fas fa-chart-bar text-primary-600 text-3xl mr-3"></i>
-                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Báo cáo & Thống kê</h3>
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Reports & Statistics</h3>
                 </div>
-                <p class="text-gray-600 dark:text-gray-300">Phân tích dữ liệu vật tư với biểu đồ và báo cáo chi tiết, hỗ trợ ra quyết định.</p>
+                <p class="text-gray-600 dark:text-gray-300">Analyze material data with detailed charts and reports to support decision-making.</p>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="bg-gray-100 dark:bg-gray-800 text-center p-6 border-t border-gray-200 dark:border-gray-700">
-        <p class="text-gray-600 dark:text-gray-300 text-sm">Hệ thống Quản lý Vật tư - Phiên bản 2.0 © 2025 | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Liên hệ hỗ trợ</a></p>
+        <p class="text-gray-600 dark:text-gray-300 text-sm">Material Management System - Version 2.0 © 2025 | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Contact Support</a></p>
     </footer>
 
     <!-- JavaScript -->

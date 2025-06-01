@@ -36,7 +36,7 @@ public class UserProfileController extends HttpServlet {
             request.setAttribute("user", user);
             request.setAttribute("role", user.getRole() != null ? user.getRole().getRoleName() : "unknown");
         } else {
-            request.setAttribute("error", "Không thể xác định thông tin người dùng: " + username);
+            request.setAttribute("error", "Cannot identify user information: " + username);
         }
         RequestDispatcher rd = request.getRequestDispatcher("userProfile.jsp");
         rd.forward(request, response);
@@ -54,7 +54,7 @@ public class UserProfileController extends HttpServlet {
         String username = (String) session.getAttribute("username");
         UserProfileDAO userDao = new UserProfileDAO();
 
-        // Lấy dữ liệu từ form
+        // Get data from form
         String fullName = request.getParameter("fullName");
         String address = request.getParameter("address");
         String email = request.getParameter("email");
@@ -73,31 +73,31 @@ public class UserProfileController extends HttpServlet {
 
         // Validation
         if (fullName == null || fullName.trim().isEmpty()) {
-            request.setAttribute("error", "Họ và tên không được để trống.");
+            request.setAttribute("error", "Full name cannot be empty.");
             request.setAttribute("user", user);
             doGet(request, response);
             return;
         }
         if (email == null || email.trim().isEmpty()) {
-            request.setAttribute("error", "Email không được để trống.");
+            request.setAttribute("error", "Email cannot be empty.");
             request.setAttribute("user", user);
             doGet(request, response);
             return;
         }
         if (address == null || address.trim().isEmpty()) {
-            request.setAttribute("error", "Địa chỉ không được để trống.");
+            request.setAttribute("error", "Address cannot be empty.");
             request.setAttribute("user", user);
             doGet(request, response);
             return;
         }
         if (!email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            request.setAttribute("error", "Email không hợp lệ.");
+            request.setAttribute("error", "Invalid email format.");
             request.setAttribute("user", user);
             doGet(request, response);
             return;
         }
 
-        // Xử lý ảnh đại diện
+        // Handle profile picture
         Part filePart = request.getPart("profilePic");
         if (filePart != null && filePart.getSize() > 0) {
             String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
@@ -115,9 +115,9 @@ public class UserProfileController extends HttpServlet {
             userDao.updateUserProfile(user);
             user = userDao.getUserProfileByUsername(username);
             request.setAttribute("user", user);
-            request.setAttribute("message", "Cập nhật hồ sơ thành công!");
+            request.setAttribute("message", "Profile updated successfully!");
         } catch (SQLException e) {
-            request.setAttribute("error", "Lỗi khi cập nhật thông tin: " + e.getMessage());
+            request.setAttribute("error", "Error updating profile: " + e.getMessage());
             request.setAttribute("user", user);
         }
 
@@ -127,6 +127,6 @@ public class UserProfileController extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Servlet xử lý thông tin hồ sơ người dùng";
+        return "Servlet that handles user profile information";
     }
 }
