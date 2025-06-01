@@ -339,6 +339,7 @@ public class SupplierDAO {
                     supplier.setSupplierName(rs.getString("name"));
                     supplier.setSupplierPhone(rs.getString("phone"));
                     supplier.setSupplierAddress(rs.getString("address"));
+                    supplier.setSupplierEmail(rs.getString("email"));
                     supplier.setSupplierStatus(rs.getString("status"));
 
                     list.add(supplier);

@@ -224,6 +224,11 @@
                     <span class="text-lg">Quản lý kho</span>
                     <span class="ml-auto bg-white bg-opacity-20 text-sm px-2 py-1 rounded-full">5</span>
                 </a>
+                <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="nav-item flex items-center p-3">
+                    <i class="fas fa-box-open mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Danh sách nhà cung cấp</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
+                </a>
                 <a href="${pageContext.request.contextPath}/items.jsp" class="nav-item flex items-center p-3">
                     <i class="fas fa-box-open mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh mục vật tư</span>
@@ -266,23 +271,23 @@
                         <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                             <i class="fas fa-bars text-2xl"></i>
                         </button>
-                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Danh sách Nhà cung cấp</h2>
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">List Supplier</h2>
                     </div>
                     <a href="${pageContext.request.contextPath}/AddSupplierServlet" class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
-                        <i class="fas fa-plus-circle mr-2"></i> Thêm Nhà Cung Cấp Mới
+                        <i class="fas fa-plus-circle mr-2"></i> Create new supplier
                     </a>
                 </div>
 
                 <!-- Search and Filter Form -->
                 <form action="ListSupplierServlet" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchName" placeholder="Tìm kiếm theo tên nhà cung cấp"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="searchName" placeholder="Search name"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchPhone" placeholder="Tìm kiếm theo SĐT nhà cung cấp"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="searchPhone" placeholder="Search phone"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchAddress" placeholder="Tìm kiếm theo địa chỉ "  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="searchAddress" placeholder="Search address "  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <div class="flex-1 min-w-[150px]">
                         <select name="searchStatus" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">                            <option value="">Tất cả Trạng thái</option>
@@ -291,7 +296,7 @@
                         </select>
                     </div>
                     <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg flex items-center">
-                        <i class="fas fa-search mr-2"></i> Tìm kiếm
+                        <i class="fas fa-search mr-2"></i> Search
                     </button>
                 </form>
 
@@ -301,28 +306,28 @@
                         <table class="w-full table-auto">
                             <thead>
                                 <tr class="bg-primary-600 text-white">
-                                    <th class="p-4 text-left">Tên Nhà Cung Cấp</th>
-                                    <th class="p-4 text-left">SĐT</th>
-                                    <th class="p-4 text-left">Địa chỉ</th>
+                                    <th class="p-4 text-left">Name</th>
+                                    <th class="p-4 text-left">Phone</th>
+                                    <th class="p-4 text-left">Address</th>
                                     <th class="p-4 text-left">Email</th>
-                                    <th class="p-4 text-left">Trạng thái</th>
-                                    <th class="p-4 text-left">Vật tư cung cấp</th>
-                                    <th class="p-4 text-left">Hành động</th>
+                                    <th class="p-4 text-left">Status</th>
+                                    <th class="p-4 text-left">List material</th>
+                                    <th class="p-4 text-left">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <c:forEach var="item" items="${suppliers}">
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
                                         <td class="p-4 font-medium">${item.supplierName}</td>
-                                        <td class="p-4">${item.supplierPhone}</td>
-                                        <td class="p-4">${item.supplierAddress}</td>
-                                        <td class="p-4">${item.supplierEmail}</td>
-                                        <td class="p-4">${item.supplierStatus}</td>
-                                        <td class="p-4">
-                                            <a href="ListSupplierMaterialServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">Danh sách </a>
+                                        <td class="p-4 font-medium">${item.supplierPhone}</td>
+                                        <td class="p-4 font-medium">${item.supplierAddress}</td>
+                                        <td class="p-4 font-medium">${item.supplierEmail}</td>
+                                        <td class="p-4 font-medium">${item.supplierStatus}</td>
+                                        <td class="p-4 font-medium">
+                                            <a href="ListSupplierMaterialServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">List </a>
                                         </td>
-                                        <td class="p-4">
-                                            <a href="EditSupplierServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">Chỉnh sửa</a>
+                                        <td class="p-4 font-medium">
+                                            <a href="EditSupplierServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -340,7 +345,7 @@
                                     <span>[${i}]</span>
                                 </c:when>
                                 <c:otherwise>
-                                     <a href="ListSupplierServlet?page=${i}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}">${i}</a>
+                                    <a href="ListSupplierServlet?page=${i}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}">${i}</a>
                                 </c:otherwise>
                             </c:choose>
                         </c:forEach>

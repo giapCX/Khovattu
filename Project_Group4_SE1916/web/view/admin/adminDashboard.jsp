@@ -257,7 +257,7 @@
                 </div>
             </div>
             <nav class="space-y-2">
-                 <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-3">
+                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-3">
                     <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
                     <span class="text-lg">Thông tin cá nhân</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
@@ -271,6 +271,11 @@
                     <i class="fas fa-warehouse mr-3 w-6 text-center"></i>
                     <span class="text-lg">Quản lý kho</span>
                     <span class="ml-auto bg-white bg-opacity-20 text-sm px-2 py-1 rounded-full">5</span>
+                </a>
+                <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="nav-item flex items-center p-3">
+                    <i class="fas fa-box-open mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Danh sách nhà cung cấp</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
                 <a href="${pageContext.request.contextPath}/items.jsp" class="nav-item flex items-center p-3">
                     <i class="fas fa-box-open mr-3 w-6 text-center"></i>
@@ -292,7 +297,7 @@
                     <span class="text-lg">Danh sách người dùng</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-               </nav>
+            </nav>
             <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">
                 <a href="${pageContext.request.contextPath}/logout" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
                     <i class="fas fa-sign-out-alt mr-3"></i>
