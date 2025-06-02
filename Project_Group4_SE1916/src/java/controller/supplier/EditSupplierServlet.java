@@ -93,14 +93,33 @@ public class EditSupplierServlet extends HttpServlet {
         
         Connection conn = DBContext.getConnection();
         SupplierDAO s= new SupplierDAO(conn);     
-        boolean success = s.updateSupplier(supplier);
-        if (success) {           
-            request.setAttribute("errorMessage", "Cập nhật nhà cung thành công!");
-            request.getRequestDispatcher("view/supplier/editSupplier.jsp").forward(request, response);
-        } else {
-            request.setAttribute("errorMessage", "Cập nhật nhà cung cấp thất bại!");
-            request.getRequestDispatcher("view/supplier/editSupplier.jsp").forward(request, response);
-        }
+        Supplier oldSupplier = s.getSupplierById(supplier.getSupplierId());
+
+         boolean isChanged = false;
+
+    if (oldSupplier != null) {
+        if (!supplier.getSupplierName().equals(oldSupplier.getSupplierName())) isChanged = true;
+        else if (!supplier.getSupplierPhone().equals(oldSupplier.getSupplierPhone())) isChanged = true;
+        else if (!supplier.getSupplierAddress().equals(oldSupplier.getSupplierAddress())) isChanged = true;
+        else if (!supplier.getSupplierEmail().equals(oldSupplier.getSupplierEmail())) isChanged = true;
+        else if (!supplier.getSupplierStatus().equals(oldSupplier.getSupplierStatus())) isChanged = true;
+    } else {
+        // Nếu không tìm thấy supplier hiện tại thì coi như có thay đổi
+        isChanged = true;
+    }
+
+    String message;
+    if (!isChanged) {
+        message = "Bạn chưa thay đổi gì!";
+    } else {
+        boolean updated = s.updateSupplier(supplier);
+        message = updated ? "Cập nhật thành công!" : "Cập nhật thất bại!";
+    }
+
+    request.setAttribute("errorMessage", message);
+    // Chuyển tiếp tới trang hiển thị, ví dụ editSupplier.jsp
+    request.getRequestDispatcher("/view/supplier/editSupplier.jsp").forward(request, response);
+      
         
     }
 

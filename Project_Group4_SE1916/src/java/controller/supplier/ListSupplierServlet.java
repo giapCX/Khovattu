@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import model.Supplier;
 
@@ -61,49 +62,62 @@ public class ListSupplierServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+String searchName = request.getParameter("searchName");
+String searchPhone = request.getParameter("searchPhone");
+String searchAddress = request.getParameter("searchAddress");
+String searchStatus = request.getParameter("searchStatus");
+String pageParam = request.getParameter("page");
+int currentPage = 1;
+int recordsPerPage = 6;
 
-        String searchName = request.getParameter("searchName");
-        String searchPhone = request.getParameter("searchPhone");
-        String searchAddress = request.getParameter("searchAddress");
-        String searchStatus = request.getParameter("searchStatus");
-        String pageParam = request.getParameter("page");
-        int currentPage = 1;
-        int recordsPerPage = 6;
+if (pageParam != null) {
+    try {
+        currentPage = Integer.parseInt(pageParam);
+        if (currentPage < 1) currentPage = 1; // đảm bảo currentPage không âm hoặc 0
+    } catch (NumberFormatException e) {
+        currentPage = 1;
+    }
+}
 
-        if (pageParam != null) {
-            try {
-                currentPage = Integer.parseInt(pageParam);
-            } catch (NumberFormatException e) {
-                currentPage = 1;
-            }
-        }
+try (Connection conn = DBContext.getConnection()) {
+    SupplierDAO supplierDAO = new SupplierDAO(conn);
 
-        try (Connection conn = DBContext.getConnection()) {
-            SupplierDAO supplierDAO = new SupplierDAO(conn);
+    int totalRecords = supplierDAO.countSuppliersByNamePhoneAddressStatus(searchName, searchPhone, searchAddress, searchStatus);
 
-            // Tổng số user theo search, role, status filter
-            int totalRecords = supplierDAO.countSuppliersByNamePhoneAddressStatus(searchName, searchPhone, searchAddress, searchStatus);
+    // Nếu không có bản ghi nào, set totalPages tối thiểu là 1
+    int totalPages = 1;
+    if (totalRecords > 0) {
+        totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+    }
 
-            // Tính offset để phân trang
-            int offset = (currentPage - 1) * recordsPerPage;
+    // Nếu currentPage lớn hơn tổng số trang, gán lại cho đúng
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
 
-            // Lấy danh sách user theo điều kiện + phân trang
-            List<Supplier> suppliers = supplierDAO.searchSuppliersByNamePhoneAddressStatusWithPaging(searchName, searchPhone, searchAddress, searchStatus, offset, recordsPerPage);
+    int offset = (currentPage - 1) * recordsPerPage;
 
-            int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+    List<Supplier> suppliers = supplierDAO.searchSuppliersByNamePhoneAddressStatusWithPaging(searchName, searchPhone, searchAddress, searchStatus, offset, recordsPerPage);
 
-            request.setAttribute("suppliers", suppliers);
-            request.setAttribute("searchName", searchName);
-            request.setAttribute("searchPhone", searchPhone);
-            request.setAttribute("searchAddress", searchAddress);
-            request.setAttribute("searchStatus", searchStatus);
-            request.setAttribute("currentPage", currentPage);
-            request.setAttribute("totalPages", totalPages);
+    // Đảm bảo suppliers không null, nếu null thì khởi tạo list rỗng
+    if (suppliers == null) {
+        suppliers = new ArrayList<>();
+    }
 
-            request.getRequestDispatcher("/view/supplier/listSupplier.jsp").forward(request, response);
-        } catch (Exception e) {
-            throw new ServletException(e);
-        }
+    request.setAttribute("suppliers", suppliers);
+    request.setAttribute("searchName", searchName);
+    request.setAttribute("searchPhone", searchPhone);
+    request.setAttribute("searchAddress", searchAddress);
+    request.setAttribute("searchStatus", searchStatus);
+    request.setAttribute("currentPage", currentPage);
+    request.setAttribute("totalPages", totalPages);
+    request.setAttribute("recordsPerPage", recordsPerPage);
+
+    request.getRequestDispatcher("/view/supplier/listSupplier.jsp").forward(request, response);
+} catch (Exception e) {
+    throw new ServletException(e);
+}
+
     }
 
     /**

@@ -316,41 +316,105 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="item" items="${suppliers}">
-                                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                                        <td class="p-4 font-medium">${item.supplierName}</td>
-                                        <td class="p-4 font-medium">${item.supplierPhone}</td>
-                                        <td class="p-4 font-medium">${item.supplierAddress}</td>
-                                        <td class="p-4 font-medium">${item.supplierEmail}</td>
-                                        <td class="p-4 font-medium">${item.supplierStatus}</td>
-                                        <td class="p-4 font-medium">
-                                            <a href="ListSupplierMaterialServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">List </a>
-                                        </td>
-                                        <td class="p-4 font-medium">
-                                            <a href="EditSupplierServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
+                                <c:choose>
+                                    <c:when test="${not empty suppliers}">
+                                        <c:forEach var="item" items="${suppliers}">
+                                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                                <td class="p-4 font-medium">${item.supplierName}</td>
+                                                <td class="p-4 font-medium">${item.supplierPhone}</td>
+                                                <td class="p-4 font-medium">${item.supplierAddress}</td>
+                                                <td class="p-4 font-medium">${item.supplierEmail}</td>
+                                                <td class="p-4 font-medium">${item.supplierStatus}</td>
+                                                <td class="p-4 font-medium">
+                                                    <a href="ListSupplierMaterialServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">List </a>
+                                                </td>
+                                                <td class="p-4 font-medium">
+                                                    <a href="EditSupplierServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <tr>
+                                            <td colspan="7" class="p-4 text-center text-gray-500 dark:text-gray-400">
+                                                Không tìm thấy nhà cung cấp nào
+                                            </td>
+                                        </tr>
+                                    </c:otherwise>
+                                </c:choose>
                             </tbody>
+
                         </table>
                     </div>
-                </div>
+                </div><br/>
 
                 <!-- Pagination -->
-                <c:if test="${totalPages > 1}">
-                    <div class="mt-6 flex justify-center pagination">
-                        <c:forEach begin="1" end="${totalPages}" var="i">
-                            <c:choose>
-                                <c:when test="${i == currentPage}">
-                                    <span>[${i}]</span>
-                                </c:when>
-                                <c:otherwise>
-                                    <a href="ListSupplierServlet?page=${i}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}">${i}</a>
-                                </c:otherwise>
-                            </c:choose>
-                        </c:forEach>
-                    </div>
-                </c:if>
+                <div class="pagination flex items-center justify-center space-x-1">
+                    <!-- Nút trang trước -->
+                    <c:choose>
+                        <c:when test="${currentPage > 1}">
+                            <a href="ListSupplierServlet?page=${currentPage - 1}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&lt;</a>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">&lt;</span>
+                        </c:otherwise>
+                    </c:choose>
+
+                    <!-- Trang 1 luôn hiện -->
+                    <c:choose>
+                        <c:when test="${currentPage == 1}">
+                            <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">1</span>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="ListSupplierServlet?page=1&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">1</a>
+                        </c:otherwise>
+                    </c:choose>
+
+                    <!-- Dấu ... nếu khoảng cách trang hiện tại > 3 với trang 1 -->
+                    <c:if test="${currentPage > 4}">
+                        <span class="px-3 py-1">...</span>
+                    </c:if>
+
+                    <!-- Hiển thị các trang giữa: từ max(2, currentPage-1) đến min(totalPages-1, currentPage+1) -->
+                    <c:forEach var="i" begin="${currentPage - 1 > 1 ? currentPage - 1 : 2}" end="${currentPage + 1 < totalPages ? currentPage + 1 : totalPages - 1}">
+                        <c:choose>
+                            <c:when test="${i == currentPage}">
+                                <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${i}</span>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="ListSupplierServlet?page=${i}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${i}</a>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:forEach>
+
+                    <!-- Dấu ... nếu khoảng cách trang hiện tại < totalPages - 3 -->
+                    <c:if test="${currentPage < totalPages - 3}">
+                        <span class="px-3 py-1">...</span>
+                    </c:if>
+
+                    <!-- Trang cuối (nếu > 1) -->
+                    <c:if test="${totalPages > 1}">
+                        <c:choose>
+                            <c:when test="${currentPage == totalPages}">
+                                <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${totalPages}</span>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="ListSupplierServlet?page=${totalPages}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${totalPages}</a>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:if>
+
+                    <!-- Nút trang sau -->
+                    <c:choose>
+                        <c:when test="${currentPage < totalPages}">
+                            <a href="ListSupplierServlet?page=${currentPage + 1}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&gt;</a>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">&gt;</span>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+
 
                 <div class="mt-6 flex justify-center">
                     <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay lại Trang chủ</a>
