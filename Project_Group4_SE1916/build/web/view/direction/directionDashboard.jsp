@@ -235,7 +235,7 @@
                     <span class="text-lg">Thông tin cá nhân</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/categories.jsp" class="nav-item flex items-center p-3">
+                <a href="${pageContext.request.contextPath}/ListMaterialController" class="nav-item flex items-center p-3">
                     <i class="fas fa-box-open mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh mục vật tư</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>

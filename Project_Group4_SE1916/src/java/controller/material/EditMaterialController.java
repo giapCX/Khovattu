@@ -1,6 +1,6 @@
 
 
-package Controller.material;
+package controller.material;
 
 import dao.MaterialDAO;
 import dao.MaterialCategoryDAO;
@@ -17,6 +17,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -80,7 +81,12 @@ public class EditMaterialController extends HttpServlet {
             }
             
             materialDAO.updateMaterial(material, supplierIdList);
-            response.sendRedirect(request.getContextPath() + "/material?action=list");
+            
+            // Lưu thông báo thành công vào session
+            HttpSession session = request.getSession();
+            session.setAttribute("successMessage", "Save material successful!");
+            
+            response.sendRedirect(request.getContextPath() + "/ListMaterialController?action=list");
         } catch (SQLException e) {
             throw new ServletException(e);
         }

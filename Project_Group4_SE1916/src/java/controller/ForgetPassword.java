@@ -45,19 +45,19 @@ public class ForgetPassword extends HttpServlet {
         HttpSession session = request.getSession();
 
         if (username == null || Email == null) {
-            setErrorAndForward(request, response, "Tên tài khoản hoặc email không đúng, vui lòng nhập lại!");
+            setErrorAndForward(request, response, "Invalid account name or email, please re-enter!");
             return;
         }
 
         Account account = getAccountByUsername(username);
         if (account == null) {
-            setErrorAndForward(request, response, "Tên tài khoản hoặc email không đúng, vui lòng nhập lại!");
+            setErrorAndForward(request, response, "Invalid account name or email, please re-enter!");
             return;
         }
 
         User user = getUserByUsername(username);
         if (user == null || !Email.equals(user.getEmail())) {
-            setErrorAndForward(request, response, "Tên tài khoản hoặc email không đúng, vui lòng nhập lại!");
+            setErrorAndForward(request, response, "Invalid account name or email, please re-enter!");
             return;
         }
 
@@ -74,7 +74,7 @@ public class ForgetPassword extends HttpServlet {
         }
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("../forgetPassword/confirmEmail.jsp");
-        request.setAttribute("message", "Mật khẩu mới đã được gửi đến bạn, vui lòng kiểm tra email.");
+        request.setAttribute("message", "A new password has been sent to you, please check your email.");
         session.setAttribute("passGen", newPassword);
          session.setAttribute("accountForgetPass", account);
         session.setMaxInactiveInterval(300);

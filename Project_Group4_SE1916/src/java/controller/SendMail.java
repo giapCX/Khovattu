@@ -28,7 +28,7 @@ public class SendMail extends HttpServlet {
         User newUser = (User) session.getAttribute("userForgetPass");
 
         if (newUser == null) {
-            setErrorAndForward(req, resp, "Đã xảy ra lỗi. Vui lòng thử lại.");
+            setErrorAndForward(req, resp, "An error occured, please try again.");
             return;
         }
 
@@ -47,10 +47,10 @@ public class SendMail extends HttpServlet {
                 sendEmail(recipient, message);
                 req.getRequestDispatcher("./confirmEmail.jsp").forward(req, resp);
             } catch (MessagingException e) {
-                setErrorAndForward(req, resp, "Chúng tôi không thể gửi mã code đến email của bạn.");
+                setErrorAndForward(req, resp, "We can't send code to your email.");
             }
         } else {
-            setErrorAndForward(req, resp, "Email không hợp lệ.");
+            setErrorAndForward(req, resp, "Invalid email, please re-enter.");
         }
     }
 

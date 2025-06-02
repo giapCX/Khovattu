@@ -92,7 +92,7 @@
                             <img src="${mat.imageUrl}" class="thumbnail" alt="Hình ảnh vật tư">
                         </td>
                         <td>
-                            <a href="${pageContext.request.contextPath}/material/edit?id=${mat.materialId}" class="btn btn-sm btn-warning action-btn">Sửa</a>
+                            <a href="${pageContext.request.contextPath}/EditMaterialController?id=${mat.materialId}" class="btn btn-sm btn-warning action-btn">Sửa</a>
                             <form action="${pageContext.request.contextPath}/ListMaterialController" method="post" style="display:inline;">
                                 <input type="hidden" name="action" value="delete"/>
                                 <input type="hidden" name="id" value="${mat.materialId}"/>
@@ -145,6 +145,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function () {
             var table = $('#materialTable').DataTable({
@@ -167,6 +168,22 @@
                 table.column(5).search(this.value).draw();
             });
         });
+        
+        // Hiển thị thông báo thành công từ session
+            <c:if test="${not empty sessionScope.successMessage}">
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Successful',
+                    text: '${sessionScope.successMessage}',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    customClass: {
+                        popup: 'animated fadeInDown'
+                    }
+                });
+                // Xóa thông báo sau khi hiển thị
+                <% session.removeAttribute("successMessage"); %>
+            </c:if>
     </script>
 </body>
 </html>
