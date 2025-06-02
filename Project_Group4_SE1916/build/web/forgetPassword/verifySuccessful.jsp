@@ -1,4 +1,4 @@
-//verisucess.jsp
+
 <%-- 
     Document   : verifySuccessful
     Created on : May 24, 2025, 10:19:48 PM

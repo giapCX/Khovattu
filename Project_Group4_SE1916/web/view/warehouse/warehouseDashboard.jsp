@@ -248,7 +248,7 @@
                 </div>
                 <span class="ml-auto bg-white bg-opacity-20 text-sm px-2 py-1 rounded">5</span>
             </a>
-            <a href="${pageContext.request.contextPath}/categories.jsp" class="nav-item flex items-center p-3 justify-between">
+            <a href="${pageContext.request.contextPath}/ListMaterialController" class="nav-item flex items-center p-3 justify-between">
                 <div class="flex items-center">
                     <i class="fas fa-box-open mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh mục vật tư</span>
