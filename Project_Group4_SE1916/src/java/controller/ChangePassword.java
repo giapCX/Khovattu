@@ -34,13 +34,18 @@ public class ChangePassword extends HttpServlet {
         String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$";
 
         AccountDAO accdb = new AccountDAO();
-        String oldPassword = accdb.getPasswordByUsername(username); // Lấy mật khẩu hiện tại
+        String oldHashedPassword = accdb.getPasswordByUsername(username); // Lấy mật khẩu hiện tại
         if (!newPass.equals(newCfPass)) {
             request.setAttribute("mess2", "Password do not match.Please re-enter");
             request.getRequestDispatcher("./changePassword.jsp").forward(request, response);
-        } else if (newPass.equals(oldPassword)) {
+        } //        else if (newPass.equals(oldPassword)) {
+        //            request.setAttribute("mess2", "New password cannot be the same as old password!");
+        //            request.getRequestDispatcher("./changePassword.jsp").forward(request, response);
+        //        }
+        else if (BCrypt.checkpw(newPass, oldHashedPassword)) {
             request.setAttribute("mess2", "New password cannot be the same as old password!");
             request.getRequestDispatcher("./changePassword.jsp").forward(request, response);
+
         } else {
             if (newPass.matches(passwordRegex)) {
 //                AccountDAO accdb = new AccountDAO();

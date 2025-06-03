@@ -54,7 +54,7 @@ public class AccountDAO extends DBContext {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                password = rs.getString("password");
+                password = rs.getString("password_hash");
             }
             conn.close();
         } catch (Exception e) {
@@ -64,7 +64,7 @@ public class AccountDAO extends DBContext {
     }
 
     public Account checkAccountExisted(String username) {
-        String sql = "SELECT * FROM users \n"
+        String sql = "SELECT * FROM users "
                 + "WHERE username = ?";
         try {
             PreparedStatement stm = connection.prepareStatement(sql); //open conextion with SQL

@@ -1,4 +1,3 @@
-
 package controller;
 
 import dao.AccountDAO;
@@ -13,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Account;
 import model.User;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
@@ -27,22 +27,27 @@ public class ChangePasswordByForget extends HttpServlet {
         String newPass = request.getParameter("password");
         String newCfPass = request.getParameter("cfpassword");
 
-        Account acc =  (Account) request.getSession().getAttribute("accountForgetPass");
+        Account acc = (Account) request.getSession().getAttribute("accountForgetPass");
         String username = acc.getUsername();
 
         String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$";
 
         AccountDAO accdb = new AccountDAO();
-        String oldPassword = accdb.getPasswordByUsername(username); // Lấy mật khẩu hiện tại
+        //String oldPassword = accdb.getPasswordByUsername(username); // Lấy mật khẩu hiện tại
         if (!newPass.equals(newCfPass)) {
             request.setAttribute("mess2", "Password do not match.Please re-enter!");
             request.getRequestDispatcher("./changePasswordByForget.jsp").forward(request, response);
-        } else if (newPass.equals(oldPassword)) {
-            request.setAttribute("mess2", "New password cannot be the same as old password!");
-            request.getRequestDispatcher("./changePasswordByForget.jsp").forward(request, response);
-        } else {
+        }
+//        else if (BCrypt.checkpw(newPass, oldPassword)) {
+//            request.setAttribute("mess2", "New password cannot be the same as old password!");
+//            request.getRequestDispatcher("./changePasswordByForget.jsp").forward(request, response);
+//        } 
+        else {
             if (newPass.matches(passwordRegex)) {
 //                AccountDAO accdb = new AccountDAO();
+
+                //String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
+                
                 accdb.updatePassword(username, newPass);
                 response.sendRedirect("./changePasswordSuccess.jsp");
 
@@ -67,7 +72,7 @@ public class ChangePasswordByForget extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("./changePassword.jsp").forward(request, response);
+        request.getRequestDispatcher("./changePasswordByForget.jsp").forward(request, response);
     }
 
     /**
