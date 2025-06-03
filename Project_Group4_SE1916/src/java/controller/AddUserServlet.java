@@ -91,16 +91,18 @@ public class AddUserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        String username = request.getParameter("username");
-        String fullName = request.getParameter("fullName");
-        String address = request.getParameter("address");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        String dob = request.getParameter("dob"); // yyyy-MM-dd
-        String status = request.getParameter("status");
-        int roleId = Integer.parseInt(request.getParameter("roleId"));
+         // Lấy dữ liệu từ form
+    String code = request.getParameter("code"); 
+    String username = request.getParameter("username");
+    String fullName = request.getParameter("fullName");
+    String address = request.getParameter("address");
+    String email = request.getParameter("email");
+    String phone = request.getParameter("phone");
+    String dob = request.getParameter("dob"); 
+    String status = request.getParameter("status");
+    int roleId = Integer.parseInt(request.getParameter("roleId"));
 
-        try (Connection conn = DBContext.getConnection()) {
+    try (Connection conn = DBContext.getConnection()) {
         UserDAO userDAO = new UserDAO(conn);
 
         // Mật khẩu mặc định (chưa mã hóa)
@@ -108,6 +110,7 @@ public class AddUserServlet extends HttpServlet {
 
         // Tạo user và set thông tin
         User user = new User();
+        user.setCode(code); 
         user.setUsername(username);
         user.setFullName(fullName);
         user.setAddress(address != null ? address : "");
