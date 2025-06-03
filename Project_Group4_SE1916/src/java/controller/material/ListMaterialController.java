@@ -37,7 +37,6 @@ public class ListMaterialController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         try {
-            // Chỉ giữ logic cho action "list" hoặc null
             listMaterials(request, response);
         } catch (SQLException e) {
             throw new ServletException(e);
@@ -60,7 +59,7 @@ public class ListMaterialController extends HttpServlet {
         List<Material> materials = materialDAO.getAllMaterials();
         List<MaterialCategory> categories = categoryDAO.getAllCategories();
         List<MaterialBrand> brands = brandDAO.getAllBrands();
-        List<Supplier> suppliers = supplierDAO.getAllSuppliers();
+        List<Supplier> suppliers = supplierDAO.getSuppliers(); // Updated to use getSuppliers()
         
         request.setAttribute("materials", materials);
         request.setAttribute("categories", categories);
@@ -72,6 +71,7 @@ public class ListMaterialController extends HttpServlet {
     private void deleteMaterial(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
         int materialId = Integer.parseInt(request.getParameter("id"));
         materialDAO.deleteMaterial(materialId);
+        request.getSession().setAttribute("successMessage", "Xóa vật tư thành công!");
         response.sendRedirect(request.getContextPath() + "/ListMaterialController?action=list");
     }
 }
