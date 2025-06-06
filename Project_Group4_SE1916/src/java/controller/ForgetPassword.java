@@ -1,4 +1,3 @@
-
 package controller;
 
 import jakarta.servlet.RequestDispatcher;
@@ -22,7 +21,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import model.Account;
 import model.User;
-
 
 public class ForgetPassword extends HttpServlet {
 
@@ -63,7 +61,7 @@ public class ForgetPassword extends HttpServlet {
 
         // Generate a new password
         String newPassword = generateRandomPassword(8);
-        
+
         // Update the password in the database
         updatePassword(username, newPassword);
 
@@ -76,7 +74,7 @@ public class ForgetPassword extends HttpServlet {
         RequestDispatcher dispatcher = request.getRequestDispatcher("../forgetPassword/confirmEmail.jsp");
         request.setAttribute("message", "A new password has been sent to you, please check your email.");
         session.setAttribute("passGen", newPassword);
-         session.setAttribute("accountForgetPass", account);
+        session.setAttribute("userForgetPass", username);
         session.setMaxInactiveInterval(300);
         session.setAttribute("email", Email);
         dispatcher.forward(request, response);

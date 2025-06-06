@@ -23,31 +23,22 @@ public class ChangePasswordByForget extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(); 
         String newPass = request.getParameter("password");
         String newCfPass = request.getParameter("cfpassword");
 
-        Account acc = (Account) request.getSession().getAttribute("accountForgetPass");
-        String username = acc.getUsername();
+        String username = (String) session.getAttribute("userForgetPass");
 
         String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$";
 
-        AccountDAO accdb = new AccountDAO();
-        //String oldPassword = accdb.getPasswordByUsername(username); // Lấy mật khẩu hiện tại
         if (!newPass.equals(newCfPass)) {
             request.setAttribute("mess2", "Password do not match.Please re-enter!");
             request.getRequestDispatcher("./changePasswordByForget.jsp").forward(request, response);
-        }
-//        else if (BCrypt.checkpw(newPass, oldPassword)) {
-//            request.setAttribute("mess2", "New password cannot be the same as old password!");
-//            request.getRequestDispatcher("./changePasswordByForget.jsp").forward(request, response);
-//        } 
-        else {
+        } else {
             if (newPass.matches(passwordRegex)) {
-//                AccountDAO accdb = new AccountDAO();
+                AccountDAO accdb = new AccountDAO();
 
                 //String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
-                
                 accdb.updatePassword(username, newPass);
                 response.sendRedirect("./changePasswordSuccess.jsp");
 
