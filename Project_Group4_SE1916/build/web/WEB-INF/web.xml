@@ -68,6 +68,10 @@
         <servlet-name>ListMaterialController</servlet-name>
         <servlet-class>controller.material.ListMaterialController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ImportDataController</servlet-name>
+        <servlet-class>controller.ImportDataController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -135,6 +139,10 @@
     <servlet-mapping>
         <servlet-name>ListMaterialController</servlet-name>
         <url-pattern>/ListMaterialController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImportDataController</servlet-name>
+        <url-pattern>/import_data</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

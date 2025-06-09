@@ -12,6 +12,8 @@ import model.Supplier;
 import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import model.ImportDetail;
+import model.ImportReceipt;
 
 public class SupplierDAO {
 
@@ -83,6 +85,61 @@ public class SupplierDAO {
         }
 
         return supplier;
+    }
+
+    public void saveImportReceipt(ImportReceipt receipt, List<ImportDetail> details) throws SQLException {
+        String sqlReceipt = "INSERT INTO ImportReceipts (import_id, supplier_id, user_id, import_date, note) VALUES (?, ?, ?, ?, ?) "
+                + "ON DUPLICATE KEY UPDATE supplier_id = VALUES(supplier_id), user_id = VALUES(user_id), import_date = VALUES(import_date), note = VALUES(note)";
+        String sqlDetail = "INSERT INTO ImportDetails (import_id, material_id, quantity, price_per_unit, material_condition) VALUES (?, ?, ?, ?, ?) "
+                + "ON DUPLICATE KEY UPDATE quantity = VALUES(quantity), price_per_unit = VALUES(price_per_unit), material_condition = VALUES(material_condition)";
+        String sqlInventory = "INSERT INTO Inventory (material_id, material_condition, quantity_in_stock) VALUES (?, ?, ?) "
+                + "ON DUPLICATE KEY UPDATE quantity_in_stock = quantity_in_stock + ?";
+
+        try {
+            conn.setAutoCommit(false);
+
+            // Insert or update receipt
+            try (PreparedStatement stmtReceipt = conn.prepareStatement(sqlReceipt)) {
+                stmtReceipt.setInt(1, receipt.getImportId());
+                stmtReceipt.setInt(2, receipt.getSupplierId());
+                stmtReceipt.setInt(3, receipt.getUserId());
+                stmtReceipt.setDate(4, receipt.getImportDate());
+                stmtReceipt.setString(5, receipt.getNote());
+                stmtReceipt.executeUpdate();
+            }
+
+            // Insert or update details
+            try (PreparedStatement stmtDetail = conn.prepareStatement(sqlDetail)) {
+                for (ImportDetail detail : details) {
+                    stmtDetail.setInt(1, detail.getImportId());
+                    stmtDetail.setInt(2, detail.getMaterialId());
+                    stmtDetail.setDouble(3, detail.getQuantity());
+                    stmtDetail.setDouble(4, detail.getPricePerUnit());
+                    stmtDetail.setString(5, detail.getMaterialCondition());
+                    stmtDetail.addBatch();
+                }
+                stmtDetail.executeBatch();
+            }
+
+            // Update inventory
+            try (PreparedStatement stmtInventory = conn.prepareStatement(sqlInventory)) {
+                for (ImportDetail detail : details) {
+                    stmtInventory.setInt(1, detail.getMaterialId());
+                    stmtInventory.setString(2, detail.getMaterialCondition());
+                    stmtInventory.setDouble(3, detail.getQuantity());
+                    stmtInventory.setDouble(4, detail.getQuantity());
+                    stmtInventory.addBatch();
+                }
+                stmtInventory.executeBatch();
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
     }
 
     public boolean updateSupplier(Supplier supplier) {
@@ -213,13 +270,12 @@ public class SupplierDAO {
 
         return list;
     }
-    
-    
-     public SupplierDAO() {
+
+    public SupplierDAO() {
         this.conn = DBContext.getConnection();
     }
 
-public List<Supplier> getAllSuppliers() throws SQLException {
+    public List<Supplier> getAllSuppliers() throws SQLException {
         List<Supplier> suppliers = new ArrayList<>();
         String sql = "SELECT supplier_id, name, phone, address, email, status FROM Suppliers";
         try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
@@ -237,7 +293,7 @@ public List<Supplier> getAllSuppliers() throws SQLException {
         return suppliers;
     }
 
-   public List<Supplier> getSuppliers() {
+    public List<Supplier> getSuppliers() {
         List<Supplier> suppliers = new ArrayList<>();
 
         String sql = "SELECT s.supplier_id, s.name AS supplier_name, s.phone AS supplier_phone, "
@@ -302,8 +358,5 @@ public List<Supplier> getAllSuppliers() throws SQLException {
         }
         return suppliers;
     }
-
-
-
 
 }
