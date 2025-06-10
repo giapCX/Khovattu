@@ -25,7 +25,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/import-data")
+
 @MultipartConfig
 public class ImportDataController extends HttpServlet {
 
