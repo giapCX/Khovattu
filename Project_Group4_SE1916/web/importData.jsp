@@ -1,227 +1,286 @@
-<%--
-    Document   : importData
-    Created on : 9 June 2025, 6:30:26 pm
-    Author     : Giap
-    Updated on : 10 June 2025
---%>
-
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nhập Dữ Liệu Đã Nhập Kho</title>
+    <title>Phiếu Nhập Kho</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(to bottom, #f0f4f8, #d9e2ec); }
-        .card { 
-            transition: all 0.3s ease; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1); 
-            border-radius: 1.5rem; 
-            border: none; 
-            background: white;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9fafb;
         }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(0,0,0,0.15); }
-        .btn-primary { 
-            background: linear-gradient(135deg, #3b82f6, #7e22ce); 
-            transition: all 0.3s ease; 
+        .table-container {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            overflow: hidden;
+        }
+        .table-header {
+            background-color: #f3f4f6;
             font-weight: 600;
         }
-        .btn-primary:hover { 
-            transform: scale(1.05); 
-            box-shadow: 0 12px 24px rgba(59,130,246,0.3); 
+        .table-row {
+            border-bottom: 1px solid #e5e7eb;
         }
-        .input-field { 
-            transition: all 0.2s ease; 
-            border: 1px solid #d1d5db; 
-            border-radius: 0.75rem; 
-            padding: 0.75rem; 
+        .table-row:last-child {
+            border-bottom: none;
         }
-        .input-field:focus { 
-            border-color: #3b82f6; 
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.1); 
+        .input-field {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            width: 100%;
         }
-        .section-title {
-            color: #1f2937;
-            font-size: 1.5rem;
-            font-weight: 700;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
         }
+        .btn-primary { background-color: #3b82f6; color: white; }
+        .btn-secondary { background-color: #6b7280; color: white; }
+        .btn:hover { opacity: 0.9; }
+        .new-supplier-input, .new-unit-input {
+            display: none;
+            margin-top: 0.25rem;
+        }
+        .show-input { display: block; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen font-sans antialiased">
-    <c:if test="${empty sessionScope.username}">
-        <c:redirect url="login.jsp"/>
-    </c:if>
+<body class="p-6">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold text-center mb-6">Phiếu Nhập Kho</h1>
 
-    <main class="flex-1 p-6 md:p-10">
-        <div class="max-w-5xl mx-auto card bg-white p-8 md:p-10">
-            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Nhập Dữ Liệu Phiếu Nhập Kho</h2>
+        <form action="${pageContext.request.contextPath}/import-data" method="post" id="importForm">
+            <div class="mb-6">
+                <h2 class="text-lg font-semibold mb-4">Thông tin phiếu nhập</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Mã phiếu nhập</label>
+                        <input type="text" name="import_id" class="input-field" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Ngày nhập</label>
+                        <input type="date" name="import_date" class="input-field" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Người lập phiếu</label>
+                        <input type="text" name="user_id" class="input-field" value="${sessionScope.username}" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nhà cung cấp</label>
+                        <select name="supplier_id" id="supplier-select" class="input-field" onchange="toggleSupplierInput()" required>
+                            <option value="">-- Chọn nhà cung cấp --</option>
+                            <c:forEach var="supplier" items="${suppliers}">
+                                <option value="${supplier.supplierId}">${supplier.supplierName}</option>
+                            </c:forEach>
+                            <option value="new">Thêm nhà cung cấp mới</option>
+                        </select>
+                        <input type="text" name="new_supplier_name" id="new-supplier-input" class="new-supplier-input input-field" placeholder="Nhập tên nhà cung cấp mới">
+                        <c:if test="${empty suppliers}">
+                            <p class="text-red-500">Không có nhà cung cấp nào trong database!</p>
+                        </c:if>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700">Ghi chú</label>
+                        <textarea name="note" class="input-field" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
 
-            <form id="importForm" action="${pageContext.request.contextPath}/import_data" method="post" enctype="multipart/form-data" class="space-y-8">
-                <!-- Thông tin chung -->
+            <div class="mb-6">
+                <h2 class="text-lg font-semibold mb-4">Danh sách hàng nhập</h2>
+                <div class="table-container">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="table-header">
+                                <th class="p-2 text-left">STT</th>
+                                <th class="p-2 text-left">Mã hàng</th>
+                                <th class="p-2 text-left">Tên hàng</th>
+                                <th class="p-2 text-left">Đơn vị</th>
+                                <th class="p-2 text-left">Số lượng</th>
+                                <th class="p-2 text-left">Đơn giá</th>
+                                <th class="p-2 text-left">Thành tiền</th>
+                                <th class="p-2 text-left">Trạng thái</th>
+                                <th class="p-2 text-left">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="material-list">
+                            <!-- Không có hàng mặc định -->
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" id="add-material" class="mt-4 btn btn-primary">+ Thêm hàng</button>
+            </div>
+
+            <div class="mb-6">
+                <h2 class="text-lg font-semibold mb-4">Tổng kết</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Tổng mặt hàng</label>
+                        <input type="number" id="total_items" class="input-field" value="0" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Tổng số lượng</label>
+                        <input type="number" id="total_quantity" class="input-field" value="0" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Tổng tiền hàng</label>
+                        <input type="number" id="total_amount" class="input-field" value="0" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between">
                 <div>
-                    <h3 class="section-title">Thông Tin Chung</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Mã Phiếu Nhập</label>
-                            <input type="text" name="import_id" class="input-field w-full" placeholder="VD: PN20250610" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Ngày Nhập Kho</label>
-                            <input type="date" name="import_date" class="input-field w-full" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nhà Cung Cấp</label>
-                            <select name="supplier_id" class="input-field w-full" required>
-                                <option value="">Chọn nhà cung cấp</option>
-                                <c:forEach var="supplier" items="${suppliers}">
-                                    <option value="${supplier.id}">${supplier.name}</option>
-                                </c:forEach>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Người Nhập</label>
-                            <input type="text" name="user_id" class="input-field w-full" value="${sessionScope.username}" readonly>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Ghi Chú</label>
-                        <textarea name="note" class="input-field w-full" rows="3" placeholder="Ghi chú về phiếu nhập kho..."></textarea>
-                    </div>
+                    <button type="submit" class="btn btn-primary mr-2">Lưu phiếu nhập</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.print()">In phiếu nhập</button>
                 </div>
-
-                <!-- Chi tiết nguyên vật liệu -->
                 <div>
-                    <h3 class="section-title">Chi Tiết Nguyên Vật Liệu</h3>
-                    <div id="material-list" class="space-y-4">
-                        <div class="material-entry grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Nguyên Vật Liệu</label>
-                                <select name="material_id[]" class="input-field w-full" required>
-                                    <option value="">Chọn nguyên vật liệu</option>
-                                    <c:forEach var="material" items="${materials}">
-                                        <option value="${material.id}">${material.name}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Số Lượng</label>
-                                <input type="number" name="quantity[]" class="input-field w-full" min="1" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Đơn Giá (VND)</label>
-                                <input type="number" name="price_per_unit[]" class="input-field w-full" min="0" step="1000" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Tình Trạng</label>
-                                <select name="material_condition[]" class="input-field w-full" required>
-                                    <option value="Tốt">Tốt</option>
-                                    <option value="Trung bình">Trung bình</option>
-                                    <option value="Kém">Kém</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="button" id="add-material" class="mt-4 btn-primary text-white px-4 py-2 rounded-lg">
-                        <i class="fas fa-plus mr-2"></i>Thêm Nguyên Vật Liệu
-                    </button>
+                    <button type="button" class="btn btn-primary mr-2" onclick="resetForm()">Nhập phiếu mới</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href=''">Quay lại danh sách</button>
                 </div>
+            </div>
+        </form>
 
-                <!-- Tải file CSV -->
-                <div>
-                    <h3 class="section-title">Tải Lên File CSV</h3>
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">Chọn file CSV</label>
-                        <input type="file" id="csvFile" name="csvFile" accept=".csv" class="input-field w-full">
-                        <p class="text-xs text-gray-500">Định dạng CSV: import_id, supplier_id, user_id, import_date, note, material_id, quantity, price_per_unit, material_condition</p>
-                    </div>
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700">Hoặc nhập thủ công</label>
-                        <textarea id="manualData" name="manualData" placeholder="Dán dữ liệu CSV ở đây..." class="input-field w-full mt-2" rows="5"></textarea>
-                    </div>
-                </div>
+        <c:if test="${not empty message}">
+            <div class="mt-6 p-4 bg-green-100 text-green-700 rounded-lg">${message}</div>
+        </c:if>
+        <c:if test="${not empty error}">
+            <div class="mt-6 p-4 bg-red-100 text-red-700 rounded-lg">${error}</div>
+        </c:if>
+    </div>
 
-                <div class="flex space-x-4">
-                    <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg flex-1">
-                        <i class="fas fa-save mr-2"></i>Lưu Phiếu Nhập
-                    </button>
-                    <button type="reset" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg flex-1 hover:bg-gray-300">
-                        <i class="fas fa-undo mr-2"></i>Đặt Lại
-                    </button>
-                </div>
-            </form>
-
-            <c:if test="${not empty message}">
-                <div class="mt-6 p-4 bg-green-100 text-green-700 rounded-lg">${message}</div>
-            </c:if>
-            <c:if test="${not empty error}">
-                <div class="mt-6 p-4 bg-red-100 text-red-700 rounded-lg">${error}</div>
-            </c:if>
-        </div>
-    </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
-        // Validate form
-        document.getElementById('importForm').addEventListener('submit', (event) => {
-            const csvFile = document.getElementById('csvFile').files[0];
-            const manualData = document.getElementById('manualData').value.trim();
-            const materialEntries = document.querySelectorAll('.material-entry');
-            if (!csvFile && !manualData && materialEntries.length === 0) {
-                event.preventDefault();
-                Toastify({
-                    text: "Vui lòng nhập ít nhất một nguyên vật liệu, tải lên file CSV hoặc nhập dữ liệu thủ công!",
-                    duration: 3000,
-                    gravity: "top",
-                    position: "center",
-                    backgroundColor: "#ef4444"
-                }).showToast();
+        document.getElementById('add-material').addEventListener('click', function() {
+            const materialList = document.getElementById('material-list');
+            const rowCount = materialList.getElementsByTagName('tr').length + 1;
+            const newRow = document.createElement('tr');
+            newRow.className = 'table-row';
+            newRow.innerHTML = `
+                <td class="p-2">${rowCount}</td>
+                <td class="p-2"><input type="text" name="material_id[]" class="input-field" required></td>
+                <td class="p-2"><input type="text" name="material_name[]" class="input-field" required></td>
+                <td class="p-2">
+                    <select name="unit[]" id="unit-select-${rowCount}" class="input-field" onchange="toggleUnitInput(${rowCount})" required>
+                        <option value="">-- Chọn đơn vị --</option>
+                        <c:forEach var="material" items="${materials}">
+                            <option value="${material.unit}">${material.unit}</option>
+                        </c:forEach>
+                        <option value="new">Thêm đơn vị mới</option>
+                    </select>
+                    <input type="text" name="new_unit[]" id="new-unit-input-${rowCount}" class="new-unit-input input-field" placeholder="Nhập đơn vị mới">
+                    <c:if test="${empty materials}">
+                        <p class="text-red-500">Không có đơn vị nào trong database!</p>
+                    </c:if>
+                </td>
+                <td class="p-2"><input type="number" name="quantity[]" class="input-field" min="1" required></td>
+                <td class="p-2"><input type="number" name="price_per_unit[]" class="input-field" min="0" step="1000" required></td>
+                <td class="p-2"><input type="number" name="total_price[]" class="input-field" readonly></td>
+                <td class="p-2">
+                    <select name="material_condition[]" class="input-field" required>
+                        <option value="Mới">Mới</option>
+                        <option value="Hỏng hóc">Hỏng hóc</option>
+                        <option value="Cũ">Cũ</option>
+                    </select>
+                </td>
+                <td class="p-2"><button type="button" class="btn btn-secondary remove-row">Xóa</button></td>
+            `;
+            materialList.appendChild(newRow);
+            updateTotals();
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-row')) {
+                e.target.closest('tr').remove();
+                updateRowNumbers();
+                updateTotals();
             }
         });
 
-        // Add new material entry
-        document.getElementById('add-material').addEventListener('click', () => {
+        function updateRowNumbers() {
+            const rows = document.getElementById('material-list').getElementsByTagName('tr');
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].cells[0].textContent = i + 1;
+            }
+        }
+
+        function updateTotals() {
+            let totalItems = 0;
+            let totalQuantity = 0;
+            let totalAmount = 0;
+
+            const rows = document.getElementById('material-list').getElementsByTagName('tr');
+            for (let row of rows) {
+                totalItems++;
+                const quantity = parseInt(row.cells[4].getElementsByTagName('input')[0].value) || 0;
+                const price = parseInt(row.cells[5].getElementsByTagName('input')[0].value) || 0;
+                const totalPrice = quantity * price;
+                row.cells[6].getElementsByTagName('input')[0].value = totalPrice;
+                totalQuantity += quantity;
+                totalAmount += totalPrice;
+            }
+
+            document.getElementById('total_items').value = totalItems;
+            document.getElementById('total_quantity').value = totalQuantity;
+            document.getElementById('total_amount').value = totalAmount;
+        }
+
+        function resetForm() {
+            document.getElementById('importForm').reset();
             const materialList = document.getElementById('material-list');
-            const newEntry = document.createElement('div');
-            newEntry.className = 'material-entry grid grid-cols-1 md:grid-cols-4 gap-4';
-            newEntry.innerHTML = `
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Nguyên Vật Liệu</label>
-                    <select name="material_id[]" class="input-field w-full" required>
-                        <option value="">Chọn nguyên vật liệu</option>
-                        <c:forEach var="material" items="${materials}">
-                            <option value="${material.id}">${material.name}</option>
-                        </c:forEach>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Số Lượng</label>
-                    <input type="number" name="quantity[]" class="input-field w-full" min="1" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Đơn Giá (VND)</label>
-                    <input type="number" name="price_per_unit[]" class="input-field w-full" min="0" step="1000" required>
-                </div>
-                <div class="flex items-end">
-                    <select name="material_condition[]" class="input-field w-full" required>
-                        <option value="Tốt">Tốt</option>
-                        <option value="Trung bình">Trung bình</option>
-                        <option value="Kém">Kém</option>
-                    </select>
-                    <button type="button" class="ml-2 text-red-600 hover:text-red-800" onclick="this.parentElement.parentElement.remove()">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            `;
-            materialList.appendChild(newEntry);
+            while (materialList.getElementsByTagName('tr').length > 0) {
+                materialList.removeChild(materialList.lastChild);
+            }
+            updateRowNumbers();
+            updateTotals();
+            document.getElementById('new-supplier-input').classList.remove('show-input');
+            const unitInputs = document.getElementsByClassName('new-unit-input');
+            for (let input of unitInputs) {
+                input.classList.remove('show-input');
+            }
+        }
+
+        document.getElementById('material-list').addEventListener('input', function(e) {
+            if (e.target.name.includes('quantity') || e.target.name.includes('price_per_unit')) {
+                const row = e.target.closest('tr');
+                const quantity = parseInt(row.cells[4].getElementsByTagName('input')[0].value) || 0;
+                const price = parseInt(row.cells[5].getElementsByTagName('input')[0].value) || 0;
+                row.cells[6].getElementsByTagName('input')[0].value = quantity * price;
+                updateTotals();
+            }
         });
+
+        function toggleSupplierInput() {
+            const select = document.getElementById('supplier-select');
+            const newSupplierInput = document.getElementById('new-supplier-input');
+            if (select.value === 'new') {
+                newSupplierInput.classList.add('show-input');
+                select.required = false;
+            } else {
+                newSupplierInput.classList.remove('show-input');
+                select.required = true;
+            }
+        }
+
+        function toggleUnitInput(rowIndex) {
+            const select = document.getElementById(`unit-select-${rowIndex}`);
+            const newUnitInput = document.getElementById(`new-unit-input-${rowIndex}`);
+            if (select.value === 'new') {
+                newUnitInput.classList.add('show-input');
+                select.required = false;
+            } else {
+                newUnitInput.classList.remove('show-input');
+                select.required = true;
+            }
+        }
+
+        window.onload = function() {
+            updateTotals();
+            toggleSupplierInput();
+            // Không gọi toggleUnitInput(1) vì không có hàng mặc định
+        };
     </script>
 </body>
 </html>
