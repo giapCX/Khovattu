@@ -9,12 +9,14 @@ package model;
  * @author Giap
  */
 public class ImportDetail {
-
+    private String materialName;
+    private String unit;
     private int importDetailId;
     private int importId;
     private int materialId;
     private double quantity;
     private double pricePerUnit;
+    private double totalPrice;
     private String materialCondition;
 
     // Getters and Setters

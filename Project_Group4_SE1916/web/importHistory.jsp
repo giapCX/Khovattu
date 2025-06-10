@@ -47,45 +47,53 @@
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Lịch sử nhập vật tư</h2>
             </div>
-
+            
+            <!-- Bộ lọc -->
+        <form method="get" action="importhistory" class="mb-4">
+            <input type="date" name="fromDate" value="${param.fromDate}" class="form-control" />
+            <input type="date" name="toDate" value="${param.toDate}" class="form-control" />
+            <input type="text" name="importer" value="${param.importer}" placeholder="Người nhập" class="form-control" />
+            <button type="submit" class="btn">Do</button>
+        </form>
+            <br><br/>
             <div class="table-container bg-white dark:bg-gray-800">
                 <div class="overflow-x-auto">
                     <table class="w-full table-auto">
                         <thead>
                             <tr>
-                                <th class="p-4">Mã vật tư</th>
-                                <th class="p-4">Tên vật tư</th>
-                                <th class="p-4">Nhà cung cấp</th>
-                                <th class="p-4">Số lượng</th>
-                                <th class="p-4">Đơn vị</th>
-                                <th class="p-4">Đơn giá</th>
+                                <th class="p-4">Mã phiếu</th>
                                 <th class="p-4">Thành tiền</th>
                                 <th class="p-4">Ngày nhập</th>
-                                <th class="p-4">Mã phiếu</th>
                                 <th class="p-4">Người nhập</th>
                                 <th class="p-4">Ghi chú</th>
+                                <th class="p-4">Action</th>
+                                
                             </tr>
                         </thead>
                         <tbody>
                             <c:forEach var="item" items="${historyData}">
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4">${item.materialId}</td>
-                                    <td class="p-4">${item.materialName}</td>
-                                    <td class="p-4">${item.supplier}</td>
-                                    <td class="p-4">${item.quantity}</td>
-                                    <td class="p-4">${item.unit}</td>
-                                    <td class="p-4">${item.price}</td>
+                                    <td class="p-4">${item.voucherId}</td>
                                     <td class="p-4">${item.total}</td>
                                     <td class="p-4">${item.importDate}</td>
-                                    <td class="p-4">${item.voucherId}</td>
                                     <td class="p-4">${item.importer}</td>
                                     <td class="p-4">${item.note}</td>
+                                    <td class="p-4">
+                                        <a href="importhistorydetail" class="text-primary-600">View</a>
+                                    </td>
                                 </tr>
                             </c:forEach>
                         </tbody>
                     </table>
                 </div>
             </div>
+            <!-- Phân trang -->
+        <div class="pagination mt-4">
+            <c:forEach begin="1" end="${totalPages}" var="i">
+                <a href="importhistory?page=${i}&fromDate=${param.fromDate}&toDate=${param.toDate}&importer=${param.importer}"
+                   class="${i == currentPage ? 'active' : ''}">${i}</a>
+            </c:forEach>
+        </div>
         </div>
     </main>
 </body>

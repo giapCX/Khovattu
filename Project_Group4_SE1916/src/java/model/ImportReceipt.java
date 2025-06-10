@@ -11,7 +11,7 @@ package model;
 import java.sql.Date;
 
 public class ImportReceipt {
-
+    
     private int importId;
     private int supplierId;
     private int userId;
@@ -21,6 +21,15 @@ public class ImportReceipt {
     //Thêm 1 vài trường
     private String importerName; 
     private double total;
+    private String voucherId;
+
+    public String getVoucherId() {
+        return voucherId;
+    }
+
+    public void setVoucherId(String voucherId) {
+        this.voucherId = voucherId;
+    }
     
     public String getImporterName() {
         return importerName;
