@@ -17,8 +17,28 @@ public class ImportReceipt {
     private int userId;
     private Date importDate;
     private String note;
+    
+    //Thêm 1 vài trường
+    private String importerName; 
+    private double total;
+    
+    public String getImporterName() {
+        return importerName;
+    }
+
+    public void setImporterName(String importerName) {
+        this.importerName = importerName;
+    }
+
+    public double getTotal() {
+        return total;
+    }
 
     // Getters and Setters
+    public void setTotal(double total) {    
+        this.total = total;
+    }
+
     public int getImportId() {
         return importId;
     }
@@ -58,4 +78,5 @@ public class ImportReceipt {
     public void setNote(String note) {
         this.note = note;
     }
+    
 }
