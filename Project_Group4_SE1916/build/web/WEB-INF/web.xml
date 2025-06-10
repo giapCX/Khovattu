@@ -74,7 +74,7 @@
     </servlet>
     <servlet>
         <servlet-name>ImportHistoryServlet</servlet-name>
-        <servlet-class>ImportHistoryServlet</servlet-class>
+        <servlet-class>controller.ImportHistoryServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
