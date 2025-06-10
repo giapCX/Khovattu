@@ -21,7 +21,7 @@ public class ImportReceiptDAO {
     public List<ImportReceipt> searchImportReceipts(Date fromDate, Date toDate, String importer, int page, int pageSize) {
         List<ImportReceipt> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT ir.import_id, ir.import_date, ir.note, u.full_name AS importer_name, " +
+                "SELECT ir.import_id,ir.voucher_id, ir.import_date, ir.note, u.full_name AS importer_name, " +
                         "SUM(id.quantity * id.price_per_unit) AS total " +
                         "FROM ImportReceipts ir " +
                         "JOIN Users u ON ir.user_id = u.user_id " +
@@ -49,6 +49,7 @@ public class ImportReceiptDAO {
             while (rs.next()) {
                 ImportReceipt receipt = new ImportReceipt();
                 receipt.setImportId(rs.getInt("import_id"));
+                receipt.setVoucherId(rs.getString("voucher_id"));
                 receipt.setImportDate(rs.getDate("import_date"));
                 receipt.setNote(rs.getString("note"));
                 receipt.setImporterName(rs.getString("importer_name"));
