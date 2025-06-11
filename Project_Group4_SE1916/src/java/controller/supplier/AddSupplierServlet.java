@@ -14,6 +14,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Supplier;
 
 /**
@@ -70,28 +73,32 @@ public class AddSupplierServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        String supplierName = request.getParameter("supplierName");
-        String supplierPhone = request.getParameter("supplierPhone");
-        String supplierAddress = request.getParameter("supplierAddress");
-        String supplierEmail = request.getParameter("supplierEmail");
-        String supplierStatus = request.getParameter("supplierStatus");
-        
-        Supplier supplier = new Supplier();
-        supplier.setSupplierName(supplierName);
-        supplier.setSupplierPhone(supplierPhone);
-        supplier.setSupplierAddress(supplierAddress);
-        supplier.setSupplierEmail(supplierEmail);
-        supplier.setSupplierStatus(supplierStatus);
-        
-        Connection conn = DBContext.getConnection();
-        SupplierDAO s= new SupplierDAO(conn);     
-        boolean success = s.addSupplier(supplier);
-        if (success) {           
-            request.setAttribute("errorMessage", "Thêm nhà cung thành công!");
-            request.getRequestDispatcher("view/supplier/editSupplier.jsp").forward(request, response);
-        } else {
-            request.setAttribute("errorMessage", "Thêm nhà cung cấp thất bại!");
-            request.getRequestDispatcher("view/supplier/editSupplier.jsp").forward(request, response);
+        try {
+            String supplierName = request.getParameter("supplierName");
+            String supplierPhone = request.getParameter("supplierPhone");
+            String supplierAddress = request.getParameter("supplierAddress");
+            String supplierEmail = request.getParameter("supplierEmail");
+            String supplierStatus = request.getParameter("supplierStatus");
+            
+            Supplier supplier = new Supplier();
+            supplier.setSupplierName(supplierName);
+            supplier.setSupplierPhone(supplierPhone);
+            supplier.setSupplierAddress(supplierAddress);
+            supplier.setSupplierEmail(supplierEmail);
+            supplier.setSupplierStatus(supplierStatus);
+            
+            Connection conn = DBContext.getConnection();
+            SupplierDAO s= new SupplierDAO(conn);
+            boolean success = s.addSupplier(supplier);
+            if (success) {
+                request.setAttribute("errorMessage", "Thêm nhà cung thành công!");
+                request.getRequestDispatcher("view/supplier/editSupplier.jsp").forward(request, response);
+            } else {
+                request.setAttribute("errorMessage", "Thêm nhà cung cấp thất bại!");
+                request.getRequestDispatcher("view/supplier/editSupplier.jsp").forward(request, response);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(AddSupplierServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }

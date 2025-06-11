@@ -73,4 +73,13 @@ public class ImportDAO {
             conn.setAutoCommit(true);
         }
     }
+    public boolean voucherIdExists(String voucherId) throws SQLException {
+        String sql = "SELECT 1 FROM ImportReceipts WHERE voucher_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, voucherId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
 }

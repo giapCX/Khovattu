@@ -187,8 +187,36 @@ public class MaterialDAO {
         }
         return 0.0;
     }
+   
+    public List<Material> searchMaterialsByName(String term) throws SQLException {
+        List<Material> materials = new ArrayList<>();
+        String sql = "SELECT material_id, name, unit FROM Materials WHERE name LIKE ? LIMIT 10";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + term + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Material material = new Material();
+                    material.setMaterialId(rs.getInt("material_id"));
+                    material.setName(rs.getString("name"));
+                    material.setUnit(rs.getString("unit"));
+                    materials.add(material);
+                }
+            }
+        }
+        return materials;
+    }
 
-    public void updateInventoryFromImport(List<ImportDetail> details) throws SQLException {
+    public boolean materialExists(int materialId) throws SQLException {
+        String sql = "SELECT 1 FROM Materials WHERE material_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, materialId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+public void updateInventoryFromImport(List<ImportDetail> details) throws SQLException {
         String sql = "INSERT INTO Inventory (material_id, material_condition, quantity_in_stock) VALUES (?, ?, ?) "
                 + "ON DUPLICATE KEY UPDATE quantity_in_stock = quantity_in_stock + ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

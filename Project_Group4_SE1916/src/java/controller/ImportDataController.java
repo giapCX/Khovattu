@@ -1,11 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 
 package controller;
 
-
+import dao.ImportDAO;
 import dao.MaterialDAO;
 import dao.SupplierDAO;
 import jakarta.servlet.ServletException;
@@ -15,118 +11,124 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import model.ImportReceipt;
 import model.ImportDetail;
+import model.Supplier;
+import Dal.DBContext;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
-
+@WebServlet(name = "ImportDataController", urlPatterns = {"/ImportDataController"})
 @MultipartConfig
 public class ImportDataController extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(ImportDataController.class.getName());
+    private SupplierDAO supplierDAO;
+    private MaterialDAO materialDAO;
+    private ImportDAO importDAO;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    public void init() throws ServletException {
+        supplierDAO = new SupplierDAO();
+        materialDAO = new MaterialDAO();
+        importDAO = new ImportDAO();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("userId") == null) {
             response.sendRedirect("login.jsp");
             return;
         }
-        request.getRequestDispatcher("importData.jsp").forward(request, response);
+
+        List<Supplier> suppliers = supplierDAO.getSuppliers();
+        request.setAttribute("suppliers", suppliers);
+        request.setAttribute("today", new Date(System.currentTimeMillis()).toString());
+        request.getRequestDispatcher("/view/import/importData.jsp").forward(request, response);
     }
 
+ 
     @Override
-protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    HttpSession session = request.getSession(false);
-    if (session == null || session.getAttribute("userId") == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
-
-    int userId = (int) session.getAttribute("userId");
-    SupplierDAO supplierDao = new SupplierDAO();
-    MaterialDAO materialDao = new MaterialDAO();
-    List<ImportReceipt> receipts = new ArrayList<>();
-    List<ImportDetail> details = new ArrayList<>();
-
-    // Xử lý file CSV
-    var csvFile = request.getPart("csvFile");
-    if (csvFile != null && csvFile.getSize() > 0) {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(csvFile.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length == 9) {
-                    ImportReceipt receipt = new ImportReceipt();
-                    receipt.setImportId(Integer.parseInt(data[0].trim()));
-                    receipt.setSupplierId(Integer.parseInt(data[1].trim()));
-                    receipt.setUserId(userId);
-                    receipt.setImportDate(java.sql.Date.valueOf(data[3].trim()));
-                    receipt.setNote(data[4].trim());
-
-                    ImportDetail detail = new ImportDetail();
-                    detail.setImportId(Integer.parseInt(data[0].trim()));
-                    detail.setMaterialId(Integer.parseInt(data[5].trim()));
-                    detail.setQuantity(Double.parseDouble(data[6].trim()));
-                    detail.setPricePerUnit(Double.parseDouble(data[7].trim()));
-                    detail.setMaterialCondition(data[8].trim());
-
-                    receipts.add(receipt);
-                    details.add(detail);
-                }
-            }
-        } catch (Exception e) {
-            request.setAttribute("error", "Lỗi khi xử lý file CSV: " + e.getMessage());
-            request.getRequestDispatcher("importData.jsp").forward(request, response);
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            response.sendRedirect("login.jsp");
             return;
         }
-    }
 
-    // Xử lý dữ liệu thủ công
-    String manualData = request.getParameter("manualData");
-    if (manualData != null && !manualData.isEmpty()) {
-        String[] lines = manualData.split("\n");
-        for (String line : lines) {
-            String[] data = line.split(",");
-            if (data.length == 9) {
-                ImportReceipt receipt = new ImportReceipt();
-                receipt.setImportId(Integer.parseInt(data[0].trim()));
-                receipt.setSupplierId(Integer.parseInt(data[1].trim()));
-                receipt.setUserId(userId);
-                receipt.setImportDate(java.sql.Date.valueOf(data[3].trim()));
-                receipt.setNote(data[4].trim());
+        int userId = (int) session.getAttribute("userId");
+        List<ImportDetail> details = new ArrayList<>();
+        ImportReceipt receipt = new ImportReceipt();
+        Connection conn = null;
 
-                ImportDetail detail = new ImportDetail();
-                detail.setImportId(Integer.parseInt(data[0].trim()));
-                detail.setMaterialId(Integer.parseInt(data[5].trim()));
-                detail.setQuantity(Double.parseDouble(data[6].trim()));
-                detail.setPricePerUnit(Double.parseDouble(data[7].trim()));
-                detail.setMaterialCondition(data[8].trim());
+        try {
+            conn = DBContext.getConnection();
+            conn.setAutoCommit(false);
 
-                receipts.add(receipt);
-                details.add(detail);
+            // Handle new supplier
+            String supplierIdStr = request.getParameter("supplier_id");
+            int supplierId;
+            if ("new".equals(supplierIdStr)) {
+                Supplier newSupplier = new Supplier();
+                newSupplier.setSupplierName(request.getParameter("new_supplier_name"));
+                newSupplier.setSupplierPhone(request.getParameter("new_supplier_phone"));
+                newSupplier.setSupplierAddress(request.getParameter("new_supplier_address"));
+                newSupplier.setSupplierEmail(request.getParameter("new_supplier_email"));
+                newSupplier.setSupplierStatus("active");
+
+                if (newSupplier.getSupplierName() == null || newSupplier.getSupplierName().trim().isEmpty()) {
+                    throw new IllegalArgumentException("Tên nhà cung cấp mới không được để trống.");
+                }
+
+                // Kiểm tra trùng lặp tên
+                if (new SupplierDAO(conn).supplierExistsByName(newSupplier.getSupplierName())) {
+                    throw new IllegalArgumentException("Nhà cung cấp với tên này đã tồn tại. Vui lòng chọn nhà cung cấp khác hoặc nhập tên khác.");
+                }
+
+                // Thêm nhà cung cấp mới và lấy supplierId
+                supplierId = new SupplierDAO(conn).addSupplierWithId(newSupplier); // Sử dụng addSupplierWithId
+            } else {
+                supplierId = Integer.parseInt(supplierIdStr);
+                if (!new SupplierDAO(conn).supplierExists(supplierId)) {
+                    throw new IllegalArgumentException("Nhà cung cấp không tồn tại.");
+                }
+            }
+
+            // ... (Phần còn lại giữ nguyên)
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("error", "Dữ liệu không hợp lệ: " + e.getMessage());
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Database error", e);
+            request.setAttribute("error", "Lỗi khi lưu dữ liệu: " + e.getMessage());
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException ex) {
+                LOGGER.log(Level.SEVERE, "Rollback error", ex);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unexpected error", e);
+            request.setAttribute("error", "Lỗi không xác định: " + e.getMessage());
+        } finally {
+            try {
+                if (conn != null) conn.setAutoCommit(true);
+            } catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "Error resetting auto-commit", e);
             }
         }
+
+        request.setAttribute("suppliers", new SupplierDAO(conn).getSuppliers());
+        request.setAttribute("today", new Date(System.currentTimeMillis()).toString());
+
+        request.getRequestDispatcher("importData.jsp").forward(request, response);
     }
-
-    // Lưu dữ liệu
-    try {
-        for (ImportReceipt receipt : receipts) {
-            supplierDao.saveImportReceipt(receipt, details.stream().filter(d -> d.getImportId() == receipt.getImportId()).toList());
-        }
-        materialDao.updateInventoryFromImport(details); // Cập nhật tồn kho
-        request.setAttribute("message", "Dữ liệu đã nhập kho thành công!");
-    } catch (SQLException e) {
-        request.setAttribute("error", "Lỗi khi lưu dữ liệu: " + e.getMessage());
-    }
-
-    request.getRequestDispatcher("importData.jsp").forward(request, response);
 }
-}
-

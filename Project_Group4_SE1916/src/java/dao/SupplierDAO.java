@@ -160,7 +160,7 @@ public class SupplierDAO {
         }
     }
 
-    public boolean addSupplier(Supplier supplier) {
+      public boolean addSupplier(Supplier supplier) throws SQLException {
         String sql = "INSERT INTO Suppliers (name, phone, address, email, status) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, supplier.getSupplierName());
@@ -169,11 +169,35 @@ public class SupplierDAO {
             stmt.setString(4, supplier.getSupplierEmail());
             stmt.setString(5, supplier.getSupplierStatus());
 
-            int rows = stmt.executeUpdate();
-            return rows > 0;
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0; // Trả về true nếu chèn thành công
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return false; // Trả về false nếu có lỗi
+        }
+    }
+
+    public int addSupplierWithId(Supplier supplier) throws SQLException {
+        String sql = "INSERT INTO Suppliers (name, phone, address, email, status) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, supplier.getSupplierName());
+            stmt.setString(2, supplier.getSupplierPhone());
+            stmt.setString(3, supplier.getSupplierAddress());
+            stmt.setString(4, supplier.getSupplierEmail());
+            stmt.setString(5, supplier.getSupplierStatus());
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1); // Trả về supplier_id vừa chèn
+                    }
+                }
+            }
+            throw new SQLException("Failed to add supplier, no ID obtained.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e; // Ném ngoại lệ để xử lý trong ImportDataController
         }
     }
 
@@ -359,4 +383,23 @@ public class SupplierDAO {
         return suppliers;
     }
 
+    public boolean supplierExists(int supplierId) throws SQLException {
+        String sql = "SELECT 1 FROM Suppliers WHERE supplier_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, supplierId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    public boolean supplierExistsByName(String name) throws SQLException {
+        String sql = "SELECT 1 FROM Suppliers WHERE name = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
 }
