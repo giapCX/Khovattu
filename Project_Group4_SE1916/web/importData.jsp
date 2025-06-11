@@ -52,17 +52,17 @@
     <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
         <h1 class="text-2xl font-bold text-center mb-6">Phiếu Nhập Kho</h1>
 
-        <form action="${pageContext.request.contextPath}/import-data" method="post" id="importForm">
+        <form action="${pageContext.request.contextPath}/import_data" method="post" id="importForm">
             <div class="mb-6">
                 <h2 class="text-lg font-semibold mb-4">Thông tin phiếu nhập</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Mã phiếu nhập</label>
-                        <input type="text" name="import_id" class="input-field" required>
+                        <input type="text" name="import_id" class="input-field" value="PN00123" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Ngày nhập</label>
-                        <input type="date" name="import_date" class="input-field" required>
+                        <input type="date" name="import_date" class="input-field" value="2025-06-10" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Người lập phiếu</label>
@@ -78,9 +78,6 @@
                             <option value="new">Thêm nhà cung cấp mới</option>
                         </select>
                         <input type="text" name="new_supplier_name" id="new-supplier-input" class="new-supplier-input input-field" placeholder="Nhập tên nhà cung cấp mới">
-                        <c:if test="${empty suppliers}">
-                            <p class="text-red-500">Không có nhà cung cấp nào trong database!</p>
-                        </c:if>
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700">Ghi chú</label>
@@ -107,7 +104,32 @@
                             </tr>
                         </thead>
                         <tbody id="material-list">
-                            <!-- Không có hàng mặc định -->
+                            <tr class="table-row">
+                                <td class="p-2">1</td>
+                                <td class="p-2"><input type="text" name="material_id[]" class="input-field" value="MH001" required></td>
+                                <td class="p-2"><input type="text" name="material_name[]" class="input-field" value="Bút bi" required></td>
+                                <td class="p-2">
+                                    <select name="unit[]" id="unit-select-1" class="input-field" onchange="toggleUnitInput(1)" required>
+                                        <option value="">-- Chọn đơn vị --</option>
+                                        <c:forEach var="material" items="${materials}">
+                                            <option value="${material.unit}">${material.unit}</option>
+                                        </c:forEach>
+                                        <option value="new">Thêm đơn vị mới</option>
+                                    </select>
+                                    <input type="text" name="new_unit[]" id="new-unit-input-1" class="new-unit-input input-field" placeholder="Nhập đơn vị mới">
+                                </td>
+                                <td class="p-2"><input type="number" name="quantity[]" class="input-field" value="100" min="1" required></td>
+                                <td class="p-2"><input type="number" name="price_per_unit[]" class="input-field" value="2000" min="0" step="1000" required></td>
+                                <td class="p-2"><input type="number" name="total_price[]" class="input-field" value="200000" readonly></td>
+                                <td class="p-2">
+                                    <select name="material_condition[]" class="input-field" required>
+                                        <option value="Mới">Mới</option>
+                                        <option value="Hỏng hóc">Hỏng hóc</option>
+                                        <option value="Cũ">Cũ</option>
+                                    </select>
+                                </td>
+                                <td class="p-2"><button type="button" class="btn btn-secondary remove-row">Xóa</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -119,15 +141,15 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Tổng mặt hàng</label>
-                        <input type="number" id="total_items" class="input-field" value="0" readonly>
+                        <input type="number" id="total_items" class="input-field" value="1" readonly>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Tổng số lượng</label>
-                        <input type="number" id="total_quantity" class="input-field" value="0" readonly>
+                        <input type="number" id="total_quantity" class="input-field" value="100" readonly>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Tổng tiền hàng</label>
-                        <input type="number" id="total_amount" class="input-field" value="0" readonly>
+                        <input type="number" id="total_amount" class="input-field" value="200000" readonly>
                     </div>
                 </div>
             </div>
@@ -171,9 +193,6 @@
                         <option value="new">Thêm đơn vị mới</option>
                     </select>
                     <input type="text" name="new_unit[]" id="new-unit-input-${rowCount}" class="new-unit-input input-field" placeholder="Nhập đơn vị mới">
-                    <c:if test="${empty materials}">
-                        <p class="text-red-500">Không có đơn vị nào trong database!</p>
-                    </c:if>
                 </td>
                 <td class="p-2"><input type="number" name="quantity[]" class="input-field" min="1" required></td>
                 <td class="p-2"><input type="number" name="price_per_unit[]" class="input-field" min="0" step="1000" required></td>
@@ -230,7 +249,7 @@
         function resetForm() {
             document.getElementById('importForm').reset();
             const materialList = document.getElementById('material-list');
-            while (materialList.getElementsByTagName('tr').length > 0) {
+            while (materialList.getElementsByTagName('tr').length > 1) {
                 materialList.removeChild(materialList.lastChild);
             }
             updateRowNumbers();
@@ -279,7 +298,7 @@
         window.onload = function() {
             updateTotals();
             toggleSupplierInput();
-            // Không gọi toggleUnitInput(1) vì không có hàng mặc định
+            toggleUnitInput(1);
         };
     </script>
 </body>
