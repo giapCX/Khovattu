@@ -1,7 +1,6 @@
 package dao;
 
 import Dal.DBContext;
-
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -175,6 +174,40 @@ public class SupplierDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // Thêm phương thức kiểm tra nhà cung cấp tồn tại theo tên
+    public boolean supplierExistsByName(String name) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Suppliers WHERE name = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name.trim());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Thêm phương thức thêm nhà cung cấp và trả về supplierId
+    public int addSupplierWithId(Supplier supplier) throws SQLException {
+        String sql = "INSERT INTO Suppliers (name, phone, address, email, status) VALUES (?, ?, ?, ?, ?) " +
+                     "RETURNING supplier_id";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, supplier.getSupplierName());
+            stmt.setString(2, supplier.getSupplierPhone());
+            stmt.setString(3, supplier.getSupplierAddress());
+            stmt.setString(4, supplier.getSupplierEmail());
+            stmt.setString(5, supplier.getSupplierStatus());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("supplier_id");
+                }
+            }
+        }
+        throw new SQLException("Không thể lấy supplier_id sau khi thêm.");
     }
 
     public int countSuppliersByNamePhoneAddressStatus(String name, String phone, String address, String status) throws SQLException {
@@ -468,4 +501,17 @@ public class SupplierDAO {
         return materials;
     }
 
+    // Thêm phương thức kiểm tra nhà cung cấp tồn tại theo ID
+    public boolean supplierExists(int supplierId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Suppliers WHERE supplier_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, supplierId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
 }

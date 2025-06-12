@@ -1,4 +1,3 @@
-
 package controller;
 
 import dao.ImportDAO;
@@ -54,10 +53,9 @@ public class ImportDataController extends HttpServlet {
         List<Supplier> suppliers = supplierDAO.getSuppliers();
         request.setAttribute("suppliers", suppliers);
         request.setAttribute("today", new Date(System.currentTimeMillis()).toString());
-        request.getRequestDispatcher("/view/import/importData.jsp").forward(request, response);
+        request.getRequestDispatcher("importData.jsp").forward(request, response);
     }
 
- 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
@@ -96,7 +94,7 @@ public class ImportDataController extends HttpServlet {
                 }
 
                 // Thêm nhà cung cấp mới và lấy supplierId
-                supplierId = new SupplierDAO(conn).addSupplierWithId(newSupplier); // Sử dụng addSupplierWithId
+                supplierId = new SupplierDAO(conn).addSupplierWithId(newSupplier);
             } else {
                 supplierId = Integer.parseInt(supplierIdStr);
                 if (!new SupplierDAO(conn).supplierExists(supplierId)) {
@@ -104,7 +102,49 @@ public class ImportDataController extends HttpServlet {
                 }
             }
 
-            // ... (Phần còn lại giữ nguyên)
+            // Lấy thông tin phiếu nhập
+            String voucherId = request.getParameter("voucher_id");
+            String importDateStr = request.getParameter("import_date");
+            String note = request.getParameter("note");
+
+            if (voucherId == null || voucherId.trim().isEmpty()) {
+                throw new IllegalArgumentException("Mã phiếu nhập không được để trống.");
+            }
+            if (importDateStr == null || importDateStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("Ngày nhập không được để trống.");
+            }
+
+            receipt.setImportId(Integer.parseInt(voucherId)); // Giả sử voucher_id là import_id
+            receipt.setSupplierId(supplierId);
+            receipt.setUserId(userId);
+            receipt.setImportDate(Date.valueOf(importDateStr));
+            receipt.setNote(note);
+
+            // Xử lý danh sách hàng nhập
+            String[] materialIds = request.getParameterValues("material_id[]");
+            String[] quantities = request.getParameterValues("quantity[]");
+            String[] prices = request.getParameterValues("price_per_unit[]");
+            String[] conditions = request.getParameterValues("material_condition[]");
+            String[] materialCodes = request.getParameterValues("material_code[]"); // Thêm mã hàng
+
+            if (materialIds != null && materialIds.length > 0) {
+                for (int i = 0; i < materialIds.length; i++) {
+                    ImportDetail detail = new ImportDetail();
+                    detail.setImportId(receipt.getImportId());
+                    detail.setMaterialId(Integer.parseInt(materialIds[i]));
+                    detail.setQuantity(Double.parseDouble(quantities[i]));
+                    detail.setPricePerUnit(Double.parseDouble(prices[i]));
+                    detail.setMaterialCondition(conditions[i]);
+                    detail.setMaterialCode(materialCodes[i]); // Gán mã hàng
+                    details.add(detail);
+                }
+            }
+
+            // Lưu phiếu nhập và chi tiết
+            supplierDAO.saveImportReceipt(receipt, details);
+
+            request.setAttribute("message", "Lưu phiếu nhập thành công!");
+            request.setAttribute("messageType", "success");
         } catch (IllegalArgumentException e) {
             request.setAttribute("error", "Dữ liệu không hợp lệ: " + e.getMessage());
         } catch (SQLException e) {
@@ -121,12 +161,13 @@ public class ImportDataController extends HttpServlet {
         } finally {
             try {
                 if (conn != null) conn.setAutoCommit(true);
+                if (conn != null) conn.close();
             } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error resetting auto-commit", e);
+                LOGGER.log(Level.SEVERE, "Error resetting auto-commit or closing connection", e);
             }
         }
 
-        request.setAttribute("suppliers", new SupplierDAO(conn).getSuppliers());
+        request.setAttribute("suppliers", new SupplierDAO().getSuppliers());
         request.setAttribute("today", new Date(System.currentTimeMillis()).toString());
 
         request.getRequestDispatcher("importData.jsp").forward(request, response);

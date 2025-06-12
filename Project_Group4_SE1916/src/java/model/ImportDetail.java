@@ -1,6 +1,6 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * Click nfs://.netbeans.org/.nbi/platform/16.0.2/nbi/studio/nb10/nbi_setsdk.xml to edit this template
  */
 package model;
 
@@ -18,6 +18,7 @@ public class ImportDetail {
     private double pricePerUnit;
     private double totalPrice;
     private String materialCondition;
+    private String materialCode; // Thêm thuộc tính materialCode
 
     // Getters and Setters
     public int getImportDetailId() {
@@ -66,5 +67,14 @@ public class ImportDetail {
 
     public void setMaterialCondition(String materialCondition) {
         this.materialCondition = materialCondition;
+    }
+
+    // Thêm getter và setter cho materialCode
+    public String getMaterialCode() {
+        return materialCode;
+    }
+
+    public void setMaterialCode(String materialCode) {
+        this.materialCode = materialCode;
     }
 }
