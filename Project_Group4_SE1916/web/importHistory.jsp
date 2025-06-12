@@ -50,9 +50,9 @@
             
             <!-- Bộ lọc -->
         <form method="get" action="importhistory" class="mb-4">
-            <input type="date" name="fromDate" value="${param.fromDate}" class="form-control" />
-            <input type="date" name="toDate" value="${param.toDate}" class="form-control" />
-            <input type="text" name="importer" value="${param.importer}" placeholder="Người nhập" class="form-control" />
+            <input type="date" name="fromDate" value="${fromDate}" class="form-control" />
+            <input type="date" name="toDate" value="${toDate}" class="form-control" />
+            <input type="text" name="importer" value="${importer}" placeholder="Người nhập" class="form-control" />
             <button type="submit" class="btn">Do</button>
         </form>
             <br><br/>
@@ -76,7 +76,7 @@
                                     <td class="p-4">${item.voucherId}</td>
                                     <td class="p-4">${item.total}</td>
                                     <td class="p-4">${item.importDate}</td>
-                                    <td class="p-4">${item.importer}</td>
+                                    <td class="p-4">${item.importerName}</td>
                                     <td class="p-4">${item.note}</td>
                                     <td class="p-4">
                                         <a href="importhistorydetail" class="text-primary-600">View</a>

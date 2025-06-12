@@ -19,77 +19,79 @@ public class ImportReceiptDAO {
     }
 
     public List<ImportReceipt> searchImportReceipts(Date fromDate, Date toDate, String importer, int page, int pageSize) {
-        List<ImportReceipt> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder(
-                "SELECT ir.import_id,ir.voucher_id, ir.import_date, ir.note, u.full_name AS importer_name, " +
-                        "SUM(id.quantity * id.price_per_unit) AS total " +
-                        "FROM ImportReceipts ir " +
-                        "JOIN Users u ON ir.user_id = u.user_id " +
-                        "JOIN ImportDetails id ON ir.import_id = id.import_id " +
-                        "WHERE 1=1 "
-        );
+    List<ImportReceipt> list = new ArrayList<>();
+    StringBuilder sql = new StringBuilder(
+            "SELECT ir.import_id, ir.voucher_id, ir.import_date, ir.note, u.full_name AS importer_name, " +
+                    "SUM(id.quantity * id.price_per_unit) AS total " +
+                    "FROM ImportReceipts ir " +
+                    "JOIN Users u ON ir.user_id = u.user_id " +
+                    "JOIN ImportDetails id ON ir.import_id = id.import_id " +
+                    "WHERE 1=1 "
+    );
 
-        if (fromDate != null) sql.append("AND ir.import_date >= ? ");
-        if (toDate != null) sql.append("AND ir.import_date <= ? ");
-        if (importer != null && !importer.isEmpty()) sql.append("AND u.full_name LIKE ? ");
+    if (fromDate != null) sql.append("AND ir.import_date >= ? ");
+    if (toDate != null) sql.append("AND ir.import_date <= ? ");
+    if (importer != null && !importer.isEmpty()) sql.append("AND u.full_name LIKE ? ");
 
-        sql.append("GROUP BY ir.import_id, ir.import_date, ir.note, u.full_name ");
-        sql.append("ORDER BY ir.import_date DESC ");
-        sql.append("LIMIT ? OFFSET ?");
+    sql.append("GROUP BY ir.import_id, ir.voucher_id, ir.import_date, ir.note, u.full_name ");
+    sql.append("ORDER BY ir.import_date DESC ");
+    sql.append("LIMIT ? OFFSET ?");
 
-        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            int index = 1;
-            if (fromDate != null) ps.setDate(index++, fromDate);
-            if (toDate != null) ps.setDate(index++, toDate);
-            if (importer != null && !importer.isEmpty()) ps.setString(index++, "%" + importer + "%");
-            ps.setInt(index++, pageSize);
-            ps.setInt(index, (page - 1) * pageSize);
+    try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        int index = 1;
+        if (fromDate != null) ps.setDate(index++, fromDate);
+        if (toDate != null) ps.setDate(index++, toDate);
+        if (importer != null && !importer.isEmpty()) ps.setString(index++, "%" + importer + "%");
+        ps.setInt(index++, pageSize);
+        ps.setInt(index, (page - 1) * pageSize);
 
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                ImportReceipt receipt = new ImportReceipt();
-                receipt.setImportId(rs.getInt("import_id"));
-                receipt.setVoucherId(rs.getString("voucher_id"));
-                receipt.setImportDate(rs.getDate("import_date"));
-                receipt.setNote(rs.getString("note"));
-                receipt.setImporterName(rs.getString("importer_name"));
-                receipt.setTotal(rs.getDouble("total"));
-                list.add(receipt);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            ImportReceipt receipt = new ImportReceipt();
+            receipt.setImportId(rs.getInt("import_id"));
+            receipt.setVoucherId(rs.getString("voucher_id"));
+            receipt.setImportDate(rs.getDate("import_date"));
+            receipt.setNote(rs.getString("note"));
+            receipt.setImporterName(rs.getString("importer_name"));
+            receipt.setTotal(rs.getDouble("total"));
+            list.add(receipt);
         }
-
-        return list;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+
+    return list;
+}
+
 
     public int countImportReceipts(Date fromDate, Date toDate, String importer) {
-        StringBuilder sql = new StringBuilder(
-                "SELECT COUNT(DISTINCT ir.import_id) " +
-                        "FROM ImportReceipts ir " +
-                        "JOIN Users u ON ir.user_id = u.user_id " +
-                        "WHERE 1=1 "
-        );
+    StringBuilder sql = new StringBuilder(
+            "SELECT COUNT(DISTINCT ir.import_id) " +
+                    "FROM ImportReceipts ir " +
+                    "JOIN Users u ON ir.user_id = u.user_id " +
+                    "WHERE 1=1 "
+    );
 
-        if (fromDate != null) sql.append("AND ir.import_date >= ? ");
-        if (toDate != null) sql.append("AND ir.import_date <= ? ");
-        if (importer != null && !importer.isEmpty()) sql.append("AND u.full_name LIKE ? ");
+    if (fromDate != null) sql.append("AND ir.import_date >= ? ");
+    if (toDate != null) sql.append("AND ir.import_date <= ? ");
+    if (importer != null && !importer.isEmpty()) sql.append("AND u.full_name LIKE ? ");
 
-        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            int index = 1;
-            if (fromDate != null) ps.setDate(index++, fromDate);
-            if (toDate != null) ps.setDate(index++, toDate);
-            if (importer != null && !importer.isEmpty()) ps.setString(index++, "%" + importer + "%");
+    try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        int index = 1;
+        if (fromDate != null) ps.setDate(index++, fromDate);
+        if (toDate != null) ps.setDate(index++, toDate);
+        if (importer != null && !importer.isEmpty()) ps.setString(index++, "%" + importer + "%");
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
         }
-
-        return 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+
+    return 0;
+}
+
 }
 

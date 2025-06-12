@@ -97,10 +97,14 @@ public class ImportHistoryServlet extends HttpServlet {
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
         request.setAttribute("historyData", receipts);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("currentPage", page);
-        request.getRequestDispatcher("importHistory.jsp").forward(request, response);
+request.setAttribute("totalPages", totalPages);
+request.setAttribute("currentPage", page);
 
+request.setAttribute("fromDate", fromDateStr);
+request.setAttribute("toDate", toDateStr);
+request.setAttribute("importer", importer);
+
+request.getRequestDispatcher("importHistory.jsp").forward(request, response);
     }
 
     /**
