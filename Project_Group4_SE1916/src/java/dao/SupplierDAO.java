@@ -160,7 +160,7 @@ public class SupplierDAO {
         }
     }
 
-      public boolean addSupplier(Supplier supplier) throws SQLException {
+    public boolean addSupplier(Supplier supplier) {
         String sql = "INSERT INTO Suppliers (name, phone, address, email, status) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, supplier.getSupplierName());
@@ -169,35 +169,11 @@ public class SupplierDAO {
             stmt.setString(4, supplier.getSupplierEmail());
             stmt.setString(5, supplier.getSupplierStatus());
 
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0; // Trả về true nếu chèn thành công
+            int rows = stmt.executeUpdate();
+            return rows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false; // Trả về false nếu có lỗi
-        }
-    }
-
-    public int addSupplierWithId(Supplier supplier) throws SQLException {
-        String sql = "INSERT INTO Suppliers (name, phone, address, email, status) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, supplier.getSupplierName());
-            stmt.setString(2, supplier.getSupplierPhone());
-            stmt.setString(3, supplier.getSupplierAddress());
-            stmt.setString(4, supplier.getSupplierEmail());
-            stmt.setString(5, supplier.getSupplierStatus());
-
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                try (ResultSet rs = stmt.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        return rs.getInt(1); // Trả về supplier_id vừa chèn
-                    }
-                }
-            }
-            throw new SQLException("Failed to add supplier, no ID obtained.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e; // Ném ngoại lệ để xử lý trong ImportDataController
+            return false;
         }
     }
 
@@ -383,23 +359,113 @@ public class SupplierDAO {
         return suppliers;
     }
 
-    public boolean supplierExists(int supplierId) throws SQLException {
-        String sql = "SELECT 1 FROM Suppliers WHERE supplier_id = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, supplierId);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
+    public int countMaterialOfSupplierBySupplierIdCategoryNameMaterialName(int supplierId, String categoryName, String materialName) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) FROM Materials m "
+                + "JOIN SupplierMaterials sm ON m.material_id = sm.material_id "
+                + "JOIN MaterialBrands mb ON m.brand_id = mb.brand_id "
+                + "JOIN MaterialCategories mc ON mb.category_id = mc.category_id "
+                + "WHERE sm.supplier_id = ? "
+        );
+
+        List<Object> params = new ArrayList<>();
+        params.add(supplierId);
+
+        if (categoryName != null && !categoryName.trim().isEmpty()) {
+            sql.append(" AND mc.name LIKE ? ");
+            params.add("%" + categoryName.trim() + "%");
+        }
+
+        if (materialName != null && !materialName.trim().isEmpty()) {
+            sql.append(" AND m.name LIKE ? ");
+            params.add("%" + materialName.trim() + "%");
+        }
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1); // Trả về số lượng vật tư thỏa mãn điều kiện
+                }
             }
         }
+
+        return 0; // Nếu không có vật tư nào thỏa mãn điều kiện
     }
 
-    public boolean supplierExistsByName(String name) throws SQLException {
-        String sql = "SELECT 1 FROM Suppliers WHERE name = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, name);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
+    public List<Material> searchMaterialOfSuppliersBySupplierIdCategoryNameMaterialNameWithPaging(
+            int supplierId, String categoryName, String materialName,
+            int offset, int recordsPerPage) throws SQLException {
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT DISTINCT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, "
+                + "mb.brand_id, mb.name AS brand_name, "
+                + "mc.category_id, mc.name AS category_name "
+                + "FROM Materials m "
+                + "JOIN SupplierMaterials sm ON m.material_id = sm.material_id "
+                + "JOIN MaterialBrands mb ON m.brand_id = mb.brand_id "
+                + "JOIN MaterialCategories mc ON mb.category_id = mc.category_id "
+                + "WHERE sm.supplier_id = ? "
+        );
+
+        List<Object> params = new ArrayList<>();
+        params.add(supplierId);
+
+        // Kiểm tra categoryName
+        if (categoryName != null && !categoryName.trim().isEmpty()) {
+            sql.append(" AND mc.name LIKE ? ");
+            params.add("%" + categoryName.trim() + "%");
+        }
+
+        // Kiểm tra materialName
+        if (materialName != null && !materialName.trim().isEmpty()) {
+            sql.append(" AND m.name LIKE ? ");
+            params.add("%" + materialName.trim() + "%");
+        }
+
+        // Thêm phân trang
+        sql.append(" ORDER BY m.material_id LIMIT ? OFFSET ? ");
+        params.add(recordsPerPage);
+        params.add(offset);
+
+        List<Material> materials = new ArrayList<>();
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Material material = new Material();
+                    material.setMaterialId(rs.getInt("material_id"));
+                    material.setCode(rs.getString("code"));
+                    material.setName(rs.getString("name"));
+                    material.setDescription(rs.getString("description"));
+                    material.setUnit(rs.getString("unit"));
+                    material.setImageUrl(rs.getString("image_url"));
+
+                    // Lấy thông tin brand và category
+                    MaterialBrand brand = new MaterialBrand();
+                    brand.setBrandId(rs.getInt("brand_id"));
+                    brand.setName(rs.getString("brand_name"));
+                    material.setBrand(brand);
+
+                    MaterialCategory category = new MaterialCategory();
+                    category.setCategoryId(rs.getInt("category_id"));
+                    category.setName(rs.getString("category_name"));
+                    brand.setCategory(category);  // Set category cho brand
+
+                    materials.add(material);
+                }
             }
         }
+
+        return materials;
     }
+
 }

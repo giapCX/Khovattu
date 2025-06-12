@@ -203,6 +203,7 @@
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
 
         <!-- Sidebar -->
+         <!-- Sidebar -->
         <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50">
             <div class="flex items-center mb-8">
                 <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
@@ -213,8 +214,20 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
+            <div class="mb-6 px-2">
+                <div class="relative">
+                    <input type="text" placeholder="Tìm kiếm..." 
+                           class="w-full bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 search-input">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-white opacity-70"></i>
+                </div>
+            </div>
             <nav class="space-y-2">
-                <a href="${pageContext.request.contextPath}/home.jsp" class="nav-item flex items-center p-3">
+                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-3">
+                    <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Thông tin cá nhân</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
+                </a>
+                <a href="${pageContext.request.contextPath}/home.jsp" class="nav-item active flex items-center p-3">
                     <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
                     <span class="text-lg">Tổng quan</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
@@ -229,7 +242,7 @@
                     <span class="text-lg">Danh sách nhà cung cấp</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/items.jsp" class="nav-item flex items-center p-3">
+                <a href="${pageContext.request.contextPath}/ListMaterialController" class="nav-item flex items-center p-3">
                     <i class="fas fa-box-open mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh mục vật tư</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
@@ -244,14 +257,9 @@
                     <span class="text-lg">Báo cáo</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/listuser" class="nav-item active flex items-center p-3">
-                    <i class="fas fa-users mr-3 w-6 text-center"></i>
+                <a href="${pageContext.request.contextPath}/listuser" class="nav-item flex items-center p-3">
+                    <i class="fas fa-cog mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh sách người dùng</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/userProfile.jsp" class="nav-item flex items-center p-3">
-                    <i class="fas fa-user mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Thông tin cá nhân</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
             </nav>
@@ -273,27 +281,20 @@
                         </button>
                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">List Material Of Supplier</h2>
                     </div>
-                    <a href="${pageContext.request.contextPath}/AddSupplierServlet" class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
-                        <i class="fas fa-plus-circle mr-2"></i> Create new supplier
+                    <a href="${pageContext.request.contextPath}/AddMaterialForSupplierServlet" class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
+                        <i class="fas fa-plus-circle mr-2"></i> Add material for supplier: "${supplierName}"
                     </a>
                 </div>
 
                 <!-- Search and Filter Form -->
-                <form action="ListSupplierServlet" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
+                <form action="FilterSupplierServlet" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
+                    <input type="hidden" name="supplierName" value="${supplierName}" />
+                    <input type="hidden" name="supplierId" value="${supplierId}" />
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchName" placeholder="Search  material"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="searchCategory" placeholder="Search category"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchPhone" placeholder="Search time"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                    </div>
-                    <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchAddress" placeholder="Search material condition "  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                    </div>
-                    <div class="flex-1 min-w-[150px]">
-                        <select name="searchStatus" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">                            <option value="">Tất cả Trạng thái</option>
-                            <option value="active" ${param.status == 'active' ? 'selected' : ''}>Active</option>
-                            <option value="inactive" ${param.status == 'inactive' ? 'selected' : ''}>Inactive</option>
-                        </select>
+                        <input type="text" name="searchName" placeholder="Search name of material"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg flex items-center">
                         <i class="fas fa-search mr-2"></i> Search
@@ -305,27 +306,32 @@
                         <table class="w-full table-auto">
                             <thead>
                                 <tr class="bg-primary-600 text-white">
-                                    <th class="p-4 text-left">Catergory Name</th>
+                                    <th class="p-4 text-left">Category Name</th>
+                                    <th class="p-4 text-left">Code of material</th>
                                     <th class="p-4 text-left">Material Name</th>
-                                    <th class="p-4 text-left">Material Condition</th>
-                                    <th class="p-4 text-left">Quantity</th>
+                                    <th class="p-4 text-left">Description</th>
+                                    <th class="p-4 text-left">Image</th>
                                     <th class="p-4 text-left">Unit</th>
-                                    <th class="p-4 text-left">Price</th>
-                                    <th class="p-4 text-left">Time import</th>
+                                    <th class="p-4 text-left">Action</th>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
                                 <c:choose>
-                                    <c:when test="${not empty suppliers}">
-                                        <c:forEach var="item" items="${suppliers}">
+                                    <c:when test="${not empty materials}">
+                                        <c:forEach var="item" items="${materials}">
                                             <tr class="border-b border-gray-200 dark:border-gray-700">
-                                                <td class="p-4 font-medium">${item.supplierName}</td>
-                                                <td class="p-4 font-medium">${item.supplierPhone}</td>
-                                                <td class="p-4 font-medium">${item.supplierAddress}</td>
-                                                <td class="p-4 font-medium">${item.supplierEmail}</td>
-                                                <td class="p-4 font-medium">${item.supplierStatus}</td>
-                                                <td class="p-4 font-medium">${item.supplierStatus}</td>
-                                                <td class="p-4 font-medium">${item.supplierStatus}</td>                      
+                                                <td class="p-4 font-medium">${item.brand.category.name}</td>
+                                                <td class="p-4 font-medium">${item.code}</td>
+                                                <td class="p-4 font-medium">${item.name}</td>
+                                                <td class="p-4 font-medium">${item.description}</td>
+                                                <td class="p-4 font-medium">
+                                                    <img src="${item.imageUrl}" alt="${item.imageUrl}" class="w-16 h-16 object-cover" />
+                                                </td>
+                                                <td class="p-4 font-medium">${item.unit}</td>
+                                                 <td class="p-4 font-medium">
+                                                    <a href="${pageContext.request.contextPath}/EditMaterialController?id=${item.materialId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
+                                                </td>
                                             </tr>
                                         </c:forEach>
                                     </c:when>
@@ -348,7 +354,7 @@
                     <!-- Nút trang trước -->
                     <c:choose>
                         <c:when test="${currentPage > 1}">
-                            <a href="ListSupplierServlet?page=${currentPage - 1}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&lt;</a>
+                            <a href="FilterSupplierServlet?page=${currentPage - 1}&searchName=${param.searchName}&searchCategory=${param.searchCategory}&supplierId=${supplierId}&supplierName=${supplierName}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&lt;</a>
                         </c:when>
                         <c:otherwise>
                             <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">&lt;</span>
@@ -361,7 +367,7 @@
                             <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">1</span>
                         </c:when>
                         <c:otherwise>
-                            <a href="ListSupplierServlet?page=1&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">1</a>
+                            <a href="FilterSupplierServlet?page=1&searchName=${param.searchName}&searchCategory=${param.searchCategory}&supplierId=${supplierId}&supplierName=${supplierName}" class="px-3 py-1 rounded border hover:border-blue-500">1</a>
                         </c:otherwise>
                     </c:choose>
 
@@ -377,7 +383,7 @@
                                 <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${i}</span>
                             </c:when>
                             <c:otherwise>
-                                <a href="ListSupplierServlet?page=${i}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${i}</a>
+                                <a href="FilterSupplierServlet?page=${i}&searchName=${param.searchName}&searchCategory=${param.searchCategory}&supplierId=${supplierId}&supplierName=${supplierName}" class="px-3 py-1 rounded border hover:border-blue-500">${i}</a>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
@@ -394,7 +400,7 @@
                                 <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${totalPages}</span>
                             </c:when>
                             <c:otherwise>
-                                <a href="ListSupplierServlet?page=${totalPages}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${totalPages}</a>
+                                <a href="FilterSupplierServlet?page=${totalPages}&searchName=${param.searchName}&searchCategory=${param.searchCategory}&supplierId=${supplierId}&supplierName=${supplierName}" class="px-3 py-1 rounded border hover:border-blue-500">${totalPages}</a>
                             </c:otherwise>
                         </c:choose>
                     </c:if>
@@ -402,7 +408,7 @@
                     <!-- Nút trang sau -->
                     <c:choose>
                         <c:when test="${currentPage < totalPages}">
-                            <a href="ListSupplierServlet?page=${currentPage + 1}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&gt;</a>
+                            <a href="FilterSupplierServlet?page=${currentPage + 1}&searchName=${param.searchName}&searchCategory=${param.searchCategory}&supplierId=${supplierId}&supplierName=${supplierName}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&gt;</a>
                         </c:when>
                         <c:otherwise>
                             <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">&gt;</span>

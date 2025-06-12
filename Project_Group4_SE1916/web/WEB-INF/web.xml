@@ -77,6 +77,10 @@
         <servlet-class>controller.ImportHistoryServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>FilterSupplierServlet</servlet-name>
+        <servlet-class>controller.supplier.FilterSupplierServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>MaterialAutocompleteServlet</servlet-name>
         <servlet-class>controller.MaterialAutocompleteServlet</servlet-class>
     </servlet>
@@ -151,6 +155,10 @@
     <servlet-mapping>
         <servlet-name>ImportDataController</servlet-name>
         <url-pattern>/import_data</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FilterSupplierServlet</servlet-name>
+        <url-pattern>/FilterSupplierServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ImportHistoryServlet</servlet-name>

@@ -203,6 +203,7 @@
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
 
         <!-- Sidebar -->
+        <!-- Sidebar -->
         <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50">
             <div class="flex items-center mb-8">
                 <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
@@ -213,8 +214,20 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
+            <div class="mb-6 px-2">
+                <div class="relative">
+                    <input type="text" placeholder="Tìm kiếm..." 
+                           class="w-full bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 search-input">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-white opacity-70"></i>
+                </div>
+            </div>
             <nav class="space-y-2">
-                <a href="${pageContext.request.contextPath}/home.jsp" class="nav-item flex items-center p-3">
+                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-3">
+                    <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Thông tin cá nhân</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
+                </a>
+                <a href="${pageContext.request.contextPath}/home.jsp" class="nav-item active flex items-center p-3">
                     <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
                     <span class="text-lg">Tổng quan</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
@@ -229,7 +242,7 @@
                     <span class="text-lg">Danh sách nhà cung cấp</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/items.jsp" class="nav-item flex items-center p-3">
+                <a href="${pageContext.request.contextPath}/ListMaterialController" class="nav-item flex items-center p-3">
                     <i class="fas fa-box-open mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh mục vật tư</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
@@ -244,14 +257,9 @@
                     <span class="text-lg">Báo cáo</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/listuser" class="nav-item active flex items-center p-3">
-                    <i class="fas fa-users mr-3 w-6 text-center"></i>
+                <a href="${pageContext.request.contextPath}/listuser" class="nav-item flex items-center p-3">
+                    <i class="fas fa-cog mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh sách người dùng</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/userProfile.jsp" class="nav-item flex items-center p-3">
-                    <i class="fas fa-user mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Thông tin cá nhân</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
             </nav>
@@ -326,10 +334,10 @@
                                                 <td class="p-4 font-medium">${item.supplierEmail}</td>
                                                 <td class="p-4 font-medium">${item.supplierStatus}</td>
                                                 <td class="p-4 font-medium">
-                                                    <a href="ListSupplierMaterialServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">List </a>
+                                                    <a href="FilterSupplierServlet?supplierId=${item.supplierId}&supplierName=${item.supplierName}" class="text-primary-600 dark:text-primary-400 hover:underline">List </a>
                                                 </td>
                                                 <td class="p-4 font-medium">
-                                                    <a href="EditSupplierServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
+                                                    <a href="EditSupplierServlet?id=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
                                                 </td>
                                             </tr>
                                         </c:forEach>

@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Thêm Nhà cung cấp - Hệ thống Quản lý Vật tư</title>
+        <title>ThÃªm NhÃ  cung cáº¥p - Há» thá»ng Quáº£n lÃ½ Váº­t tÆ°</title>
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
@@ -139,7 +139,7 @@
                 <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
                     <i class="fas fa-boxes text-primary-600 text-2xl"></i>
                 </div>
-                <h2 class="text-2xl font-bold">QL Vật Tư</h2>
+                <h2 class="text-2xl font-bold">QL Váº­t TÆ°</h2>
                 <button id="toggleSidebar" class="ml-auto text-white opacity-70 hover:opacity-100">
                     <i class="fas fa-times"></i>
                 </button>
@@ -147,44 +147,44 @@
             <nav class="space-y-2">
                 <a href="${pageContext.request.contextPath}/home.jsp" class="nav-item flex items-center p-3">
                     <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Tổng quan</span>
+                    <span class="text-lg">Tá»ng quan</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
                 <a href="${pageContext.request.contextPath}/inventory.jsp" class="nav-item flex items-center p-3">
                     <i class="fas fa-warehouse mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Quản lý kho</span>
+                    <span class="text-lg">Quáº£n lÃ½ kho</span>
                     <span class="ml-auto bg-white bg-opacity-20 text-sm px-2 py-1 rounded-full">5</span>
                 </a>
                 <a href="${pageContext.request.contextPath}/items.jsp" class="nav-item flex items-center p-3">
                     <i class="fas fa-box-open mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Danh mục vật tư</span>
+                    <span class="text-lg">Danh má»¥c váº­t tÆ°</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
                 <a href="${pageContext.request.contextPath}/orders.jsp" class="nav-item flex items-center p-3">
                     <i class="fas fa-clipboard-list mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Đơn hàng</span>
+                    <span class="text-lg">ÄÆ¡n hÃ ng</span>
                     <span class="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full">3</span>
                 </a>
                 <a href="${pageContext.request.contextPath}/reports.jsp" class="nav-item flex items-center p-3">
                     <i class="fas fa-chart-bar mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Báo cáo</span>
+                    <span class="text-lg">BÃ¡o cÃ¡o</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
                 <a href="${pageContext.request.contextPath}/listuser" class="nav-item active flex items-center p-3">
                     <i class="fas fa-users mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Danh sách người dùng</span>
+                    <span class="text-lg">Danh sÃ¡ch ngÆ°á»i dÃ¹ng</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
                 <a href="${pageContext.request.contextPath}/userProfile.jsp" class="nav-item flex items-center p-3">
                     <i class="fas fa-user mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Thông tin cá nhân</span>
+                    <span class="text-lg">ThÃ´ng tin cÃ¡ nhÃ¢n</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
             </nav>
             <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">
                 <a href="logout" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
                     <i class="fas fa-sign-out-alt mr-3"></i>
-                    <span class="text-lg">Đăng xuất</span>
+                    <span class="text-lg">ÄÄng xuáº¥t</span>
                 </a>
             </div>
         </aside>
@@ -196,22 +196,22 @@
                     <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Thêm Nhà cung cấp mới</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">ThÃªm NhÃ  cung cáº¥p má»i</h2>
                 </div>
 
                 <form action="AddSupplierServlet" method="post" class="space-y-4">
                     <div class="space-y-2">
-                        <label for="supplierName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tên nhà cung cấp</label>
+                        <label for="supplierName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">TÃªn nhÃ  cung cáº¥p</label>
                         <input type="text" id="supplierName" name="supplierName" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
 
                     <div class="space-y-2">
-                        <label for="supplierPhone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Số điện thoại</label>
+                        <label for="supplierPhone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sá» Äiá»n thoáº¡i</label>
                         <input type="text" id="supplierPhone" name="supplierPhone" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
 
                     <div class="space-y-2">
-                        <label for="supplierAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Địa chỉ</label>
+                        <label for="supplierAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Äá»a chá»</label>
                         <input type="text" id="supplierAddress" name="supplierAddress" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
                     <div class="space-y-2">
@@ -219,25 +219,25 @@
                         <input type="email" id="supplierEmail" name="supplierEmail" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
                     <div class="space-y-2">
-                        <label for="supplierStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Trạng thái</label>
+                        <label for="supplierStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tráº¡ng thÃ¡i</label>
                         <select id="supplierStatus" name="supplierStatus" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                         </select>
                     </div>
                     <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg w-full flex items-center justify-center">
-                        <i class="fas fa-plus-circle mr-2"></i> Thêm Nhà cung cấp mới
+                        <i class="fas fa-plus-circle mr-2"></i> ThÃªm NhÃ  cung cáº¥p má»i
                     </button>
                 </form>
                 <c:if test="${not empty errorMessage}">
                     <div class="mb-4 p-3 rounded
-                         ${errorMessage == 'Thêm nhà cung thành công!' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                         ${errorMessage == 'ThÃªm nhÃ  cung thÃ nh cÃ´ng!' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
                         ${errorMessage}
                     </div>
                 </c:if>
 
                 <div class="mt-4 flex justify-center">
-                    <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay lại Danh sách</a>
+                    <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay láº¡i Danh sÃ¡ch</a>
                 </div>
             </div>
         </main>
@@ -291,13 +291,13 @@
 
                 if (!emailRegex.test(email)) {
                     e.preventDefault();
-                    alert('Vui lòng nhập email hợp lệ!');
+                    alert('Vui lÃ²ng nháº­p email há»£p lá»!');
                     return;
                 }
 
                 if (!phoneRegex.test(phone)) {
                     e.preventDefault();
-                    alert('Số điện thoại phải có đúng 10 chữ số và chỉ gồm số!');
+                    alert('Sá» Äiá»n thoáº¡i pháº£i cÃ³ ÄÃºng 10 chá»¯ sá» vÃ  chá» gá»m sá»!');
                     return;
                 }
             });
