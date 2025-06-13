@@ -284,7 +284,7 @@
                 </div>
                 <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
             </a>
-            <a href="${pageContext.request.contextPath}/export.jsp" class="nav-item flex items-center p-2 justify-between">
+            <a href="${pageContext.request.contextPath}/exportMaterial.jsp" class="nav-item flex items-center p-2 justify-between">
                 <div class="flex items-center">
                     <i class="fas fa-arrow-up mr-2 w-5 text-center"></i>
                     <span class="text-base">Xuất kho</span>
