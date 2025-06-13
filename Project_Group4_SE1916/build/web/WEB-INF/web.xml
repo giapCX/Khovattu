@@ -84,6 +84,10 @@
         <servlet-name>MaterialAutocompleteServlet</servlet-name>
         <servlet-class>controller.MaterialAutocompleteServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ProposalController</servlet-name>
+        <servlet-class>controller.ProposalController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -167,6 +171,10 @@
     <servlet-mapping>
         <servlet-name>MaterialAutocompleteServlet</servlet-name>
         <url-pattern>/material_auto</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProposalController</servlet-name>
+        <url-pattern>/ProposalController</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

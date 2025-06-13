@@ -3,14 +3,13 @@ package model;
 import java.util.Date;
 
 public class Proposal {
-
-    private int id; // Mã đề xuất (proposal_id)
-    private String type; // Loại đề xuất (proposal_type)
-    private String sender; // Người gửi (full_name từ Users dựa trên proposer_id)
-    private Date sendDate; // Ngày gửi (proposal_sent_date)
-    private String finalApprover; // Người duyệt cuối (full_name từ Users dựa trên director_approver_id hoặc admin_approver_id)
-    private Date approvalDate; // Ngày duyệt (director_approval_date hoặc admin_approval_date)
-    private String status; // Trạng thái duyệt (status từ EmployeeProposals)
+    private int id;
+    private String type;
+    private String sender;
+    private Date sendDate;
+    private String finalApprover;
+    private Date approvalDate;
+    private String status;
 
     // Constructor
     public Proposal(int id, String type, String sender, Date sendDate, String finalApprover, Date approvalDate, String status) {
