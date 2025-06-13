@@ -404,7 +404,7 @@
                 <i class="fas fa-arrow-down text-3xl mb-3"></i>
                 <span class="text-lg">Nhập kho</span>
             </button>
-            <button onclick="window.location.href='${pageContext.request.contextPath}/export.jsp'" 
+            <button onclick="window.location.href='${pageContext.request.contextPath}/exportMaterial.jsp'" 
                     class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
                 <i class="fas fa-arrow-up text-3xl mb-3"></i>
                 <span class="text-lg">Xuất kho</span>

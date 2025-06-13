@@ -88,6 +88,10 @@
         <servlet-name>ProposalController</servlet-name>
         <servlet-class>controller.ProposalController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ExportMaterial</servlet-name>
+        <servlet-class>controller.ExportMaterial</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -175,6 +179,10 @@
     <servlet-mapping>
         <servlet-name>ProposalController</servlet-name>
         <url-pattern>/ProposalController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExportMaterial</servlet-name>
+        <url-pattern>/exportMaterial</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

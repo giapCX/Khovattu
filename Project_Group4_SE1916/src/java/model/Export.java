@@ -1,26 +1,20 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-/**
- *
- * @author ASUS
- */
 import java.time.LocalDate;
 
 public class Export {
     private int exportId;
-    private int userId;
+    private String voucherId; 
+    private String userId;       
     private LocalDate exportDate;
     private String note;
 
     public Export() {
     }
 
-    public Export(int exportId, int userId, LocalDate exportDate, String note) {
+    public Export(int exportId, String voucherId, String userId, LocalDate exportDate, String note) {
         this.exportId = exportId;
+        this.voucherId = voucherId;
         this.userId = userId;
         this.exportDate = exportDate;
         this.note = note;
@@ -34,11 +28,19 @@ public class Export {
         this.exportId = exportId;
     }
 
-    public int getUserId() {
+    public String getVoucherId() {
+        return voucherId;
+    }
+
+    public void setVoucherId(String voucherId) {
+        this.voucherId = voucherId;
+    }
+
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -57,7 +59,4 @@ public class Export {
     public void setNote(String note) {
         this.note = note;
     }
-
-    
 }
-
