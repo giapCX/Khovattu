@@ -89,6 +89,12 @@
             <div class="max-w-md mx-auto card bg-white dark:bg-gray-800 p-6">
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">Edit Material</h2>
 
+                <c:if test="${not empty message}">
+                    <div class="bg-${messageType}-100 border border-${messageType}-400 text-${messageType}-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        ${message}
+                    </div>
+                </c:if>
+
                 <form action="${pageContext.request.contextPath}/EditMaterialController" method="post" class="space-y-4">
                     <input type="hidden" name="id" value="${material.materialId}" />
 
@@ -107,17 +113,7 @@
                         <select name="category" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
                             <option value="">Chọn danh mục</option>
                             <c:forEach var="cat" items="${categories}">
-                                <option value="${cat.categoryId}" ${cat.categoryId == material.brand.category.categoryId ? 'selected' : ''}>${cat.name}</option>
-                            </c:forEach>
-                        </select>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Brand</label>
-                        <select name="brand" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
-                            <option value="">Chọn nhãn hiệu</option>
-                            <c:forEach var="brand" items="${brands}">
-                                <option value="${brand.brandId}" data-category="${brand.category.categoryId}" ${brand.brandId == material.brand.brandId ? 'selected' : ''}>${brand.name}</option>
+                                <option value="${cat.categoryId}" ${cat.categoryId == material.category.categoryId ? 'selected' : ''}>${cat.name}</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -139,7 +135,6 @@
 
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Supplier</label>
-                       
                         <c:forEach var="sup" items="${suppliers}">
                             <label class="block">
                                 <input type="checkbox" name="suppliers" value="${sup.supplierId}"
@@ -162,26 +157,5 @@
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            $(document).ready(function () {
-                // Lọc nhãn hiệu theo danh mục
-                $('#category').change(function () {
-                    var categoryId = $(this).val();
-                    $('#brand option').each(function () {
-                        if (categoryId === '') {
-                            $(this).show();
-                        } else {
-                            if ($(this).data('category') == categoryId || $(this).val() === '') {
-                                $(this).show();
-                            } else {
-                                $(this).hide();
-                            }
-                        }
-                    });
-                    $('#brand').val('');
-                });
-
-            });
-        </script>
     </body>
 </html>
