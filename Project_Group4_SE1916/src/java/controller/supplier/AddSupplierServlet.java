@@ -87,11 +87,11 @@ public class AddSupplierServlet extends HttpServlet {
         SupplierDAO s= new SupplierDAO(conn);     
         boolean success = s.addSupplier(supplier);
         if (success) {           
-            request.setAttribute("errorMessage", "Thêm nhà cung thành công!");
-            request.getRequestDispatcher("view/supplier/editSupplier.jsp").forward(request, response);
+            request.setAttribute("errorMessage", "Add supplier successful!");
+            request.getRequestDispatcher("view/supplier/addSupplier.jsp").forward(request, response);
         } else {
-            request.setAttribute("errorMessage", "Thêm nhà cung cấp thất bại!");
-            request.getRequestDispatcher("view/supplier/editSupplier.jsp").forward(request, response);
+            request.setAttribute("errorMessage", "Add supplier fail!");
+            request.getRequestDispatcher("view/supplier/addSupplier.jsp").forward(request, response);
         }
         
     }

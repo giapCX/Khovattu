@@ -3,191 +3,35 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ThÃªm NhÃ  cung cáº¥p - Há» thá»ng Quáº£n lÃ½ Váº­t tÆ°</title>
+        <title>Add supplier</title>
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            primary: {
-                                50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
-                                400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
-                                800: '#075985', 900: '#0c4a6e'
-                            },
-                            secondary: {
-                                50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe', 300: '#c4b5fd',
-                                400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9',
-                                800: '#5b21b6', 900: '#4c1d95'
-                            }
-                        },
-                        fontFamily: {
-                            sans: ['Inter', 'sans-serif']
-                        }
-                    }
-                }
-            }
-        </script>
+        <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
+
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-            body {
-                font-family: 'Inter', sans-serif;
-                background-color: #f8fafc;
-            }
-
-            .sidebar {
-                background: linear-gradient(195deg, #1e3a8a, #3b82f6);
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(59, 130, 246, 0.4);
-                transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-                transform: translateX(-100%);
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            main, footer {
-                transition: all 0.3s ease;
-            }
-
-            .sidebar.active ~ main,
-            .sidebar.active ~ footer {
-                margin-left: 18rem;
-            }
-
-            .nav-item {
-                transition: all 0.2s ease;
-                border-radius: 0.5rem;
-            }
-
-            .nav-item:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-                transform: translateX(5px);
-            }
-
-            .nav-item.active {
-                background-color: rgba(255, 255, 255, 0.2);
-                font-weight: 600;
-            }
-
-            .card {
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-                border-radius: 1rem;
-                border: 1px solid #e5e7eb;
-            }
-
-            .card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            }
-
-            .btn-primary {
-                background: linear-gradient(to right, #3b82f6, #6366f1);
-                transition: all 0.3s ease;
-            }
-
-            .btn-primary:hover {
-                transform: scale(1.05);
-                box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
-            }
-
-            .btn-secondary {
-                background: linear-gradient(to right, #6b7280, #9ca3af);
-                transition: all 0.3s ease;
-            }
-
-            .btn-secondary:hover {
-                transform: scale(1.05);
-                box-shadow: 0 10px 15px -3px rgba(107, 114, 128, 0.3), 0 4px 6px -2px rgba(107, 114, 128, 0.1);
-            }
-
-            .dark-mode {
-                background-color: #1a202c;
-                color: #e2e8f0;
-            }
-
-            .dark-mode .card {
-                background-color: #2d3748;
-                color: #e2e8f0;
-                border-color: #4a5568;
-            }
-
-            .dark-mode .sidebar {
-                background: linear-gradient(195deg, #111827, #1f2937);
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(31, 41, 55, 0.4);
-            }
-
-            @media (max-width: 768px) {
-                .sidebar {
-                    width: 100%;
-                    max-width: 280px;
-                    z-index: 50;
-                }
-            }
-        </style>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_add_edit.css">
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
 
+        <%
+            String role = (String) session.getAttribute("role");
+        %>
         <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50">
-            <div class="flex items-center mb-8">
-                <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
-                    <i class="fas fa-boxes text-primary-600 text-2xl"></i>
-                </div>
-                <h2 class="text-2xl font-bold">QL Váº­t TÆ°</h2>
-                <button id="toggleSidebar" class="ml-auto text-white opacity-70 hover:opacity-100">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <nav class="space-y-2">
-                <a href="${pageContext.request.contextPath}/home.jsp" class="nav-item flex items-center p-3">
-                    <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Tá»ng quan</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/inventory.jsp" class="nav-item flex items-center p-3">
-                    <i class="fas fa-warehouse mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Quáº£n lÃ½ kho</span>
-                    <span class="ml-auto bg-white bg-opacity-20 text-sm px-2 py-1 rounded-full">5</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/items.jsp" class="nav-item flex items-center p-3">
-                    <i class="fas fa-box-open mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Danh má»¥c váº­t tÆ°</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/orders.jsp" class="nav-item flex items-center p-3">
-                    <i class="fas fa-clipboard-list mr-3 w-6 text-center"></i>
-                    <span class="text-lg">ÄÆ¡n hÃ ng</span>
-                    <span class="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full">3</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/reports.jsp" class="nav-item flex items-center p-3">
-                    <i class="fas fa-chart-bar mr-3 w-6 text-center"></i>
-                    <span class="text-lg">BÃ¡o cÃ¡o</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/listuser" class="nav-item active flex items-center p-3">
-                    <i class="fas fa-users mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Danh sÃ¡ch ngÆ°á»i dÃ¹ng</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/userProfile.jsp" class="nav-item flex items-center p-3">
-                    <i class="fas fa-user mr-3 w-6 text-center"></i>
-                    <span class="text-lg">ThÃ´ng tin cÃ¡ nhÃ¢n</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-            </nav>
-            <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">
-                <a href="logout" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
-                    <i class="fas fa-sign-out-alt mr-3"></i>
-                    <span class="text-lg">ÄÄng xuáº¥t</span>
-                </a>
-            </div>
-        </aside>
+        <c:choose>
+            <c:when test="${role == 'admin'}">
+                <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
+            </c:when>
+            <c:when test="${role == 'direction'}">
+                <jsp:include page="/view/sidebar/sidebarDirection.jsp" />
+            </c:when>
+            <c:when test="${role == 'warehouse'}">
+                <jsp:include page="/view/sidebar/sidebarWarehouse.jsp" />
+            </c:when>
+            <c:when test="${role == 'employee'}">
+                <jsp:include page="/view/sidebar/sidebarEmployee.jsp" />
+            </c:when>
+        </c:choose>
 
         <!-- Main Content -->
         <main class="flex-1 p-8 transition-all duration-300">
@@ -196,22 +40,22 @@
                     <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">ThÃªm NhÃ  cung cáº¥p má»i</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Add new supplier</h2>
                 </div>
 
                 <form action="AddSupplierServlet" method="post" class="space-y-4">
                     <div class="space-y-2">
-                        <label for="supplierName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">TÃªn nhÃ  cung cáº¥p</label>
+                        <label for="supplierName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
                         <input type="text" id="supplierName" name="supplierName" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
 
                     <div class="space-y-2">
-                        <label for="supplierPhone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sá» Äiá»n thoáº¡i</label>
+                        <label for="supplierPhone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone number</label>
                         <input type="text" id="supplierPhone" name="supplierPhone" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
 
                     <div class="space-y-2">
-                        <label for="supplierAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Äá»a chá»</label>
+                        <label for="supplierAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
                         <input type="text" id="supplierAddress" name="supplierAddress" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
                     <div class="space-y-2">
@@ -219,68 +63,32 @@
                         <input type="email" id="supplierEmail" name="supplierEmail" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
                     <div class="space-y-2">
-                        <label for="supplierStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tráº¡ng thÃ¡i</label>
+                        <label for="supplierStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                         <select id="supplierStatus" name="supplierStatus" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                         </select>
                     </div>
                     <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg w-full flex items-center justify-center">
-                        <i class="fas fa-plus-circle mr-2"></i> ThÃªm NhÃ  cung cáº¥p má»i
+                        <i class="fas fa-plus-circle mr-2"></i> Add 
                     </button>
                 </form>
                 <c:if test="${not empty errorMessage}">
                     <div class="mb-4 p-3 rounded
-                         ${errorMessage == 'ThÃªm nhÃ  cung thÃ nh cÃ´ng!' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                         ${errorMessage == 'Add supplier successful!' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
                         ${errorMessage}
                     </div>
                 </c:if>
 
                 <div class="mt-4 flex justify-center">
-                    <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay láº¡i Danh sÃ¡ch</a>
+                    <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to list supplier</a>
                 </div>
             </div>
         </main>
 
-        <!-- JavaScript -->
+        <!--JavaScript -->
+        <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
         <script>
-            // Toggle Sidebar
-            const sidebar = document.getElementById('sidebar');
-            const toggleSidebar = document.getElementById('toggleSidebar');
-            const toggleSidebarMobile = document.getElementById('toggleSidebarMobile');
-
-            function toggleSidebarVisibility() {
-                sidebar.classList.toggle('active');
-                sidebar.classList.toggle('hidden');
-            }
-
-            toggleSidebar.addEventListener('click', toggleSidebarVisibility);
-            toggleSidebarMobile.addEventListener('click', toggleSidebarVisibility);
-
-            // Initialize sidebar as hidden
-            sidebar.classList.add('hidden');
-
-            // Dark Mode Toggle
-            const toggleDarkMode = document.createElement('button');
-            toggleDarkMode.id = 'toggleDarkMode';
-            toggleDarkMode.className = 'bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 fixed top-4 right-4 z-50';
-            toggleDarkMode.innerHTML = '<i class="fas fa-moon text-gray-700 dark:text-yellow-300 text-xl"></i>';
-            document.body.appendChild(toggleDarkMode);
-
-            toggleDarkMode.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode');
-                const icon = toggleDarkMode.querySelector('i');
-                icon.classList.toggle('fa-moon');
-                icon.classList.toggle('fa-sun');
-                localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-            });
-
-            // Load Dark Mode Preference
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-                toggleDarkMode.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-            }
-
             // Client-side validation
             const form = document.querySelector('form');
             form.addEventListener('submit', (e) => {
@@ -291,13 +99,13 @@
 
                 if (!emailRegex.test(email)) {
                     e.preventDefault();
-                    alert('Vui lÃ²ng nháº­p email há»£p lá»!');
+                    alert('Please re-enter the correct email format.');
                     return;
                 }
 
                 if (!phoneRegex.test(phone)) {
                     e.preventDefault();
-                    alert('Sá» Äiá»n thoáº¡i pháº£i cÃ³ ÄÃºng 10 chá»¯ sá» vÃ  chá» gá»m sá»!');
+                    alert('Phone number must have 10 number. Please re-enter the correct phone number format.');
                     return;
                 }
             });
