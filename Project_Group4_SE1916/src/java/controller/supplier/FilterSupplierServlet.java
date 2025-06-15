@@ -65,7 +65,7 @@ public class FilterSupplierServlet extends HttpServlet {
         String searchCategory = request.getParameter("searchCategory");
         String searchName = request.getParameter("searchName");
         String supplierName = request.getParameter("supplierName");
-        Integer supplierId = Integer.parseInt(request.getParameter("supplierId"));
+        int supplierId = Integer.parseInt(request.getParameter("supplierId"));
         String pageParam = request.getParameter("page");
         int currentPage = 1;
         int recordsPerPage = 6;

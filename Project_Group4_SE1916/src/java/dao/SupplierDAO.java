@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import model.Material;
-import model.MaterialBrand;
 import model.MaterialCategory;
 import model.Supplier;
 import java.sql.*;
@@ -29,12 +28,11 @@ public class SupplierDAO {
                 + "s.address AS supplier_address, s.email AS supplier_email, s.status AS supplier_status, "
                 + "m.material_id, m.code AS material_code, m.name AS material_name, m.description AS material_description, "
                 + "m.unit AS material_unit, m.image_url AS material_image_url, "
-                + "mb.brand_id, mb.name AS brand_name, mc.category_id, mc.name AS category_name "
+                + "mc.category_id, mc.name AS category_name "
                 + "FROM Suppliers s "
                 + "LEFT JOIN SupplierMaterials sm ON s.supplier_id = sm.supplier_id "
                 + "LEFT JOIN Materials m ON sm.material_id = m.material_id "
-                + "LEFT JOIN MaterialBrands mb ON m.brand_id = mb.brand_id "
-                + "LEFT JOIN MaterialCategories mc ON mb.category_id = mc.category_id "
+                + "LEFT JOIN MaterialCategories mc ON m.category_id = mc.category_id "
                 + "WHERE s.supplier_id = ? "
                 + "ORDER BY m.material_id";
 
@@ -63,18 +61,10 @@ public class SupplierDAO {
                         material.setDescription(rs.getString("material_description"));
                         material.setUnit(rs.getString("material_unit"));
                         material.setImageUrl(rs.getString("material_image_url"));
-
-                        MaterialBrand brand = new MaterialBrand();
-                        brand.setBrandId(rs.getInt("brand_id"));
-                        brand.setName(rs.getString("brand_name"));
-
                         MaterialCategory category = new MaterialCategory();
                         category.setCategoryId(rs.getInt("category_id"));
                         category.setName(rs.getString("category_name"));
-
-                        brand.setCategory(category);
-                        material.setBrand(brand);
-
+                        material.setCategory(category);
                         supplier.getMaterials().add(material);
                     }
                 }
@@ -84,61 +74,6 @@ public class SupplierDAO {
         }
 
         return supplier;
-    }
-
-    public void saveImportReceipt(ImportReceipt receipt, List<ImportDetail> details) throws SQLException {
-        String sqlReceipt = "INSERT INTO ImportReceipts (import_id, supplier_id, user_id, import_date, note) VALUES (?, ?, ?, ?, ?) "
-                + "ON DUPLICATE KEY UPDATE supplier_id = VALUES(supplier_id), user_id = VALUES(user_id), import_date = VALUES(import_date), note = VALUES(note)";
-        String sqlDetail = "INSERT INTO ImportDetails (import_id, material_id, quantity, price_per_unit, material_condition) VALUES (?, ?, ?, ?, ?) "
-                + "ON DUPLICATE KEY UPDATE quantity = VALUES(quantity), price_per_unit = VALUES(price_per_unit), material_condition = VALUES(material_condition)";
-        String sqlInventory = "INSERT INTO Inventory (material_id, material_condition, quantity_in_stock) VALUES (?, ?, ?) "
-                + "ON DUPLICATE KEY UPDATE quantity_in_stock = quantity_in_stock + ?";
-
-        try {
-            conn.setAutoCommit(false);
-
-            // Insert or update receipt
-            try (PreparedStatement stmtReceipt = conn.prepareStatement(sqlReceipt)) {
-                stmtReceipt.setInt(1, receipt.getImportId());
-                stmtReceipt.setInt(2, receipt.getSupplierId());
-                stmtReceipt.setInt(3, receipt.getUserId());
-                stmtReceipt.setDate(4, receipt.getImportDate());
-                stmtReceipt.setString(5, receipt.getNote());
-                stmtReceipt.executeUpdate();
-            }
-
-            // Insert or update details
-            try (PreparedStatement stmtDetail = conn.prepareStatement(sqlDetail)) {
-                for (ImportDetail detail : details) {
-                    stmtDetail.setInt(1, detail.getImportId());
-                    stmtDetail.setInt(2, detail.getMaterialId());
-                    stmtDetail.setDouble(3, detail.getQuantity());
-                    stmtDetail.setDouble(4, detail.getPricePerUnit());
-                    stmtDetail.setString(5, detail.getMaterialCondition());
-                    stmtDetail.addBatch();
-                }
-                stmtDetail.executeBatch();
-            }
-
-            // Update inventory
-            try (PreparedStatement stmtInventory = conn.prepareStatement(sqlInventory)) {
-                for (ImportDetail detail : details) {
-                    stmtInventory.setInt(1, detail.getMaterialId());
-                    stmtInventory.setString(2, detail.getMaterialCondition());
-                    stmtInventory.setDouble(3, detail.getQuantity());
-                    stmtInventory.setDouble(4, detail.getQuantity());
-                    stmtInventory.addBatch();
-                }
-                stmtInventory.executeBatch();
-            }
-
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
-        }
     }
 
     public boolean updateSupplier(Supplier supplier) {
@@ -174,40 +109,6 @@ public class SupplierDAO {
             e.printStackTrace();
             return false;
         }
-    }
-
-    // Thêm phương thức kiểm tra nhà cung cấp tồn tại theo tên
-    public boolean supplierExistsByName(String name) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Suppliers WHERE name = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, name.trim());
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
-    }
-
-    // Thêm phương thức thêm nhà cung cấp và trả về supplierId
-    public int addSupplierWithId(Supplier supplier) throws SQLException {
-        String sql = "INSERT INTO Suppliers (name, phone, address, email, status) VALUES (?, ?, ?, ?, ?) " +
-                     "RETURNING supplier_id";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, supplier.getSupplierName());
-            stmt.setString(2, supplier.getSupplierPhone());
-            stmt.setString(3, supplier.getSupplierAddress());
-            stmt.setString(4, supplier.getSupplierEmail());
-            stmt.setString(5, supplier.getSupplierStatus());
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("supplier_id");
-                }
-            }
-        }
-        throw new SQLException("Không thể lấy supplier_id sau khi thêm.");
     }
 
     public int countSuppliersByNamePhoneAddressStatus(String name, String phone, String address, String status) throws SQLException {
@@ -304,8 +205,24 @@ public class SupplierDAO {
         return list;
     }
 
-    public SupplierDAO() {
-        this.conn = DBContext.getConnection();
+    // Thêm phương thức thêm nhà cung cấp và trả về supplierId
+    public int addSupplierWithId(Supplier supplier) throws SQLException {
+        String sql = "INSERT INTO Suppliers (name, phone, address, email, status) VALUES (?, ?, ?, ?, ?) "
+                + "RETURNING supplier_id";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, supplier.getSupplierName());
+            stmt.setString(2, supplier.getSupplierPhone());
+            stmt.setString(3, supplier.getSupplierAddress());
+            stmt.setString(4, supplier.getSupplierEmail());
+            stmt.setString(5, supplier.getSupplierStatus());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("supplier_id");
+                }
+            }
+        }
+        throw new SQLException("Không thể lấy supplier_id sau khi thêm.");
     }
 
     public List<Supplier> getAllSuppliers() throws SQLException {
@@ -333,12 +250,11 @@ public class SupplierDAO {
                 + "s.address AS supplier_address, s.email AS supplier_email, s.status AS supplier_status, "
                 + "m.material_id, m.code AS material_code, m.name AS material_name, m.description AS material_description, "
                 + "m.unit AS material_unit, m.image_url AS material_image_url, "
-                + "mb.brand_id, mb.name AS brand_name, mc.category_id, mc.name AS category_name "
+                + "mc.category_id, mc.name AS category_name "
                 + "FROM Suppliers s "
                 + "LEFT JOIN SupplierMaterials sm ON s.supplier_id = sm.supplier_id "
                 + "LEFT JOIN Materials m ON sm.material_id = m.material_id "
-                + "LEFT JOIN MaterialBrands mb ON m.brand_id = mb.brand_id "
-                + "LEFT JOIN MaterialCategories mc ON mb.category_id = mc.category_id "
+                + "LEFT JOIN MaterialCategories mc ON m.category_id = mc.category_id "
                 + "ORDER BY s.supplier_id";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
@@ -370,16 +286,11 @@ public class SupplierDAO {
                     material.setUnit(rs.getString("material_unit"));
                     material.setImageUrl(rs.getString("material_image_url"));
 
-                    MaterialBrand brand = new MaterialBrand();
-                    brand.setBrandId(rs.getInt("brand_id"));
-                    brand.setName(rs.getString("brand_name"));
-
                     MaterialCategory category = new MaterialCategory();
                     category.setCategoryId(rs.getInt("category_id"));
                     category.setName(rs.getString("category_name"));
 
-                    brand.setCategory(category);
-                    material.setBrand(brand);
+                    material.setCategory(category);
 
                     supplier.getMaterials().add(material);
                 }
@@ -393,32 +304,38 @@ public class SupplierDAO {
     }
 
     public int countMaterialOfSupplierBySupplierIdCategoryNameMaterialName(int supplierId, String categoryName, String materialName) throws SQLException {
+        // Xây dựng câu truy vấn SQL
         StringBuilder sql = new StringBuilder(
-                "SELECT COUNT(*) FROM Materials m "
+                "SELECT COUNT(DISTINCT m.material_id) FROM Materials m "
                 + "JOIN SupplierMaterials sm ON m.material_id = sm.material_id "
-                + "JOIN MaterialBrands mb ON m.brand_id = mb.brand_id "
-                + "JOIN MaterialCategories mc ON mb.category_id = mc.category_id "
+                + "JOIN MaterialCategories mc ON m.category_id = mc.category_id "
                 + "WHERE sm.supplier_id = ? "
         );
 
+        // Danh sách các tham số để truyền vào PreparedStatement
         List<Object> params = new ArrayList<>();
         params.add(supplierId);
 
+        // Thêm điều kiện lọc theo categoryName nếu có
         if (categoryName != null && !categoryName.trim().isEmpty()) {
             sql.append(" AND mc.name LIKE ? ");
             params.add("%" + categoryName.trim() + "%");
         }
 
+        // Thêm điều kiện lọc theo materialName nếu có
         if (materialName != null && !materialName.trim().isEmpty()) {
             sql.append(" AND m.name LIKE ? ");
             params.add("%" + materialName.trim() + "%");
         }
 
+        // Khởi tạo PreparedStatement và thiết lập các tham số
         try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            // Thiết lập các tham số vào PreparedStatement
             for (int i = 0; i < params.size(); i++) {
                 stmt.setObject(i + 1, params.get(i));
             }
 
+            // Thực thi truy vấn và lấy kết quả
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1); // Trả về số lượng vật tư thỏa mãn điều kiện
@@ -433,33 +350,32 @@ public class SupplierDAO {
             int supplierId, String categoryName, String materialName,
             int offset, int recordsPerPage) throws SQLException {
 
+        // Xây dựng câu truy vấn SQL
         StringBuilder sql = new StringBuilder(
                 "SELECT DISTINCT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, "
-                + "mb.brand_id, mb.name AS brand_name, "
                 + "mc.category_id, mc.name AS category_name "
                 + "FROM Materials m "
                 + "JOIN SupplierMaterials sm ON m.material_id = sm.material_id "
-                + "JOIN MaterialBrands mb ON m.brand_id = mb.brand_id "
-                + "JOIN MaterialCategories mc ON mb.category_id = mc.category_id "
+                + "JOIN MaterialCategories mc ON m.category_id = mc.category_id "
                 + "WHERE sm.supplier_id = ? "
         );
 
         List<Object> params = new ArrayList<>();
         params.add(supplierId);
 
-        // Kiểm tra categoryName
+        // Kiểm tra categoryName và thêm điều kiện lọc
         if (categoryName != null && !categoryName.trim().isEmpty()) {
             sql.append(" AND mc.name LIKE ? ");
             params.add("%" + categoryName.trim() + "%");
         }
 
-        // Kiểm tra materialName
+        // Kiểm tra materialName và thêm điều kiện lọc
         if (materialName != null && !materialName.trim().isEmpty()) {
             sql.append(" AND m.name LIKE ? ");
             params.add("%" + materialName.trim() + "%");
         }
 
-        // Thêm phân trang
+        // Thêm phân trang vào câu truy vấn SQL
         sql.append(" ORDER BY m.material_id LIMIT ? OFFSET ? ");
         params.add(recordsPerPage);
         params.add(offset);
@@ -467,11 +383,12 @@ public class SupplierDAO {
         List<Material> materials = new ArrayList<>();
 
         try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-
+            // Thiết lập các tham số cho PreparedStatement
             for (int i = 0; i < params.size(); i++) {
                 stmt.setObject(i + 1, params.get(i));
             }
 
+            // Thực thi truy vấn và xử lý kết quả
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Material material = new Material();
@@ -482,16 +399,11 @@ public class SupplierDAO {
                     material.setUnit(rs.getString("unit"));
                     material.setImageUrl(rs.getString("image_url"));
 
-                    // Lấy thông tin brand và category
-                    MaterialBrand brand = new MaterialBrand();
-                    brand.setBrandId(rs.getInt("brand_id"));
-                    brand.setName(rs.getString("brand_name"));
-                    material.setBrand(brand);
-
+                    // Lấy thông tin danh mục vật liệu
                     MaterialCategory category = new MaterialCategory();
                     category.setCategoryId(rs.getInt("category_id"));
                     category.setName(rs.getString("category_name"));
-                    brand.setCategory(category);  // Set category cho brand
+                    material.setCategory(category);
 
                     materials.add(material);
                 }
@@ -506,6 +418,75 @@ public class SupplierDAO {
         String sql = "SELECT COUNT(*) FROM Suppliers WHERE supplier_id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, supplierId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void saveImportReceipt(ImportReceipt receipt, List<ImportDetail> details) throws SQLException {
+        String sqlReceipt = "INSERT INTO ImportReceipts (import_id, supplier_id, user_id, import_date, note) VALUES (?, ?, ?, ?, ?) "
+                + "ON DUPLICATE KEY UPDATE supplier_id = VALUES(supplier_id), user_id = VALUES(user_id), import_date = VALUES(import_date), note = VALUES(note)";
+        String sqlDetail = "INSERT INTO ImportDetails (import_id, material_id, quantity, price_per_unit, material_condition) VALUES (?, ?, ?, ?, ?) "
+                + "ON DUPLICATE KEY UPDATE quantity = VALUES(quantity), price_per_unit = VALUES(price_per_unit), material_condition = VALUES(material_condition)";
+        String sqlInventory = "INSERT INTO Inventory (material_id, material_condition, quantity_in_stock) VALUES (?, ?, ?) "
+                + "ON DUPLICATE KEY UPDATE quantity_in_stock = quantity_in_stock + ?";
+
+        try {
+            conn.setAutoCommit(false);
+
+            // Insert or update receipt
+            try (PreparedStatement stmtReceipt = conn.prepareStatement(sqlReceipt)) {
+                stmtReceipt.setInt(1, receipt.getImportId());
+                stmtReceipt.setInt(2, receipt.getSupplierId());
+                stmtReceipt.setInt(3, receipt.getUserId());
+                stmtReceipt.setDate(4, receipt.getImportDate());
+                stmtReceipt.setString(5, receipt.getNote());
+                stmtReceipt.executeUpdate();
+            }
+
+            // Insert or update details
+            try (PreparedStatement stmtDetail = conn.prepareStatement(sqlDetail)) {
+                for (ImportDetail detail : details) {
+                    stmtDetail.setInt(1, detail.getImportId());
+                    stmtDetail.setInt(2, detail.getMaterialId());
+                    stmtDetail.setDouble(3, detail.getQuantity());
+                    stmtDetail.setDouble(4, detail.getPricePerUnit());
+                    stmtDetail.setString(5, detail.getMaterialCondition());
+                    stmtDetail.addBatch();
+                }
+                stmtDetail.executeBatch();
+            }
+
+            // Update inventory
+            try (PreparedStatement stmtInventory = conn.prepareStatement(sqlInventory)) {
+                for (ImportDetail detail : details) {
+                    stmtInventory.setInt(1, detail.getMaterialId());
+                    stmtInventory.setString(2, detail.getMaterialCondition());
+                    stmtInventory.setDouble(3, detail.getQuantity());
+                    stmtInventory.setDouble(4, detail.getQuantity());
+                    stmtInventory.addBatch();
+                }
+                stmtInventory.executeBatch();
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
+    }
+    // Thêm phương thức kiểm tra nhà cung cấp tồn tại theo tên
+
+    public boolean supplierExistsByName(String name) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Suppliers WHERE name = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name.trim());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1) > 0;

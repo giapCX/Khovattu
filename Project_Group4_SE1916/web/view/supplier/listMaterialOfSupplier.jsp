@@ -5,271 +5,38 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Danh sách vật tư của từng nhà cung cấp</title>
+        <title>List material of supplier</title>
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            primary: {
-                                50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
-                                400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
-                                800: '#075985', 900: '#0c4a6e'
-                            },
-                            secondary: {
-                                50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe', 300: '#c4b5fd',
-                                400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9',
-                                800: '#5b21b6', 900: '#4c1d95'
-                            }
-                        },
-                        fontFamily: {
-                            sans: ['Inter', 'sans-serif']
-                        }
-                    }
-                }
-            }
-        </script>
+        <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
+
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-            body {
-                font-family: 'Inter', sans-serif;
-                background-color: #f8fafc;
-            }
+        <!-- Liên kết đến file CSS -->
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
 
-            .sidebar {
-                background: linear-gradient(195deg, #1e3a8a, #3b82f6);
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(59, 130, 246, 0.4);
-                transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-                transform: translateX(-100%);
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            main, footer {
-                transition: all 0.3s ease;
-            }
-
-            .sidebar.active ~ main,
-            .sidebar.active ~ footer {
-                margin-left: 18rem;
-            }
-
-            .nav-item {
-                transition: all 0.2s ease;
-                border-radius: 0.5rem;
-            }
-
-            .nav-item:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-                transform: translateX(5px);
-            }
-
-            .nav-item.active {
-                background-color: rgba(255, 255, 255, 0.2);
-                font-weight: 600;
-            }
-
-            .table-container {
-                border-radius: 1rem;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-                border: 1px solid #e5e7eb;
-            }
-
-            .table th {
-                background-color: #3b82f6;
-                color: white;
-                font-weight: 600;
-                text-transform: uppercase;
-                font-size: 0.75rem;
-                letter-spacing: 0.05em;
-                padding: 1rem;
-            }
-
-            .table td {
-                padding: 1rem;
-            }
-
-            .table tr:nth-child(even) {
-                background-color: #f8fafc;
-            }
-
-            .btn-primary {
-                background: linear-gradient(to right, #3b82f6, #6366f1);
-                transition: all 0.3s ease;
-            }
-
-            .btn-primary:hover {
-                transform: scale(1.05);
-                box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
-            }
-
-            .btn-secondary {
-                background: linear-gradient(to right, #6b7280, #9ca3af);
-                transition: all 0.3s ease;
-            }
-
-            .btn-secondary:hover {
-                transform: scale(1.05);
-                box-shadow: 0 10px 15px -3px rgba(107, 114, 128, 0.3), 0 4px 6px -2px rgba(107, 114, 128, 0.1);
-            }
-
-            .btn-danger {
-                background: linear-gradient(to right, #ef4444, #f87171);
-                transition: all 0.3s ease;
-            }
-
-            .btn-danger:hover {
-                transform: scale(1.05);
-                box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3), 0 4px 6px -2px rgba(239, 68, 68, 0.1);
-            }
-
-            .dark-mode {
-                background-color: #1a202c;
-                color: #e2e8f0;
-            }
-
-            .dark-mode .table-container {
-                background-color: #2d3748;
-                color: #e2e8f0;
-                border-color: #4a5568;
-            }
-
-            .dark-mode .table tr:nth-child(even) {
-                background-color: #2d3748;
-            }
-
-            .dark-mode .table tr {
-                border-color: #4a5568;
-            }
-
-            .dark-mode .sidebar {
-                background: linear-gradient(195deg, #111827, #1f2937);
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(31, 41, 55, 0.4);
-            }
-
-            th.asc::after {
-                content: ' ↑';
-                font-size: 0.75rem;
-            }
-
-            th.desc::after {
-                content: ' ↓';
-                font-size: 0.75rem;
-            }
-
-            .pagination a, .pagination span {
-                padding: 0.5rem 1rem;
-                margin: 0 0.25rem;
-                border-radius: 0.5rem;
-                transition: all 0.3s ease;
-            }
-
-            .pagination a {
-                background-color: #e5e7eb;
-                color: #374151;
-            }
-
-            .pagination a:hover {
-                background-color: #d1d5db;
-                transform: scale(1.05);
-            }
-
-            .pagination span {
-                background-color: #3b82f6;
-                color: white;
-                font-weight: 600;
-            }
-
-            @media (max-width: 768px) {
-                .sidebar {
-                    width: 100%;
-                    max-width: 280px;
-                    z-index: 50;
-                }
-
-                .table-container {
-                    overflow-x: auto;
-                }
-            }
-        </style>
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
 
+        <%
+            String role = (String) session.getAttribute("role");
+        %>
         <!-- Sidebar -->
-         <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50">
-            <div class="flex items-center mb-8">
-                <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
-                    <i class="fas fa-boxes text-primary-600 text-2xl"></i>
-                </div>
-                <h2 class="text-2xl font-bold">QL Vật Tư</h2>
-                <button id="toggleSidebar" class="ml-auto text-white opacity-70 hover:opacity-100">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="mb-6 px-2">
-                <div class="relative">
-                    <input type="text" placeholder="Tìm kiếm..." 
-                           class="w-full bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 search-input">
-                    <i class="fas fa-search absolute left-3 top-2.5 text-white opacity-70"></i>
-                </div>
-            </div>
-            <nav class="space-y-2">
-                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-3">
-                    <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Thông tin cá nhân</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/home.jsp" class="nav-item active flex items-center p-3">
-                    <i class="fas fa-tachometer-alt mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Tổng quan</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/inventory.jsp" class="nav-item flex items-center p-3">
-                    <i class="fas fa-warehouse mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Quản lý kho</span>
-                    <span class="ml-auto bg-white bg-opacity-20 text-sm px-2 py-1 rounded-full">5</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="nav-item flex items-center p-3">
-                    <i class="fas fa-box-open mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Danh sách nhà cung cấp</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/ListMaterialController" class="nav-item flex items-center p-3">
-                    <i class="fas fa-box-open mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Danh mục vật tư</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/orders.jsp" class="nav-item flex items-center p-3">
-                    <i class="fas fa-clipboard-list mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Đơn hàng</span>
-                    <span class="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full">3</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/reports.jsp" class="nav-item flex items-center p-3">
-                    <i class="fas fa-chart-bar mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Báo cáo</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/listuser" class="nav-item flex items-center p-3">
-                    <i class="fas fa-cog mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Danh sách người dùng</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-            </nav>
-            <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">
-                <a href="${pageContext.request.contextPath}/logout" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
-                    <i class="fas fa-sign-out-alt mr-3"></i>
-                    <span class="text-lg">Đăng xuất</span>
-                </a>
-            </div>
-        </aside>
+        <c:choose>
+            <c:when test="${role == 'admin'}">
+                <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
+            </c:when>
+            <c:when test="${role == 'direction'}">
+                <jsp:include page="/view/sidebar/sidebarDirection.jsp" />
+            </c:when>
+            <c:when test="${role == 'warehouse'}">
+                <jsp:include page="/view/sidebar/sidebarWarehouse.jsp" />
+            </c:when>
+            <c:when test="${role == 'employee'}">
+                <jsp:include page="/view/sidebar/sidebarEmployee.jsp" />
+            </c:when>
+        </c:choose>
 
         <!-- Main Content -->
         <main class="flex-1 p-8 transition-all duration-300">
@@ -313,7 +80,7 @@
                                     <th class="p-4 text-left">Image</th>
                                     <th class="p-4 text-left">Unit</th>
                                     <th class="p-4 text-left">Action</th>
-                                    
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -321,7 +88,7 @@
                                     <c:when test="${not empty materials}">
                                         <c:forEach var="item" items="${materials}">
                                             <tr class="border-b border-gray-200 dark:border-gray-700">
-                                                <td class="p-4 font-medium">${item.brand.category.name}</td>
+                                                <td class="p-4 font-medium">${item.category.name}</td>
                                                 <td class="p-4 font-medium">${item.code}</td>
                                                 <td class="p-4 font-medium">${item.name}</td>
                                                 <td class="p-4 font-medium">${item.description}</td>
@@ -329,7 +96,7 @@
                                                     <img src="${item.imageUrl}" alt="${item.imageUrl}" class="w-16 h-16 object-cover" />
                                                 </td>
                                                 <td class="p-4 font-medium">${item.unit}</td>
-                                                 <td class="p-4 font-medium">
+                                                <td class="p-4 font-medium">
                                                     <a href="${pageContext.request.contextPath}/EditMaterialController?id=${item.materialId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
                                                 </td>
                                             </tr>
@@ -338,13 +105,12 @@
                                     <c:otherwise>
                                         <tr>
                                             <td colspan="7" class="p-4 text-center text-gray-500 dark:text-gray-400">
-                                                Không tìm thấy sản phẩm nào
+                                                No suppliers found
                                             </td>
                                         </tr>
                                     </c:otherwise>
                                 </c:choose>
                             </tbody>
-
                         </table>
                     </div>
                 </div><br/>
@@ -416,81 +182,28 @@
                     </c:choose>
                 </div>
 
-
-                <div class="mt-6 flex justify-center">
-                    <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Quay lại Trang chủ</a>
+                <div class="mt-6 flex justify-center space-x-4">
+                    <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to list supplier</a>
+                    <c:choose>
+                        <c:when test="${role == 'admin'}">
+                            <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
+                        </c:when>
+                        <c:when test="${role == 'direction'}">
+                            <a href="${pageContext.request.contextPath}/view/direction/directionDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
+                        </c:when>
+                        <c:when test="${role == 'warehouse'}">
+                            <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
+                        </c:when>
+                        <c:when test="${role == 'employee'}">
+                            <a href="${pageContext.request.contextPath}/view/employee/employeeDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
+                        </c:when>
+                    </c:choose>
                 </div>
-
             </div>
         </main>
 
         <!-- JavaScript -->
-        <script>
-            // Toggle Sidebar
-            const sidebar = document.getElementById('sidebar');
-            const toggleSidebar = document.getElementById('toggleSidebar');
-            const toggleSidebarMobile = document.getElementById('toggleSidebarMobile');
-
-            function toggleSidebarVisibility() {
-                sidebar.classList.toggle('active');
-                sidebar.classList.toggle('hidden');
-            }
-
-            toggleSidebar.addEventListener('click', toggleSidebarVisibility);
-            toggleSidebarMobile.addEventListener('click', toggleSidebarVisibility);
-
-            // Initialize sidebar as hidden
-            sidebar.classList.add('hidden');
-
-            // Dark Mode Toggle
-            const toggleDarkMode = document.createElement('button');
-            toggleDarkMode.id = 'toggleDarkMode';
-            toggleDarkMode.className = 'bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 fixed top-4 right-4 z-50';
-            toggleDarkMode.innerHTML = '<i class="fas fa-moon text-gray-700 dark:text-yellow-300 text-xl"></i>';
-            document.body.appendChild(toggleDarkMode);
-
-            toggleDarkMode.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode');
-                const icon = toggleDarkMode.querySelector('i');
-                icon.classList.toggle('fa-moon');
-                icon.classList.toggle('fa-sun');
-                localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-            });
-
-            // Load Dark Mode Preference
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-                toggleDarkMode.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-            }
-
-            // Table Sorting
-            document.querySelectorAll('th').forEach(th => {
-                th.addEventListener('click', () => {
-                    const table = th.closest('table');
-                    const tbody = table.querySelector('tbody');
-                    const rows = Array.from(tbody.querySelectorAll('tr'));
-                    const columnIndex = th.cellIndex;
-                    const isNumeric = columnIndex === 4; // Phone number might be numeric
-                    const isAsc = th.classList.toggle('asc');
-                    th.classList.toggle('desc', !isAsc);
-                    table.querySelectorAll('th').forEach(header => {
-                        if (header !== th)
-                            header.classList.remove('asc', 'desc');
-                    });
-                    rows.sort((a, b) => {
-                        let aValue = a.cells[columnIndex].textContent;
-                        let bValue = b.cells[columnIndex].textContent;
-                        if (isNumeric) {
-                            aValue = parseFloat(aValue) || 0;
-                            bValue = parseFloat(bValue) || 0;
-                            return isAsc ? aValue - bValue : bValue - aValue;
-                        }
-                        return isAsc ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-                    });
-                    tbody.innerHTML = '';
-                    rows.forEach(row => tbody.appendChild(row));
-                });
-            });
-        </script>
+        <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
     </body>
 </html>

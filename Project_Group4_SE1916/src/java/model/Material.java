@@ -18,20 +18,20 @@ public class Material {
     private String description;
     private String unit;
     private String imageUrl;
-    private MaterialBrand brand;
+    private MaterialCategory category;
     private List<Supplier> suppliers;
 
     public Material() {
     }
 
-    public Material(int materialId, String code, String name, String description, String unit, String imageUrl, MaterialBrand brand, List<Supplier> suppliers) {
+    public Material(int materialId, String code, String name, String description, String unit, String imageUrl, MaterialCategory category, List<Supplier> suppliers) {
         this.materialId = materialId;
         this.code = code;
         this.name = name;
         this.description = description;
         this.unit = unit;
         this.imageUrl = imageUrl;
-        this.brand = brand;
+        this.category = category;
         this.suppliers = suppliers;
     }
 
@@ -83,12 +83,12 @@ public class Material {
         this.imageUrl = imageUrl;
     }
 
-    public MaterialBrand getBrand() {
-        return brand;
+    public MaterialCategory getCategory() {
+        return category;
     }
 
-    public void setBrand(MaterialBrand brand) {
-        this.brand = brand;
+    public void setCategory(MaterialCategory category) {
+        this.category = category;
     }
 
     public List<Supplier> getSuppliers() {
@@ -99,6 +99,6 @@ public class Material {
         this.suppliers = suppliers;
     }
 
-    
-    
+   
+
 }

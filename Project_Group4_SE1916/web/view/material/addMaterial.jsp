@@ -42,15 +42,6 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="brand" class="form-label">Brand</label>
-                <select class="form-select" id="brand" name="brand" required>
-                    <option value="">Select Brand</option>
-                    <c:forEach var="brand" items="${brands}">
-                        <option value="${brand.brandId}" data-category="${brand.category.categoryId}">${brand.name}</option>
-                    </c:forEach>
-                </select>
-            </div>
-            <div class="form-group">
                 <label for="unit" class="form-label">Unit</label>
                 <input type="text" class="form-control" id="unit" name="unit" required>
             </div>
@@ -82,22 +73,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#category').change(function() {
-                var categoryId = $(this).val();
-                $('#brand option').each(function() {
-                    if (categoryId === '') {
-                        $(this).show();
-                    } else {
-                        if ($(this).data('category') == categoryId || $(this).val() === '') {
-                            $(this).show();
-                        } else {
-                            $(this).hide();
-                        }
-                    }
-                });
-                $('#brand').val('');
-            });
-
             // Auto-dismiss alerts after 5 seconds
             setTimeout(function() {
                 $('.alert').alert('close');

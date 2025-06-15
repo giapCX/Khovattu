@@ -2,12 +2,8 @@ package controller.material;
 
 import dao.MaterialDAO;
 import dao.MaterialCategoryDAO;
-import dao.MaterialBrandDAO;
-import dao.SupplierDAO;
 import model.Material;
 import model.MaterialCategory;
-import model.MaterialBrand;
-import model.Supplier;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,15 +18,11 @@ import java.util.List;
 public class ListMaterialController extends HttpServlet {
     private MaterialDAO materialDAO;
     private MaterialCategoryDAO categoryDAO;
-    private MaterialBrandDAO brandDAO;
-    private SupplierDAO supplierDAO;
 
     @Override
     public void init() throws ServletException {
         materialDAO = new MaterialDAO();
         categoryDAO = new MaterialCategoryDAO();
-        brandDAO = new MaterialBrandDAO();
-        supplierDAO = new SupplierDAO();
     }
 
     @Override
@@ -58,13 +50,9 @@ public class ListMaterialController extends HttpServlet {
     private void listMaterials(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         List<Material> materials = materialDAO.getAllMaterials();
         List<MaterialCategory> categories = categoryDAO.getAllCategories();
-        List<MaterialBrand> brands = brandDAO.getAllBrands();
-        List<Supplier> suppliers = supplierDAO.getSuppliers(); // Updated to use getSuppliers()
         
         request.setAttribute("materials", materials);
         request.setAttribute("categories", categories);
-        request.setAttribute("brands", brands);
-        request.setAttribute("suppliers", suppliers);
         request.getRequestDispatcher("/view/material/listMaterial.jsp").forward(request, response);
     }
 

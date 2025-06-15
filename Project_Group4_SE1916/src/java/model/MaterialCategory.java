@@ -13,15 +13,15 @@ import java.util.List;
 public class MaterialCategory {
     private int categoryId;
     private String name;
-    private List<MaterialBrand> brands;
+    private List<Material> materials;
 
     public MaterialCategory() {
     }
 
-    public MaterialCategory(int categoryId, String name, List<MaterialBrand> brands) {
+    public MaterialCategory(int categoryId, String name, List<Material> materials) {
         this.categoryId = categoryId;
         this.name = name;
-        this.brands = brands;
+        this.materials = materials;
     }
 
     public int getCategoryId() {
@@ -40,16 +40,14 @@ public class MaterialCategory {
         this.name = name;
     }
 
-    public List<MaterialBrand> getBrands() {
-        return brands;
+    public List<Material> getMaterials() {
+        return materials;
     }
 
-    public void setBrands(List<MaterialBrand> brands) {
-        this.brands = brands;
+    public void setMaterials(List<Material> materials) {
+        this.materials = materials;
     }
 
-    public void setDescription(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-    
+  
+
 }

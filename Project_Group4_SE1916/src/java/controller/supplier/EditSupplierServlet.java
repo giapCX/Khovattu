@@ -57,11 +57,11 @@ public class EditSupplierServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        String supplierId = request.getParameter("supplierId");
+        String sId = request.getParameter("supplierId");
+        int supplierId = Integer.parseInt(sId);
         Connection conn = DBContext.getConnection();
         SupplierDAO s= new SupplierDAO(conn);
-        Integer sId = Integer.valueOf(supplierId);
-        Supplier supplier = s.getSupplierById(sId);
+        Supplier supplier = s.getSupplierById(supplierId);
         request.setAttribute("supplier", supplier);
         request.getRequestDispatcher("/view/supplier/editSupplier.jsp").forward(request, response);
     } 
@@ -110,10 +110,10 @@ public class EditSupplierServlet extends HttpServlet {
 
     String message;
     if (!isChanged) {
-        message = "Bạn chưa thay đổi gì!";
+        message = "You haven't changed anything!";
     } else {
         boolean updated = s.updateSupplier(supplier);
-        message = updated ? "Cập nhật thành công!" : "Cập nhật thất bại!";
+        message = updated ? "Update successful!" : "Update failful!";
     }
 
     request.setAttribute("errorMessage", message);
