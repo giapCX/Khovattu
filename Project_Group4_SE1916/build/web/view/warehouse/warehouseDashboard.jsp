@@ -277,7 +277,7 @@
                 <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
             </a>
             <div class="border-t border-white border-opacity-20 my-2"></div>
-            <a href="${pageContext.request.contextPath}/importData.jsp" class="nav-item flex items-center p-2 justify-between">
+            <a href="${pageContext.request.contextPath}/view/warehouse/importData.jsp" class="nav-item flex items-center p-2 justify-between">
                 <div class="flex items-center">
                     <i class="fas fa-arrow-down mr-2 w-5 text-center"></i>
                     <span class="text-base">Nhập kho</span>
@@ -399,7 +399,7 @@
 
         <!-- Quick Actions -->
         <div class="mb-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <button onclick="window.location.href='${pageContext.request.contextPath}/importData.jsp'" 
+            <button onclick="window.location.href='${pageContext.request.contextPath}/view/warehouse/importData.jsp'" 
                     class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
                 <i class="fas fa-arrow-down text-3xl mb-3"></i>
                 <span class="text-lg">Nhập kho</span>

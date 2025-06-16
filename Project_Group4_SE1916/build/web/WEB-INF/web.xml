@@ -69,10 +69,6 @@
         <servlet-class>controller.material.ListMaterialController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ImportDataController</servlet-name>
-        <servlet-class>controller.ImportDataController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>ImportHistoryServlet</servlet-name>
         <servlet-class>controller.ImportHistoryServlet</servlet-class>
     </servlet>
@@ -91,6 +87,18 @@
     <servlet>
         <servlet-name>ExportMaterial</servlet-name>
         <servlet-class>controller.ExportMaterial</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CheckVoucherIdServlet</servlet-name>
+        <servlet-class>controller.CheckVoucherIdServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DownloadCSVServlet</servlet-name>
+        <servlet-class>DownloadCSVServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SaveImportServlet</servlet-name>
+        <servlet-class>controller.SaveImportServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
@@ -161,10 +169,6 @@
         <url-pattern>/ListMaterialController</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ImportDataController</servlet-name>
-        <url-pattern>/import_data</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>FilterSupplierServlet</servlet-name>
         <url-pattern>/FilterSupplierServlet</url-pattern>
     </servlet-mapping>
@@ -183,6 +187,18 @@
     <servlet-mapping>
         <servlet-name>ExportMaterial</servlet-name>
         <url-pattern>/exportMaterial</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CheckVoucherIdServlet</servlet-name>
+        <url-pattern>/check_voucher_id</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DownloadCSVServlet</servlet-name>
+        <url-pattern>/download_csv</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SaveImportServlet</servlet-name>
+        <url-pattern>/save_import</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

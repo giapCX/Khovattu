@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dao;
 
-/**
- *
- * @author Giap
- */
 import Dal.DBContext;
 import model.ImportReceipt;
 import model.ImportDetail;
@@ -19,7 +11,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class ImportDAO {
-
     private Connection conn;
 
     public ImportDAO() {
@@ -27,7 +18,7 @@ public class ImportDAO {
     }
 
     public void saveImportReceipt(ImportReceipt receipt, List<ImportDetail> details) throws SQLException {
-        String sqlReceipt = "INSERT INTO ImportReceipts (supplier_id, user_id, import_date, note) VALUES (?, ?, ?, ?)";
+        String sqlReceipt = "INSERT INTO ImportReceipts (voucher_id, supplier_id, user_id, import_date, note) VALUES (?, ?, ?, ?, ?)";
         String sqlDetail = "INSERT INTO ImportDetails (import_id, material_id, quantity, price_per_unit, material_condition) VALUES (?, ?, ?, ?, ?)";
 
         try {
@@ -35,10 +26,11 @@ public class ImportDAO {
 
             // Insert receipt
             try (PreparedStatement stmtReceipt = conn.prepareStatement(sqlReceipt, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                stmtReceipt.setInt(1, receipt.getSupplierId());
-                stmtReceipt.setInt(2, receipt.getUserId());
-                stmtReceipt.setDate(3, receipt.getImportDate());
-                stmtReceipt.setString(4, receipt.getNote());
+                stmtReceipt.setString(1, receipt.getVoucherId());
+                stmtReceipt.setInt(2, receipt.getSupplierId());
+                stmtReceipt.setInt(3, receipt.getUserId());
+                stmtReceipt.setDate(4, receipt.getImportDate());
+                stmtReceipt.setString(5, receipt.getNote());
                 stmtReceipt.executeUpdate();
 
                 // Get generated import_id
@@ -73,6 +65,7 @@ public class ImportDAO {
             conn.setAutoCommit(true);
         }
     }
+
     public boolean voucherIdExists(String voucherId) throws SQLException {
         String sql = "SELECT 1 FROM ImportReceipts WHERE voucher_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

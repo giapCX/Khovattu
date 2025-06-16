@@ -163,16 +163,18 @@ public class MaterialDAO {
         }
         return 0.0;
     }
-   
+
     public List<Material> searchMaterialsByName(String term) throws SQLException {
         List<Material> materials = new ArrayList<>();
-        String sql = "SELECT material_id, name, unit FROM Materials WHERE name LIKE ? LIMIT 10";
+        String sql = "SELECT material_id, code, name, unit FROM Materials WHERE name LIKE ? OR code LIKE ? LIMIT 10";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + term + "%");
+            ps.setString(2, "%" + term + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Material material = new Material();
                     material.setMaterialId(rs.getInt("material_id"));
+                    material.setCode(rs.getString("code"));
                     material.setName(rs.getString("name"));
                     material.setUnit(rs.getString("unit"));
                     materials.add(material);

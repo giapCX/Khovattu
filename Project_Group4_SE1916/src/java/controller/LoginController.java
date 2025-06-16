@@ -31,20 +31,22 @@ public class LoginController extends HttpServlet {
             String username = request.getParameter("username");
             String password = request.getParameter("password");
             UserDAO userDAO = new UserDAO(conn);
-            
+
             User foundAccount = userDAO.getUserByUsername(username);
-            
+
             if (foundAccount != null) {
                 String storedHashedPassword = foundAccount.getPassword();
                 if (storedHashedPassword != null && storedHashedPassword.startsWith("$2a$")) {
                     if (BCrypt.checkpw(password, storedHashedPassword)) {
                         HttpSession session = request.getSession();
                         session.setAttribute("username", foundAccount.getUsername());
+                        session.setAttribute("userId", foundAccount.getUserId()); // Thêm userId
+                        session.setAttribute("userFullName", foundAccount.getFullName()); // Thêm userFullName
                         session.setAttribute("role", userDAO.getRoleNameByUsername(username));
                         session.setMaxInactiveInterval(30 * 60);
 
                         String roleName = userDAO.getRoleNameByUsername(username);
-                        
+
                         switch (roleName) {
                             case "admin":
                                 response.sendRedirect("view/admin/adminDashboard.jsp");

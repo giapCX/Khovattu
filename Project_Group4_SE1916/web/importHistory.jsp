@@ -1,100 +1,248 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8" />
-    <title>Lịch sử nhập vật tư</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhập kho</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f9fafb;
-            color: #1f2937;
-            font-family: 'Inter', sans-serif;
-        }
-        .max-w-6xl {
-            max-width: 72rem;
-            margin: 0 auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #fff;
-            border-radius: 0.5rem;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
-        }
-        thead tr {
-            background-color: #2563eb;
-            color: white;
-        }
-        th, td {
-            padding: 0.75rem 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        tbody tr:hover {
-            background-color: #f3f4f6;
-        }
-        .p-4 {
-            padding: 1rem;
-        }
+        .error { color: red; }
     </style>
 </head>
 <body>
-    <main class="flex-1 p-8 transition-all duration-300">
-        <div class="max-w-6xl mx-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Lịch sử nhập vật tư</h2>
-            </div>
-            
-            <!-- Bộ lọc -->
-        <form method="get" action="importhistory" class="mb-4">
-            <input type="date" name="fromDate" value="${fromDate}" class="form-control" />
-            <input type="date" name="toDate" value="${toDate}" class="form-control" />
-            <input type="text" name="importer" value="${importer}" placeholder="Người nhập" class="form-control" />
-            <button type="submit" class="btn">Do</button>
-        </form>
-            <br><br/>
-            <div class="table-container bg-white dark:bg-gray-800">
-                <div class="overflow-x-auto">
-                    <table class="w-full table-auto">
-                        <thead>
-                            <tr>
-                                <th class="p-4">Mã phiếu</th>
-                                <th class="p-4">Thành tiền</th>
-                                <th class="p-4">Ngày nhập</th>
-                                <th class="p-4">Người nhập</th>
-                                <th class="p-4">Ghi chú</th>
-                                <th class="p-4">Action</th>
-                                
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach var="item" items="${historyData}">
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4">${item.voucherId}</td>
-                                    <td class="p-4">${item.total}</td>
-                                    <td class="p-4">${item.importDate}</td>
-                                    <td class="p-4">${item.importerName}</td>
-                                    <td class="p-4">${item.note}</td>
-                                    <td class="p-4">
-                                        <a href="importhistorydetail" class="text-primary-600">View</a>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </tbody>
-                    </table>
+    <div class="container mt-4">
+        <h2 class="mb-4">Thông tin phiếu nhập</h2>
+        <form id="importForm" action="${pageContext.request.contextPath}/save_import" method="post">
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">Mã phiếu nhập *</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" id="voucher_id" name="voucher_id" required>
+                    <p id="voucherError" class="error"></p>
+                </div>
+                <label class="col-sm-2 col-form-label">Ngày nhập *</label>
+                <div class="col-sm-4">
+                    <input type="date" class="form-control" name="import_date" required value="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>">
                 </div>
             </div>
-            <!-- Phân trang -->
-        <div class="pagination mt-4">
-            <c:forEach begin="1" end="${totalPages}" var="i">
-                <a href="importhistory?page=${i}&fromDate=${param.fromDate}&toDate=${param.toDate}&importer=${param.importer}"
-                   class="${i == currentPage ? 'active' : ''}">${i}</a>
-            </c:forEach>
-        </div>
-        </div>
-    </main>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">Người lập phiếu *</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" name="user_full_name" required placeholder="Nhập tên người lập phiếu">
+                    <input type="hidden" name="user_id" value="${sessionScope.userId != null ? sessionScope.userId : ''}">
+                </div>
+                <label class="col-sm-2 col-form-label">Nhà cung cấp *</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" name="supplier_name" required placeholder="Nhập tên nhà cung cấp">
+                    <input type="text" class="form-control mt-2" name="supplier_phone" placeholder="Số điện thoại">
+                    <input type="text" class="form-control mt-2" name="supplier_address" placeholder="Địa chỉ">
+                    <input type="email" class="form-control mt-2" name="supplier_email" placeholder="Email">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">Ghi chú</label>
+                <div class="col-sm-10">
+                    <textarea class="form-control" name="note" rows="3" placeholder="Nhập ghi chú"></textarea>
+                </div>
+            </div>
+
+            <h3 class="mb-4">Danh sách hàng nhập</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên hàng</th>
+                        <th>Mã hàng</th>
+                        <th>Đơn vị</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                        <th>Trạng thái hàng</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="importDetailsBody">
+                    <tr>
+                        <td>1</td>
+                        <td><input type="text" class="form-control" name="material_name[]" required placeholder="Nhập tên hàng"></td>
+                        <td><input type="text" class="form-control" name="material_code[]" required placeholder="Nhập mã hàng"></td>
+                        <td><input type="text" class="form-control" name="unit[]" required placeholder="Nhập đơn vị"></td>
+                        <td><input type="number" name="quantity[]" class="form-control quantity" value="0.00" step="0.01" min="0.01" required></td>
+                        <td><input type="number" name="price_per_unit[]" class="form-control price" value="0.00" step="0.01" min="0.01" required></td>
+                        <td class="total">0.00</td>
+                        <td>
+                            <select name="material_condition[]" class="form-select" required>
+                                <option value="new">Mới</option>
+                                <option value="used">Cũ</option>
+                                <option value="damaged">Hỏng hóc</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteRow(this)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-end mb-3">
+                <button type="button" class="btn btn-primary" onclick="addRow()">Thêm dòng</button>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+                <button type="button" class="btn btn-success" onclick="printReceipt()">In phiếu</button>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <p>Tổng số dòng: <span id="totalItems">1</span></p>
+                    <p>Tổng số lượng: <span id="totalQuantity">0.00</span></p>
+                </div>
+                <div class="col-sm-6 text-end">
+                    <p>Tổng tiền: <span id="totalAmount">0.00</span> VNĐ</p>
+                </div>
+            </div>
+            <div class="text-end mt-3">
+                <button type="submit" class="btn btn-primary">Lưu phiếu nhập</button>
+            </div>
+        </form>
+        <c:if test="${param.success == 'true'}">
+            <div class="alert alert-success mt-3" role="alert">Lưu phiếu nhập thành công!</div>
+        </c:if>
+        <c:if test="${not empty error}">
+            <div class="alert alert-danger mt-3" role="alert">${error}</div>
+        </c:if>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#voucher_id').on('blur', function() {
+                var voucherId = $(this).val();
+                if (voucherId) {
+                    $.ajax({
+                        url: '${pageContext.request.contextPath}/check_voucher_id',
+                        type: 'POST',
+                        data: { voucher_id: voucherId },
+                        success: function(response) {
+                            if (response.exists) {
+                                $('#voucherError').text('Mã phiếu nhập đã tồn tại.');
+                                $('#voucher_id').addClass('is-invalid');
+                            } else {
+                                $('#voucherError').text('');
+                                $('#voucher_id').removeClass('is-invalid');
+                            }
+                        }
+                    });
+                }
+            });
+
+            window.addRow = function() {
+                var table = document.getElementById("importDetailsBody");
+                var row = table.insertRow();
+                var stt = table.rows.length + 1;
+                row.innerHTML = `
+                    <td>${stt}</td>
+                    <td><input type="text" class="form-control" name="material_name[]" required placeholder="Nhập tên hàng"></td>
+                    <td><input type="text" class="form-control" name="material_code[]" required placeholder="Nhập mã hàng"></td>
+                    <td><input type="text" class="form-control" name="unit[]" required placeholder="Nhập đơn vị"></td>
+                    <td><input type="number" name="quantity[]" class="form-control quantity" value="0.00" step="0.01" min="0.01" required></td>
+                    <td><input type="number" name="price_per_unit[]" class="form-control price" value="0.00" step="0.01" min="0.01" required></td>
+                    <td class="total">0.00</td>
+                    <td>
+                        <select name="material_condition[]" class="form-select" required>
+                            <option value="new">Mới</option>
+                            <option value="used">Cũ</option>
+                            <option value="damaged">Hỏng hóc</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteRow(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                updateRowNumbers();
+                updateTotals();
+            };
+
+            window.deleteRow = function(button) {
+                var row = button.parentNode.parentNode;
+                row.parentNode.removeChild(row);
+                updateRowNumbers();
+                updateTotals();
+            };
+
+            function updateRowNumbers() {
+                var rows = document.getElementById("importDetailsBody").rows;
+                for (var i = 0; i < rows.length; i++) {
+                    rows[i].cells[0].innerHTML = i + 1;
+                }
+                document.getElementById("totalItems").innerText = rows.length;
+            }
+
+            function updateTotals() {
+                var rows = document.getElementById("importDetailsBody").rows;
+                var totalQuantity = 0;
+                var totalAmount = 0;
+
+                for (var i = 0; i < rows.length; i++) {
+                    var quantity = parseFloat(rows[i].cells[4].getElementsByTagName("input")[0].value) || 0;
+                    var price = parseFloat(rows[i].cells[5].getElementsByTagName("input")[0].value) || 0;
+                    var total = quantity * price;
+                    rows[i].cells[6].innerHTML = total.toFixed(2);
+                    totalQuantity += quantity;
+                    totalAmount += total;
+                }
+
+                document.getElementById("totalQuantity").innerText = totalQuantity.toFixed(2);
+                document.getElementById("totalAmount").innerText = totalAmount.toFixed(2);
+            }
+
+            window.resetForm = function() {
+                document.getElementById("importForm").reset();
+                document.getElementById("importDetailsBody").innerHTML = `
+                    <tr>
+                        <td>1</td>
+                        <td><input type="text" class="form-control" name="material_name[]" required placeholder="Nhập tên hàng"></td>
+                        <td><input type="text" class="form-control" name="material_code[]" required placeholder="Nhập mã hàng"></td>
+                        <td><input type="text" class="form-control" name="unit[]" required placeholder="Nhập đơn vị"></td>
+                        <td><input type="number" name="quantity[]" class="form-control quantity" value="0.00" step="0.01" min="0.01" required></td>
+                        <td><input type="number" name="price_per_unit[]" class="form-control price" value="0.00" step="0.01" min="0.01" required></td>
+                        <td class="total">0.00</td>
+                        <td>
+                            <select name="material_condition[]" class="form-select" required>
+                                <option value="new">Mới</option>
+                                <option value="used">Cũ</option>
+                                <option value="damaged">Hỏng hóc</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteRow(this)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                updateRowNumbers();
+                updateTotals();
+            };
+
+            window.printReceipt = function() {
+                window.print();
+            };
+
+            document.getElementById("importDetailsBody").addEventListener("input", updateTotals);
+
+            $('#importForm').on('submit', function(e) {
+                if ($('#voucher_id').hasClass('is-invalid')) {
+                    e.preventDefault();
+                    alert('Vui lòng sửa mã phiếu nhập bị trùng.');
+                }
+            });
+
+            updateTotals();
+        });
+    </script>
 </body>
 </html>
