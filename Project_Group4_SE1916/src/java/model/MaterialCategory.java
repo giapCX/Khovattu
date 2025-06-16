@@ -13,14 +13,16 @@ import java.util.List;
 public class MaterialCategory {
     private int categoryId;
     private String name;
+    private int parentId;
     private List<Material> materials;
 
     public MaterialCategory() {
     }
 
-    public MaterialCategory(int categoryId, String name, List<Material> materials) {
+    public MaterialCategory(int categoryId, String name, int parentId, List<Material> materials) {
         this.categoryId = categoryId;
         this.name = name;
+        this.parentId = parentId;
         this.materials = materials;
     }
 
@@ -46,6 +48,14 @@ public class MaterialCategory {
 
     public void setMaterials(List<Material> materials) {
         this.materials = materials;
+    }
+
+    public int getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
     }
 
   
