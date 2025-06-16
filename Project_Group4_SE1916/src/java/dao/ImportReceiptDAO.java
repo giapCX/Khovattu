@@ -92,6 +92,33 @@ public class ImportReceiptDAO {
 
     return 0;
 }
+public ImportReceipt getReceiptByVoucherId(String voucherId) {
+    ImportReceipt receipt = null;
+    String sql = "SELECT i.import_id, i.voucher_id, i.import_date, i.note, i.total, " +
+                 "u.fullname AS importer_name, s.supplier_name " +
+                 "FROM import_receipts i " +
+                 "JOIN users u ON i.importer_id = u.user_id " +
+                 "JOIN suppliers s ON i.supplier_id = s.supplier_id " +
+                 "WHERE i.voucher_id = ?";
 
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, voucherId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            receipt = new ImportReceipt();
+            receipt.setImportId(rs.getInt("import_id")); // để dùng truy vấn chi tiết
+            receipt.setVoucherId(rs.getString("voucher_id"));
+            receipt.setImportDate(rs.getDate("import_date"));
+            receipt.setNote(rs.getString("note"));
+            receipt.setTotal(rs.getDouble("total"));
+            receipt.setImporterName(rs.getString("importer_name"));
+            receipt.setSupplierName(rs.getString("supplier_name"));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return receipt;
+}
 }
 

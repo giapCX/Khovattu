@@ -3,6 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/DownloadCsvTemplateServlet.java</file>
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dao/AccountDAO.java</file>
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/WEB-INF/web.xml</file>
@@ -36,6 +37,12 @@
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/EditUserServlet.java</file>
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dao/ExportDAO.java</file>
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/importHistory.jsp</file>
+=======
+            <file>file:/C:/Users/quanh/Documents/GitHub/Khovattu/Project_Group4_SE1916/src/java/model/ImportDetail.java</file>
+            <file>file:/C:/Users/quanh/Documents/GitHub/Khovattu/Project_Group4_SE1916/web/exportMaterial.jsp</file>
+            <file>file:/C:/Users/quanh/Documents/GitHub/Khovattu/Project_Group4_SE1916/src/java/dao/ImportDetailDAO.java</file>
+            <file>file:/C:/Users/quanh/Documents/GitHub/Khovattu/Project_Group4_SE1916/src/java/dal/DBContext.java</file>
+>>>>>>> 2318de79a34855c4bc5d032d30293db603a78718
         </group>
     </open-files>
 </project-private>

@@ -12,6 +12,7 @@
     </style>
 </head>
 <body>
+<<<<<<< HEAD
     <div class="container mt-4">
         <h2 class="mb-4">Thông tin phiếu nhập</h2>
         <form id="importForm" action="${pageContext.request.contextPath}/save_import" method="post">
@@ -24,6 +25,51 @@
                 <label class="col-sm-2 col-form-label">Ngày nhập *</label>
                 <div class="col-sm-4">
                     <input type="date" class="form-control" name="import_date" required value="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>">
+=======
+    <main class="flex-1 p-8 transition-all duration-300">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Lịch sử nhập vật tư</h2>
+            </div>
+            
+            <!-- Bộ lọc -->
+        <form method="get" action="importhistory" class="mb-4">
+            <input type="date" name="fromDate" value="${fromDate}" class="form-control" />
+            <input type="date" name="toDate" value="${toDate}" class="form-control" />
+            <input type="text" name="importer" value="${importer}" placeholder="Người nhập" class="form-control" />
+            <button type="submit" class="btn">Do</button>
+        </form>
+            <br><br/>
+            <div class="table-container bg-white dark:bg-gray-800">
+                <div class="overflow-x-auto">
+                    <table class="w-full table-auto">
+                        <thead>
+                            <tr>
+                                <th class="p-4">Mã phiếu</th>
+                                <th class="p-4">Thành tiền</th>
+                                <th class="p-4">Ngày nhập</th>
+                                <th class="p-4">Người nhập</th>
+                                <th class="p-4">Ghi chú</th>
+                                <th class="p-4">Action</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="item" items="${historyData}">
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <td class="p-4">${item.voucherId}</td>
+                                    <td class="p-4">${item.total}</td>
+                                    <td class="p-4">${item.importDate}</td>
+                                    <td class="p-4">${item.importerName}</td>
+                                    <td class="p-4">${item.note}</td>
+                                    <td class="p-4">
+                                        <a href="importhistorydetail?importId=${item.voucherId}">View</a>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+>>>>>>> 2318de79a34855c4bc5d032d30293db603a78718
                 </div>
             </div>
 
