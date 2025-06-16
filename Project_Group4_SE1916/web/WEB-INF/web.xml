@@ -81,10 +81,6 @@
         <servlet-class>controller.supplier.FilterSupplierServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>MaterialAutocompleteServlet</servlet-name>
-        <servlet-class>controller.MaterialAutocompleteServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>ProposalController</servlet-name>
         <servlet-class>controller.ProposalController</servlet-class>
     </servlet>
@@ -95,6 +91,14 @@
     <servlet>
         <servlet-name>ImportHistoryDetailServlet</servlet-name>
         <servlet-class>controller.ImportHistoryDetailServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CheckVoucherIdServlet</servlet-name>
+        <servlet-class>controller.CheckVoucherIdServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SaveImportServlet</servlet-name>
+        <servlet-class>controller.SaveImportServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
@@ -177,10 +181,6 @@
         <url-pattern>/importhistory</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>MaterialAutocompleteServlet</servlet-name>
-        <url-pattern>/material_auto</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>ProposalController</servlet-name>
         <url-pattern>/ProposalController</url-pattern>
     </servlet-mapping>
@@ -191,6 +191,14 @@
     <servlet-mapping>
         <servlet-name>ImportHistoryDetailServlet</servlet-name>
         <url-pattern>/importhistorydetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CheckVoucherIdServlet</servlet-name>
+        <url-pattern>/check_voucher_id</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SaveImportServlet</servlet-name>
+        <url-pattern>/save_import</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

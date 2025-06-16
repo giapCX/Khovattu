@@ -40,6 +40,8 @@ public class LoginController extends HttpServlet {
                     if (BCrypt.checkpw(password, storedHashedPassword)) {
                         HttpSession session = request.getSession();
                         session.setAttribute("username", foundAccount.getUsername());
+                        session.setAttribute("userId", foundAccount.getUserId()); // Thêm userId
+                        session.setAttribute("userFullName", foundAccount.getFullName()); // Thêm fullName
                         session.setAttribute("role", userDAO.getRoleNameByUsername(username));
                         session.setMaxInactiveInterval(30 * 60);
 
