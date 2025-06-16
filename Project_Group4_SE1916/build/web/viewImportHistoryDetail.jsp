@@ -5,139 +5,93 @@
 <head>
     <meta charset="UTF-8">
     <title>Chi tiết phiếu nhập</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9fafb;
-            color: #1f2937;
-        }
-        .container {
-            max-width: 900px;
-            margin: 30px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        h2 {
-            color: #2563eb;
-            margin-bottom: 20px;
-        }
-        .info p {
-            margin: 5px 0;
-        }
-        form {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-        }
-        input, select {
-            padding: 6px 10px;
-            font-size: 14px;
-        }
-        button {
-            padding: 6px 12px;
-            background-color: #2563eb;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        thead {
-            background-color: #2563eb;
-            color: white;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #e5e7eb;
-            text-align: left;
-        }
-        tbody tr:hover {
-            background-color: #f3f4f6;
-        }
-        .pagination {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .pagination a {
-            display: inline-block;
-            margin: 0 5px;
-            padding: 6px 10px;
-            background: #eee;
-            color: #333;
-            border-radius: 4px;
-            text-decoration: none;
-        }
-        .pagination a.active {
-            background: #2563eb;
-            color: white;
-            font-weight: bold;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-<div class="container">
-    <h2>Chi tiết phiếu nhập</h2>
+<body class="bg-light text-dark">
+    <div class="container my-5">
+        <!-- Tiêu đề -->
+        <div class="mb-4 border-bottom pb-2">
+            <h2 class="text-primary fw-bold">Chi tiết phiếu nhập</h2>
+        </div>
 
-    <!-- Thông tin chung -->
-    <div class="info">
-        <p><strong>Mã phiếu:</strong> ${receipt.voucherId}</p>
-        <p><strong>Người nhập:</strong> ${receipt.importerName}</p>
-        <p><strong>Nhà cung cấp:</strong> ${receipt.supplierName}</p>
-        <p><strong>Ngày nhập:</strong> ${receipt.importDate}</p>
-        <p><strong>Ghi chú:</strong> ${receipt.note}</p>
-        <p><strong>Tổng tiền:</strong> ${receipt.total} đ</p>
+        <!-- Thông tin chung -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <strong>Mã phiếu:</strong> ${receipt.voucherId}
+            </div>
+            <div class="col-md-6">
+                <strong>Ngày nhập:</strong> ${receipt.importDate}
+            </div>
+            <div class="col-md-6">
+                <strong>Người nhập:</strong> ${receipt.importerName}
+            </div>
+            <div class="col-md-6">
+                <strong>Tổng tiền:</strong> ${receipt.total} đ
+            </div>
+            <div class="col-12">
+                <strong>Ghi chú:</strong> ${receipt.note}
+            </div>
+        </div>
+
+        <!-- Bộ lọc -->
+        <form method="get" action="importhistorydetail" class="row g-2 mb-4">
+            <input type="hidden" name="voucherId" value="${receipt.voucherId}" />
+            <div class="col-md-5">
+                <input type="text" name="keyword" value="${param.keyword}" class="form-control" placeholder="Tìm tên vật tư..." />
+            </div>
+            <div class="col-md-4">
+                <select name="sort" class="form-select">
+                    <option value="">Sắp xếp theo giá</option>
+                    <option value="asc" ${param.sort == 'asc' ? 'selected' : ''}>Tăng dần</option>
+                    <option value="desc" ${param.sort == 'desc' ? 'selected' : ''}>Giảm dần</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Lọc</button>
+            </div>
+        </form>
+
+        <!-- Bảng chi tiết vật tư -->
+        <h5 class="fw-bold mb-3">Danh sách vật tư nhập</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Mã vật tư</th>
+                        <th>Tên vật tư</th>
+                        <th>Nhà cung cấp</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="detail" items="${details}">
+                        <tr>
+                            <td>${detail.materialId}</td>
+                            <td>${detail.materialName}</td>
+                            <td>${detail.supplierName}</td>
+                            <td>${detail.quantity}</td>
+                            <td>${detail.unitPrice}</td>
+                            <td>${detail.totalPrice}</td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Phân trang -->
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <c:forEach var="i" begin="1" end="${totalPages}">
+                    <li class="page-item ${i == currentPage ? 'active' : ''}">
+                        <a class="page-link" href="importhistorydetail?voucherId=${receipt.voucherId}&page=${i}&keyword=${param.keyword}&sort=${param.sort}">
+                            ${i}
+                        </a>
+                    </li>
+                </c:forEach>
+            </ul>
+        </nav>
     </div>
-
-    <!-- Bộ lọc tìm kiếm + sắp xếp -->
-    <form method="get" action="importhistorydetail">
-        <input type="hidden" name="voucherId" value="${receipt.voucherId}" />
-        <input type="text" name="keyword" value="${param.keyword}" placeholder="Tìm tên vật tư..." />
-        <select name="sort">
-            <option value="">Sắp xếp theo giá</option>
-            <option value="asc" ${param.sort == 'asc' ? 'selected' : ''}>Tăng dần</option>
-            <option value="desc" ${param.sort == 'desc' ? 'selected' : ''}>Giảm dần</option>
-        </select>
-        <button type="submit">Lọc</button>
-    </form>
-
-    <!-- Chi tiết vật tư -->
-    <h3>Danh sách vật tư nhập</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Mã vật tư</th>
-                <th>Tên vật tư</th>
-                <th>Số lượng</th>
-                <th>Đơn giá</th>
-                <th>Thành tiền</th>
-            </tr>
-        </thead>
-        <tbody>
-            <c:forEach var="detail" items="${details}">
-                <tr>
-                    <td>${detail.materialId}</td>
-                    <td>${detail.materialName}</td>
-                    <td>${detail.quantity}</td>
-                    <td>${detail.unitPrice}</td>
-                    <td>${detail.totalPrice}</td>
-                </tr>
-            </c:forEach>
-        </tbody>
-    </table>
-
-    <!-- Phân trang -->
-    <div class="pagination">
-        <c:forEach var="i" begin="1" end="${totalPages}">
-            <a href="importhistorydetail?voucherId=${receipt.voucherId}&page=${i}&keyword=${param.keyword}&sort=${param.sort}"
-               class="${i == currentPage ? 'active' : ''}">${i}</a>
-        </c:forEach>
-    </div>
-</div>
 </body>
 </html>
