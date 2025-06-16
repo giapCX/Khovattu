@@ -92,6 +92,10 @@
         <servlet-name>ExportMaterial</servlet-name>
         <servlet-class>controller.ExportMaterial</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ImportHistoryDetailServlet</servlet-name>
+        <servlet-class>controller.ImportHistoryDetailServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -183,6 +187,10 @@
     <servlet-mapping>
         <servlet-name>ExportMaterial</servlet-name>
         <url-pattern>/exportMaterial</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImportHistoryDetailServlet</servlet-name>
+        <url-pattern>/importhistorydetail</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

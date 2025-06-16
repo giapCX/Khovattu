@@ -79,7 +79,7 @@
                                     <td class="p-4">${item.importerName}</td>
                                     <td class="p-4">${item.note}</td>
                                     <td class="p-4">
-                                        <a href="importhistorydetail?importId=${item.voucherId}">View</a>
+                                        <a href="importhistorydetail?importId=${item.importId}&keyword=${param.keyword}&sort=${param.sort}&page=1">View</a>
                                     </td>
                                 </tr>
                             </c:forEach>

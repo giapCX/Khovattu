@@ -92,32 +92,44 @@ public class ImportReceiptDAO {
 
     return 0;
 }
-public ImportReceipt getReceiptByVoucherId(String voucherId) {
+public ImportReceipt getReceiptById(int importId) {
     ImportReceipt receipt = null;
-    String sql = "SELECT i.import_id, i.voucher_id, i.import_date, i.note, i.total, " +
-                 "u.fullname AS importer_name, s.supplier_name " +
-                 "FROM import_receipts i " +
-                 "JOIN users u ON i.importer_id = u.user_id " +
-                 "JOIN suppliers s ON i.supplier_id = s.supplier_id " +
-                 "WHERE i.voucher_id = ?";
+    String sql = """
+        SELECT ir.import_id, ir.voucher_id, ir.import_date, ir.note,
+               ir.user_id, u.full_name AS importer_name,
+               ir.supplier_id, s.name AS supplier_name,
+               SUM(idt.quantity * idt.price_per_unit) AS total
+        FROM ImportReceipts ir
+        LEFT JOIN Users u ON ir.user_id = u.user_id
+        LEFT JOIN Suppliers s ON ir.supplier_id = s.supplier_id
+        LEFT JOIN ImportDetails idt ON ir.import_id = idt.import_id
+        WHERE ir.import_id = ?
+        GROUP BY ir.import_id, ir.voucher_id, ir.import_date, ir.note,
+                 ir.user_id, u.full_name, ir.supplier_id, s.name
+    """;
 
-    try (PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setString(1, voucherId);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            receipt = new ImportReceipt();
-            receipt.setImportId(rs.getInt("import_id")); // để dùng truy vấn chi tiết
-            receipt.setVoucherId(rs.getString("voucher_id"));
-            receipt.setImportDate(rs.getDate("import_date"));
-            receipt.setNote(rs.getString("note"));
-            receipt.setTotal(rs.getDouble("total"));
-            receipt.setImporterName(rs.getString("importer_name"));
-            receipt.setSupplierName(rs.getString("supplier_name"));
+    try (Connection con = DBContext.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, importId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                receipt = new ImportReceipt();
+                receipt.setImportId(rs.getInt("import_id"));
+                receipt.setVoucherId(rs.getString("voucher_id"));
+                receipt.setImportDate(rs.getDate("import_date"));
+                receipt.setNote(rs.getString("note"));
+                receipt.setUserId(rs.getInt("user_id"));
+                receipt.setImporterName(rs.getString("importer_name"));
+                receipt.setSupplierId(rs.getInt("supplier_id"));
+                receipt.setSupplierName(rs.getString("supplier_name"));
+                receipt.setTotal(rs.getDouble("total"));
+            }
         }
+
     } catch (SQLException e) {
         e.printStackTrace();
     }
-
     return receipt;
 }
 }
