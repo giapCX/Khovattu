@@ -100,6 +100,10 @@
         <servlet-name>SaveImportServlet</servlet-name>
         <servlet-class>controller.SaveImportServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AddChildCategoryController</servlet-name>
+        <servlet-class>controller.material.AddChildCategoryController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -199,6 +203,10 @@
     <servlet-mapping>
         <servlet-name>SaveImportServlet</servlet-name>
         <url-pattern>/save_import</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddChildCategoryController</servlet-name>
+        <url-pattern>/AddChildCategoryController</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

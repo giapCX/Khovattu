@@ -46,7 +46,7 @@ public class EditMaterialController extends HttpServlet {
 
             // 2. Lấy thông tin vật tư, danh mục và nhà cung cấp từ database
             Material material = materialDAO.getMaterialById(materialId);
-            List<MaterialCategory> categories = categoryDAO.getAllCategories();
+            List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
 
             // 3. Gửi dữ liệu tới JSP để hiển thị form
@@ -124,7 +124,7 @@ public class EditMaterialController extends HttpServlet {
     // Hàm hỗ trợ: Tải lại dữ liệu cho form khi có lỗi
     private void reloadFormData(HttpServletRequest request) throws ServletException {
         try {
-            List<MaterialCategory> categories = categoryDAO.getAllCategories();
+            List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
             request.setAttribute("categories", categories);
             request.setAttribute("suppliers", suppliers);

@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import model.Supplier;
 
 public class MaterialDAO {
 
@@ -21,31 +22,52 @@ public class MaterialDAO {
     }
 
     public List<Material> getAllMaterials() throws SQLException {
-        List<Material> materials = new ArrayList<>();
-        String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name "
-                + "FROM Materials m "
-                + "JOIN MaterialCategories mc ON m.category_id = mc.category_id";
-        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Material material = new Material();
-                material.setMaterialId(rs.getInt("material_id"));
-                material.setCode(rs.getString("code"));
-                material.setName(rs.getString("name"));
-                material.setDescription(rs.getString("description"));
-                material.setUnit(rs.getString("unit"));
-                material.setImageUrl(rs.getString("image_url"));
+    List<Material> materials = new ArrayList<>();
+    String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name, "
+            + "mc.parent_id, mc2.name AS parent_category_name, GROUP_CONCAT(s.name SEPARATOR ', ') AS supplier_names "
+            + "FROM Materials m "
+            + "JOIN MaterialCategories mc ON m.category_id = mc.category_id "
+            + "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id "
+            + "LEFT JOIN SupplierMaterials sm ON m.material_id = sm.material_id "
+            + "LEFT JOIN Suppliers s ON sm.supplier_id = s.supplier_id "
+            + "GROUP BY m.material_id";
+    try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            Material material = new Material();
+            material.setMaterialId(rs.getInt("material_id"));
+            material.setCode(rs.getString("code"));
+            material.setName(rs.getString("name"));
+            material.setDescription(rs.getString("description"));
+            material.setUnit(rs.getString("unit"));
+            material.setImageUrl(rs.getString("image_url"));
 
-                MaterialCategory category = new MaterialCategory();
-                category.setCategoryId(rs.getInt("category_id"));
-                category.setName(rs.getString("category_name"));
+            MaterialCategory category = new MaterialCategory();
+            category.setCategoryId(rs.getInt("category_id"));
+            category.setName(rs.getString("category_name"));
+            category.setParentCategoryName(rs.getString("parent_category_name")); // Gán parentCategoryName
+            material.setCategory(category);
 
-                material.setCategory(category);
-                materials.add(material);
+            // Lấy danh sách nhà cung cấp
+            String supplierNames = rs.getString("supplier_names");
+            List<Supplier> suppliers = new ArrayList<>();
+            if (supplierNames != null && !supplierNames.isEmpty()) {
+                String[] supplierArray = supplierNames.split(",\\s*");
+                for (String supplierName : supplierArray) {
+                    Supplier supplier = new Supplier();
+                    supplier.setSupplierName(supplierName.trim());
+                    suppliers.add(supplier);
+                }
             }
-        }
-        return materials;
-    }
+            material.setSuppliers(suppliers);
 
+            materials.add(material);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        throw e;
+    }
+    return materials;
+}
     public Material getMaterialById(int materialId) throws SQLException {
         Material material = null;
         String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name "

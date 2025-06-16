@@ -20,6 +20,7 @@ public class Material {
     private String imageUrl;
     private MaterialCategory category;
     private List<Supplier> suppliers;
+    
 
     public Material() {
     }

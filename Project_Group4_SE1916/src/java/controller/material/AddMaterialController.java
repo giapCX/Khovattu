@@ -39,7 +39,7 @@ public class AddMaterialController extends HttpServlet {
             throws ServletException, IOException {
         try {
             // Lấy danh sách danh mục và nhà cung cấp từ database
-            List<MaterialCategory> categories = categoryDAO.getAllCategories();
+            List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
 
             // Gửi dữ liệu tới JSP để hiển thị form
@@ -107,7 +107,7 @@ public class AddMaterialController extends HttpServlet {
 
         // 6. Tải lại dữ liệu cho form (để người dùng tiếp tục nhập nếu có lỗi)
         try {
-            List<MaterialCategory> categories = categoryDAO.getAllCategories();
+            List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
             request.setAttribute("categories", categories);
             request.setAttribute("suppliers", suppliers);

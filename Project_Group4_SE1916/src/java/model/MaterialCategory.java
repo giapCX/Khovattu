@@ -1,26 +1,20 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import java.util.List;
 
-/**
- *
- * @author Admin
- */
 public class MaterialCategory {
     private int categoryId;
     private String name;
+    private String parentCategoryName; // Thêm thuộc tính mới
     private List<Material> materials;
 
     public MaterialCategory() {
     }
 
-    public MaterialCategory(int categoryId, String name, List<Material> materials) {
+    public MaterialCategory(int categoryId, String name, String parentCategoryName, List<Material> materials) {
         this.categoryId = categoryId;
         this.name = name;
+        this.parentCategoryName = parentCategoryName;
         this.materials = materials;
     }
 
@@ -40,6 +34,14 @@ public class MaterialCategory {
         this.name = name;
     }
 
+    public String getParentCategoryName() {
+        return parentCategoryName;
+    }
+
+    public void setParentCategoryName(String parentCategoryName) {
+        this.parentCategoryName = parentCategoryName;
+    }
+
     public List<Material> getMaterials() {
         return materials;
     }
@@ -47,7 +49,4 @@ public class MaterialCategory {
     public void setMaterials(List<Material> materials) {
         this.materials = materials;
     }
-
-  
-
 }

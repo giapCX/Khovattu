@@ -12,9 +12,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@WebServlet(name = "ListMaterialController", urlPatterns = {"/listMaterialController"})
+@WebServlet(name = "ListMaterialController", urlPatterns = {"/ListMaterialController"})
 public class ListMaterialController extends HttpServlet {
     private MaterialDAO materialDAO;
     private MaterialCategoryDAO categoryDAO;
@@ -39,7 +41,7 @@ public class ListMaterialController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         try {
-            if (action.equals("delete")) {
+            if ("delete".equals(action)) {
                 deleteMaterial(request, response);
             }
         } catch (SQLException e) {
@@ -49,10 +51,20 @@ public class ListMaterialController extends HttpServlet {
 
     private void listMaterials(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         List<Material> materials = materialDAO.getAllMaterials();
-        List<MaterialCategory> categories = categoryDAO.getAllCategories();
-        
+        List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
+        List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
+
+        // Tạo map chứa danh sách child categories theo parentId
+        Map<Integer, List<MaterialCategory>> childCategoriesMap = new HashMap<>();
+        for (MaterialCategory parent : parentCategories) {
+            List<MaterialCategory> childCategories = categoryDAO.getChildCategoriesByParentId(parent.getCategoryId());
+            childCategoriesMap.put(parent.getCategoryId(), childCategories);
+        }
+
         request.setAttribute("materials", materials);
         request.setAttribute("categories", categories);
+        request.setAttribute("parentCategories", parentCategories);
+        request.setAttribute("childCategoriesMap", childCategoriesMap); // Truyền map vào JSP
         request.getRequestDispatcher("/view/material/listMaterial.jsp").forward(request, response);
     }
 
