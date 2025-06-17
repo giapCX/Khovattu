@@ -104,6 +104,10 @@
         <servlet-name>AddChildCategoryController</servlet-name>
         <servlet-class>controller.material.AddChildCategoryController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ProposalServlet</servlet-name>
+        <servlet-class>controller.proposal.ProposalServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -207,6 +211,10 @@
     <servlet-mapping>
         <servlet-name>AddChildCategoryController</servlet-name>
         <url-pattern>/AddChildCategoryController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProposalServlet</servlet-name>
+        <url-pattern>/ProposalServlet</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

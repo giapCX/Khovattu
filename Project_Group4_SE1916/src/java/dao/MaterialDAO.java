@@ -10,7 +10,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.Supplier;
 
 public class MaterialDAO {
@@ -227,5 +229,27 @@ public class MaterialDAO {
             }
             ps.executeBatch();
         }
+    }
+    
+        public List<Map<String, String>> searchMaterials(String searchTerm) throws SQLException {
+        List<Map<String, String>> materials = new ArrayList<>();
+        String sql = "SELECT material_id, name, unit, material_code FROM Materials WHERE name LIKE ? LIMIT 10";  // Lấy tối đa 10 vật tư phù hợp
+        
+        // Sử dụng conn đã khởi tạo trong constructor
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + searchTerm + "%"); // Dùng LIKE để tìm kiếm vật tư theo từ khóa
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, String> material = new HashMap<>();
+                    material.put("label", rs.getString("name"));  // Tên vật tư
+                    material.put("value", rs.getString("name"));  // Giá trị hiển thị trong autocomplete
+                    material.put("material_id", String.valueOf(rs.getInt("material_id")));  // Mã vật tư
+                    material.put("unit", rs.getString("unit"));  // Đơn vị của vật tư
+                    material.put("material_code", rs.getString("material_code"));  // Mã vật tư
+                    materials.add(material);
+                }
+            }
+        }
+        return materials;
     }
 }

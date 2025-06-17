@@ -1,74 +1,59 @@
 package model;
-
-import java.util.Date;
+import java.sql.Timestamp;
+import java.util.List;
 
 public class Proposal {
-    private int id;
-    private String type;
-    private String sender;
-    private Date sendDate;
-    private String finalApprover;
-    private Date approvalDate;
+    private int proposalId;
+    private String proposalType;
+    private int proposerId;
+    private Timestamp sendDate;
     private String status;
+    private Timestamp executedDate;
+    private List<ProposalDetails> proposalDetails; 
 
-    // Constructor
-    public Proposal(int id, String type, String sender, Date sendDate, String finalApprover, Date approvalDate, String status) {
-        this.id = id;
-        this.type = type;
-        this.sender = sender;
+    public Proposal() {
+    }
+
+    public Proposal(int proposalId, String proposalType, int proposerId, Timestamp sendDate, String status, Timestamp executedDate, List<ProposalDetails> proposalDetails) {
+        this.proposalId = proposalId;
+        this.proposalType = proposalType;
+        this.proposerId = proposerId;
         this.sendDate = sendDate;
-        this.finalApprover = finalApprover;
-        this.approvalDate = approvalDate;
         this.status = status;
+        this.executedDate = executedDate;
+        this.proposalDetails = proposalDetails;
     }
 
-    // Getters and Setters
-    public int getId() {
-        return id;
+    public int getProposalId() {
+        return proposalId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setProposalId(int proposalId) {
+        this.proposalId = proposalId;
     }
 
-    public String getType() {
-        return type;
+    public String getProposalType() {
+        return proposalType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setProposalType(String proposalType) {
+        this.proposalType = proposalType;
     }
 
-    public String getSender() {
-        return sender;
+    public int getProposerId() {
+        return proposerId;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setProposerId(int proposerId) {
+        this.proposerId = proposerId;
     }
 
-    public Date getSendDate() {
+    public Timestamp getSendDate() {
         return sendDate;
     }
 
-    public void setSendDate(Date sendDate) {
+    public void setSendDate(Timestamp sendDate) {
         this.sendDate = sendDate;
-    }
-
-    public String getFinalApprover() {
-        return finalApprover;
-    }
-
-    public void setFinalApprover(String finalApprover) {
-        this.finalApprover = finalApprover;
-    }
-
-    public Date getApprovalDate() {
-        return approvalDate;
-    }
-
-    public void setApprovalDate(Date approvalDate) {
-        this.approvalDate = approvalDate;
     }
 
     public String getStatus() {
@@ -78,4 +63,24 @@ public class Proposal {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public Timestamp getExecutedDate() {
+        return executedDate;
+    }
+
+    public void setExecutedDate(Timestamp executedDate) {
+        this.executedDate = executedDate;
+    }
+
+    public List<ProposalDetails> getProposalDetails() {
+        return proposalDetails;
+    }
+
+    public void setProposalDetails(List<ProposalDetails> proposalDetails) {
+        this.proposalDetails = proposalDetails;
+    }
+
+   
+    
+
 }
