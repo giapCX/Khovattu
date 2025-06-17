@@ -1,23 +1,35 @@
 package model;
 
 public class ExportDetail {
+
     private int exportDetailId;
     private int exportId;
     private int materialId;
-    private double quantity; 
+    private double quantity;
     private String materialCondition;
     private String reason;
+
+    private String materialCode;
+    private String materialName;
+    private String unit;
+    private String materialCategory;
 
     public ExportDetail() {
     }
 
-    public ExportDetail(int exportDetailId, int exportId, int materialId, double quantity, String materialCondition, String reason) {
+    public ExportDetail(int exportDetailId, int exportId, int materialId, double quantity,
+            String materialCondition, String reason,
+            String materialCode, String materialName, String unit, String materialCategory) {
         this.exportDetailId = exportDetailId;
         this.exportId = exportId;
         this.materialId = materialId;
         this.quantity = quantity;
         this.materialCondition = materialCondition;
         this.reason = reason;
+        this.materialCode = materialCode;
+        this.materialName = materialName;
+        this.unit = unit;
+        this.materialCategory = materialCategory;
     }
 
     public int getExportDetailId() {
@@ -66,5 +78,37 @@ public class ExportDetail {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public String getMaterialCode() {
+        return materialCode;
+    }
+
+    public void setMaterialCode(String materialCode) {
+        this.materialCode = materialCode;
+    }
+
+    public String getMaterialName() {
+        return materialName;
+    }
+
+    public void setMaterialName(String materialName) {
+        this.materialName = materialName;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public String getMaterialCategory() {
+        return materialCategory;
+    }
+
+    public void setMaterialCategory(String materialCategory) {
+        this.materialCategory = materialCategory;
     }
 }

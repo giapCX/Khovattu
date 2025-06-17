@@ -1,12 +1,15 @@
 package controller;
 
 import Dal.DBContext;
+import com.google.gson.Gson;
 import dao.ExportDAO;
 import dao.UserDAO;
+import dao.MaterialDAO;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -14,11 +17,33 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Export;
 import model.ExportDetail;
+import model.Material;
 import model.User;
 
-//@WebServlet("/saveExport")
+
 public class ExportMaterial extends HttpServlet {
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            
+            MaterialDAO materialDAO = new MaterialDAO();
+            List<Material> materials = materialDAO.getAllMaterials();
+            Gson gson = new Gson();
+            String json = gson.toJson(materials);
+            out.print(json);
+            out.flush();
+        } catch (SQLException e) {
+            
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Database error: " + e.getMessage() + "\"}");
+        }
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String errorMessage = null;
@@ -37,12 +62,6 @@ public class ExportMaterial extends HttpServlet {
 
         UserDAO userDAO = new UserDAO();
         User user = userDAO.getUserByUsername(username);
-        
-        request.setAttribute("user", user); 
-        request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
-        //String wareId = userDAO.getWareIdByUsername(username);
-        //request.setAttribute("wareId", wareId); // gửi sang JSP
-        //request.getRequestDispatcher("/exportMaterial.jsp").forward(request, response);
 
         // Validate inputs for null or empty
         if (exportIdStr == null || exportIdStr.trim().isEmpty()) {
