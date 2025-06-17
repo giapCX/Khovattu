@@ -51,15 +51,15 @@
             font-size: 0.95rem;
         }
         .table th {
-            background-color: #bfdbfe; /* Light blue for header */
-            color: #1e3a8a; /* Dark blue text for contrast */
+            background-color: #bfdbfe;
+            color: #1e3a8a;
             font-weight: 600;
         }
         .table tbody tr {
-            background-color: #eff6ff; /* Very light blue for rows */
+            background-color: #eff6ff;
         }
         .table tbody tr:hover {
-            background-color: #dbeafe; /* Slightly darker light blue on hover */
+            background-color: #dbeafe;
             transition: background-color 0.2s ease;
         }
         .thumbnail {
@@ -84,7 +84,7 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
         .modal-header {
-            background-color: #bfdbfe; /* Light blue for modal header */
+            background-color: #bfdbfe;
             border-bottom: 1px solid #e5e7eb;
             color: #1e3a8a;
         }
@@ -92,7 +92,6 @@
             border-radius: 8px;
             border: 1px solid #e5e7eb;
         }
-        /* Center DataTable pagination */
         .dataTables_paginate {
             display: flex;
             justify-content: center;
@@ -102,16 +101,16 @@
             margin: 0 5px;
             padding: 8px 12px;
             border-radius: 6px;
-            background-color: transparent; /* Xóa màu nền */
+            background-color: transparent;
             color: #1e3a8a;
             transition: all 0.3s ease;
         }
         .dataTables_paginate .paginate_button:hover {
-            background-color: #60a5fa; /* Brighter blue on hover */
+            background-color: #60a5fa;
             color: white;
         }
         .dataTables_paginate .paginate_button.current {
-            background-color: #60a5fa; /* Brighter blue for active page */
+            background-color: #60a5fa;
             color: white;
             font-weight: 600;
         }
@@ -120,7 +119,7 @@
 <body>
     <div class="container mt-4">
         <div class="header-actions flex justify-between items-center mb-6">
-            <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn btn-secondary">Back to Home</a>
+            <a href="${pageContext.request.contextPath}/ListParentCategoryController" class="btn btn-secondary">PREVIOUS PAGE</a>
             <div>
                 <a href="${pageContext.request.contextPath}/AddMaterialController" class="btn btn-primary mr-2">Add Material</a>
                 <a href="${pageContext.request.contextPath}/AddChildCategoryController" class="btn btn-primary">Add Child Category</a>
@@ -138,16 +137,23 @@
                 <select id="filterParentCategory" class="form-select">
                     <option value="">All parent categories</option>
                     <c:forEach var="parentCat" items="${parentCategories}">
-                        <option value="${parentCat.categoryId}">${parentCat.name}</option>
+                        <option value="${parentCat.categoryId}" <c:if test="${parentCat.categoryId == selectedParentCategory}">selected</c:if>>${parentCat.name}</option>
                     </c:forEach>
                 </select>
             </div>
             <div class="col-md-2 mb-3">
                 <select id="filterCategory" class="form-select">
                     <option value="">All child categories</option>
-                    <c:forEach var="cat" items="${categories}">
-                        <option value="${cat.categoryId}">${cat.name}</option>
-                    </c:forEach>
+                    <c:if test="${not empty selectedParentCategory}">
+                        <c:forEach var="childCat" items="${childCategoriesMap[selectedParentCategory]}">
+                            <option value="${childCat.categoryId}">${childCat.name}</option>
+                        </c:forEach>
+                    </c:if>
+                    <c:if test="${empty selectedParentCategory}">
+                        <c:forEach var="cat" items="${categories}">
+                            <option value="${cat.categoryId}">${cat.name}</option>
+                        </c:forEach>
+                    </c:if>
                 </select>
             </div>
         </div>
@@ -216,36 +222,23 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <img id="detailImage" class="img-fluid" src="${material.imageUrl}" alt="Material image">
+                            <img id="detailImage" class="img-fluid" src="" alt="Material image">
                         </div>
                         <div class="col-md-8">
-                            <p><strong>Material Code:</strong> <span id="detailCode">${material.code}</span></p>
-                            <p><strong>Parent Category:</strong> <span id="detailParentCategory">${material.category.parentCategoryName}</span></p>
-                            <p><strong>Child Category:</strong> <span id="detailCategory">${material.category.name}</span></p>
-                            <p><strong>Material Name:</strong> <span id="detailName">${material.name}</span></p>
-                            <p><strong>Unit:</strong> <span id="detailUnit">${material.unit}</span></p>
-                            <p><strong>Suppliers:</strong> 
-                                <span id="detailSuppliers">
-                                    <c:choose>
-                                        <c:when test="${not empty material.suppliers}">
-                                            <c:forEach var="supplier" items="${material.suppliers}" varStatus="status">
-                                                ${fn:escapeXml(supplier.supplierName)}<c:if test="${!status.last}">,</c:if>
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:otherwise>
-                                            Không có nhà cung cấp
-                                        </c:otherwise>
-                                    </c:choose>
-                                </span>
-                            </p>
-                            <p><strong>Description:</strong> <span id="detailDescription">${material.description}</span></p>
-                            <p><strong>Inventory:</strong> <span id="detailInventory">${inventory}</span></p>
+                            <p><strong>Material Code:</strong> <span id="detailCode"></span></p>
+                            <p><strong>Parent Category:</strong> <span id="detailParentCategory"></span></p>
+                            <p><strong>Child Category:</strong> <span id="detailCategory"></span></p>
+                            <p><strong>Material Name:</strong> <span id="detailName"></span></p>
+                            <p><strong>Unit:</strong> <span id="detailUnit"></span></p>
+                            <p><strong>Suppliers:</strong> <span id="detailSuppliers"></span></p>
+                            <p><strong>Description:</strong> <span id="detailDescription"></span></p>
+                            <p><strong>Inventory:</strong> <span id="detailInventory"></span></p>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <a href="${pageContext.request.contextPath}/EditMaterialController?id=${material.materialId}" class="btn btn-primary">Edit</a>
+                    <a id="editMaterialLink" href="" class="btn btn-primary">Edit</a>
                 </div>
             </div>
         </div>
@@ -259,13 +252,12 @@
     <script>
 $(document).ready(function () {
     var table = $('#materialTable').DataTable({
-    dom: '<"top"lf>rt<"bottom"p><"clear">',
-    pagingType: 'full_numbers',
-    pageLength: 10,
-    lengthMenu: [5, 10, 25, 50, 100] 
-});
+        dom: '<"top"lf>rt<"bottom"p><"clear">',
+        pagingType: 'full_numbers',
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50, 100]
+    });
 
-    
     var childCategoriesMap = {
         <c:forEach var="parentCat" items="${parentCategories}" varStatus="status">
             "${parentCat.categoryId}": [
@@ -298,38 +290,44 @@ $(document).ready(function () {
         return parentCat ? parentCat.name : '';
     }
 
-    
-    $('#filterParentCategory').on('change', function () {
-        var selectedParentCategoryId = $(this).val();
+    function updateChildCategorySelect(parentCategoryId) {
         var $childCategorySelect = $('#filterCategory');
-
         $childCategorySelect.empty();
         $childCategorySelect.append('<option value="">All child categories</option>');
 
-        if (!selectedParentCategoryId) {
+        if (!parentCategoryId) {
             categories.forEach(function(cat) {
                 $childCategorySelect.append('<option value="' + cat.categoryId + '">' + cat.name + '</option>');
             });
         } else {
-            var childCategories = childCategoriesMap[selectedParentCategoryId] || [];
+            var childCategories = childCategoriesMap[parentCategoryId] || [];
             childCategories.forEach(function(cat) {
                 $childCategorySelect.append('<option value="' + cat.categoryId + '">' + cat.name + '</option>');
             });
         }
+    }
 
-        $childCategorySelect.val('').trigger('change');
-        var parentCategoryName = selectedParentCategoryId ? getParentCategoryName(selectedParentCategoryId) : '';
-        table.column(2).search(parentCategoryName).draw();
+    // Khởi tạo childCategorySelect dựa trên selectedParentCategory
+    <c:if test="${not empty selectedParentCategory}">
+        updateChildCategorySelect('${selectedParentCategory}');
+    </c:if>
+
+    $('#filterParentCategory').on('change', function () {
+        var selectedParentCategoryId = $(this).val();
+        // Tải lại trang với bộ lọc mới
+        var url = '${pageContext.request.contextPath}/ListMaterialController';
+        if (selectedParentCategoryId) {
+            url += '?filterParentCategory=' + selectedParentCategoryId;
+        }
+        window.location.href = url;
     });
 
-    
     $('#filterCategory').on('change', function () {
         var selectedCategoryId = $(this).val();
         var categoryName = selectedCategoryId ? getCategoryName(selectedCategoryId) : '';
         table.column(3).search(categoryName).draw();
     });
 
-    
     $('#searchButton').on('click', function () {
         var searchValue = $('#searchInput').val();
         table.column(1).search(searchValue).draw();
@@ -342,13 +340,11 @@ $(document).ready(function () {
             text: '${sessionScope.successMessage}',
             showConfirmButton: false,
             timer: 2000,
-            customClass: {
-                popup: 'animated fadeInDown'
-            }
+            customClass: { popup: 'animated fadeInDown' }
         });
         <% session.removeAttribute("successMessage"); %>
     </c:if>
 });
-</script>
+    </script>
 </body>
 </html>

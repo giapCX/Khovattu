@@ -108,6 +108,14 @@
         <servlet-name>ProposalServlet</servlet-name>
         <servlet-class>controller.proposal.ProposalServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ListParentCategoryController</servlet-name>
+        <servlet-class>controller.material.ListParentCategoryController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AddParentCategoryController</servlet-name>
+        <servlet-class>controller.material.AddParentCategoryController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -215,6 +223,14 @@
     <servlet-mapping>
         <servlet-name>ProposalServlet</servlet-name>
         <url-pattern>/ProposalServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ListParentCategoryController</servlet-name>
+        <url-pattern>/ListParentCategoryController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddParentCategoryController</servlet-name>
+        <url-pattern>/AddParentCategoryController</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

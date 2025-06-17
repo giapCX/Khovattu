@@ -29,7 +29,6 @@ public class ListMaterialController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
         try {
             listMaterials(request, response);
         } catch (SQLException e) {
@@ -43,6 +42,8 @@ public class ListMaterialController extends HttpServlet {
         try {
             if ("delete".equals(action)) {
                 deleteMaterial(request, response);
+            } else {
+                listMaterials(request, response);
             }
         } catch (SQLException e) {
             throw new ServletException(e);
@@ -50,7 +51,23 @@ public class ListMaterialController extends HttpServlet {
     }
 
     private void listMaterials(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        List<Material> materials = materialDAO.getAllMaterials();
+        List<Material> materials;
+        String filterParentCategory = request.getParameter("filterParentCategory");
+
+        // Lấy danh sách vật tư dựa trên bộ lọc
+        if (filterParentCategory != null && !filterParentCategory.isEmpty()) {
+            try {
+                int parentCategoryId = Integer.parseInt(filterParentCategory);
+                materials = materialDAO.getMaterialsByParentCategory(parentCategoryId);
+            } catch (NumberFormatException e) {
+                materials = materialDAO.getAllMaterials();
+                filterParentCategory = null; // Đặt lại nếu ID không hợp lệ
+            }
+        } else {
+            materials = materialDAO.getAllMaterials();
+        }
+
+        // Lấy danh sách danh mục
         List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
         List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
 
@@ -61,10 +78,12 @@ public class ListMaterialController extends HttpServlet {
             childCategoriesMap.put(parent.getCategoryId(), childCategories);
         }
 
+        // Lưu dữ liệu vào request
         request.setAttribute("materials", materials);
         request.setAttribute("categories", categories);
         request.setAttribute("parentCategories", parentCategories);
-        request.setAttribute("childCategoriesMap", childCategoriesMap); // Truyền map vào JSP
+        request.setAttribute("childCategoriesMap", childCategoriesMap);
+        request.setAttribute("selectedParentCategory", filterParentCategory);
         request.getRequestDispatcher("/view/material/listMaterial.jsp").forward(request, response);
     }
 
@@ -72,6 +91,6 @@ public class ListMaterialController extends HttpServlet {
         int materialId = Integer.parseInt(request.getParameter("id"));
         materialDAO.deleteMaterial(materialId);
         request.getSession().setAttribute("successMessage", "Xóa vật tư thành công!");
-        response.sendRedirect(request.getContextPath() + "/ListMaterialController?action=list");
+        response.sendRedirect(request.getContextPath() + "/ListMaterialController");
     }
 }

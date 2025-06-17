@@ -53,11 +53,26 @@ public class MaterialCategoryDAO {
         }
     }
 
+    public void addParentCategory(String name) throws SQLException {
+        String sql = "INSERT INTO MaterialCategories (name, parent_id) VALUES (?, NULL)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.executeUpdate();
+        }
+    }
+
     public boolean categoryExistsByName(String name, int parentId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM MaterialCategories WHERE name = ? AND parent_id = ?";
+        String sql;
+        if (parentId == 0) {
+            sql = "SELECT COUNT(*) FROM MaterialCategories WHERE name = ? AND parent_id IS NULL";
+        } else {
+            sql = "SELECT COUNT(*) FROM MaterialCategories WHERE name = ? AND parent_id = ?";
+        }
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name.trim());
-            ps.setInt(2, parentId);
+            if (parentId != 0) {
+                ps.setInt(2, parentId);
+            }
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1) > 0;
@@ -66,21 +81,21 @@ public class MaterialCategoryDAO {
         }
         return false;
     }
-    
-  public List<MaterialCategory> getChildCategoriesByParentId(int parentId) throws SQLException {
-    List<MaterialCategory> categories = new ArrayList<>();
-    String sql = "SELECT category_id, name FROM MaterialCategories WHERE parent_id = ?";
-    try (PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, parentId);
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                MaterialCategory category = new MaterialCategory();
-                category.setCategoryId(rs.getInt("category_id"));
-                category.setName(rs.getString("name"));
-                categories.add(category);
+
+    public List<MaterialCategory> getChildCategoriesByParentId(int parentId) throws SQLException {
+        List<MaterialCategory> categories = new ArrayList<>();
+        String sql = "SELECT category_id, name FROM MaterialCategories WHERE parent_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, parentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    MaterialCategory category = new MaterialCategory();
+                    category.setCategoryId(rs.getInt("category_id"));
+                    category.setName(rs.getString("name"));
+                    categories.add(category);
+                }
             }
         }
+        return categories;
     }
-    return categories;
-}
 }

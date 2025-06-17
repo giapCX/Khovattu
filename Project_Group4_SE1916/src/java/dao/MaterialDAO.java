@@ -4,6 +4,7 @@ import Dal.DBContext;
 import model.Material;
 import model.MaterialCategory;
 import model.ImportDetail;
+import model.Supplier;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import model.Supplier;
 
 public class MaterialDAO {
 
@@ -24,52 +24,103 @@ public class MaterialDAO {
     }
 
     public List<Material> getAllMaterials() throws SQLException {
-    List<Material> materials = new ArrayList<>();
-    String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name, "
-            + "mc.parent_id, mc2.name AS parent_category_name, GROUP_CONCAT(s.name SEPARATOR ', ') AS supplier_names "
-            + "FROM Materials m "
-            + "JOIN MaterialCategories mc ON m.category_id = mc.category_id "
-            + "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id "
-            + "LEFT JOIN SupplierMaterials sm ON m.material_id = sm.material_id "
-            + "LEFT JOIN Suppliers s ON sm.supplier_id = s.supplier_id "
-            + "GROUP BY m.material_id";
-    try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-        while (rs.next()) {
-            Material material = new Material();
-            material.setMaterialId(rs.getInt("material_id"));
-            material.setCode(rs.getString("code"));
-            material.setName(rs.getString("name"));
-            material.setDescription(rs.getString("description"));
-            material.setUnit(rs.getString("unit"));
-            material.setImageUrl(rs.getString("image_url"));
+        List<Material> materials = new ArrayList<>();
+        String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name, "
+                + "mc.parent_id, mc2.name AS parent_category_name, GROUP_CONCAT(s.name SEPARATOR ', ') AS supplier_names "
+                + "FROM Materials m "
+                + "JOIN MaterialCategories mc ON m.category_id = mc.category_id "
+                + "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id "
+                + "LEFT JOIN SupplierMaterials sm ON m.material_id = sm.material_id "
+                + "LEFT JOIN Suppliers s ON sm.supplier_id = s.supplier_id "
+                + "GROUP BY m.material_id";
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Material material = new Material();
+                material.setMaterialId(rs.getInt("material_id"));
+                material.setCode(rs.getString("code"));
+                material.setName(rs.getString("name"));
+                material.setDescription(rs.getString("description"));
+                material.setUnit(rs.getString("unit"));
+                material.setImageUrl(rs.getString("image_url"));
 
-            MaterialCategory category = new MaterialCategory();
-            category.setCategoryId(rs.getInt("category_id"));
-            category.setName(rs.getString("category_name"));
-            category.setParentCategoryName(rs.getString("parent_category_name")); // Gán parentCategoryName
-            material.setCategory(category);
+                MaterialCategory category = new MaterialCategory();
+                category.setCategoryId(rs.getInt("category_id"));
+                category.setName(rs.getString("category_name"));
+                category.setParentCategoryName(rs.getString("parent_category_name"));
+                material.setCategory(category);
 
-            // Lấy danh sách nhà cung cấp
-            String supplierNames = rs.getString("supplier_names");
-            List<Supplier> suppliers = new ArrayList<>();
-            if (supplierNames != null && !supplierNames.isEmpty()) {
-                String[] supplierArray = supplierNames.split(",\\s*");
-                for (String supplierName : supplierArray) {
-                    Supplier supplier = new Supplier();
-                    supplier.setSupplierName(supplierName.trim());
-                    suppliers.add(supplier);
+                String supplierNames = rs.getString("supplier_names");
+                List<Supplier> suppliers = new ArrayList<>();
+                if (supplierNames != null && !supplierNames.isEmpty()) {
+                    String[] supplierArray = supplierNames.split(",\\s*");
+                    for (String supplierName : supplierArray) {
+                        Supplier supplier = new Supplier();
+                        supplier.setSupplierName(supplierName.trim());
+                        suppliers.add(supplier);
+                    }
+                }
+                material.setSuppliers(suppliers);
+
+                materials.add(material);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+        return materials;
+    }
+
+    public List<Material> getMaterialsByParentCategory(int parentCategoryId) throws SQLException {
+        List<Material> materials = new ArrayList<>();
+        String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name, "
+                + "mc.parent_id, mc2.name AS parent_category_name, GROUP_CONCAT(s.name SEPARATOR ', ') AS supplier_names "
+                + "FROM Materials m "
+                + "JOIN MaterialCategories mc ON m.category_id = mc.category_id "
+                + "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id "
+                + "LEFT JOIN SupplierMaterials sm ON m.material_id = sm.material_id "
+                + "LEFT JOIN Suppliers s ON sm.supplier_id = s.supplier_id "
+                + "WHERE mc.parent_id = ? "
+                + "GROUP BY m.material_id";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, parentCategoryId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Material material = new Material();
+                    material.setMaterialId(rs.getInt("material_id"));
+                    material.setCode(rs.getString("code"));
+                    material.setName(rs.getString("name"));
+                    material.setDescription(rs.getString("description"));
+                    material.setUnit(rs.getString("unit"));
+                    material.setImageUrl(rs.getString("image_url"));
+
+                    MaterialCategory category = new MaterialCategory();
+                    category.setCategoryId(rs.getInt("category_id"));
+                    category.setName(rs.getString("category_name"));
+                    category.setParentCategoryName(rs.getString("parent_category_name"));
+                    material.setCategory(category);
+
+                    String supplierNames = rs.getString("supplier_names");
+                    List<Supplier> suppliers = new ArrayList<>();
+                    if (supplierNames != null && !supplierNames.isEmpty()) {
+                        String[] supplierArray = supplierNames.split(",\\s*");
+                        for (String supplierName : supplierArray) {
+                            Supplier supplier = new Supplier();
+                            supplier.setSupplierName(supplierName.trim());
+                            suppliers.add(supplier);
+                        }
+                    }
+                    material.setSuppliers(suppliers);
+
+                    materials.add(material);
                 }
             }
-            material.setSuppliers(suppliers);
-
-            materials.add(material);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        throw e;
+        return materials;
     }
-    return materials;
-}
+
     public Material getMaterialById(int materialId) throws SQLException {
         Material material = null;
         String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name "
@@ -91,7 +142,6 @@ public class MaterialDAO {
                     MaterialCategory category = new MaterialCategory();
                     category.setCategoryId(rs.getInt("category_id"));
                     category.setName(rs.getString("category_name"));
-
                     material.setCategory(category);
                 }
             }
@@ -110,12 +160,10 @@ public class MaterialDAO {
             ps.setString(6, material.getImageUrl());
             ps.executeUpdate();
 
-            // Lấy material_id vừa tạo
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     int materialId = generatedKeys.getInt(1);
 
-                    // Thêm vào SupplierMaterials
                     if (supplierIdList != null && !supplierIdList.isEmpty()) {
                         String sqlSupplier = "INSERT INTO SupplierMaterials (supplier_id, material_id) VALUES (?, ?)";
                         try (PreparedStatement psSupplier = conn.prepareStatement(sqlSupplier)) {
@@ -144,14 +192,12 @@ public class MaterialDAO {
             ps.setInt(7, material.getMaterialId());
             ps.executeUpdate();
 
-            // Xóa các mối quan hệ cũ trong SupplierMaterials
             String deleteSql = "DELETE FROM SupplierMaterials WHERE material_id = ?";
             try (PreparedStatement psDelete = conn.prepareStatement(deleteSql)) {
                 psDelete.setInt(1, material.getMaterialId());
                 psDelete.executeUpdate();
             }
 
-            // Thêm các mối quan hệ mới
             if (supplierIdList != null && !supplierIdList.isEmpty()) {
                 String sqlSupplier = "INSERT INTO SupplierMaterials (supplier_id, material_id) VALUES (?, ?)";
                 try (PreparedStatement psSupplier = conn.prepareStatement(sqlSupplier)) {
@@ -187,7 +233,7 @@ public class MaterialDAO {
         }
         return 0.0;
     }
-   
+
     public List<Material> searchMaterialsByName(String term) throws SQLException {
         List<Material> materials = new ArrayList<>();
         String sql = "SELECT material_id, name, unit FROM Materials WHERE name LIKE ? LIMIT 10";
@@ -230,22 +276,20 @@ public class MaterialDAO {
             ps.executeBatch();
         }
     }
-    
-        public List<Map<String, String>> searchMaterials(String searchTerm) throws SQLException {
+
+    public List<Map<String, String>> searchMaterials(String searchTerm) throws SQLException {
         List<Map<String, String>> materials = new ArrayList<>();
-        String sql = "SELECT material_id, name, unit, material_code FROM Materials WHERE name LIKE ? LIMIT 10";  // Lấy tối đa 10 vật tư phù hợp
-        
-        // Sử dụng conn đã khởi tạo trong constructor
+        String sql = "SELECT material_id, name, unit, code AS material_code FROM Materials WHERE name LIKE ? LIMIT 10";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, "%" + searchTerm + "%"); // Dùng LIKE để tìm kiếm vật tư theo từ khóa
+            ps.setString(1, "%" + searchTerm + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Map<String, String> material = new HashMap<>();
-                    material.put("label", rs.getString("name"));  // Tên vật tư
-                    material.put("value", rs.getString("name"));  // Giá trị hiển thị trong autocomplete
-                    material.put("material_id", String.valueOf(rs.getInt("material_id")));  // Mã vật tư
-                    material.put("unit", rs.getString("unit"));  // Đơn vị của vật tư
-                    material.put("material_code", rs.getString("material_code"));  // Mã vật tư
+                    material.put("label", rs.getString("name"));
+                    material.put("value", rs.getString("name"));
+                    material.put("material_id", String.valueOf(rs.getInt("material_id")));
+                    material.put("unit", rs.getString("unit"));
+                    material.put("material_code", rs.getString("material_code"));
                     materials.add(material);
                 }
             }
