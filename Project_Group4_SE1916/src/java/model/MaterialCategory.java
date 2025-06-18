@@ -5,7 +5,8 @@ import java.util.List;
 public class MaterialCategory {
     private int categoryId;
     private String name;
-    private String parentCategoryName; // Thêm thuộc tính mới
+    private String parentCategoryName;
+    private int parentId;// Thêm thuộc tính mới
     private List<Material> materials;
 
     public MaterialCategory() {
@@ -49,4 +50,13 @@ public class MaterialCategory {
     public void setMaterials(List<Material> materials) {
         this.materials = materials;
     }
+
+    public int getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
+    }
+    
 }

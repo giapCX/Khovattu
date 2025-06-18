@@ -47,6 +47,7 @@ public class MaterialDAO {
                 category.setCategoryId(rs.getInt("category_id"));
                 category.setName(rs.getString("category_name"));
                 category.setParentCategoryName(rs.getString("parent_category_name"));
+                category.setParentId(rs.getInt("parent_id")); 
                 material.setCategory(category);
 
                 String supplierNames = rs.getString("supplier_names");

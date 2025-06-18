@@ -5,6 +5,7 @@
 package controller.proposal;
 
 import Dal.DBContext;
+import dao.MaterialCategoryDAO;
 import dao.MaterialDAO;
 import dao.ProposalDAO;
 import java.io.IOException;
@@ -15,9 +16,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import model.Material;
+import model.MaterialCategory;
 import model.Proposal;
 import model.ProposalDetails;
 
@@ -65,24 +69,18 @@ public class ProposalServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String searchTerm = request.getParameter("term");
-
-        if (searchTerm != null && !searchTerm.isEmpty()) {
-
-            List<Map<String, String>> materialList = new ArrayList<>();
-            try {
-                MaterialDAO materialDAO = new MaterialDAO();
-                materialList = materialDAO.searchMaterials(searchTerm);
-
-                JSONObject jsonResponse = new JSONObject();
-                jsonResponse.put("suggestions", materialList);
-
-                response.setContentType("application/json");
-                PrintWriter out = response.getWriter();
-                out.write(jsonResponse.toString());
-            } catch (Exception e) {
-                throw new ServletException(e);
-            }
+        try {
+            MaterialCategoryDAO categoryDAO = new MaterialCategoryDAO();
+            MaterialDAO materialDAO = new MaterialDAO();
+            List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
+            List<MaterialCategory> childCategories = categoryDAO.getAllChildCategories();
+            List<Material> material = materialDAO.getAllMaterials();
+             request.setAttribute("material", material);
+            request.setAttribute("parentCategories", parentCategories);
+            request.setAttribute("childCategories", childCategories);
+            request.getRequestDispatcher("/view/proposal/proposalOfEmployee.jsp").forward(request, response);
+        } catch (SQLException e) {
+            throw new ServletException("Error " + e.getMessage(), e);
         }
     }
 
@@ -100,6 +98,7 @@ public class ProposalServlet extends HttpServlet {
         String proposalType = request.getParameter("proposalType");
         HttpSession session = request.getSession();
         Integer proposerId = (Integer) session.getAttribute("userId");
+        String note = request.getParameter("note");
         String[] materialIds = request.getParameterValues("materialId[]");
         String[] quantities = request.getParameterValues("quantity[]");
         String[] materialConditions = request.getParameterValues("materialCondition[]");
@@ -107,6 +106,7 @@ public class ProposalServlet extends HttpServlet {
         Proposal proposal = new Proposal();
         proposal.setProposalType(proposalType);
         proposal.setProposerId(proposerId);
+        proposal.setNote(note);
 
         List<ProposalDetails> proposalDetailsList = new ArrayList<>();
         for (int i = 0; i < materialIds.length; i++) {
@@ -115,7 +115,6 @@ public class ProposalServlet extends HttpServlet {
             proposalDetail.setMaterialId(Integer.parseInt(materialIds[i]));
             proposalDetail.setQuantity(Double.parseDouble(quantities[i]));
             proposalDetail.setMaterialCondition(materialConditions[i]);
-
             proposalDetailsList.add(proposalDetail);
         }
 
@@ -126,7 +125,7 @@ public class ProposalServlet extends HttpServlet {
 
             boolean isInserted = proposalDAO.addProposal(proposal);
             if (isInserted) {
-                request.setAttribute("message", "success");
+                request.setAttribute("message", "Proposal material sent success");
                 request.getRequestDispatcher("/view/proposal/proposalOfEmployee.jsp").forward(request, response);
             } else {
                 request.setAttribute("error", "error");

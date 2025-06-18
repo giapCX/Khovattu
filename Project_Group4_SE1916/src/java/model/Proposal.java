@@ -6,6 +6,7 @@ public class Proposal {
     private int proposalId;
     private String proposalType;
     private int proposerId;
+    private String note;
     private Timestamp sendDate;
     private String status;
     private Timestamp executedDate;
@@ -14,15 +15,18 @@ public class Proposal {
     public Proposal() {
     }
 
-    public Proposal(int proposalId, String proposalType, int proposerId, Timestamp sendDate, String status, Timestamp executedDate, List<ProposalDetails> proposalDetails) {
+    public Proposal(int proposalId, String proposalType, int proposerId, String note, Timestamp sendDate, String status, Timestamp executedDate, List<ProposalDetails> proposalDetails) {
         this.proposalId = proposalId;
         this.proposalType = proposalType;
         this.proposerId = proposerId;
+        this.note = note;
         this.sendDate = sendDate;
         this.status = status;
         this.executedDate = executedDate;
         this.proposalDetails = proposalDetails;
     }
+
+   
 
     public int getProposalId() {
         return proposalId;
@@ -78,6 +82,14 @@ public class Proposal {
 
     public void setProposalDetails(List<ProposalDetails> proposalDetails) {
         this.proposalDetails = proposalDetails;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
    

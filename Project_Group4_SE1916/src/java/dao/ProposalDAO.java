@@ -19,16 +19,16 @@ public class ProposalDAO {
         this.conn = DBContext.getConnection();
     }
 public boolean addProposal(Proposal proposal) throws SQLException {
-    String insertProposalSQL = "INSERT INTO EmployeeProposals (proposal_type, proposer_id) VALUES (?, ?)";
+    String insertProposalSQL = "INSERT INTO EmployeeProposals (proposal_type, proposer_id, note) VALUES (?, ?, ?)";
     try (PreparedStatement ps = conn.prepareStatement(insertProposalSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
         ps.setString(1, proposal.getProposalType());
         ps.setInt(2, proposal.getProposerId());
+        ps.setString(3,proposal.getNote());
         int rowsAffected = ps.executeUpdate();
         if (rowsAffected > 0) {
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     int proposalId = rs.getInt(1);
-                    // Kiểm tra và thêm ProposalDetails
                     if (proposal.getProposalDetails() != null && !proposal.getProposalDetails().isEmpty()) {
                         return addProposalDetails(proposalId, proposal.getProposalDetails());
                     }

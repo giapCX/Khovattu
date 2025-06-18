@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MaterialCategoryDAO {
+
     private Connection conn;
 
     public MaterialCategoryDAO() {
@@ -18,12 +19,18 @@ public class MaterialCategoryDAO {
 
     public List<MaterialCategory> getAllChildCategories() throws SQLException {
         List<MaterialCategory> categories = new ArrayList<>();
-        String sql = "SELECT category_id, name FROM MaterialCategories WHERE parent_id IS NOT NULL";
+        String sql = "SELECT mc.category_id, mc.name, mc.parent_id, pc.name AS parent_category_name "
+                + "FROM MaterialCategories mc "
+                + "LEFT JOIN MaterialCategories pc ON mc.parent_id = pc.category_id "
+                + "WHERE mc.parent_id IS NOT NULL";
+
         try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 MaterialCategory category = new MaterialCategory();
                 category.setCategoryId(rs.getInt("category_id"));
                 category.setName(rs.getString("name"));
+                category.setParentCategoryName(rs.getString("parent_category_name"));
+                category.setParentId(rs.getInt("parent_id"));  // Thêm dòng này để gán giá trị parentId
                 categories.add(category);
             }
         }
