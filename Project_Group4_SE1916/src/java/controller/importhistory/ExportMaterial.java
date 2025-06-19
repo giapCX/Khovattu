@@ -65,37 +65,37 @@ public class ExportMaterial extends HttpServlet {
 
         // Validate inputs for null or empty
         if (exportIdStr == null || exportIdStr.trim().isEmpty()) {
-            errorMessage = "Mã xuất không được để trống.";
+            errorMessage = "Export ID cannot be empty.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
         }
         if (voucherIdStr == null || voucherIdStr.trim().isEmpty()) {
-            errorMessage = "Mã phiếu không được để trống.";
+            errorMessage = "Voucher ID cannot be empty.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
         }
         if (materialCodes == null || materialCodes.length == 0 || isArrayEmpty(materialCodes)) {
-            errorMessage = "Danh sách mã vật tư không được để trống.";
+            errorMessage = "Material code list cannot be empty.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
         }
         if (quantities == null || quantities.length == 0 || isArrayEmpty(quantities)) {
-            errorMessage = "Danh sách số lượng không được để trống.";
+            errorMessage = "Quantity list cannot be empty.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
         }
         if (conditions == null || conditions.length == 0 || isArrayEmpty(conditions)) {
-            errorMessage = "Danh sách điều kiện không được để trống.";
+            errorMessage = "Condition list cannot be empty.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
         }
         if (purpose == null || purpose.trim().isEmpty()) {
-            errorMessage = "Lý do xuất kho không được để trống.";
+            errorMessage = "Export purpose cannot be empty.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
@@ -103,16 +103,16 @@ public class ExportMaterial extends HttpServlet {
 
         // Validate array lengths
         if (materialCodes.length != quantities.length || materialCodes.length != conditions.length) {
-            errorMessage = "Dữ liệu mã vật tư, số lượng và điều kiện không đồng bộ.";
+            errorMessage = "Material codes, quantities, and conditions are not synchronized.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
         }
 
-        // Validate wareId
+        // Validate userId
         String userId = user.getCode();
         if (userId == null || userId.trim().isEmpty()) {
-            errorMessage = "Mã nhân viên không được để trống.";
+            errorMessage = "Employee code cannot be empty.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
@@ -126,10 +126,10 @@ public class ExportMaterial extends HttpServlet {
             export.setUserId(userId);
             export.setExportDate(LocalDate.now());
             export.setNote(purpose);
-            //Save export
+            // Save export
             int exportId = dao.saveExport(export);
             if (exportId <= 0) {
-                errorMessage = "Không thể lưu phiếu xuất. Vui lòng thử lại.";
+                errorMessage = "Unable to save export voucher. Please try again.";
                 request.setAttribute("error", errorMessage);
                 request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                 return;
@@ -138,21 +138,21 @@ public class ExportMaterial extends HttpServlet {
             List<ExportDetail> detailList = new ArrayList<>();
             for (int i = 0; i < materialCodes.length; i++) {
                 if (materialCodes[i] == null || materialCodes[i].trim().isEmpty()) {
-                    errorMessage = "Mã vật tư không được để trống tại dòng " + (i + 1);
+                    errorMessage = "Material code cannot be empty at row " + (i + 1);
                     request.setAttribute("error", errorMessage);
                     request.setAttribute("errorRow", i); // Set error row index
                     request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                     return;
                 }
                 if (quantities[i] == null || quantities[i].trim().isEmpty()) {
-                    errorMessage = "Số lượng không được để trống tại dòng " + (i + 1);
+                    errorMessage = "Quantity cannot be empty at row " + (i + 1);
                     request.setAttribute("error", errorMessage);
                     request.setAttribute("errorRow", i);
                     request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                     return;
                 }
                 if (conditions[i] == null || conditions[i].trim().isEmpty()) {
-                    errorMessage = "Điều kiện không được để trống tại dòng " + (i + 1);
+                    errorMessage = "Condition cannot be empty at row " + (i + 1);
                     request.setAttribute("error", errorMessage);
                     request.setAttribute("errorRow", i);
                     request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
@@ -162,7 +162,7 @@ public class ExportMaterial extends HttpServlet {
                     int materialId = Integer.parseInt(materialCodes[i]);
                     int quantity = Integer.parseInt(quantities[i]);
                     if (quantity <= 0) {
-                        errorMessage = "Số lượng phải lớn hơn 0 tại dòng " + (i + 1);
+                        errorMessage = "Quantity must be greater than 0 at row " + (i + 1);
                         request.setAttribute("error", errorMessage);
                         request.setAttribute("errorRow", i); // Set error row index
                         request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
@@ -176,7 +176,7 @@ public class ExportMaterial extends HttpServlet {
                     detail.setReason(purpose);
                     detailList.add(detail);
                 } catch (NumberFormatException e) {
-                    errorMessage = "Mã vật tư hoặc số lượng không hợp lệ tại dòng " + (i + 1);
+                    errorMessage = "Invalid material code or quantity at row " + (i + 1);
                     request.setAttribute("error", errorMessage);
                     request.setAttribute("errorRow", i);
                     request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
@@ -188,20 +188,20 @@ public class ExportMaterial extends HttpServlet {
             try {
                 dao.saveExportDetails(detailList, exportId);
             } catch (SQLException e) {
-                errorMessage = "Lỗi khi lưu chi tiết phiếu xuất. Vui lòng thử lại.";
+                errorMessage = "Error saving export details. Please try again.";
                 request.setAttribute("error", errorMessage);
                 request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                 return;
             }
 
             // Success
-            request.setAttribute("message", "Phiếu xuất đã được lưu thành công!");
+            request.setAttribute("message", "Export voucher saved successfully!");
             request.setAttribute("exportId", exportId);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            errorMessage = "Lỗi hệ thống khi xử lý xuất kho. Vui lòng thử lại hoặc liên hệ quản trị viên.";
+            errorMessage = "System error while processing export. Please try again or contact the administrator.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
         }
