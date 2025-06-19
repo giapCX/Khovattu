@@ -97,10 +97,6 @@
         <servlet-class>controller.CheckVoucherIdServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>SaveImportServlet</servlet-name>
-        <servlet-class>controller.SaveImportServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>AddChildCategoryController</servlet-name>
         <servlet-class>controller.material.AddChildCategoryController</servlet-class>
     </servlet>
@@ -115,6 +111,10 @@
     <servlet>
         <servlet-name>AddParentCategoryController</servlet-name>
         <servlet-class>controller.material.AddParentCategoryController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ImportWarehouseServlet</servlet-name>
+        <servlet-class>controller.importhistory.ImportWarehouseServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
@@ -213,10 +213,6 @@
         <url-pattern>/check_voucher_id</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>SaveImportServlet</servlet-name>
-        <url-pattern>/save_import</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>AddChildCategoryController</servlet-name>
         <url-pattern>/AddChildCategoryController</url-pattern>
     </servlet-mapping>
@@ -231,6 +227,10 @@
     <servlet-mapping>
         <servlet-name>AddParentCategoryController</servlet-name>
         <url-pattern>/AddParentCategoryController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImportWarehouseServlet</servlet-name>
+        <url-pattern>/ImportWarehouseServlet</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>
