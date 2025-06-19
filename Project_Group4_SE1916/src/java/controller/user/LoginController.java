@@ -1,4 +1,4 @@
-package controller;
+package controller.user;
 
 import Dal.DBContext;
 import dao.UserDAO;

@@ -1,5 +1,5 @@
 //sendmail
-package controller;
+package controller.mail;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

@@ -1,4 +1,4 @@
-package controller;
+package controller.importhistory;
 
 import Dal.DBContext;
 import dao.ImportDAO;

@@ -3,8 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/password/PasswordMigration.java</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dal/DBContext.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/warehouse/warehouseDashboard.jsp</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/supplier/addSupplier.jsp</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dao/ImportDAO.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dao/SupplierDAO.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/admin/adminApprovalHistory.jsp</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ImportWarehouseServlet.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/RequestListServlet.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/warehouse/importData.jsp</file>
         </group>
     </open-files>
 </project-private>
