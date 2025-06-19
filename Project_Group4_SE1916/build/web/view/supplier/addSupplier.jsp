@@ -89,6 +89,7 @@
         <!--JavaScript -->
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
         <script>
+            
             // Client-side validation
             const form = document.querySelector('form');
             form.addEventListener('submit', (e) => {

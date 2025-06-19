@@ -48,9 +48,7 @@ public class ImportHistoryDetailServlet extends HttpServlet {
             out.println("</html>");
         }
     } 
-    private final int PAGE_SIZE = 10;
-    private final ImportReceiptDAO receiptDAO = new ImportReceiptDAO();
-    private final ImportDetailDAO detailDAO = new ImportDetailDAO();
+    private final int PAGE_SIZE = 5;
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
      * Handles the HTTP <code>GET</code> method.
@@ -62,59 +60,68 @@ public class ImportHistoryDetailServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        String search = request.getParameter("search");
-        String sort = request.getParameter("sort");
-        String pageRaw = request.getParameter("page");
-        String importIdRaw = request.getParameter("importId");
+         String search = request.getParameter("search");
+    String sort = request.getParameter("sort");
+    String pageRaw = request.getParameter("page");
+    String importIdRaw = request.getParameter("importId");
 
-        if (importIdRaw == null || importIdRaw.trim().isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing importId");
-            return;
-        }
+    // Check null
+    if (importIdRaw == null || importIdRaw.trim().isEmpty()) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing importId");
+        return;
+    }
 
-        int importId;
+    int importId;
+    try {
+        importId = Integer.parseInt(importIdRaw);
+    } catch (NumberFormatException e) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid importId");
+        return;
+    }
+
+    int page = 1;
+    if (pageRaw != null) {
         try {
-            importId = Integer.parseInt(importIdRaw);
+            page = Integer.parseInt(pageRaw);
         } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid importId");
-            return;
+            page = 1;
         }
+    }
 
-        int page = 1;
-        if (pageRaw != null) {
-            try {
-                page = Integer.parseInt(pageRaw);
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
+    ImportDetailDAO detailDAO = new ImportDetailDAO();
+    ImportReceiptDAO receiptDAO = new ImportReceiptDAO();
 
-        ImportDetailDAO detailDAO = new ImportDetailDAO();
-        ImportReceiptDAO receiptDAO = new ImportReceiptDAO();
+    // === Chọn DAO phù hợp ===
+    List<ImportDetailView> details;
+    if (search != null && !search.isEmpty() && sort != null && !sort.isEmpty()) {
+        details = detailDAO.searchAndSortByPrice(importId, search, sort, page, PAGE_SIZE);
+    } else if (search != null && !search.isEmpty()) {
+        details = detailDAO.searchByName(importId, search, page, PAGE_SIZE);
+    } else if (sort != null && !sort.isEmpty()) {
+        details = detailDAO.sortByPrice(importId, sort, page, PAGE_SIZE);
+    } else {
+        details = detailDAO.getByImportId(importId, page, PAGE_SIZE);
+    }
 
-        // Get data
-        List<ImportDetailView> details = detailDAO.getDetailsByImportId(importId, search, sort, page, PAGE_SIZE);
-        int totalItems = detailDAO.countSearchByImportId(importId, search);
-        int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
+    int totalItems = detailDAO.countSearch(importId, search);
+    int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
 
-        ImportReceipt receipt = receiptDAO.getReceiptById(importId);
-        if (receipt == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Import receipt not found");
-            return;
-        }
+    ImportReceipt receipt = receiptDAO.getReceiptById(importId);
+    if (receipt == null) {
+        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Import receipt not found");
+        return;
+    }
 
-        // Set data
-        request.setAttribute("receipt", receipt);
-        request.setAttribute("details", details);
-        request.setAttribute("importId", importId);
-        request.setAttribute("search", search);
-        request.setAttribute("sort", sort);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
+    request.setAttribute("receipt", receipt);
+    request.setAttribute("details", details);
+    request.setAttribute("importId", importId);
+    request.setAttribute("search", search);
+    request.setAttribute("sort", sort);
+    request.setAttribute("currentPage", page);
+    request.setAttribute("totalPages", totalPages);
 
-        request.getRequestDispatcher("viewImportHistoryDetail.jsp").forward(request, response);
-    
-    
+    request.getRequestDispatcher("viewImportHistoryDetail.jsp").forward(request, response);
+   
     } 
 
     /** 
