@@ -35,7 +35,7 @@
 
         <!-- Bộ lọc -->
         <form method="get" action="importhistorydetail" class="row g-2 mb-4">
-            <input type="hidden" name="voucherId" value="${receipt.voucherId}" />
+            <input type="hidden" name="importId" value="${receipt.importId}" />
             <div class="col-md-5">
                 <input type="text" name="keyword" value="${param.keyword}" class="form-control" placeholder="Tìm tên vật tư..." />
             </div>

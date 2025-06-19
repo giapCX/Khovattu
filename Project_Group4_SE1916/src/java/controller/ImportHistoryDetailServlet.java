@@ -8,16 +8,16 @@ package controller;
 
 import dao.ImportDetailDAO;
 import dao.ImportReceiptDAO;
-import java.io.IOException;
-import java.io.PrintWriter;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.stream.Collectors;
 import model.ImportDetailView;
 import model.ImportReceipt;
+
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.*;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
 
 /**
  *
@@ -60,46 +60,60 @@ public class ImportHistoryDetailServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        String importIdStr = req.getParameter("importId");
-        String keyword = req.getParameter("keyword");
-        String sort = req.getParameter("sort");
-        String pageStr = req.getParameter("page");
+        String search = request.getParameter("search");
+        String sort = request.getParameter("sort");
+        String pageRaw = request.getParameter("page");
+        String importIdRaw = request.getParameter("importId");
 
-        if (importIdStr == null) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing importId");
+        if (importIdRaw == null || importIdRaw.trim().isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing importId");
             return;
         }
 
-        int importId = Integer.parseInt(importIdStr);
-        int page = pageStr == null ? 1 : Integer.parseInt(pageStr);
-        int offset = (page - 1) * PAGE_SIZE;
-
+        int importId;
         try {
-            ImportReceipt receipt = receiptDAO.getReceiptById(importId);
-            List<ImportDetailView> allDetails = detailDAO.getDetailsByImportId(importId, keyword, sort);
-
-            int totalItems = allDetails.size();
-            int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
-
-            List<ImportDetailView> pagedDetails = allDetails.stream()
-                .skip(offset)
-                .limit(PAGE_SIZE)
-                .collect(Collectors.toList());
-
-            req.setAttribute("receipt", receipt);
-            req.setAttribute("details", pagedDetails);
-            req.setAttribute("currentPage", page);
-            req.setAttribute("totalPages", totalPages);
-            req.setAttribute("param", req.getParameterMap());
-
-            req.getRequestDispatcher("viewImportHistoryDetail.jsp").forward(req, resp);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            importId = Integer.parseInt(importIdRaw);
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid importId");
+            return;
         }
+
+        int page = 1;
+        if (pageRaw != null) {
+            try {
+                page = Integer.parseInt(pageRaw);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+
+        ImportDetailDAO detailDAO = new ImportDetailDAO();
+        ImportReceiptDAO receiptDAO = new ImportReceiptDAO();
+
+        // Get data
+        List<ImportDetailView> details = detailDAO.getDetailsByImportId(importId, search, sort, page, PAGE_SIZE);
+        int totalItems = detailDAO.countSearchByImportId(importId, search);
+        int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
+
+        ImportReceipt receipt = receiptDAO.getReceiptById(importId);
+        if (receipt == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Import receipt not found");
+            return;
+        }
+
+        // Set data
+        request.setAttribute("receipt", receipt);
+        request.setAttribute("details", details);
+        request.setAttribute("importId", importId);
+        request.setAttribute("search", search);
+        request.setAttribute("sort", sort);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+
+        request.getRequestDispatcher("viewImportHistoryDetail.jsp").forward(request, response);
+    
     
     } 
 
