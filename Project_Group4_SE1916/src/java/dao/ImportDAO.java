@@ -21,7 +21,7 @@ public class ImportDAO {
         this.conn = conn;
     }
 
-    public boolean saveImportReceipt(ImportReceipt receipt, List<ImportDetail> details) throws SQLException {
+    public int saveImportReceipt(ImportReceipt receipt, List<ImportDetail> details) throws SQLException {
         String insertReceiptSQL = "INSERT INTO ImportReceipts (voucher_id, supplier_id, user_id, import_date, note) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(insertReceiptSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, receipt.getVoucherId());
@@ -35,21 +35,24 @@ public class ImportDAO {
                     if (rs.next()) {
                         int importId = rs.getInt(1);
                         if (details != null && !details.isEmpty()) {
-                            return addImportDetails(importId, details);
+                            addImportDetails(importId, details);
+                            updateInventory(importId, details); // Cập nhật kho
                         }
+                        return importId;
                     }
                 }
             }
-            return false;
+            return -1;
         }
     }
 
-    private boolean addImportDetails(int importId, List<ImportDetail> detailsList) throws SQLException {
+    private void addImportDetails(int importId, List<ImportDetail> detailsList) throws SQLException {
         String insertDetailSQL = "INSERT INTO ImportDetails (import_id, material_id, quantity, price_per_unit, material_condition) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(insertDetailSQL)) {
             conn.setAutoCommit(false);
             try {
                 for (ImportDetail detail : detailsList) {
+                    detail.setImportId(importId); // Gán importId cho từng detail
                     ps.setInt(1, importId);
                     ps.setInt(2, detail.getMaterialId());
                     ps.setDouble(3, detail.getQuantity());
@@ -57,21 +60,29 @@ public class ImportDAO {
                     ps.setString(5, detail.getMaterialCondition());
                     ps.addBatch();
                 }
-                int[] result = ps.executeBatch();
-                for (int i : result) {
-                    if (i == PreparedStatement.EXECUTE_FAILED) {
-                        conn.rollback();
-                        return false;
-                    }
-                }
+                ps.executeBatch();
                 conn.commit();
-                return true;
             } catch (SQLException e) {
                 conn.rollback();
                 throw e;
             } finally {
                 conn.setAutoCommit(true);
             }
+        }
+    }
+
+    private void updateInventory(int importId, List<ImportDetail> details) throws SQLException {
+        String sql = "INSERT INTO Inventory (material_id, material_condition, quantity_in_stock) VALUES (?, ?, ?) "
+                + "ON DUPLICATE KEY UPDATE quantity_in_stock = quantity_in_stock + ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (ImportDetail detail : details) {
+                ps.setInt(1, detail.getMaterialId());
+                ps.setString(2, detail.getMaterialCondition());
+                ps.setDouble(3, detail.getQuantity());
+                ps.setDouble(4, detail.getQuantity());
+                ps.addBatch();
+            }
+            ps.executeBatch();
         }
     }
 

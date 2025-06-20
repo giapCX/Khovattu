@@ -2,43 +2,43 @@
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
     <servlet>
         <servlet-name>LoginController</servlet-name>
-        <servlet-class>controller.LoginController</servlet-class>
+        <servlet-class>controller.user.LoginController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ListUserServlet</servlet-name>
-        <servlet-class>controller.ListUserServlet</servlet-class>
+        <servlet-class>controller.user.ListUserServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ChangePassword</servlet-name>
-        <servlet-class>controller.ChangePassword</servlet-class>
+        <servlet-class>controller.auth.ChangePassword</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>SendMail</servlet-name>
-        <servlet-class>controller.SendMail</servlet-class>
+        <servlet-class>controller.mail.SendMail</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ForgetPassword</servlet-name>
-        <servlet-class>controller.ForgetPassword</servlet-class>
+        <servlet-class>controller.auth.ForgetPassword</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>VerifyCode</servlet-name>
-        <servlet-class>controller.VerifyCode</servlet-class>
+        <servlet-class>controller.auth.VerifyCode</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LogoutController</servlet-name>
-        <servlet-class>controller.LogoutController</servlet-class>
+        <servlet-class>controller.user.LogoutController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>UserProfileController</servlet-name>
-        <servlet-class>controller.UserProfileController</servlet-class>
+        <servlet-class>controller.user.UserProfileController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>EditUserServlet</servlet-name>
-        <servlet-class>controller.EditUserServlet</servlet-class>
+        <servlet-class>controller.user.EditUserServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AddUserServlet</servlet-name>
-        <servlet-class>controller.AddUserServlet</servlet-class>
+        <servlet-class>controller.user.AddUserServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ListSupplierServlet</servlet-name>

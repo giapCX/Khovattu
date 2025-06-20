@@ -17,6 +17,10 @@ public class MaterialCategoryDAO {
         this.conn = DBContext.getConnection();
     }
 
+    public MaterialCategoryDAO(Connection conn) {
+        this.conn = conn;
+    }
+
     public List<MaterialCategory> getAllChildCategories() throws SQLException {
         List<MaterialCategory> categories = new ArrayList<>();
         String sql = "SELECT mc.category_id, mc.name, mc.parent_id, pc.name AS parent_category_name "
@@ -30,7 +34,7 @@ public class MaterialCategoryDAO {
                 category.setCategoryId(rs.getInt("category_id"));
                 category.setName(rs.getString("name"));
                 category.setParentCategoryName(rs.getString("parent_category_name"));
-                category.setParentId(rs.getInt("parent_id"));  // Thêm dòng này để gán giá trị parentId
+                category.setParentId(rs.getInt("parent_id"));  
                 categories.add(category);
             }
         }

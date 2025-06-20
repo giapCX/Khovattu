@@ -426,60 +426,7 @@ public class SupplierDAO {
         return false;
     }
 
-    public void saveImportReceipt(ImportReceipt receipt, List<ImportDetail> details) throws SQLException {
-        String sqlReceipt = "INSERT INTO ImportReceipts (import_id, supplier_id, user_id, import_date, note) VALUES (?, ?, ?, ?, ?) "
-                + "ON DUPLICATE KEY UPDATE supplier_id = VALUES(supplier_id), user_id = VALUES(user_id), import_date = VALUES(import_date), note = VALUES(note)";
-        String sqlDetail = "INSERT INTO ImportDetails (import_id, material_id, quantity, price_per_unit, material_condition) VALUES (?, ?, ?, ?, ?) "
-                + "ON DUPLICATE KEY UPDATE quantity = VALUES(quantity), price_per_unit = VALUES(price_per_unit), material_condition = VALUES(material_condition)";
-        String sqlInventory = "INSERT INTO Inventory (material_id, material_condition, quantity_in_stock) VALUES (?, ?, ?) "
-                + "ON DUPLICATE KEY UPDATE quantity_in_stock = quantity_in_stock + ?";
-
-        try {
-            conn.setAutoCommit(false);
-
-            // Insert or update receipt
-            try (PreparedStatement stmtReceipt = conn.prepareStatement(sqlReceipt)) {
-                stmtReceipt.setInt(1, receipt.getImportId());
-                stmtReceipt.setInt(2, receipt.getSupplierId());
-                stmtReceipt.setInt(3, receipt.getUserId());
-                stmtReceipt.setDate(4, receipt.getImportDate());
-                stmtReceipt.setString(5, receipt.getNote());
-                stmtReceipt.executeUpdate();
-            }
-
-            // Insert or update details
-            try (PreparedStatement stmtDetail = conn.prepareStatement(sqlDetail)) {
-                for (ImportDetail detail : details) {
-                    stmtDetail.setInt(1, detail.getImportId());
-                    stmtDetail.setInt(2, detail.getMaterialId());
-                    stmtDetail.setDouble(3, detail.getQuantity());
-                    stmtDetail.setDouble(4, detail.getPricePerUnit());
-                    stmtDetail.setString(5, detail.getMaterialCondition());
-                    stmtDetail.addBatch();
-                }
-                stmtDetail.executeBatch();
-            }
-
-            // Update inventory
-            try (PreparedStatement stmtInventory = conn.prepareStatement(sqlInventory)) {
-                for (ImportDetail detail : details) {
-                    stmtInventory.setInt(1, detail.getMaterialId());
-                    stmtInventory.setString(2, detail.getMaterialCondition());
-                    stmtInventory.setDouble(3, detail.getQuantity());
-                    stmtInventory.setDouble(4, detail.getQuantity());
-                    stmtInventory.addBatch();
-                }
-                stmtInventory.executeBatch();
-            }
-
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
-        }
-    }
+    
     // Thêm phương thức kiểm tra nhà cung cấp tồn tại theo tên
 
     public boolean supplierExistsByName(String name) throws SQLException {

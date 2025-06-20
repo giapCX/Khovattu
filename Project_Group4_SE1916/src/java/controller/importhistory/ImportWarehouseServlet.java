@@ -17,7 +17,6 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,10 +35,10 @@ public class ImportWarehouseServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            MaterialCategoryDAO categoryDAO = new MaterialCategoryDAO();
-            MaterialDAO materialDAO = new MaterialDAO();
-            SupplierDAO supplierDAO = new SupplierDAO(); // Cần sửa ở đây nếu MaterialCategoryDAO/MaterialDAO cũng yêu cầu Connection
+        try (Connection conn = DBContext.getConnection()) {
+            MaterialCategoryDAO categoryDAO = new MaterialCategoryDAO(conn);
+            MaterialDAO materialDAO = new MaterialDAO(conn);
+            SupplierDAO supplierDAO = new SupplierDAO(conn);
 
             List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
             List<MaterialCategory> childCategories = categoryDAO.getAllChildCategories();
@@ -63,7 +62,7 @@ public class ImportWarehouseServlet extends HttpServlet {
         String importDateStr = request.getParameter("import_date");
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
-        Integer supplierId = request.getParameter("supplier_id") != null && !request.getParameter("supplier_id").equals("new") 
+        Integer supplierId = request.getParameter("supplier_id") != null && !request.getParameter("supplier_id").equals("new")
                 ? Integer.parseInt(request.getParameter("supplier_id")) : null;
         String newSupplierName = request.getParameter("new_supplier_name");
         String newSupplierPhone = request.getParameter("new_supplier_phone");
@@ -82,6 +81,9 @@ public class ImportWarehouseServlet extends HttpServlet {
             receipt.setImportDate(new java.sql.Date(new SimpleDateFormat("yyyy-MM-dd").parse(importDateStr).getTime()));
         } catch (ParseException ex) {
             Logger.getLogger(ImportWarehouseServlet.class.getName()).log(Level.SEVERE, null, ex);
+            request.setAttribute("error", "Invalid date format.");
+            request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
+            return;
         }
         receipt.setNote(note);
 
@@ -91,11 +93,11 @@ public class ImportWarehouseServlet extends HttpServlet {
             newSupplier.setSupplierPhone(newSupplierPhone);
             newSupplier.setSupplierAddress(newSupplierAddress);
             newSupplier.setSupplierEmail(newSupplierEmail);
-            newSupplier.setSupplierStatus("active"); // Default status
-            try (Connection conn = DBContext.getConnection()) { // Mở kết nối mới cho SupplierDAO
-                SupplierDAO supplierDAO = new SupplierDAO(conn); // Sử dụng Connection từ DBContext
-                supplierId = supplierDAO.addSupplier(newSupplier) ? supplierDAO.getSupplierById(newSupplier.getSupplierId()).getSupplierId() : null;
-                if (supplierId == null) {
+            newSupplier.setSupplierStatus("active");
+            try (Connection conn = DBContext.getConnection()) {
+                SupplierDAO supplierDAO = new SupplierDAO(conn);
+                supplierId = supplierDAO.addSupplierWithId(newSupplier);
+                if (supplierId <= 0) {
                     request.setAttribute("error", "Failed to add new supplier.");
                     request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
                     return;
@@ -115,13 +117,34 @@ public class ImportWarehouseServlet extends HttpServlet {
         }
 
         List<ImportDetail> details = new ArrayList<>();
+        if (materialIds == null || quantities == null || prices == null || materialConditions == null ||
+                materialIds.length == 0 || quantities.length == 0 || prices.length == 0 || materialConditions.length == 0 ||
+                materialIds.length != quantities.length || materialIds.length != prices.length || materialIds.length != materialConditions.length) {
+            request.setAttribute("error", "Material details are inconsistent or empty.");
+            request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
+            return;
+        }
+
         for (int i = 0; i < materialIds.length; i++) {
-            ImportDetail detail = new ImportDetail();
-            detail.setMaterialId(Integer.parseInt(materialIds[i]));
-            detail.setQuantity(Double.parseDouble(quantities[i]));
-            detail.setPricePerUnit(Double.parseDouble(prices[i]));
-            detail.setMaterialCondition(materialConditions[i]);
-            details.add(detail);
+            try {
+                ImportDetail detail = new ImportDetail();
+                detail.setMaterialId(Integer.parseInt(materialIds[i]));
+                detail.setQuantity(Double.parseDouble(quantities[i]));
+                detail.setPricePerUnit(Double.parseDouble(prices[i]));
+                detail.setMaterialCondition(materialConditions[i]);
+                if (detail.getQuantity() <= 0 || detail.getPricePerUnit() <= 0) {
+                    request.setAttribute("error", "Quantity and price must be greater than 0 at row " + (i + 1));
+                    request.setAttribute("errorRow", i);
+                    request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
+                    return;
+                }
+                details.add(detail);
+            } catch (NumberFormatException e) {
+                request.setAttribute("error", "Invalid number format at row " + (i + 1));
+                request.setAttribute("errorRow", i);
+                request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
+                return;
+            }
         }
 
         try (Connection conn = DBContext.getConnection()) {
@@ -132,17 +155,17 @@ public class ImportWarehouseServlet extends HttpServlet {
                 return;
             }
 
-            importDAO.saveImportReceipt(receipt, details);
-            request.setAttribute("message", "Import receipt saved successfully");
+            int importId = importDAO.saveImportReceipt(receipt, details);
+            if (importId > 0) {
+                request.setAttribute("message", "Import receipt saved successfully");
+                request.setAttribute("success", "true");
+                request.setAttribute("voucher_id", voucherId);
+            } else {
+                request.setAttribute("error", "Failed to save import receipt.");
+            }
             request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
         } catch (SQLException e) {
             request.setAttribute("error", "Error saving import receipt: " + e.getMessage());
-            request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
-        } catch (NumberFormatException e) {
-            request.setAttribute("error", "Invalid number format in quantities or prices");
-            request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
-        } catch (Exception e) {
-            request.setAttribute("error", "Error processing date or data: " + e.getMessage());
             request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
         }
     }

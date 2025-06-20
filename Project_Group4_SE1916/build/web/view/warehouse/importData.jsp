@@ -49,10 +49,10 @@
                         <option value="new">Add New Supplier</option>
                     </select>
                     <div id="newSupplierFields" class="hidden mt-2">
-                        <input type="text" name="new_supplier_name" placeholder="Supplier Name" class="form-control mb-2">
-                        <input type="text" name="new_supplier_phone" placeholder="Phone Number" class="form-control mb-2">
-                        <input type="text" name="new_supplier_address" placeholder="Address" class="form-control mb-2">
-                        <input type="email" name="new_supplier_email" placeholder="Email" class="form-control mb-2">
+                        <input type="text" name="new_supplier_name" placeholder="Supplier Name" class="form-control mb-2" required>
+                        <input type="text" name="new_supplier_phone" placeholder="Phone Number" class="form-control mb-2" required>
+                        <input type="text" name="new_supplier_address" placeholder="Address" class="form-control mb-2" required>
+                        <input type="email" name="new_supplier_email" placeholder="Email" class="form-control mb-2" required>
                     </div>
                 </div>
             </div>
@@ -84,7 +84,7 @@
                     <tr>
                         <td>1</td>
                         <td>
-                            <select class="parentCategory form-select" name="parentCategoryId[]">
+                            <select class="parentCategory form-select" name="parentCategoryId[]" onchange="filterChildCategories(this)">
                                 <option value="">Select Parent Category</option>
                                 <c:forEach var="cat" items="${parentCategories}">
                                     <option value="${cat.categoryId}">${cat.name}</option>
@@ -232,7 +232,7 @@
                     <tr>
                         <td>1</td>
                         <td>
-                            <select class="parentCategory form-select" name="parentCategoryId[]">
+                            <select class="parentCategory form-select" name="parentCategoryId[]" onchange="filterChildCategories(this)">
                                 <option value="">Select Parent Category</option>
                                 <c:forEach var="cat" items="${parentCategories}">
                                     <option value="${cat.categoryId}">${cat.name}</option>
@@ -290,53 +290,49 @@
             window.toggleNewSupplier = function(select) {
                 var newSupplierFields = document.getElementById('newSupplierFields');
                 newSupplierFields.classList.toggle('hidden', select.value !== 'new');
+                if (select.value === 'new') {
+                    newSupplierFields.querySelectorAll('input').forEach(input => input.value = '');
+                }
             };
+
+            function filterChildCategories(select) {
+                const parentId = select.value;
+                const row = select.closest('tr');
+                const childSelect = row.querySelector('.childCategory');
+                childSelect.value = '';
+                childSelect.querySelectorAll('option').forEach(option => {
+                    option.style.display = option.getAttribute('data-parent') == parentId ? '' : 'none';
+                });
+                row.querySelector('.nameMaterial').value = '';
+                row.querySelector('.unitMaterial').value = '';
+            }
 
             document.addEventListener('change', function(e) {
                 if (e.target.classList.contains('parentCategory')) {
-                    const parentId = e.target.value;
-                    const row = e.target.closest('tr');
-                    const childSelect = row.querySelector('.childCategory');
-                    const materialSelect = row.querySelector('.nameMaterial');
-                    const unitInput = row.querySelector('.unitMaterial');
-
-                    childSelect.querySelectorAll('option').forEach(option => {
-                        const optionParentId = option.getAttribute('data-parent');
-                        option.style.display = (!parentId || optionParentId === parentId) ? '' : 'none';
-                    });
-                    childSelect.value = '';
-                    materialSelect.value = '';
-                    unitInput.value = '';
-
-                    filterMaterialByCategory(materialSelect, parentId);
+                    filterChildCategories(e.target);
                 }
                 if (e.target.classList.contains('childCategory')) {
                     const childId = e.target.value;
                     const row = e.target.closest('tr');
                     const materialSelect = row.querySelector('.nameMaterial');
                     const unitInput = row.querySelector('.unitMaterial');
-
                     materialSelect.value = '';
                     unitInput.value = '';
-                    filterMaterialByCategory(materialSelect, childId);
+                    materialSelect.querySelectorAll('option').forEach(option => {
+                        option.style.display = option.getAttribute('data-parent') == childId ? '' : 'none';
+                    });
                 }
                 if (e.target.classList.contains('nameMaterial')) {
                     const materialId = e.target.value;
                     const row = e.target.closest('tr');
                     const unitInput = row.querySelector('.unitMaterial');
-
                     const selectedOption = e.target.selectedOptions[0];
                     unitInput.value = selectedOption ? selectedOption.getAttribute('data-unit') : '';
                 }
+                if (e.target.classList.contains('quantity') || e.target.classList.contains('price')) {
+                    updateTotals();
+                }
             });
-
-            function filterMaterialByCategory(materialSelect, categoryId) {
-                materialSelect.querySelectorAll('option').forEach(option => {
-                    const optionCatId = option.getAttribute('data-parent');
-                    option.style.display = (!categoryId || optionCatId === categoryId) ? '' : 'none';
-                });
-                materialSelect.value = '';
-            }
 
             document.getElementById("importDetailsBody").addEventListener("input", updateTotals);
 
