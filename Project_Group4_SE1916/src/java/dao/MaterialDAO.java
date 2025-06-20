@@ -23,10 +23,6 @@ public class MaterialDAO {
         this.conn = DBContext.getConnection();
     }
 
-    public MaterialDAO(Connection conn) {
-        this.conn = conn;
-    }
-
     public List<Material> getAllMaterials() throws SQLException {
         List<Material> materials = new ArrayList<>();
         String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name, "
