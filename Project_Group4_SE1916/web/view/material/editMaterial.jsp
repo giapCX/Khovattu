@@ -1,161 +1,236 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Edit Material - Material Management System</title>
-        <!-- Tailwind CSS -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            primary: {
-                                50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
-                                400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
-                                800: '#075985', 900: '#0c4a6e'
-                            },
-                            secondary: {
-                                50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe', 300: '#c4b5fd',
-                                400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9',
-                                800: '#5b21b6', 900: '#4c1d95'
-                            }
-                        },
-                        fontFamily: {
-                            sans: ['Inter', 'sans-serif']
-                        }
-                    }
-                }
-            }
-        </script>
-        <!-- Font Awesome -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            :root {
+                --primary-color: #4361ee;
+                --secondary-color: #3f37c9;
+                --light-color: #f8f9fa;
+                --dark-color: #212529;
+                --border-radius: 8px;
+                --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
 
             body {
-                font-family: 'Inter', sans-serif;
-                background-color: #f8fafc;
+                background-color: #f5f7fb;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                padding-top: 2rem;
             }
 
-            .card {
+            .form-container {
+                background-color: white;
+                border-radius: var(--border-radius);
+                box-shadow: var(--box-shadow);
+                padding: 2rem;
+                margin-bottom: 2rem;
+            }
+
+            .form-header {
+                color: var(--primary-color);
+                border-bottom: 2px solid var(--primary-color);
+                padding-bottom: 0.75rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .form-label {
+                font-weight: 500;
+                color: var(--dark-color);
+                margin-bottom: 0.5rem;
+            }
+
+            .form-control, .form-select {
+                border-radius: var(--border-radius);
+                border: 1px solid #ced4da;
+                padding: 0.75rem 1rem;
                 transition: all 0.3s ease;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-                border-radius: 1rem;
-                border: 1px solid #e5e7eb;
             }
 
-            .card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            .form-control:focus, .form-select:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+            }
+
+            .suppliers-container {
+                border: 1px solid #dee2e6;
+                border-radius: var(--border-radius);
+                padding: 1rem;
+                max-height: 200px;
+                overflow-y: auto;
+                background-color: var(--light-color);
+            }
+
+            .supplier-item {
+                margin-bottom: 0.5rem;
+                padding: 0.5rem;
+                border-radius: 4px;
+                transition: background-color 0.2s;
+            }
+
+            .supplier-item:hover {
+                background-color: #e9ecef;
             }
 
             .btn-primary {
-                background: linear-gradient(to right, #3b82f6, #6366f1);
-                transition: all 0.3s ease;
+                background-color: var(--primary-color);
+                border-color: var(--primary-color);
+                padding: 0.5rem 1.5rem;
+                border-radius: var(--border-radius);
+                font-weight: 500;
+                transition: all 0.3s;
             }
 
             .btn-primary:hover {
-                transform: scale(1.05);
-                box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
+                background-color: var(--secondary-color);
+                border-color: var(--secondary-color);
+                transform: translateY(-2px);
             }
 
             .btn-secondary {
-                background: linear-gradient(to right, #6b7280, #9ca3af);
-                transition: all 0.3s ease;
+                border-radius: var(--border-radius);
+                padding: 0.5rem 1.5rem;
+                font-weight: 500;
             }
 
-            .btn-secondary:hover {
-                transform: scale(1.05);
-                box-shadow: 0 10px 15px -3px rgba(107, 114, 128, 0.3), 0 4px 6px -2px rgba(107, 114, 128, 0.1);
+            .alert {
+                border-radius: var(--border-radius);
             }
 
-            .dark-mode {
-                background-color: #1a202c;
-                color: #e2e8f0;
-            }
-
-            .dark-mode .card {
-                background-color: #2d3748;
-                color: #e2e8f0;
-                border-color: #4a5568;
+            @media (max-width: 768px) {
+                .form-container {
+                    padding: 1.5rem;
+                }
             }
         </style>
     </head>
-    <body class="bg-gray-50 min-h-screen font-sans antialiased">
-        <main class="flex-1 p-8">
-            <div class="max-w-md mx-auto card bg-white dark:bg-gray-800 p-6">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">Edit Material</h2>
+    <body>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="form-container">
+                        <c:if test="${not empty message}">
+                            <div class="alert alert-${messageType} alert-dismissible fade show" role="alert">
+                                <i class="fas ${messageType == 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                                ${message}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </c:if>
 
-                <c:if test="${not empty message}">
-                    <div class="bg-${messageType}-100 border border-${messageType}-400 text-${messageType}-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        ${message}
+                        <h2 class="form-header">
+                            <i class="fas fa-edit me-2"></i>Edit Material
+                        </h2>
+
+                        <form action="${pageContext.request.contextPath}/EditMaterialController" method="post">
+                            <input type="hidden" name="id" value="${material.materialId}" />
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="code" class="form-label">Material Code</label>
+                                    <input type="text" class="form-control" id="code" name="code" value="${material.code}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="name" class="form-label">Material Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" value="${material.name}" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="category" class="form-label">Child Category</label>
+                                    <select class="form-select" id="category" name="category" required>
+                                        <option value="">Select Category</option>
+                                        <c:forEach var="cat" items="${categories}">
+                                            <option value="${cat.categoryId}" ${cat.categoryId == material.category.categoryId ? 'selected' : ''}>${cat.name}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="unit" class="form-label">Unit</label>
+                                    <input type="text" class="form-control" id="unit" name="unit" value="${material.unit}" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="3">${material.description}</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="imageUrl" class="form-label">Image URL</label>
+                                <input type="url" class="form-control" id="imageUrl" name="imageUrl" value="${material.imageUrl}" placeholder="https://example.com/image.jpg">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Suppliers</label>
+                                <div class="suppliers-container">
+                                    <div class="row">
+                                        <c:forEach var="sup" items="${suppliers}">
+                                            <div class="col-md-6">
+                                                <div class="supplier-item">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" 
+                                                               id="supplier_${sup.supplierId}" name="suppliers" 
+                                                               value="${sup.supplierId}"
+                                                               <c:forEach var="matSup" items="${material.suppliers}">
+                                                                   <c:if test="${matSup.supplierId == sup.supplierId}">checked</c:if>
+                                                               </c:forEach>
+                                                               >
+                                                        <label class="form-check-label" for="supplier_${sup.supplierId}">
+                                                            <i class="fas fa-truck me-2"></i>${sup.supplierName}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <a onclick ="history.back()" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to List
+                                    </a>
+                                </div>
+                                <div>
+                                    <button type="reset" class="btn btn-outline-secondary me-2">
+                                        <i class="fas fa-undo me-2"></i>Reset
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Save Material
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                </c:if>
-
-                <form action="${pageContext.request.contextPath}/EditMaterialController" method="post" class="space-y-4">
-                    <input type="hidden" name="id" value="${material.materialId}" />
-
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Material Code</label>
-                        <input type="text" name="code" value="${material.code}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Material Name</label>
-                        <input type="text" name="name" value="${material.name}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Child Category</label>
-                        <select name="category" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
-                            <option value="">Chọn danh mục</option>
-                            <c:forEach var="cat" items="${categories}">
-                                <option value="${cat.categoryId}" ${cat.categoryId == material.category.categoryId ? 'selected' : ''}>${cat.name}</option>
-                            </c:forEach>
-                        </select>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Unit</label>
-                        <input type="text" name="unit" value="${material.unit}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" required>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Describe</label>
-                        <textarea name="description" rows="4" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">${material.description}</textarea>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Image(URL)</label>
-                        <input type="url" name="imageUrl" value="${material.imageUrl}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Supplier</label>
-                        <c:forEach var="sup" items="${suppliers}">
-                            <label class="block">
-                                <input type="checkbox" name="suppliers" value="${sup.supplierId}"
-                                       <c:forEach var="matSup" items="${material.suppliers}">
-                                           <c:if test="${matSup.supplierId == sup.supplierId}">checked</c:if>
-                                       </c:forEach>
-                                       />
-                                ${sup.supplierName}
-                            </label>
-                        </c:forEach>
-                    </div>
-
-                    <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg w-full mt-4">Save</button>
-                    <div class="mt-4 flex justify-center">
-                        <a href="${pageContext.request.contextPath}/ListMaterialController?action=list" class="btn-secondary text-white px-6 py-3 rounded-lg">Cancel</a>
-                    </div>
-                </form>
+                </div>
             </div>
-        </main>
+        </div>
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                // Auto-dismiss alerts after 5 seconds
+                setTimeout(function () {
+                    $('.alert').alert('close');
+                }, 5000);
+
+                // Preview image when URL changes
+                $('#imageUrl').on('change', function () {
+                    const url = $(this).val();
+                    if (url) {
+                        // You could add image preview functionality here
+                        console.log('Image URL changed:', url);
+                    }
+                });
+            });
+        </script>
     </body>
 </html>

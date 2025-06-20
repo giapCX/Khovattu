@@ -18,9 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 // em note các bước ra để sau đọc lại hiểu luôn nên thầy đừng bắt bẻ em nhá =(( 
-
 public class EditMaterialController extends HttpServlet {
 
     private MaterialDAO materialDAO;
@@ -38,7 +36,7 @@ public class EditMaterialController extends HttpServlet {
 
     // Xử lý GET request: Hiển thị form chỉnh sửa vật tư
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
             // 1. Lấy ID vật tư từ tham số URL
@@ -56,22 +54,19 @@ public class EditMaterialController extends HttpServlet {
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
         } catch (SQLException e) {
             // Nếu có lỗi khi lấy dữ liệu, báo lỗi chi tiết
-            throw new ServletException("Không thể lấy dữ liệu vật tư", e);
+            throw new ServletException("Failed to retrieve material data", e);
         } catch (NumberFormatException e) {
             // Nếu ID không hợp lệ (không phải số)
-            throw new ServletException("ID vật tư không hợp lệ", e);
+            throw new ServletException("Invalid material ID", e);
         }
     }
 
     // Xử lý POST request: Lưu thông tin chỉnh sửa vật tư
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Tạo đối tượng Material để chứa thông tin từ form
         Material material = new Material();
 
         try {
-            // 1. Lấy dữ liệu từ form và gán vào đối tượng Material
             material.setMaterialId(Integer.parseInt(request.getParameter("id")));
             material.setCode(request.getParameter("code"));
             material.setName(request.getParameter("name"));
@@ -79,43 +74,44 @@ public class EditMaterialController extends HttpServlet {
             material.setUnit(request.getParameter("unit"));
             material.setImageUrl(request.getParameter("imageUrl"));
 
-            // 2. Lấy và gán danh mục (category)
-            String categoryIdStr = request.getParameter("category");
-            int categoryId = Integer.parseInt(categoryIdStr); // Chuyển chuỗi thành số
+            int categoryId = Integer.parseInt(request.getParameter("category"));
             MaterialCategory category = new MaterialCategory();
             category.setCategoryId(categoryId);
             material.setCategory(category);
 
-            // 3. Lấy danh sách nhà cung cấp (suppliers)
             String[] supplierIds = request.getParameterValues("suppliers");
             List<Integer> supplierIdList = new ArrayList<>();
             if (supplierIds != null) {
                 for (String id : supplierIds) {
-                    supplierIdList.add(Integer.parseInt(id)); // Chuyển mỗi ID thành số
+                    supplierIdList.add(Integer.parseInt(id));
                 }
             }
 
-            // 4. Cập nhật vật tư trong database
+            // Cập nhật vào DB
             materialDAO.updateMaterial(material, supplierIdList);
 
-            // 5. Lưu thông báo thành công vào session
-            HttpSession session = request.getSession();
-            session.setAttribute("successMessage", "Cập nhật vật tư thành công!");
+            // Gán thông báo thành công vào request (ko dùng session nữa)
+            request.setAttribute("message", "Update material success!");
+            request.setAttribute("messageType", "success");
 
-            // 6. Chuyển hướng về trang danh sách vật tư
-            response.sendRedirect(request.getContextPath() + "/ListMaterialController?action=list");
+            // Load lại dữ liệu cần thiết để hiển thị form
+            reloadFormData(request);
+
+            // Lấy lại thông tin vật tư mới nhất để hiển thị
+            Material updatedMaterial = materialDAO.getMaterialById(material.getMaterialId());
+            request.setAttribute("material", updatedMaterial);
+
+            // Hiển thị lại trang chỉnh sửa
+            request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
+
         } catch (NumberFormatException e) {
-            // Lỗi khi dữ liệu nhập vào không đúng định dạng (ví dụ: ID hoặc category không phải số)
-            request.setAttribute("message", "Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.");
+            request.setAttribute("message", "Invalid input! Please check your data.");
             request.setAttribute("messageType", "danger");
-            // Tải lại dữ liệu để hiển thị form
             reloadFormData(request);
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
         } catch (SQLException e) {
-            // Xử lý lỗi từ database
-            request.setAttribute("message", "Lỗi khi cập nhật vật tư: " + e.getMessage());
+            request.setAttribute("message", "Error updating material: " + e.getMessage());
             request.setAttribute("messageType", "danger");
-            // Tải lại dữ liệu để hiển thị form
             reloadFormData(request);
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
         }
@@ -138,7 +134,7 @@ public class EditMaterialController extends HttpServlet {
             material.setImageUrl(request.getParameter("imageUrl"));
             request.setAttribute("material", material);
         } catch (SQLException | NumberFormatException e) {
-            throw new ServletException("Không thể tải lại dữ liệu cho form", e);
+            throw new ServletException("Failed to reload data for form", e);
         }
     }
 }
