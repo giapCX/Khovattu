@@ -54,7 +54,7 @@
     </servlet>
     <servlet>
         <servlet-name>ChangePasswordByForget</servlet-name>
-        <servlet-class>controller.ChangePasswordByForget</servlet-class>
+        <servlet-class>controller.auth.ChangePasswordByForget</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AddMaterialController</servlet-name>
@@ -82,11 +82,11 @@
     </servlet>
     <servlet>
         <servlet-name>ProposalController</servlet-name>
-        <servlet-class>controller.ProposalController</servlet-class>
+        <servlet-class>controller.proposal.ProposalController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ExportMaterial</servlet-name>
-        <servlet-class>controller.ExportMaterial</servlet-class>
+        <servlet-class>controller.importhistory.ExportMaterial</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ImportHistoryDetailServlet</servlet-name>
@@ -94,7 +94,7 @@
     </servlet>
     <servlet>
         <servlet-name>CheckVoucherIdServlet</servlet-name>
-        <servlet-class>controller.CheckVoucherIdServlet</servlet-class>
+        <servlet-class>controller.importhistory.CheckVoucherIdServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AddChildCategoryController</servlet-name>
