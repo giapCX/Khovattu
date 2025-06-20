@@ -5,9 +5,7 @@
 --%>
 <%@page import="dao.MaterialDAO"%>
 <%@page import="model.Material"%>
-<%@page import="dao.MaterialCategoryDAO"%>
 <%@ page import="java.util.List" %>
-<%@ page import="model.MaterialCategory" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -20,7 +18,6 @@
     <style>
         body {
             min-height: 100vh;
-            /*background: linear-gradient(135deg, #6e8efb, #a777e3);*/
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
         }
@@ -55,7 +52,7 @@
         .table {
             background: #fff;
             border-radius: 10px;
-            overflow: hidden;
+/*            overflow: hidden;*/
         }
         .table th {
             background: #6e8efb;
@@ -63,7 +60,7 @@
             font-weight: 600;
         }
         .table th:first-child {
-            width: 60px; /* Fixed width for STT column */
+            width: 60px;
         }
         .btn-primary {
             background: linear-gradient(45deg, #6e8efb, #a777e3);
@@ -85,20 +82,34 @@
             opacity: 0.65;
             cursor: not-allowed;
         }
+        .autocomplete-suggestions {
+            position: absolute;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fff;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            width: 100%;
+        }
+        .autocomplete-suggestion {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .autocomplete-suggestion:hover {
+            background: #f0f0f0;
+        }
     </style>
 </head>
 <body>
     <%
         MaterialDAO materialDAO = new MaterialDAO();
-        MaterialCategoryDAO cateDAO = new MaterialCategoryDAO();
-        List<MaterialCategory> parentCategories = cateDAO.getAllParentCategories(); // Parent categories
-        //List<Material> allCategories = materialDAO.getAllMaterials(); // All categories (including subcategories)
+        List<Material> allMaterials = materialDAO.getAllMaterials();
     %>
 
     <div class="container">
         <h1 class="text-center mb-4">Export Materials</h1>
 
-        <!-- Display error message if present -->
         <c:if test="${not empty error}">
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 ${error}
@@ -106,7 +117,6 @@
             </div>
         </c:if>
 
-        <!-- Display success message with exportId if present -->
         <c:if test="${not empty message}">
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 ${message} <c:if test="${not empty exportId}">(Export ID: ${exportId})</c:if>
@@ -147,8 +157,6 @@
                     <thead>
                         <tr>
                             <th>No.</th>
-                            <th>Parent Category</th> <!-- Select first -->
-                            <th>Child Category</th>       <!-- Select based on parent -->
                             <th>Material Name</th>
                             <th>Material Code</th>
                             <th>Quantity</th>
@@ -160,33 +168,11 @@
                     <tbody id="materialTableBody">
                         <tr>
                             <td class="serial-number">1</td>
-                            <td>
-                                <select class="form-select parent-category-select" name="parentCategoryId[]" required>
-                                    <option value="">Select parent category</option>
-                                    <%
-                                        for (MaterialCategory cat : parentCategories) {
-                                    %>
-                                        <option value="<%= cat.getCategoryId()%>"><%= cat.getName()%></option>
-                                    <%
-                                        }
-                                    %>
-                                </select>
+                            <td style="position: relative;">
+                                <input type="text" class="form-control material-name-input" name="materialName[]" required autocomplete="off">
+                                <div class="autocomplete-suggestions" style="display: none;"></div>
                             </td>
-                            <td>
-                                <select class="form-select category-select" name="categoryId[]" required disabled>
-                                    <option value="">Select child category</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select class="form-select material-name-select" name="materialName[]" required disabled>
-                                    <option value="">-- Select material name --</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select class="form-select material-code-select" name="materialCode[]" required disabled>
-                                    <option value="">-- Select material code --</option>
-                                </select>
-                            </td>
+                            <td><input type="text" class="form-control material-code-input" name="materialCode[]" readonly></td>
                             <td><input type="number" class="form-control" name="quantity[]" min="1" required></td>
                             <td><input type="text" class="form-control unit-display" name="unit[]" readonly></td>
                             <td>
@@ -222,77 +208,7 @@
     </div>
 
     <script>
-        let materialData = []; // Initialize empty
-
-        // Function to attach event listeners to parent category select
-        function attachParentCategoryListener(parentCategorySelect) {
-            parentCategorySelect.addEventListener("change", function () {
-                const selectedParentCategoryId = this.value;
-                console.log('Selected parentCategoryId:', selectedParentCategoryId); // Log for debugging
-                const row = this.closest("tr");
-                const categorySelect = row.querySelector(".category-select");
-                const nameSelect = row.querySelector(".material-name-select");
-                const codeSelect = row.querySelector(".material-code-select");
-                const unitInput = row.querySelector(".unit-display");
-
-                // Reset
-                categorySelect.innerHTML = '<option value="">Select child category</option>';
-                nameSelect.innerHTML = '<option value="">-- Select material name --</option>';
-                codeSelect.innerHTML = '<option value="">-- Select material code --</option>';
-                unitInput.value = '';
-                categorySelect.disabled = !selectedParentCategoryId;
-                nameSelect.disabled = true;
-                codeSelect.disabled = true;
-
-                if (!selectedParentCategoryId) return;
-
-                // Filter subcategories based on parentCategoryId
-                const childCategories = materialData
-                    .filter(mat => mat.category.parentId == selectedParentCategoryId)
-                    .map(mat => ({ categoryId: mat.category.categoryId, name: mat.category.name }))
-                    .reduce((unique, item) => {
-                        if (!unique.some(cat => cat.categoryId === item.categoryId)) unique.push(item);
-                        return unique;
-                    }, []);
-
-                childCategories.forEach(cat => {
-                    categorySelect.add(new Option(cat.name, cat.categoryId));
-                });
-
-                // Attach event for categorySelect
-                categorySelect.onchange = function () {
-                    const selectedCategoryId = this.value;
-                    console.log('Selected categoryId:', selectedCategoryId);
-                    nameSelect.innerHTML = '<option value="">-- Select material name --</option>';
-                    codeSelect.innerHTML = '<option value="">-- Select material code --</option>';
-                    unitInput.value = '';
-                    nameSelect.disabled = !selectedCategoryId;
-                    codeSelect.disabled = !selectedCategoryId;
-
-                    if (!selectedCategoryId) return;
-
-                    const filteredMaterials = materialData.filter(mat => mat.category.categoryId == selectedCategoryId);
-                    console.log('Filtered materials:', filteredMaterials);
-
-                    if (filteredMaterials.length > 0) {
-                        filteredMaterials.forEach(mat => {
-                            nameSelect.add(new Option(mat.name, mat.name));
-                            codeSelect.add(new Option(mat.code, mat.code));
-                        });
-
-                        const updateUnit = () => {
-                            const selected = filteredMaterials.find(m => m.name === nameSelect.value || m.code === codeSelect.value);
-                            unitInput.value = selected ? selected.unit : "";
-                        };
-
-                        nameSelect.onchange = updateUnit;
-                        codeSelect.onchange = updateUnit;
-                    } else {
-                        showAlert('warning', 'No materials found for this category.');
-                    }
-                };
-            });
-        }
+        let materialData = [];
 
         // Show alert
 //        function showAlert(type, message) {
@@ -307,14 +223,10 @@
 //            setTimeout(() => alert.remove(), 5000);
 //        }
 
-        // Update serial numbers for No. column
+        // Update serial numbers
         function updateSerialNumbers() {
-            const rows = document.querySelectorAll('#materialTableBody tr');
-            rows.forEach((row, index) => {
-                const serialCell = row.querySelector('.serial-number');
-                if (serialCell) {
-                    serialCell.textContent = index + 1;
-                }
+            document.querySelectorAll('#materialTableBody tr').forEach((row, index) => {
+                row.querySelector('.serial-number').textContent = index + 1;
             });
         }
 
@@ -332,41 +244,14 @@
         // Add new material row
         function addMaterialRow() {
             const tableBody = document.getElementById('materialTableBody');
-            if (!tableBody) {
-                console.error('Table body with ID "materialTableBody" not found.');
-                showAlert('danger', 'Cannot add material: System error.');
-                return;
-            }
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="serial-number"></td>
-                <td>
-                    <select class="form-select parent-category-select" name="parentCategoryId[]" required>
-                        <option value="">Select parent category</option>
-                        <%
-                            for (MaterialCategory cat : parentCategories) {
-                        %>
-                            <option value="<%= cat.getCategoryId()%>"><%= cat.getName()%></option>
-                        <%
-                            }
-                        %>
-                    </select>
+                <td style="position: relative;">
+                    <input type="text" class="form-control material-name-input" name="materialName[]" required autocomplete="off">
+                    <div class="autocomplete-suggestions" style="display: none;"></div>
                 </td>
-                <td>
-                    <select class="form-select category-select" name="categoryId[]" required disabled>
-                        <option value="">Select category</option>
-                    </select>
-                </td>
-                <td>
-                    <select class="form-select material-name-select" name="materialName[]" required disabled>
-                        <option value="">-- Select material name --</option>
-                    </select>
-                </td>
-                <td>
-                    <select class="form-select material-code-select" name="materialCode[]" required disabled>
-                        <option value="">-- Select material code --</option>
-                    </select>
-                </td>
+                <td><input type="text" class="form-control material-code-input" name="materialCode[]" readonly></td>
                 <td><input type="number" class="form-control" name="quantity[]" min="1" required></td>
                 <td><input type="text" class="form-control unit-display" name="unit[]" readonly></td>
                 <td>
@@ -380,7 +265,7 @@
                 <td><button type="button" class="btn btn-danger btn-sm remove-row">Delete</button></td>
             `;
             tableBody.appendChild(row);
-            attachParentCategoryListener(row.querySelector('.parent-category-select'));
+            attachAutocomplete(row.querySelector('.material-name-input'));
             updateSerialNumbers();
             updateRemoveButtons();
             showAlert('success', 'Added new material row.');
@@ -393,15 +278,47 @@
                 showAlert('warning', 'Cannot delete: At least one material row is required.');
                 return;
             }
-            const row = button.closest('tr');
-            if (!row) {
-                showAlert('danger', 'Cannot delete row: System error.');
-                return;
-            }
-            row.remove();
+            button.closest('tr').remove();
             updateSerialNumbers();
             updateRemoveButtons();
             showAlert('success', 'Deleted material row.');
+        }
+
+        // Autocomplete functionality
+        function attachAutocomplete(input) {
+            input.addEventListener('input', function() {
+                const value = this.value.toLowerCase();
+                const suggestionsDiv = this.nextElementSibling;
+                suggestionsDiv.innerHTML = '';
+                suggestionsDiv.style.display = 'none';
+
+                if (value) {
+                    const matches = materialData.filter(mat => 
+                        mat.name.toLowerCase().includes(value)
+                    );
+                    if (matches.length > 0) {
+                        matches.forEach(mat => {
+                            const suggestion = document.createElement('div');
+                            suggestion.className = 'autocomplete-suggestion';
+                            suggestion.textContent = mat.name;
+                            suggestion.addEventListener('click', () => {
+                                this.value = mat.name;
+                                this.closest('tr').querySelector('.material-code-input').value = mat.code;
+                                this.closest('tr').querySelector('.unit-display').value = mat.unit;
+                                suggestionsDiv.style.display = 'none';
+                            });
+                            suggestionsDiv.appendChild(suggestion);
+                        });
+                        suggestionsDiv.style.display = 'block';
+                    }
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                setTimeout(() => {
+                    this.nextElementSibling.style.display = 'none';
+                }, 200);
+            });
         }
 
         // Bootstrap form validation
@@ -427,16 +344,12 @@
             const materialNames = document.getElementsByName('materialName[]');
             const materialCodes = document.getElementsByName('materialCode[]');
             const quantities = document.getElementsByName('quantity[]');
-            const parentCategories = document.getElementsByName('parentCategoryId[]');
-            const categories = document.getElementsByName('categoryId[]');
             const units = document.getElementsByName('unit[]');
             const conditions = document.getElementsByName('condition[]');
             const rows = document.querySelectorAll('#materialTableBody tr');
 
-            // Clear previous error highlights
             rows.forEach(row => row.classList.remove('error-row'));
 
-            // Validate purpose, exportId, and voucherId
             if (!exportId) {
                 showAlert('danger', 'Export ID cannot be empty.');
                 return false;
@@ -450,23 +363,12 @@
                 return false;
             }
 
-            // Validate material rows
             if (materialNames.length === 0) {
                 showAlert('danger', 'At least one material is required.');
                 return false;
             }
 
             for (let i = 0; i < materialNames.length; i++) {
-                if (!parentCategories[i].value) {
-                    showAlert('danger', `Parent category cannot be empty at row ${i + 1}`);
-                    rows[i].classList.add('error-row');
-                    return false;
-                }
-                if (!categories[i].value) {
-                    showAlert('danger', `Category cannot be empty at row ${i + 1}`);
-                    rows[i].classList.add('error-row');
-                    return false;
-                }
                 if (!materialNames[i].value.trim()) {
                     showAlert('danger', `Material name cannot be empty at row ${i + 1}`);
                     rows[i].classList.add('error-row');
@@ -496,13 +398,13 @@
             return true;
         }
 
-        // Load materials and initialize listeners
+        // Initialize
         document.addEventListener("DOMContentLoaded", () => {
             const tableBody = document.getElementById('materialTableBody');
             const addButton = document.getElementById('addMaterialBtn');
 
             if (!tableBody || !addButton) {
-                console.error('Required elements not found: materialTableBody or addMaterialBtn');
+                console.error('Required elements not found');
                 showAlert('danger', 'System error: Table or add button not found.');
                 return;
             }
@@ -514,23 +416,23 @@
                     'Accept': 'application/json'
                 }
             })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.text().then(errorText => {
-                                throw new Error(`Server error: ${response.status} - ${errorText || 'No error details'}`);
-                            });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        materialData = data;
-                        console.log('Material data loaded:', materialData); // Log data for debugging
-                        document.querySelectorAll(".parent-category-select").forEach(attachParentCategoryListener);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching materials:', error);
-                        showAlert('danger', `Failed to load material data. Error: ${error.message}`);
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(errorText => {
+                        throw new Error(`Server error: ${response.status} - ${errorText || 'No error details'}`);
                     });
+                }
+                return response.json();
+            })
+            .then(data => {
+                materialData = data;
+                console.log('Material data loaded:', materialData);
+                document.querySelectorAll(".material-name-input").forEach(attachAutocomplete);
+            })
+            .catch(error => {
+                console.error('Error fetching materials:', error);
+                showAlert('danger', `Failed to load material data. Error: ${error.message}`);
+            });
 
             // Add row event
             addButton.addEventListener('click', addMaterialRow);
@@ -542,11 +444,9 @@
                 }
             });
 
-            // Initialize serial numbers and remove button states
             updateSerialNumbers();
             updateRemoveButtons();
 
-            // Highlight error row on page load
             <c:if test="${not empty errorRow}">
                 const rows = document.querySelectorAll('#materialTableBody tr');
                 if (rows[${errorRow}]) {

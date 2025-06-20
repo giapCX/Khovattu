@@ -333,17 +333,7 @@ $(document).ready(function () {
         table.column(1).search(searchValue).draw();
     });
 
-    <c:if test="${not empty sessionScope.successMessage}">
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: '${sessionScope.successMessage}',
-            showConfirmButton: false,
-            timer: 2000,
-            customClass: { popup: 'animated fadeInDown' }
-        });
-        <% session.removeAttribute("successMessage"); %>
-    </c:if>
+    
 });
     </script>
 </body>

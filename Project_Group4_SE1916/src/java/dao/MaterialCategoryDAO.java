@@ -51,6 +51,20 @@ public class MaterialCategoryDAO {
         }
         return categories;
     }
+    
+    public List<MaterialCategory> getAllParentCategories2() throws SQLException {
+        List<MaterialCategory> categories = new ArrayList<>();
+        String sql = "SELECT category_id, name FROM MaterialCategories WHERE parent_id IS NULL";
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                MaterialCategory category = new MaterialCategory();
+                category.setCategoryId(rs.getInt("category_id"));
+                category.setName(rs.getString("name"));
+                categories.add(category);
+            }
+        }
+        return categories;
+    }
 
     public void addChildCategory(String name, int parentId) throws SQLException {
         String sql = "INSERT INTO MaterialCategories (name, parent_id) VALUES (?, ?)";

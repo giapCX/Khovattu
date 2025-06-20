@@ -3,6 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/model/ImportDetail.java</file>
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dal/DBContext.java</file>
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/model/ImportReceipt.java</file>
@@ -12,6 +13,24 @@
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/exportMaterial.jsp</file>
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dao/MaterialDAO.java</file>
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/warehouse/importData.jsp</file>
+=======
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/exportMaterial.jsp</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/model/Material.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dao/AccountDAO.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/login.jsp</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/material/listMaterial.jsp</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/user/LoginController.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/material/EditMaterialController.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ExportMaterial.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ImportWarehouseServlet.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/model/Export.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ImportHistoryServlet.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/warehouse/warehouseDashboard.jsp</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/forgetPassword/changePassword.jsp</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/material/editMaterial.jsp</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/admin/adminDashboard.jsp</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/RequestListServlet.java</file>
+>>>>>>> 4e9113ee5d8f05407ec0a3739bda2cc988e9f63f
         </group>
     </open-files>
 </project-private>
