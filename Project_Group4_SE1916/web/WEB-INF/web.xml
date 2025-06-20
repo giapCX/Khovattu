@@ -68,10 +68,7 @@
         <servlet-name>ListMaterialController</servlet-name>
         <servlet-class>controller.material.ListMaterialController</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>ImportDataController</servlet-name>
-        <servlet-class>controller.importhistory.ImportDataController</servlet-class>
-    </servlet>
+
     <servlet>
         <servlet-name>ImportHistoryServlet</servlet-name>
         <servlet-class>controller.importhistory.ImportHistoryServlet</servlet-class>
@@ -113,12 +110,8 @@
         <servlet-class>controller.material.AddParentCategoryController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ImportWarehouseServlet</servlet-name>
-        <servlet-class>controller.importhistory.ImportWarehouseServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>RequestListServlet</servlet-name>
-        <servlet-class>controller.importhistory.RequestListServlet</servlet-class>
+        <servlet-name>ImportMaterialServlet</servlet-name>
+        <servlet-class>controller.importhistory.ImportMaterialServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AddMaterialSupplier</servlet-name>
@@ -192,10 +185,7 @@
         <servlet-name>ListMaterialController</servlet-name>
         <url-pattern>/ListMaterialController</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ImportDataController</servlet-name>
-        <url-pattern>/import_data</url-pattern>
-    </servlet-mapping>
+    
     <servlet-mapping>
         <servlet-name>FilterSupplierServlet</servlet-name>
         <url-pattern>/FilterSupplierServlet</url-pattern>
@@ -237,12 +227,8 @@
         <url-pattern>/AddParentCategoryController</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ImportWarehouseServlet</servlet-name>
-        <url-pattern>/ImportWarehouseServlet</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RequestListServlet</servlet-name>
-        <url-pattern>/RequestListServlet</url-pattern>
+        <servlet-name>ImportMaterialServlet</servlet-name>
+        <url-pattern>/ImportMaterialServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AddMaterialSupplier</servlet-name>

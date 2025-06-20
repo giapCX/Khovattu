@@ -6,33 +6,53 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.io.PrintWriter;
+import com.google.gson.Gson;
+import dao.ImportDAO;
 import java.sql.SQLException;
-import Dal.DBContext;
 
 
 public class CheckVoucherIdServlet extends HttpServlet {
-    private static final String CHECK_VOUCHER_SQL = "SELECT COUNT(*) FROM ImportReceipts WHERE voucher_id = ?";
+    private static class VoucherCheckResponse {
+        boolean exists;
+        String error;
+
+        VoucherCheckResponse(boolean exists) {
+            this.exists = exists;
+            this.error = null;
+        }
+
+        VoucherCheckResponse(String error) {
+            this.exists = false;
+            this.error = error;
+        }
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String voucherId = request.getParameter("voucher_id");
-        boolean exists = false;
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
 
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(CHECK_VOUCHER_SQL)) {
-            pstmt.setString(1, voucherId);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                exists = rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        String voucherId = request.getParameter("voucher_id");
+        if (voucherId == null || voucherId.trim().isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write(gson.toJson(new VoucherCheckResponse("Mã phiếu nhập không được để trống")));
+            out.flush();
+            return;
         }
 
-        response.setContentType("application/json");
-        response.getWriter().write("{\"exists\": " + exists + "}");
+        try {
+            ImportDAO dao = new ImportDAO();
+            boolean exists = dao.voucherIdExists(voucherId);
+            out.write(gson.toJson(new VoucherCheckResponse(exists)));
+            out.flush();
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.write(gson.toJson(new VoucherCheckResponse("Lỗi cơ sở dữ liệu: " + e.getMessage())));
+            out.flush();
+            e.printStackTrace();
+        }
     }
 }

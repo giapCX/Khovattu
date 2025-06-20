@@ -1,2 +1,0 @@
-controller.importhistory.ImportResponse
-controller.importhistory.ImportWarehouseServlet
