@@ -20,12 +20,12 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             padding: 2rem;
         }
-        .form-control {
+        .form-control, .form-select {
             border-radius: 8px;
             border: 1px solid #d1d5db;
             padding: 10px;
         }
-        .form-control:focus {
+        .form-control:focus, .form-select:focus {
             border-color: #60a5fa;
             box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
         }
@@ -54,13 +54,20 @@
             <div class="alert alert-success" role="alert">${successMessage}</div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/AddParentCategoryController" method="post">
+        <form action="${pageContext.request.contextPath}/AddParentCategoryController" method="post" id="addCategoryForm">
             <div class="mb-3">
                 <label for="name" class="form-label">Category Name</label>
                 <input type="text" class="form-control" id="name" name="name" required placeholder="Enter parent category name">
             </div>
+            <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status" name="status" required>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
             <button type="submit" class="btn btn-primary">Add Category</button>
-            <a href="${pageContext.request.contextPath}/ListParentCategoryController" class="btn btn-secondary">Cancel</a>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('addCategoryForm').reset();">Cancel</button>
         </form>
     </div>
 
@@ -75,6 +82,8 @@
                 showConfirmButton: false,
                 timer: 2000,
                 customClass: { popup: 'animated fadeInDown' }
+            }).then(() => {
+                document.getElementById('addCategoryForm').reset(); // Reset form sau khi hiển thị thông báo thành công
             });
             <% session.removeAttribute("successMessage"); %>
         </c:if>

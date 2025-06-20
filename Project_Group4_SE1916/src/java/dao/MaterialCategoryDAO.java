@@ -30,7 +30,7 @@ public class MaterialCategoryDAO {
                 category.setCategoryId(rs.getInt("category_id"));
                 category.setName(rs.getString("name"));
                 category.setParentCategoryName(rs.getString("parent_category_name"));
-                category.setParentId(rs.getInt("parent_id"));  // Thêm dòng này để gán giá trị parentId
+                category.setParentId(rs.getInt("parent_id"));
                 categories.add(category);
             }
         }
@@ -39,12 +39,13 @@ public class MaterialCategoryDAO {
 
     public List<MaterialCategory> getAllParentCategories() throws SQLException {
         List<MaterialCategory> categories = new ArrayList<>();
-        String sql = "SELECT category_id, name FROM MaterialCategories WHERE parent_id IS NULL";
+        String sql = "SELECT category_id, name, status FROM MaterialCategories WHERE parent_id IS NULL";
         try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 MaterialCategory category = new MaterialCategory();
                 category.setCategoryId(rs.getInt("category_id"));
                 category.setName(rs.getString("name"));
+                category.setStatus(rs.getString("status"));
                 categories.add(category);
             }
         }
@@ -60,10 +61,11 @@ public class MaterialCategoryDAO {
         }
     }
 
-    public void addParentCategory(String name) throws SQLException {
-        String sql = "INSERT INTO MaterialCategories (name, parent_id) VALUES (?, NULL)";
+    public void addParentCategory(String name, String status) throws SQLException {
+        String sql = "INSERT INTO MaterialCategories (name, parent_id, status) VALUES (?, NULL, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
+            ps.setString(2, status);
             ps.executeUpdate();
         }
     }

@@ -27,10 +27,16 @@ public class AddParentCategoryController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String name = request.getParameter("name");
+        String status = request.getParameter("status");
 
         // Kiểm tra dữ liệu đầu vào
         if (name == null || name.trim().isEmpty()) {
             request.setAttribute("errorMessage", "Tên danh mục không được để trống!");
+            request.getRequestDispatcher("/view/material/addParentCategory.jsp").forward(request, response);
+            return;
+        }
+        if (status == null || (!status.equals("active") && !status.equals("inactive"))) {
+            request.setAttribute("errorMessage", "Trạng thái không hợp lệ!");
             request.getRequestDispatcher("/view/material/addParentCategory.jsp").forward(request, response);
             return;
         }
@@ -43,10 +49,10 @@ public class AddParentCategoryController extends HttpServlet {
                 return;
             }
 
-            // Thêm danh mục cha (parent_id = NULL)
-            categoryDAO.addParentCategory(name);
-            request.getSession().setAttribute("successMessage", "Thêm danh mục cha thành công!");
-            response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
+            // Thêm danh mục cha với trạng thái
+            categoryDAO.addParentCategory(name, status);
+            request.setAttribute("successMessage", "Thêm danh mục cha thành công!");
+            request.getRequestDispatcher("/view/material/addParentCategory.jsp").forward(request, response);
         } catch (SQLException e) {
             request.setAttribute("errorMessage", "Lỗi khi thêm danh mục: " + e.getMessage());
             request.getRequestDispatcher("/view/material/addParentCategory.jsp").forward(request, response);

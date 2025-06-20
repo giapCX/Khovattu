@@ -7,17 +7,30 @@ public class MaterialCategory {
     private String name;
     private String parentCategoryName;
     private int parentId;// Thêm thuộc tính mới
+    private String status; 
     private List<Material> materials;
 
     public MaterialCategory() {
     }
 
-    public MaterialCategory(int categoryId, String name, String parentCategoryName, List<Material> materials) {
+    public MaterialCategory(int categoryId, String name, String parentCategoryName, int parentId, String status, List<Material> materials) {
         this.categoryId = categoryId;
         this.name = name;
         this.parentCategoryName = parentCategoryName;
+        this.parentId = parentId;
+        this.status = status;
         this.materials = materials;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+   
 
     public int getCategoryId() {
         return categoryId;

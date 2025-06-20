@@ -78,6 +78,14 @@
             color: white;
             font-weight: 600;
         }
+        .status-active {
+            color: #28a745;
+            font-weight: 500;
+        }
+        .status-inactive {
+            color: #dc3545;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -97,6 +105,7 @@
                     <tr>
                         <th>#</th>
                         <th>Category Name</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -105,6 +114,7 @@
                         <tr>
                             <td>${loop.index + 1}</td>
                             <td>${cat.name}</td>
+                            <td class="${cat.status == 'active' ? 'status-active' : 'status-inactive'}">${cat.status}</td>
                             <td>
                                 <a href="${pageContext.request.contextPath}/ListMaterialController?filterParentCategory=${cat.categoryId}" 
                                    class="btn btn-sm btn-info action-btn">View Details</a>
