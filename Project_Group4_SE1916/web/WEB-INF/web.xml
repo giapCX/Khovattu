@@ -68,7 +68,6 @@
         <servlet-name>ListMaterialController</servlet-name>
         <servlet-class>controller.material.ListMaterialController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>ImportHistoryServlet</servlet-name>
         <servlet-class>controller.importhistory.ImportHistoryServlet</servlet-class>
@@ -116,6 +115,10 @@
     <servlet>
         <servlet-name>AddMaterialSupplier</servlet-name>
         <servlet-class>controller.supplier.AddMaterialSupplier</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExportHistoryServlet</servlet-name>
+        <servlet-class>controller.importhistory.ExportHistoryServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
@@ -185,7 +188,6 @@
         <servlet-name>ListMaterialController</servlet-name>
         <url-pattern>/ListMaterialController</url-pattern>
     </servlet-mapping>
-    
     <servlet-mapping>
         <servlet-name>FilterSupplierServlet</servlet-name>
         <url-pattern>/FilterSupplierServlet</url-pattern>
@@ -233,6 +235,10 @@
     <servlet-mapping>
         <servlet-name>AddMaterialSupplier</servlet-name>
         <url-pattern>/AddMaterialSupplier</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExportHistoryServlet</servlet-name>
+        <url-pattern>/exportHistoryServlet</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

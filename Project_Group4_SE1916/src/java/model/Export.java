@@ -8,7 +8,20 @@ public class Export {
     private String userId;       
     private LocalDate exportDate;
     private String note;
+    private String exporterName;
 
+    public String getExporterName() {
+        return exporterName;
+    }
+
+    public void setExporterName(String exporterName) {
+        this.exporterName = exporterName;
+    }
+
+    public Export(String exporterName) {
+        this.exporterName = exporterName;
+    }
+    
     public Export() {
     }
 
