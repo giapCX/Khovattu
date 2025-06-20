@@ -89,10 +89,6 @@
         <servlet-class>controller.importhistory.ImportHistoryDetailServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>CheckVoucherIdServlet</servlet-name>
-        <servlet-class>controller.importhistory.CheckVoucherIdServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>AddChildCategoryController</servlet-name>
         <servlet-class>controller.material.AddChildCategoryController</servlet-class>
     </servlet>
@@ -207,10 +203,6 @@
     <servlet-mapping>
         <servlet-name>ImportHistoryDetailServlet</servlet-name>
         <url-pattern>/importhistorydetail</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CheckVoucherIdServlet</servlet-name>
-        <url-pattern>/check_voucher_id</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AddChildCategoryController</servlet-name>

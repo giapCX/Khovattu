@@ -3,9 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ImportHistoryDetailServlet.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/admin/adminApprovalHistory.jsp</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ImportHistoryServlet.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/model/ImportDetail.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ImportMaterialServlet.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/WEB-INF/web.xml</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/model/Import.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dao/ImportDAO.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/model/Material.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dao/MaterialDAO.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/warehouse/importData.jsp</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/model/ImportReceipt.java</file>
         </group>
     </open-files>
 </project-private>
