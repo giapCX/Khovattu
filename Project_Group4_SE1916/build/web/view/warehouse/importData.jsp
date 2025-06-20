@@ -5,135 +5,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warehouse Import</title>
+    <title>Import Materials</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .error { color: red; }
-        .autocomplete-suggestion { padding: 8px; cursor: pointer; }
-        .autocomplete-suggestion:hover { background-color: #e9ecef; }
-        .hidden { display: none; }
+        body {
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            backdrop-filter: blur(5px);
+        }
+        h1 {
+            color: #2c3e50;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #34495e;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #6e8efb;
+            box-shadow: 0 0 5px rgba(110, 142, 251, 0.5);
+        }
+        .table {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .table th {
+            background: #6e8efb;
+            color: #fff;
+            font-weight: 600;
+        }
+        .table th:first-child {
+            width: 60px;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #6e8efb, #a777e3);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+        .btn-danger, .btn-secondary, .btn-success, .btn-info {
+            border-radius: 8px;
+        }
+        .alert {
+            margin-top: 20px;
+        }
+        .error-row {
+            background-color: #ffe6e6;
+        }
+        .btn-disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <h2 class="mb-4">Import Receipt Information</h2>
-        <form id="importForm" action="${pageContext.request.contextPath}/ImportWarehouseServlet" method="post">
-            <div class="row mb-3">
-                <label class="col-sm-2 col-form-label">Voucher ID *</label>
-                <div class="col-sm-4">
-                    <input type="text" class="form-control" id="voucher_id" name="voucher_id" required>
-                    <p id="voucherError" class="error"></p>
-                </div>
-                <label class="col-sm-2 col-form-label">Import Date *</label>
-                <div class="col-sm-4">
-                    <input type="date" class="form-control" name="import_date" required value="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>">
-                </div>
+    <div class="container">
+        <h1 class="text-center mb-4">Import Materials</h1>
+
+        <!-- Display error message if present -->
+        <c:if test="${not empty error}">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                ${error}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </c:if>
+
+        <!-- Display success message with importId if present -->
+        <c:if test="${not empty message}">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${message} <c:if test="${not empty importId}">(Import ID: ${importId})</c:if>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </c:if>
+
+        <form action="${pageContext.request.contextPath}/ImportWarehouseServlet" method="post" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="userFN" class="form-label">Importer</label>
+                <input type="text" name="userFN" class="form-control" value="${sessionScope.userFullName != null ? sessionScope.userFullName : 'Not Identified'}" readonly>
+                <input type="hidden" name="user_id" value="${sessionScope.userId != null ? sessionScope.userId : ''}">
+                <c:if test="${empty sessionScope.userFullName}">
+                    <p class="error mt-2">Not logged in or user information is missing. Please log in again.</p>
+                </c:if>
             </div>
 
-            <div class="row mb-3">
-                <label class="col-sm-2 col-form-label">Importer</label>
-                <div class="col-sm-4">
-                    <input type="text" class="form-control" value="${sessionScope.userFullName != null ? sessionScope.userFullName : 'Not specified'}" readonly>
-                    <input type="hidden" name="user_id" value="${sessionScope.userId != null ? sessionScope.userId : ''}">
-                    <c:if test="${empty sessionScope.userFullName}">
-                        <p class="error mt-2">Not logged in or user information missing. Please log in again.</p>
-                    </c:if>
-                </div>
-                <label class="col-sm-2 col-form-label">Supplier *</label>
-                <div class="col-sm-4">
-                    <select id="supplier" name="supplier_id" class="form-select" required onchange="toggleNewSupplier(this)">
-                        <option value="">-- Select Supplier --</option>
-                        <c:forEach items="${suppliers}" var="supplier">
-                            <option value="${supplier.supplierId}">${supplier.supplierName}</option>
-                        </c:forEach>
-                        <option value="new">Add New Supplier</option>
-                    </select>
-                    <div id="newSupplierFields" class="hidden mt-2">
-                        <input type="text" name="new_supplier_name" placeholder="Supplier Name" class="form-control mb-2" required>
-                        <input type="text" name="new_supplier_phone" placeholder="Phone Number" class="form-control mb-2" required>
-                        <input type="text" name="new_supplier_address" placeholder="Address" class="form-control mb-2" required>
-                        <input type="email" name="new_supplier_email" placeholder="Email" class="form-control mb-2" required>
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label for="voucherId" class="form-label">Voucher ID</label>
+                <input type="text" class="form-control" id="voucherId" name="voucher_id" required>
+                <div class="invalid-feedback">Please enter the voucher ID.</div>
             </div>
 
-            <div class="row mb-3">
-                <label class="col-sm-2 col-form-label">Note</label>
-                <div class="col-sm-10">
-                    <textarea class="form-control" name="note" rows="3" placeholder="Enter note"></textarea>
-                </div>
+            <div class="mb-3">
+                <label for="importDate" class="form-label">Import Date</label>
+                <input type="date" class="form-control" id="importDate" name="import_date" required value="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>">
+                <div class="invalid-feedback">Please select the import date.</div>
             </div>
 
-            <h3 class="mb-4">List of Imported Items</h3>
-            <table class="table table-bordered" id="importDetailsTable">
-                <thead>
-                    <tr>
-                        <th style="width: 5%">No.</th>
-                        <th style="width: 15%">Parent Category</th>
-                        <th style="width: 15%">Child Category</th>
-                        <th style="width: 15%">Material Name</th>
-                        <th style="width: 10%">Unit</th>
-                        <th style="width: 10%">Quantity</th>
-                        <th style="width: 10%">Unit Price</th>
-                        <th style="width: 10%">Total Price</th>
-                        <th style="width: 10%">Material Condition</th>
-                        <th style="width: 5%">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="importDetailsBody">
-                    <tr>
-                        <td>1</td>
-                        <td>
-                            <select class="parentCategory form-select" name="parentCategoryId[]" onchange="filterChildCategories(this)">
-                                <option value="">Select Parent Category</option>
-                                <c:forEach var="cat" items="${parentCategories}">
-                                    <option value="${cat.categoryId}">${cat.name}</option>
-                                </c:forEach>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="childCategory form-select" name="childCategoryId[]">
-                                <option value="">Select Child Category</option>
-                                <c:forEach var="cat" items="${childCategories}">
-                                    <option value="${cat.categoryId}" data-parent="${cat.parentId}">${cat.name}</option>
-                                </c:forEach>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="nameMaterial form-select" name="materialId[]">
-                                <option value="">Select Material</option>
-                                <c:forEach var="mat" items="${material}">
-                                    <option value="${mat.materialId}" data-parent="${mat.category.categoryId}" data-unit="${mat.unit}">${mat.name}</option>
-                                </c:forEach>
-                            </select>
-                        </td>
-                        <td>
-                            <input type="text" class="form-control unitMaterial" name="unit[]" readonly>
-                        </td>
-                        <td><input type="number" name="quantity[]" class="form-control quantity" value="0.00" step="0.01" min="0.01" required></td>
-                        <td><input type="number" name="price_per_unit[]" class="form-control price" value="0.00" step="0.01" min="0.01" required></td>
-                        <td class="total">0.00</td>
-                        <td>
-                            <select name="materialCondition[]" class="form-select" required>
-                                <option value="new">New</option>
-                                <option value="used">Used</option>
-                                <option value="damaged">Damaged</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteRow(this)">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="mb-3">
+                <label for="note" class="form-label">Note</label>
+                <textarea class="form-control" id="note" name="note" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Material List</label>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Parent Category</th>
+                            <th>Child Category</th>
+                            <th>Material Name</th>
+                            <th>Material Code</th>
+                            <th>Supplier</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th>Unit Price</th>
+                            <th>Total Price</th>
+                            <th>Condition</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="materialTableBody">
+                        <tr>
+                            <td class="serial-number">1</td>
+                            <td>
+                                <select class="form-select parent-category-select" name="parentCategoryId[]" required>
+                                    <option value="">Select parent category</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-select category-select" name="childCategoryId[]" required disabled>
+                                    <option value="">Select child category</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-select material-name-select" name="materialId[]" required disabled>
+                                    <option value="">-- Select material name --</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control material-code-select" name="materialCode[]" readonly>
+                            </td>
+                            <td>
+                                <select class="form-select supplier-select" name="supplierId[]" required disabled>
+                                    <option value="">-- Select supplier --</option>
+                                </select>
+                            </td>
+                            <td><input type="number" class="form-control quantity" name="quantity[]" min="0.01" step="0.01" required></td>
+                            <td><input type="text" class="form-control unit-display" name="unit[]" readonly></td>
+                            <td><input type="number" class="form-control unit-price" name="price_per_unit[]" min="0.01" step="0.01" required></td>
+                            <td class="total-price">0.00</td>
+                            <td>
+                                <select class="form-select" name="materialCondition[]" required>
+                                    <option value="">Select condition</option>
+                                    <option value="new">New</option>
+                                    <option value="used">Used</option>
+                                    <option value="damaged">Damaged</option>
+                                </select>
+                            </td>
+                            <td><button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-secondary" id="addMaterialBtn">Add Material</button>
+            </div>
+
             <div class="text-end mb-3">
-                <button type="button" class="btn btn-primary" onclick="addRow()">Add Row</button>
-                <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
                 <button type="button" class="btn btn-success" onclick="printReceipt()">Print Receipt</button>
-                <button type="button" class="btn btn-warning" onclick="goBack()">Back</button>
             </div>
+
             <div class="row">
                 <div class="col-sm-6">
                     <p>Total Rows: <span id="totalItems">1</span></p>
@@ -143,208 +200,370 @@
                     <p>Total Amount: <span id="totalAmount">0.00</span> VND</p>
                 </div>
             </div>
-            <div class="text-end mt-3">
-                <button type="submit" class="btn btn-primary">Save Import Receipt</button>
-            </div>
+
+            <button type="submit" class="btn btn-primary">Save Import Receipt</button>
+            <button type="reset" class="btn btn-info">Reset</button>
+            <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn btn-secondary">Back to Dashboard</a>
         </form>
-        <c:if test="${param.success == 'true'}">
-            <div class="alert alert-success mt-3" role="alert">
-                Import receipt saved successfully!
-                <a href="${pageContext.request.contextPath}/download_csv?voucher_id=${param.voucher_id}" class="btn btn-info btn-sm ms-2">Download CSV</a>
-            </div>
-        </c:if>
-        <c:if test="${not empty error}">
-            <div class="alert alert-danger mt-3" role="alert">${error}</div>
-        </c:if>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#voucher_id').on('blur', function() {
-                var voucherId = $(this).val();
-                if (voucherId) {
-                    $.ajax({
-                        url: '${pageContext.request.contextPath}/check_voucher_id',
-                        type: 'POST',
-                        data: { voucher_id: voucherId },
-                        success: function(response) {
-                            var data = JSON.parse(response);
-                            if (data.exists) {
-                                $('#voucherError').text('Voucher ID already exists.');
-                                $('#voucher_id').addClass('is-invalid');
-                            } else {
-                                $('#voucherError').text('');
-                                $('#voucher_id').removeClass('is-invalid');
-                            }
-                        }
-                    });
-                }
-            });
+        let materialData = [];
 
-            window.addRow = function() {
-                var table = document.getElementById("importDetailsBody");
-                var row = table.rows[0].cloneNode(true);
-                row.querySelectorAll('input[type="number"]').forEach(input => input.value = '0.00');
-                row.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
-                row.querySelector('.unitMaterial').value = '';
-                table.appendChild(row);
-                updateRowNumbers();
-                updateTotals();
-            };
+        // Function to attach event listeners to parent category select
+        function attachParentCategoryListener(parentCategorySelect) {
+            parentCategorySelect.addEventListener("change", function () {
+                const selectedParentCategoryId = this.value;
+                const row = this.closest("tr");
+                const categorySelect = row.querySelector(".category-select");
+                const nameSelect = row.querySelector(".material-name-select");
+                const codeInput = row.querySelector(".material-code-select");
+                const supplierSelect = row.querySelector(".supplier-select");
+                const unitInput = row.querySelector(".unit-display");
+                const unitPriceInput = row.querySelector(".unit-price");
+                const totalPriceCell = row.querySelector(".total-price");
 
-            window.deleteRow = function(button) {
-                var row = button.parentNode.parentNode;
-                row.parentNode.removeChild(row);
-                updateRowNumbers();
-                updateTotals();
-            };
+                // Reset
+                categorySelect.innerHTML = '<option value="">Select child category</option>';
+                nameSelect.innerHTML = '<option value="">-- Select material name --</option>';
+                codeInput.value = '';
+                supplierSelect.innerHTML = '<option value="">-- Select supplier --</option>';
+                unitInput.value = '';
+                unitPriceInput.value = '0.00';
+                totalPriceCell.textContent = '0.00';
+                categorySelect.disabled = !selectedParentCategoryId;
+                nameSelect.disabled = true;
+                codeInput.disabled = true;
+                supplierSelect.disabled = true;
+                unitPriceInput.disabled = true;
 
-            function updateRowNumbers() {
-                var rows = document.getElementById("importDetailsBody").rows;
-                for (var i = 0; i < rows.length; i++) {
-                    rows[i].cells[0].innerHTML = i + 1;
-                }
-                document.getElementById("totalItems").innerText = rows.length;
-            }
+                if (!selectedParentCategoryId) return;
 
-            function updateTotals() {
-                var rows = document.getElementById("importDetailsBody").rows;
-                var totalQuantity = 0;
-                var totalAmount = 0;
+                // Filter subcategories based on parentCategoryId
+                const childCategories = materialData
+                    .filter(mat => mat.category && mat.category.parentId == selectedParentCategoryId)
+                    .map(mat => ({ categoryId: mat.category.categoryId, name: mat.category.name }))
+                    .reduce((unique, item) => {
+                        if (!unique.some(cat => cat.categoryId === item.categoryId)) unique.push(item);
+                        return unique;
+                    }, []);
 
-                for (var i = 0; i < rows.length; i++) {
-                    var quantity = parseFloat(rows[i].cells[5].getElementsByTagName("input")[0].value) || 0;
-                    var price = parseFloat(rows[i].cells[6].getElementsByTagName("input")[0].value) || 0;
-                    var total = quantity * price;
-                    rows[i].cells[7].innerHTML = total.toFixed(2);
-                    totalQuantity += quantity;
-                    totalAmount += total;
-                }
-
-                document.getElementById("totalQuantity").innerText = totalQuantity.toFixed(2);
-                document.getElementById("totalAmount").innerText = totalAmount.toFixed(2);
-            }
-
-            window.resetForm = function() {
-                document.getElementById("importForm").reset();
-                document.getElementById("importDetailsBody").innerHTML = `
-                    <tr>
-                        <td>1</td>
-                        <td>
-                            <select class="parentCategory form-select" name="parentCategoryId[]" onchange="filterChildCategories(this)">
-                                <option value="">Select Parent Category</option>
-                                <c:forEach var="cat" items="${parentCategories}">
-                                    <option value="${cat.categoryId}">${cat.name}</option>
-                                </c:forEach>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="childCategory form-select" name="childCategoryId[]">
-                                <option value="">Select Child Category</option>
-                                <c:forEach var="cat" items="${childCategories}">
-                                    <option value="${cat.categoryId}" data-parent="${cat.parentId}">${cat.name}</option>
-                                </c:forEach>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="nameMaterial form-select" name="materialId[]">
-                                <option value="">Select Material</option>
-                                <c:forEach var="mat" items="${material}">
-                                    <option value="${mat.materialId}" data-parent="${mat.category.categoryId}" data-unit="${mat.unit}">${mat.name}</option>
-                                </c:forEach>
-                            </select>
-                        </td>
-                        <td>
-                            <input type="text" class="form-control unitMaterial" name="unit[]" readonly>
-                        </td>
-                        <td><input type="number" name="quantity[]" class="form-control quantity" value="0.00" step="0.01" min="0.01" required></td>
-                        <td><input type="number" name="price_per_unit[]" class="form-control price" value="0.00" step="0.01" min="0.01" required></td>
-                        <td class="total">0.00</td>
-                        <td>
-                            <select name="materialCondition[]" class="form-select" required>
-                                <option value="new">New</option>
-                                <option value="used">Used</option>
-                                <option value="damaged">Damaged</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteRow(this)">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                updateRowNumbers();
-                updateTotals();
-            };
-
-            window.printReceipt = function() {
-                window.print();
-            };
-
-            window.goBack = function() {
-                window.history.back();
-            };
-
-            window.toggleNewSupplier = function(select) {
-                var newSupplierFields = document.getElementById('newSupplierFields');
-                newSupplierFields.classList.toggle('hidden', select.value !== 'new');
-                if (select.value === 'new') {
-                    newSupplierFields.querySelectorAll('input').forEach(input => input.value = '');
-                }
-            };
-
-            function filterChildCategories(select) {
-                const parentId = select.value;
-                const row = select.closest('tr');
-                const childSelect = row.querySelector('.childCategory');
-                childSelect.value = '';
-                childSelect.querySelectorAll('option').forEach(option => {
-                    option.style.display = option.getAttribute('data-parent') == parentId ? '' : 'none';
+                childCategories.forEach(cat => {
+                    categorySelect.add(new Option(cat.name, cat.categoryId));
                 });
-                row.querySelector('.nameMaterial').value = '';
-                row.querySelector('.unitMaterial').value = '';
+
+                // Attach event for categorySelect
+                categorySelect.onchange = function () {
+                    const selectedCategoryId = this.value;
+                    nameSelect.innerHTML = '<option value="">-- Select material name --</option>';
+                    codeInput.value = '';
+                    supplierSelect.innerHTML = '<option value="">-- Select supplier --</option>';
+                    unitInput.value = '';
+                    unitPriceInput.value = '0.00';
+                    totalPriceCell.textContent = '0.00';
+                    nameSelect.disabled = !selectedCategoryId;
+                    codeInput.disabled = !selectedCategoryId;
+                    supplierSelect.disabled = !selectedCategoryId;
+                    unitPriceInput.disabled = !selectedCategoryId;
+
+                    if (!selectedCategoryId) return;
+
+                    const filteredMaterials = materialData.filter(mat => mat.category && mat.category.categoryId == selectedCategoryId);
+
+                    if (filteredMaterials.length > 0) {
+                        filteredMaterials.forEach(mat => {
+                            nameSelect.add(new Option(mat.name, mat.materialId));
+                            if (mat.supplier) {
+                                supplierSelect.add(new Option(mat.supplier.supplierName, mat.supplier.supplierId));
+                            }
+                        });
+
+                        const updateDetails = () => {
+                            const selectedMaterial = filteredMaterials.find(m => m.materialId == nameSelect.value);
+                            if (selectedMaterial) {
+                                codeInput.value = selectedMaterial.code;
+                                unitInput.value = selectedMaterial.unit;
+                                unitPriceInput.value = selectedMaterial.pricePerUnit || '0.00';
+                                updateTotalPrice(row);
+                            }
+                        };
+
+                        nameSelect.onchange = updateDetails;
+                        supplierSelect.onchange = updateDetails;
+                    }
+                };
+            });
+        }
+
+        // Update serial numbers for No. column
+        function updateSerialNumbers() {
+            const rows = document.querySelectorAll('#materialTableBody tr');
+            rows.forEach((row, index) => {
+                const serialCell = row.querySelector('.serial-number');
+                if (serialCell) serialCell.textContent = index + 1;
+            });
+        }
+
+        // Update remove button states
+        function updateRemoveButtons() {
+            const rows = document.querySelectorAll('#materialTableBody tr');
+            const removeButtons = document.querySelectorAll('.remove-row');
+            const isSingleRow = rows.length === 1;
+            removeButtons.forEach(button => {
+                button.disabled = isSingleRow;
+                button.classList.toggle('btn-disabled', isSingleRow);
+            });
+        }
+
+        // Add new material row
+        function addMaterialRow() {
+            const tableBody = document.getElementById('materialTableBody');
+            if (!tableBody) {
+                console.error('Table body with ID "materialTableBody" not found.');
+                return;
+            }
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="serial-number"></td>
+                <td>
+                    <select class="form-select parent-category-select" name="parentCategoryId[]" required>
+                        <option value="">Select parent category</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select category-select" name="childCategoryId[]" required disabled>
+                        <option value="">Select child category</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select material-name-select" name="materialId[]" required disabled>
+                        <option value="">-- Select material name --</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="form-control material-code-select" name="materialCode[]" readonly>
+                </td>
+                <td>
+                    <select class="form-select supplier-select" name="supplierId[]" required disabled>
+                        <option value="">-- Select supplier --</option>
+                    </select>
+                </td>
+                <td><input type="number" class="form-control quantity" name="quantity[]" min="0.01" step="0.01" required></td>
+                <td><input type="text" class="form-control unit-display" name="unit[]" readonly></td>
+                <td><input type="number" class="form-control unit-price" name="price_per_unit[]" min="0.01" step="0.01" required></td>
+                <td class="total-price">0.00</td>
+                <td>
+                    <select class="form-select" name="materialCondition[]" required>
+                        <option value="">Select condition</option>
+                        <option value="new">New</option>
+                        <option value="used">Used</option>
+                        <option value="damaged">Damaged</option>
+                    </select>
+                </td>
+                <td><button type="button" class="btn btn-danger btn-sm remove-row">Delete</button></td>
+            `;
+            tableBody.appendChild(row);
+            attachParentCategoryListener(row.querySelector('.parent-category-select'));
+            updateSerialNumbers();
+            updateRemoveButtons();
+            updateTotals();
+        }
+
+        // Remove material row
+        function removeRow(button) {
+            const rows = document.querySelectorAll('#materialTableBody tr');
+            if (rows.length <= 1) return;
+            const row = button.closest('tr');
+            if (!row) return;
+            row.remove();
+            updateSerialNumbers();
+            updateRemoveButtons();
+            updateTotals();
+        }
+
+        // Update total price for a row
+        function updateTotalPrice(row) {
+            const quantityInput = row.querySelector('.quantity');
+            const unitPriceInput = row.querySelector('.unit-price');
+            const totalPriceCell = row.querySelector('.total-price');
+            const quantity = parseFloat(quantityInput.value) || 0;
+            const unitPrice = parseFloat(unitPriceInput.value) || 0;
+            totalPriceCell.textContent = (quantity * unitPrice).toFixed(2);
+            updateTotals();
+        }
+
+        // Update totals for all rows
+        function updateTotals() {
+            let totalQuantity = 0;
+            let totalAmount = 0;
+            const rows = document.querySelectorAll('#materialTableBody tr');
+            rows.forEach(row => {
+                const quantityInput = row.querySelector('.quantity');
+                const unitPriceInput = row.querySelector('.unit-price');
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const unitPrice = parseFloat(unitPriceInput.value) || 0;
+                const total = quantity * unitPrice;
+                row.querySelector('.total-price').textContent = total.toFixed(2);
+                totalQuantity += quantity;
+                totalAmount += total;
+            });
+            document.getElementById('totalItems').textContent = rows.length;
+            document.getElementById('totalQuantity').textContent = totalQuantity.toFixed(2);
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+        }
+
+        // Bootstrap form validation
+        (function () {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity() || !validateForm()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+
+        // Client-side form validation
+        function validateForm() {
+            const voucherId = document.getElementById('voucherId').value.trim();
+            const importDate = document.getElementById('importDate').value.trim();
+            const materialIds = document.getElementsByName('materialId[]');
+            const quantities = document.getElementsByName('quantity[]');
+            const unitPrices = document.getElementsByName('price_per_unit[]');
+            const units = document.getElementsByName('unit[]');
+            const conditions = document.getElementsByName('materialCondition[]');
+            const rows = document.querySelectorAll('#materialTableBody tr');
+
+            // Clear previous error highlights
+            rows.forEach(row => row.classList.remove('error-row'));
+
+            if (!voucherId) {
+                alert('Voucher ID cannot be empty.');
+                return false;
+            }
+            if (!importDate) {
+                alert('Import date cannot be empty.');
+                return false;
             }
 
-            document.addEventListener('change', function(e) {
-                if (e.target.classList.contains('parentCategory')) {
-                    filterChildCategories(e.target);
+            if (materialIds.length === 0) {
+                alert('At least one material is required.');
+                return false;
+            }
+
+            for (let i = 0; i < materialIds.length; i++) {
+                if (!materialIds[i].value.trim()) {
+                    alert(`Material name cannot be empty at row ${i + 1}`);
+                    rows[i].classList.add('error-row');
+                    return false;
                 }
-                if (e.target.classList.contains('childCategory')) {
-                    const childId = e.target.value;
-                    const row = e.target.closest('tr');
-                    const materialSelect = row.querySelector('.nameMaterial');
-                    const unitInput = row.querySelector('.unitMaterial');
-                    materialSelect.value = '';
-                    unitInput.value = '';
-                    materialSelect.querySelectorAll('option').forEach(option => {
-                        option.style.display = option.getAttribute('data-parent') == childId ? '' : 'none';
+                if (!quantities[i].value || quantities[i].value <= 0) {
+                    alert(`Quantity must be greater than 0 at row ${i + 1}`);
+                    rows[i].classList.add('error-row');
+                    return false;
+                }
+                if (!unitPrices[i].value || unitPrices[i].value <= 0) {
+                    alert(`Unit price must be greater than 0 at row ${i + 1}`);
+                    rows[i].classList.add('error-row');
+                    return false;
+                }
+                if (!units[i].value) {
+                    alert(`Unit cannot be empty at row ${i + 1}`);
+                    rows[i].classList.add('error-row');
+                    return false;
+                }
+                if (!conditions[i].value) {
+                    alert(`Condition cannot be empty at row ${i + 1}`);
+                    rows[i].classList.add('error-row');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Load materials and initialize listeners
+        document.addEventListener("DOMContentLoaded", () => {
+            const tableBody = document.getElementById('materialTableBody');
+            const addButton = document.getElementById('addMaterialBtn');
+
+            if (!tableBody || !addButton) {
+                console.error('Required elements not found.');
+                return;
+            }
+
+            // Fetch materials
+            fetch('${pageContext.request.contextPath}/ImportWarehouseServlet', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                materialData = data;
+                console.log('Material data loaded:', materialData);
+
+                // Populate parent categories dynamically
+                const parentSelects = document.querySelectorAll('.parent-category-select');
+                const uniqueParentCategories = [...new Set(materialData.map(mat => mat.category.parentId))];
+                uniqueParentCategories.forEach(parentId => {
+                    const parentCat = materialData.find(mat => mat.category.parentId === parentId).category;
+                    parentSelects.forEach(select => {
+                        select.add(new Option(parentCat.name, parentCat.parentId));
                     });
-                }
-                if (e.target.classList.contains('nameMaterial')) {
-                    const materialId = e.target.value;
-                    const row = e.target.closest('tr');
-                    const unitInput = row.querySelector('.unitMaterial');
-                    const selectedOption = e.target.selectedOptions[0];
-                    unitInput.value = selectedOption ? selectedOption.getAttribute('data-unit') : '';
-                }
-                if (e.target.classList.contains('quantity') || e.target.classList.contains('price')) {
-                    updateTotals();
+                });
+
+                document.querySelectorAll(".parent-category-select").forEach(attachParentCategoryListener);
+            })
+            .catch(error => {
+                console.error('Error fetching materials:', error);
+                alert(`Failed to load material data. Error: ${error.message}`);
+            });
+
+            // Add row event
+            addButton.addEventListener('click', addMaterialRow);
+
+            // Remove row event
+            tableBody.addEventListener('click', (event) => {
+                if (event.target.classList.contains('remove-row')) {
+                    removeRow(event.target);
                 }
             });
 
-            document.getElementById("importDetailsBody").addEventListener("input", updateTotals);
+            // Initialize serial numbers and remove button states
+            updateSerialNumbers();
+            updateRemoveButtons();
 
-            $('#importForm').on('submit', function(e) {
-                if ($('#voucher_id').hasClass('is-invalid')) {
-                    e.preventDefault();
-                    alert('Please correct the duplicate voucher ID.');
+            // Add event listener for quantity and unit price changes
+            tableBody.addEventListener('input', function(e) {
+                if (e.target.classList.contains('quantity') || e.target.classList.contains('unit-price')) {
+                    updateTotalPrice(e.target.closest('tr'));
                 }
             });
 
-            updateTotals();
+            // Highlight error row on page load
+            <c:if test="${not empty errorRow}">
+                const rows = document.querySelectorAll('#materialTableBody tr');
+                if (rows[${errorRow}]) {
+                    rows[${errorRow}].classList.add('error-row');
+                }
+            </c:if>
         });
+
+        // Print receipt function
+        function printReceipt() {
+            window.print();
+        }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
