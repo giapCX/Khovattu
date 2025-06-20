@@ -48,7 +48,7 @@
                         </button>
                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">List Material Of Supplier</h2>
                     </div>
-                    <a href="${pageContext.request.contextPath}/AddMaterialForSupplierServlet" class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
+                    <a href="AddMaterialSupplier?supplierId=${supplierId}" class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
                         <i class="fas fa-plus-circle mr-2"></i> Add material for supplier: "${supplierName}"
                     </a>
                 </div>
