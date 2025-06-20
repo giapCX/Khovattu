@@ -57,9 +57,7 @@
                 <form action="FilterSupplierServlet" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
                     <input type="hidden" name="supplierName" value="${supplierName}" />
                     <input type="hidden" name="supplierId" value="${supplierId}" />
-                    <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchCategory" placeholder="Search category"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                    </div>
+                    <input type="hidden" name="searchCategory" />
                     <div class="flex-1 min-w-[200px]">
                         <input type="text" name="searchName" placeholder="Search name of material"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
@@ -73,7 +71,8 @@
                         <table class="w-full table-auto">
                             <thead>
                                 <tr class="bg-primary-600 text-white">
-                                    <th class="p-4 text-left">Category Name</th>
+                                    <th class="p-4 text-left">Parent Category Name</th>
+                                    <th class="p-4 text-left">Child Category Name</th>
                                     <th class="p-4 text-left">Code of material</th>
                                     <th class="p-4 text-left">Material Name</th>
                                     <th class="p-4 text-left">Description</th>
@@ -88,6 +87,7 @@
                                     <c:when test="${not empty materials}">
                                         <c:forEach var="item" items="${materials}">
                                             <tr class="border-b border-gray-200 dark:border-gray-700">
+                                                <td class="p-4 font-medium">${item.category.parentCategoryName}</td>
                                                 <td class="p-4 font-medium">${item.category.name}</td>
                                                 <td class="p-4 font-medium">${item.code}</td>
                                                 <td class="p-4 font-medium">${item.name}</td>

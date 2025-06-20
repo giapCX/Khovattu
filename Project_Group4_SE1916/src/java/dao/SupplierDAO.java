@@ -346,72 +346,71 @@ public class SupplierDAO {
         return 0; // Nếu không có vật tư nào thỏa mãn điều kiện
     }
 
-    public List<Material> searchMaterialOfSuppliersBySupplierIdCategoryNameMaterialNameWithPaging(
-            int supplierId, String categoryName, String materialName,
-            int offset, int recordsPerPage) throws SQLException {
+    public List<Material> searchMaterialOfSuppliersBySupplierIdCategoryNameMaterialNameWithPaging( 
+        int supplierId, String categoryName, String materialName,
+        int offset, int recordsPerPage) throws SQLException {
 
-        // Xây dựng câu truy vấn SQL
-        StringBuilder sql = new StringBuilder(
-                "SELECT DISTINCT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, "
-                + "mc.category_id, mc.name AS category_name "
-                + "FROM Materials m "
-                + "JOIN SupplierMaterials sm ON m.material_id = sm.material_id "
-                + "JOIN MaterialCategories mc ON m.category_id = mc.category_id "
-                + "WHERE sm.supplier_id = ? "
-        );
+    StringBuilder sql = new StringBuilder(
+        "SELECT DISTINCT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, "
+      + "mc.category_id, mc.name AS category_name, "
+      + "mc.parent_id, mc2.name AS parent_category_name "
+      + "FROM Materials m "
+      + "JOIN SupplierMaterials sm ON m.material_id = sm.material_id "
+      + "JOIN MaterialCategories mc ON m.category_id = mc.category_id "
+      + "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id "
+      + "WHERE sm.supplier_id = ? "
+    );
 
-        List<Object> params = new ArrayList<>();
-        params.add(supplierId);
+    List<Object> params = new ArrayList<>();
+    params.add(supplierId);
 
-        // Kiểm tra categoryName và thêm điều kiện lọc
-        if (categoryName != null && !categoryName.trim().isEmpty()) {
-            sql.append(" AND mc.name LIKE ? ");
-            params.add("%" + categoryName.trim() + "%");
-        }
-
-        // Kiểm tra materialName và thêm điều kiện lọc
-        if (materialName != null && !materialName.trim().isEmpty()) {
-            sql.append(" AND m.name LIKE ? ");
-            params.add("%" + materialName.trim() + "%");
-        }
-
-        // Thêm phân trang vào câu truy vấn SQL
-        sql.append(" ORDER BY m.material_id LIMIT ? OFFSET ? ");
-        params.add(recordsPerPage);
-        params.add(offset);
-
-        List<Material> materials = new ArrayList<>();
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-            // Thiết lập các tham số cho PreparedStatement
-            for (int i = 0; i < params.size(); i++) {
-                stmt.setObject(i + 1, params.get(i));
-            }
-
-            // Thực thi truy vấn và xử lý kết quả
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Material material = new Material();
-                    material.setMaterialId(rs.getInt("material_id"));
-                    material.setCode(rs.getString("code"));
-                    material.setName(rs.getString("name"));
-                    material.setDescription(rs.getString("description"));
-                    material.setUnit(rs.getString("unit"));
-                    material.setImageUrl(rs.getString("image_url"));
-
-                    // Lấy thông tin danh mục vật liệu
-                    MaterialCategory category = new MaterialCategory();
-                    category.setCategoryId(rs.getInt("category_id"));
-                    category.setName(rs.getString("category_name"));
-                    material.setCategory(category);
-
-                    materials.add(material);
-                }
-            }
-        }
-
-        return materials;
+    if (categoryName != null && !categoryName.trim().isEmpty()) {
+        sql.append(" AND mc.name LIKE ? ");
+        params.add("%" + categoryName.trim() + "%");
     }
+
+    if (materialName != null && !materialName.trim().isEmpty()) {
+        sql.append(" AND m.name LIKE ? ");
+        params.add("%" + materialName.trim() + "%");
+    }
+
+    sql.append(" ORDER BY m.material_id LIMIT ? OFFSET ? ");
+    params.add(recordsPerPage);
+    params.add(offset);
+
+    List<Material> materials = new ArrayList<>();
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+        for (int i = 0; i < params.size(); i++) {
+            stmt.setObject(i + 1, params.get(i));
+        }
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Material material = new Material();
+                material.setMaterialId(rs.getInt("material_id"));
+                material.setCode(rs.getString("code"));
+                material.setName(rs.getString("name"));
+                material.setDescription(rs.getString("description"));
+                material.setUnit(rs.getString("unit"));
+                material.setImageUrl(rs.getString("image_url"));
+
+                MaterialCategory category = new MaterialCategory();
+                category.setCategoryId(rs.getInt("category_id"));
+                category.setName(rs.getString("category_name"));
+                category.setParentId(rs.getInt("parent_id"));
+                category.setParentCategoryName(rs.getString("parent_category_name"));
+
+                material.setCategory(category);
+
+                materials.add(material);
+            }
+        }
+    }
+
+    return materials;
+}
+
 
     // Thêm phương thức kiểm tra nhà cung cấp tồn tại theo ID
     public boolean supplierExists(int supplierId) throws SQLException {
