@@ -120,6 +120,10 @@
         <servlet-name>RequestListServlet</servlet-name>
         <servlet-class>controller.importhistory.RequestListServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AddMaterialSupplier</servlet-name>
+        <servlet-class>controller.supplier.AddMaterialSupplier</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -239,6 +243,10 @@
     <servlet-mapping>
         <servlet-name>RequestListServlet</servlet-name>
         <url-pattern>/RequestListServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddMaterialSupplier</servlet-name>
+        <url-pattern>/AddMaterialSupplier</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

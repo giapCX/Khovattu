@@ -10,8 +10,8 @@ import model.Supplier;
 import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import model.ImportDetail;
-import model.ImportReceipt;
+
+
 
 public class SupplierDAO {
 
@@ -441,4 +441,32 @@ public class SupplierDAO {
         }
         return false;
     }
+    public void addMaterialsToSupplier(int supplierId, List<Integer> materialIds) throws SQLException {
+    String sql = "INSERT INTO SupplierMaterials (supplier_id, material_id) VALUES (?, ?)";
+
+    try (Connection conn = DBContext.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        for (int materialId : materialIds) {
+            ps.setInt(1, supplierId);
+            ps.setInt(2, materialId);
+            ps.addBatch();
+        }
+
+        ps.executeBatch();
+    }
+}
+    public boolean isMaterialAlreadyExists(int supplierId, int materialId) throws SQLException {
+    String sql = "SELECT COUNT(*) FROM SupplierMaterials WHERE supplier_id = ? AND material_id = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, supplierId);
+        stmt.setInt(2, materialId);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+    }
+    return false;
+}
 }
