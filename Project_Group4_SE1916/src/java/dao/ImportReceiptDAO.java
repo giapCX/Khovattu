@@ -122,8 +122,8 @@ public ImportReceipt getReceiptById(int importId) {
             receipt.setImportDate(rs.getDate("import_date"));
             receipt.setNote(rs.getString("note"));
             receipt.setTotal(rs.getDouble("total"));
-            receipt.setImporterName(rs.getString("importer_name"));
-            receipt.setSupplierName(rs.getString("supplier_name"));
+            receipt.setImporterName(rs.getString("importer_name")); // Sử dụng phương thức mới
+            receipt.setSupplierName(rs.getString("supplier_name")); // Sử dụng phương thức mới
         }
     } catch (SQLException e) {
         e.printStackTrace();

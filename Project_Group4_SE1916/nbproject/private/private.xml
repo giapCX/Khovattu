@@ -3,30 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/user/AddUserServlet.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/CheckVoucherIdServlet.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/user/EditUserServlet.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ImportHistoryDetailServlet.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/auth/ForgetPassword.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/admin/adminApprovalHistory.jsp</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ImportWarehouseServlet.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/user/UserProfileController.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/warehouse/warehouseDashboard.jsp</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/mail/SendMail.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/user/LoginController.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/auth/ChangePasswordByForget.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/material/AddChildCategoryController.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/supplier/addSupplier.jsp</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/user/LogoutController.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/model/ImportDetail.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dal/DBContext.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/model/ImportReceipt.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dao/ImportReceiptDAO.java</file>
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dao/ImportDAO.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dao/SupplierDAO.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/auth/VerifyCode.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ImportHistoryServlet.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/RequestListServlet.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ExportMaterial.java</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/user/ListUserServlet.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ImportWarehouseServlet.java</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/exportMaterial.jsp</file>
+            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/dao/MaterialDAO.java</file>
             <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/web/view/warehouse/importData.jsp</file>
-            <file>file:/D:/SWP391/Khovattu/Project_Group4_SE1916/src/java/controller/auth/ChangePassword.java</file>
         </group>
     </open-files>
 </project-private>

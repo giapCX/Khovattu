@@ -3,12 +3,13 @@ package controller.importhistory;
 import Dal.DBContext;
 import com.google.gson.Gson;
 import dao.ImportDAO;
-import dao.MaterialCategoryDAO;
 import dao.MaterialDAO;
-import dao.SupplierDAO;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -20,13 +21,7 @@ import java.util.List;
 import model.ImportDetail;
 import model.ImportReceipt;
 import model.Material;
-import model.MaterialCategory;
-import model.Supplier;
 
-/**
- *
- * @author Admin
- */
 public class ImportWarehouseServlet extends HttpServlet {
 
     @Override
@@ -35,28 +30,28 @@ public class ImportWarehouseServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            
             MaterialDAO materialDAO = new MaterialDAO();
             List<Material> materials = materialDAO.getAllMaterials();
+            for (Material m : materials) {
+                System.out.println("Material ID: " + m.getMaterialId() + ", Suppliers: " + m.getSuppliers());
+            }
             Gson gson = new Gson();
             String json = gson.toJson(materials);
             out.print(json);
             out.flush();
         } catch (SQLException e) {
-            
+            System.err.println("ImportWarehouseServlet: SQL error in doGet: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Database error: " + e.getMessage() + "\"}");
         }
     }
 
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String errorMessage = null;
-        Integer errorRow = null; // To store the index of the invalid row
+        Integer errorRow = null;
 
-        // Get input parameters
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
         String voucherId = request.getParameter("voucher_id");
@@ -65,121 +60,125 @@ public class ImportWarehouseServlet extends HttpServlet {
         String[] quantities = request.getParameterValues("quantity[]");
         String[] prices = request.getParameterValues("price_per_unit[]");
         String[] materialConditions = request.getParameterValues("materialCondition[]");
-        Integer supplierId = request.getParameter("supplier_id") != null && !request.getParameter("supplier_id").equals("new")
-                ? Integer.parseInt(request.getParameter("supplier_id")) : null;
-        String newSupplierName = request.getParameter("new_supplier_name");
-        String newSupplierPhone = request.getParameter("new_supplier_phone");
-        String newSupplierAddress = request.getParameter("new_supplier_address");
-        String newSupplierEmail = request.getParameter("new_supplier_email");
+        String[] supplierIds = request.getParameterValues("supplierId[]");
         String note = request.getParameter("note");
 
-        // Validate inputs for null or empty
+        System.out.println("ImportWarehouseServlet: Received data - voucherId: " + voucherId + ", userId: " + userId +
+                ", supplierIds: " + (supplierIds != null ? String.join(",", supplierIds) : "null"));
+
         if (voucherId == null || voucherId.trim().isEmpty()) {
-            errorMessage = "Voucher ID cannot be empty.";
+            errorMessage = "Voucher ID is missing or empty.";
+            System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
             sendErrorResponse(response, errorMessage);
             return;
         }
         if (importDateStr == null || importDateStr.trim().isEmpty()) {
             errorMessage = "Import date cannot be empty.";
+            System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
             sendErrorResponse(response, errorMessage);
             return;
         }
         if (materialIds == null || materialIds.length == 0 || isArrayEmpty(materialIds)) {
             errorMessage = "Material ID list cannot be empty.";
+            System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
             sendErrorResponse(response, errorMessage);
             return;
         }
         if (quantities == null || quantities.length == 0 || isArrayEmpty(quantities)) {
             errorMessage = "Quantity list cannot be empty.";
+            System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
             sendErrorResponse(response, errorMessage);
             return;
         }
         if (prices == null || prices.length == 0 || isArrayEmpty(prices)) {
             errorMessage = "Price list cannot be empty.";
+            System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
             sendErrorResponse(response, errorMessage);
             return;
         }
         if (materialConditions == null || materialConditions.length == 0 || isArrayEmpty(materialConditions)) {
             errorMessage = "Condition list cannot be empty.";
+            System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
             sendErrorResponse(response, errorMessage);
             return;
         }
-        if (supplierId == null && (newSupplierName == null || newSupplierName.trim().isEmpty())) {
-            errorMessage = "Supplier information is required.";
+        if (supplierIds == null || supplierIds.length == 0 || isArrayEmpty(supplierIds)) {
+            errorMessage = "Supplier list cannot be empty.";
+            System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
             sendErrorResponse(response, errorMessage);
             return;
         }
-
-        // Validate array lengths
-        if (materialIds.length != quantities.length || materialIds.length != prices.length || materialIds.length != materialConditions.length) {
-            errorMessage = "Material IDs, quantities, prices, and conditions are not synchronized.";
-            sendErrorResponse(response, errorMessage);
-            return;
-        }
-
-        // Validate userId
         if (userId == null) {
-            errorMessage = "User ID cannot be empty.";
+            errorMessage = "User ID cannot be empty. Please log in again.";
+            System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
+            sendErrorResponse(response, errorMessage);
+            return;
+        }
+
+        if (materialIds.length != quantities.length || materialIds.length != prices.length
+                || materialIds.length != materialConditions.length || materialIds.length != supplierIds.length) {
+            errorMessage = "Material IDs, quantities, prices, conditions, and suppliers are not synchronized.";
+            System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
             sendErrorResponse(response, errorMessage);
             return;
         }
 
         try (Connection conn = DBContext.getConnection()) {
+            conn.setAutoCommit(false); // Start transaction
+            conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE); // Prevent race conditions
             ImportDAO importDAO = new ImportDAO(conn);
 
-            // Check if voucherId exists
             if (importDAO.voucherIdExists(voucherId)) {
-                errorMessage = "Voucher ID already exists.";
+                conn.rollback();
+                errorMessage = "Voucher ID '" + voucherId + "' already exists in the system. Please use a different ID.";
+                System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
                 sendErrorResponse(response, errorMessage);
                 return;
             }
 
-            // Create ImportReceipt object
             ImportReceipt receipt = new ImportReceipt();
             receipt.setVoucherId(voucherId);
             receipt.setUserId(userId);
             try {
                 receipt.setImportDate(new java.sql.Date(new SimpleDateFormat("yyyy-MM-dd").parse(importDateStr).getTime()));
             } catch (ParseException e) {
+                conn.rollback();
                 errorMessage = "Invalid date format.";
+                System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
                 sendErrorResponse(response, errorMessage);
                 return;
             }
             receipt.setNote(note);
-
-            // Handle new supplier if selected
-            if (supplierId == null && newSupplierName != null && !newSupplierName.isEmpty()) {
-                Supplier newSupplier = new Supplier();
-                newSupplier.setSupplierName(newSupplierName);
-                newSupplier.setSupplierPhone(newSupplierPhone);
-                newSupplier.setSupplierAddress(newSupplierAddress);
-                newSupplier.setSupplierEmail(newSupplierEmail);
-                newSupplier.setSupplierStatus("active");
-                SupplierDAO supplierDAO = new SupplierDAO(conn);
-                supplierId = supplierDAO.addSupplierWithId(newSupplier);
-                if (supplierId <= 0) {
-                    errorMessage = "Failed to add new supplier.";
-                    sendErrorResponse(response, errorMessage);
-                    return;
-                }
+            if (supplierIds != null && supplierIds.length > 0 && supplierIds[0] != null && !supplierIds[0].trim().isEmpty()) {
+                receipt.setSupplierId(Integer.parseInt(supplierIds[0]));
+            } else {
+                conn.rollback();
+                errorMessage = "Supplier ID cannot be empty for receipt.";
+                System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
+                sendErrorResponse(response, errorMessage);
+                return;
             }
-            receipt.setSupplierId(supplierId);
 
-            // Process import details
             List<ImportDetail> detailList = new ArrayList<>();
             for (int i = 0; i < materialIds.length; i++) {
                 if (materialIds[i] == null || materialIds[i].trim().isEmpty()) {
+                    conn.rollback();
                     errorMessage = "Material ID cannot be empty at row " + (i + 1);
+                    System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
                     sendErrorResponse(response, errorMessage, i);
                     return;
                 }
                 if (quantities[i] == null || quantities[i].trim().isEmpty()) {
+                    conn.rollback();
                     errorMessage = "Quantity cannot be empty at row " + (i + 1);
+                    System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
                     sendErrorResponse(response, errorMessage, i);
                     return;
                 }
                 if (prices[i] == null || prices[i].trim().isEmpty()) {
+                    conn.rollback();
                     errorMessage = "Price cannot be empty at row " + (i + 1);
+                    System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
                     sendErrorResponse(response, errorMessage, i);
                     return;
                 }
@@ -187,8 +186,11 @@ public class ImportWarehouseServlet extends HttpServlet {
                     int materialId = Integer.parseInt(materialIds[i]);
                     double quantity = Double.parseDouble(quantities[i]);
                     double price = Double.parseDouble(prices[i]);
+                    int supplierId = Integer.parseInt(supplierIds[i]);
                     if (quantity <= 0 || price <= 0) {
+                        conn.rollback();
                         errorMessage = "Quantity and price must be greater than 0 at row " + (i + 1);
+                        System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
                         sendErrorResponse(response, errorMessage, i);
                         return;
                     }
@@ -197,18 +199,22 @@ public class ImportWarehouseServlet extends HttpServlet {
                     detail.setQuantity(quantity);
                     detail.setPricePerUnit(price);
                     detail.setMaterialCondition(materialConditions[i]);
+                    detail.setSupplierId(supplierId);
                     detailList.add(detail);
                 } catch (NumberFormatException e) {
-                    errorMessage = "Invalid material ID, quantity, or price at row " + (i + 1);
+                    conn.rollback();
+                    errorMessage = "Invalid material ID, quantity, price, or supplier at row " + (i + 1);
+                    System.out.println("ImportWarehouseServlet: Validation failed - " + errorMessage);
                     sendErrorResponse(response, errorMessage, i);
                     return;
                 }
             }
 
-            // Save import receipt and details
             try {
                 int importId = importDAO.saveImportReceipt(receipt, detailList);
                 if (importId > 0) {
+                    conn.commit(); // Commit transaction
+                    System.out.println("ImportWarehouseServlet: Import receipt saved successfully, importId: " + importId);
                     Gson gson = new Gson();
                     String jsonResponse = gson.toJson(new ImportResponse("success", "Import receipt saved successfully!", importId, voucherId));
                     response.setContentType("application/json");
@@ -218,16 +224,20 @@ public class ImportWarehouseServlet extends HttpServlet {
                         out.flush();
                     }
                 } else {
-                    errorMessage = "Unable to save import receipt. Please try again.";
+                    conn.rollback();
+                    errorMessage = "Unable to save import receipt. Please check database or contact administrator.";
+                    System.out.println("ImportWarehouseServlet: Failed to save import receipt");
                     sendErrorResponse(response, errorMessage);
                 }
             } catch (SQLException e) {
-                errorMessage = "Error saving import details. Please try again.";
+                conn.rollback();
+                errorMessage = "Error saving import details: " + e.getMessage();
+                System.err.println("ImportWarehouseServlet: SQL error in doPost: " + e.getMessage());
                 sendErrorResponse(response, errorMessage);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            errorMessage = "System error while processing import. Please try again or contact the administrator.";
+        } catch (SQLException e) {
+            errorMessage = "System error while processing import: " + e.getMessage();
+            System.err.println("ImportWarehouseServlet: SQL error in doPost: " + e.getMessage());
             sendErrorResponse(response, errorMessage);
         }
     }
@@ -261,9 +271,7 @@ public class ImportWarehouseServlet extends HttpServlet {
     }
 }
 
-// Class để đóng gói phản hồi cho JSON
 class ImportResponse {
-
     private String status;
     private String message;
     private Integer importId;
@@ -277,7 +285,6 @@ class ImportResponse {
         this.voucherId = voucherId;
     }
 
-    // Getters and setters
     public String getStatus() {
         return status;
     }

@@ -1,56 +1,17 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nfs://.netbeans.org/.nbi/platform/16.0.2/nbi/studio/nb10/nbi_setsdk.xml to edit this template
- */
 package model;
 
-/**
- *
- * @author Giap
- */
 public class ImportDetail {
-    private String materialName;
-    private String unit;
-    private int importDetailId;
+
     private int importId;
     private int materialId;
+    private String materialCode;
+    private int supplierId;
     private double quantity;
+    private String unit;
     private double pricePerUnit;
-    private double totalPrice;
     private String materialCondition;
-    private String materialCode; // Thêm thuộc tính materialCode
 
-    // Getters and Setters
-    public int getImportDetailId() {
-        return importDetailId;
-    }
-
-    public String getMaterialName() {
-        return materialName;
-    }
-
-    public void setMaterialName(String materialName) {
-        this.materialName = materialName;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public double getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public void setImportDetailId(int importDetailId) {
-        this.importDetailId = importDetailId;
+    public ImportDetail() {
     }
 
     public int getImportId() {
@@ -69,12 +30,36 @@ public class ImportDetail {
         this.materialId = materialId;
     }
 
+    public String getMaterialCode() {
+        return materialCode;
+    }
+
+    public void setMaterialCode(String materialCode) {
+        this.materialCode = materialCode;
+    }
+
+    public int getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(int supplierId) {
+        this.supplierId = supplierId;
+    }
+
     public double getQuantity() {
         return quantity;
     }
 
     public void setQuantity(double quantity) {
         this.quantity = quantity;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public double getPricePerUnit() {
@@ -92,13 +77,7 @@ public class ImportDetail {
     public void setMaterialCondition(String materialCondition) {
         this.materialCondition = materialCondition;
     }
-
-    // Thêm getter và setter cho materialCode
-    public String getMaterialCode() {
-        return materialCode;
-    }
-
-    public void setMaterialCode(String materialCode) {
-        this.materialCode = materialCode;
-    }
 }
+
+    // Getters and Setters
+    

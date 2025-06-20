@@ -1,35 +1,26 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-/**
- *
- * @author Giap
- */
 import java.sql.Date;
 
 public class ImportReceipt {
-    
+
     private int importId;
+    private String voucherId;
     private int supplierId;
     private int userId;
     private Date importDate;
     private String note;
-    
-    //Thêm 1 vài trường
-    private String importerName; 
-    private double total;
-    private String voucherId;
-    private String supplierName;
+    private String importerName; // Thêm trường này
+    private String supplierName; // Thêm trường này
+    private double total; // Đã có từ trước
 
-    public String getSupplierName() {
-        return supplierName;
+    // Getters and Setters
+    public int getImportId() {
+        return importId;
     }
 
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
+    public void setImportId(int importId) {
+        this.importId = importId;
     }
 
     public String getVoucherId() {
@@ -38,31 +29,6 @@ public class ImportReceipt {
 
     public void setVoucherId(String voucherId) {
         this.voucherId = voucherId;
-    }
-    
-    public String getImporterName() {
-        return importerName;
-    }
-
-    public void setImporterName(String importerName) {
-        this.importerName = importerName;
-    }
-
-    public double getTotal() {
-        return total;
-    }
-
-    // Getters and Setters
-    public void setTotal(double total) {    
-        this.total = total;
-    }
-
-    public int getImportId() {
-        return importId;
-    }
-
-    public void setImportId(int importId) {
-        this.importId = importId;
     }
 
     public int getSupplierId() {
@@ -96,5 +62,28 @@ public class ImportReceipt {
     public void setNote(String note) {
         this.note = note;
     }
-    
+
+    public String getImporterName() {
+        return importerName;
+    } // Thêm getter
+
+    public void setImporterName(String importerName) {
+        this.importerName = importerName;
+    } // Thêm setter
+
+    public String getSupplierName() {
+        return supplierName;
+    } // Thêm getter
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    } // Thêm setter
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
 }
