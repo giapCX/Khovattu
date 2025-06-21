@@ -109,7 +109,7 @@
                                 </span>
                             </td>
                             <td class="py-4 px-6">
-                                <a href="${pageContext.request.contextPath}/proposal-detail?id=${proposal.proposalId}"
+                                <a href="${pageContext.request.contextPath}/AdminProposalDetailServlet?id=${proposal.proposalId}"
                                    class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md">
                                     <i class="fas fa-eye mr-2"></i>View & Edit
                                 </a>

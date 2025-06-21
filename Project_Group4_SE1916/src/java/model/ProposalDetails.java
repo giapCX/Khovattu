@@ -6,6 +6,7 @@ package model;
 
 public class ProposalDetails {
     private int proposalDetailId;
+    private String materialName;
     private Proposal proposal;    
     private int materialId;  
     private double quantity;
@@ -20,6 +21,23 @@ public class ProposalDetails {
         this.materialId = materialId;
         this.quantity = quantity;
         this.materialCondition = materialCondition;
+    }
+
+    public ProposalDetails(int proposalDetailId, String materialName, Proposal proposal, int materialId, double quantity, String materialCondition) {
+        this.proposalDetailId = proposalDetailId;
+        this.materialName = materialName;
+        this.proposal = proposal;
+        this.materialId = materialId;
+        this.quantity = quantity;
+        this.materialCondition = materialCondition;
+    }
+
+    public String getMaterialName() {
+        return materialName;
+    }
+
+    public void setMaterialName(String materialName) {
+        this.materialName = materialName;
     }
 
     public int getProposalDetailId() {

@@ -9,7 +9,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import model.ProposalApprovals;
 
 public class ProposalDAO {
 
@@ -170,4 +173,153 @@ public class ProposalDAO {
         }
         return 0;
     }
+    public Proposal getProposalById(int proposalId) {
+    Proposal proposal = null;
+    String sql = "SELECT ep.*, u.full_name, " +
+                 "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, m.name AS material_name, " +
+                 "pa.approval_id, pa.admin_approver_id, pa.director_approver_id, " +
+                 "pa.admin_approval_date, pa.admin_reason, pa.admin_note, " +
+                 "pa.director_approval_date, pa.director_reason, pa.director_note " +
+                 "FROM EmployeeProposals ep " +
+                 "JOIN Users u ON ep.proposer_id = u.user_id " +
+                 "LEFT JOIN ProposalDetails pd ON ep.proposal_id = pd.proposal_id " +
+                 "LEFT JOIN Materials m ON pd.material_id = m.material_id " +
+                 "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id " +
+                 "WHERE ep.proposal_id = ?";
+
+    try (Connection conn = DBContext.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, proposalId);
+        ResultSet rs = ps.executeQuery();
+
+        Map<Integer, ProposalDetails> detailsMap = new LinkedHashMap<>();
+        ProposalApprovals approval = null;
+
+        while (rs.next()) {
+            if (proposal == null) {
+                proposal = new Proposal();
+                proposal.setProposalId(rs.getInt("proposal_id"));
+                proposal.setProposalType(rs.getString("proposal_type"));
+                proposal.setProposerId(rs.getInt("proposer_id"));
+                proposal.setSenderName(rs.getString("full_name"));
+                proposal.setNote(rs.getString("note"));
+                proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
+                proposal.setFinalStatus(rs.getString("final_status"));
+                proposal.setApprovalDate(rs.getTimestamp("executed_date"));
+            }
+
+            int detailId = rs.getInt("proposal_detail_id");
+            if (detailId > 0 && !detailsMap.containsKey(detailId)) {
+                ProposalDetails detail = new ProposalDetails();
+                detail.setProposalDetailId(detailId);
+                detail.setProposal(proposal);
+                detail.setMaterialId(rs.getInt("material_id"));
+                detail.setMaterialName(rs.getString("material_name"));
+                detail.setQuantity(rs.getDouble("quantity"));
+                detail.setMaterialCondition(rs.getString("material_condition"));
+                detailsMap.put(detailId, detail);
+            }
+
+            if (approval == null && rs.getInt("approval_id") > 0) {
+                approval = new ProposalApprovals();
+                approval.setApprovalId(rs.getInt("approval_id"));
+                approval.setProposal(proposal);
+                approval.setAdminApproverId(rs.getInt("admin_approver_id"));
+                approval.setDirectorApproverId(rs.getInt("director_approver_id"));
+                approval.setAdminApprovalDate(rs.getTimestamp("admin_approval_date"));
+                approval.setAdminReason(rs.getString("admin_reason"));
+                approval.setAdminNote(rs.getString("admin_note"));
+                approval.setDirectorApprovalDate(rs.getTimestamp("director_approval_date"));
+                approval.setDirectorReason(rs.getString("director_reason"));
+                approval.setDirectorNote(rs.getString("director_note"));
+            }
+        }
+
+        if (proposal != null) {
+            proposal.setProposalDetails(new ArrayList<>(detailsMap.values()));
+            proposal.setApproval(approval);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return proposal;
+}
+    public List<ProposalDetails> getProposalDetailsByProposalId(int proposalId) {
+        List<ProposalDetails> list = new ArrayList<>();
+        String sql = "SELECT * FROM ProposalDetails WHERE proposal_id = ?";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, proposalId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ProposalDetails detail = new ProposalDetails();
+                detail.setProposalDetailId(rs.getInt("proposal_detail_id"));
+                detail.setMaterialId(rs.getInt("material_id"));
+                detail.setQuantity(rs.getDouble("quantity"));
+                detail.setMaterialCondition(rs.getString("material_condition"));
+
+                Proposal p = new Proposal();
+                p.setProposalId(proposalId);
+                detail.setProposal(p);
+
+                list.add(detail);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+ public ProposalApprovals getApprovalByProposalId(int proposalId) {
+        ProposalApprovals approval = null;
+        String sql = "SELECT * FROM ProposalApprovals WHERE proposal_id = ?";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, proposalId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                approval = new ProposalApprovals();
+                approval.setApprovalId(rs.getInt("approval_id"));
+                approval.setAdminApproverId(rs.getInt("admin_approver_id"));
+                approval.setDirectorApproverId(rs.getInt("director_approver_id"));
+                approval.setAdminApprovalDate(rs.getTimestamp("admin_approval_date"));
+                approval.setAdminReason(rs.getString("admin_reason"));
+                approval.setAdminNote(rs.getString("admin_note"));
+                approval.setDirectorApprovalDate(rs.getTimestamp("director_approval_date"));
+                approval.setDirectorReason(rs.getString("director_reason"));
+                approval.setDirectorNote(rs.getString("director_note"));
+
+                Proposal p = new Proposal();
+                p.setProposalId(proposalId);
+                approval.setProposal(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return approval;
+    }
+
+    // 4. (Tùy chọn) Cập nhật thông tin duyệt của admin
+    public void adminUpdateProposal(int proposalId, String finalStatus, String adminReason, String adminNote) throws SQLException {
+    String updateProposalSql = "UPDATE EmployeeProposals SET final_status = ?, executed_date = CASE WHEN ? = 'executed' THEN CURRENT_TIMESTAMP ELSE executed_date END WHERE proposal_id = ?";
+    String updateApprovalSql = "UPDATE ProposalApprovals SET admin_reason = ?, admin_note = ?, admin_approval_date = CURRENT_TIMESTAMP WHERE proposal_id = ?";
+
+    try (PreparedStatement ps1 = conn.prepareStatement(updateProposalSql);
+         PreparedStatement ps2 = conn.prepareStatement(updateApprovalSql)) {
+
+        // Cập nhật bảng EmployeeProposals
+        ps1.setString(1, finalStatus);
+        ps1.setString(2, finalStatus); // dùng lại cho CASE WHEN
+        ps1.setInt(3, proposalId);
+        ps1.executeUpdate();
+
+        // Cập nhật bảng ProposalApprovals
+        ps2.setString(1, adminReason);
+        ps2.setString(2, adminNote);
+        ps2.setInt(3, proposalId);
+        ps2.executeUpdate();
+    }
+}
 }

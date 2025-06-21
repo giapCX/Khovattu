@@ -120,6 +120,14 @@
         <servlet-name>AdminApproveServlet</servlet-name>
         <servlet-class>controller.proposal.AdminApproveServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminProposalDetailServlet</servlet-name>
+        <servlet-class>controller.proposal.AdminProposalDetailServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminUpdateProposalServlet</servlet-name>
+        <servlet-class>AdminUpdateProposalServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -239,6 +247,14 @@
     <servlet-mapping>
         <servlet-name>AdminApproveServlet</servlet-name>
         <url-pattern>/AdminApproveServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminProposalDetailServlet</servlet-name>
+        <url-pattern>/AdminProposalDetailServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminUpdateProposalServlet</servlet-name>
+        <url-pattern>/AdminUpdateProposalServlet</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

@@ -13,8 +13,17 @@ public class Proposal {
     private String finalStatus;
     private Timestamp approvalDate; // New field for approval date
     private List<ProposalDetails> proposalDetails;
+    private ProposalApprovals approval;
 
     public Proposal() {
+    }
+
+    public ProposalApprovals getApproval() {
+        return approval;
+    }
+
+    public void setApproval(ProposalApprovals approval) {
+        this.approval = approval;
     }
 
     public int getProposalId() {
