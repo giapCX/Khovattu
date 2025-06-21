@@ -116,6 +116,10 @@
         <servlet-name>ExportHistoryServlet</servlet-name>
         <servlet-class>controller.importhistory.ExportHistoryServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminApproveServlet</servlet-name>
+        <servlet-class>controller.proposal.AdminApproveServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -231,6 +235,10 @@
     <servlet-mapping>
         <servlet-name>ExportHistoryServlet</servlet-name>
         <url-pattern>/exportHistoryServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminApproveServlet</servlet-name>
+        <url-pattern>/AdminApproveServlet</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

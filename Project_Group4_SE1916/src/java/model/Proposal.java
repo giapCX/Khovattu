@@ -1,4 +1,5 @@
 package model;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -6,27 +7,15 @@ public class Proposal {
     private int proposalId;
     private String proposalType;
     private int proposerId;
+    private String senderName; // New field for sender's full name
     private String note;
-    private Timestamp sendDate;
-    private String status;
-    private Timestamp executedDate;
-    private List<ProposalDetails> proposalDetails; 
+    private Timestamp proposalSentDate;
+    private String finalStatus;
+    private Timestamp approvalDate; // New field for approval date
+    private List<ProposalDetails> proposalDetails;
 
     public Proposal() {
     }
-
-    public Proposal(int proposalId, String proposalType, int proposerId, String note, Timestamp sendDate, String status, Timestamp executedDate, List<ProposalDetails> proposalDetails) {
-        this.proposalId = proposalId;
-        this.proposalType = proposalType;
-        this.proposerId = proposerId;
-        this.note = note;
-        this.sendDate = sendDate;
-        this.status = status;
-        this.executedDate = executedDate;
-        this.proposalDetails = proposalDetails;
-    }
-
-   
 
     public int getProposalId() {
         return proposalId;
@@ -52,36 +41,12 @@ public class Proposal {
         this.proposerId = proposerId;
     }
 
-    public Timestamp getSendDate() {
-        return sendDate;
+    public String getSenderName() {
+        return senderName;
     }
 
-    public void setSendDate(Timestamp sendDate) {
-        this.sendDate = sendDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Timestamp getExecutedDate() {
-        return executedDate;
-    }
-
-    public void setExecutedDate(Timestamp executedDate) {
-        this.executedDate = executedDate;
-    }
-
-    public List<ProposalDetails> getProposalDetails() {
-        return proposalDetails;
-    }
-
-    public void setProposalDetails(List<ProposalDetails> proposalDetails) {
-        this.proposalDetails = proposalDetails;
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
     }
 
     public String getNote() {
@@ -92,7 +57,35 @@ public class Proposal {
         this.note = note;
     }
 
-   
-    
+    public Timestamp getProposalSentDate() {
+        return proposalSentDate;
+    }
 
+    public void setProposalSentDate(Timestamp proposalSentDate) {
+        this.proposalSentDate = proposalSentDate;
+    }
+
+    public String getFinalStatus() {
+        return finalStatus;
+    }
+
+    public void setFinalStatus(String finalStatus) {
+        this.finalStatus = finalStatus;
+    }
+
+    public Timestamp getApprovalDate() {
+        return approvalDate;
+    }
+
+    public void setApprovalDate(Timestamp approvalDate) {
+        this.approvalDate = approvalDate;
+    }
+
+    public List<ProposalDetails> getProposalDetails() {
+        return proposalDetails;
+    }
+
+    public void setProposalDetails(List<ProposalDetails> proposalDetails) {
+        this.proposalDetails = proposalDetails;
+    }
 }
