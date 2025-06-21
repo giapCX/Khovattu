@@ -61,10 +61,9 @@ public class AdminProposalDetailServlet extends HttpServlet {
             int proposalId = Integer.parseInt(request.getParameter("id"));
             ProposalDAO dao = new ProposalDAO(conn);
 
-            Proposal proposal = dao.getProposalById(proposalId); // Gồm cả proposalDetails + materialName
-            ProposalApprovals approval = dao.getApprovalByProposalId(proposalId); // lấy thông tin phê duyệt
+            Proposal proposal = dao.getProposalById(proposalId); 
+            ProposalApprovals approval = dao.getApprovalByProposalId(proposalId);
 
-            // Nếu bạn đã thêm setApproval trong Proposal
             proposal.setApproval(approval);
 
             request.setAttribute("proposal", proposal);
