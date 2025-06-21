@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="editable" value="${proposal.finalStatus == 'pending'}" />
 <html>
 <head>
     <title>Proposal Detail</title>
@@ -77,33 +78,52 @@
         <!-- Form phê duyệt của Admin -->
         <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-4">Admin Approval</h2>
         <form action="${pageContext.request.contextPath}/AdminUpdateProposalServlet" method="post" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 space-y-6">
-            <input type="hidden" name="proposalId" value="${proposal.proposalId}" />
+    <input type="hidden" name="proposalId" value="${proposal.proposalId}" />
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select name="finalStatus" class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="pending" ${proposal.finalStatus == 'pending' ? 'selected' : ''}>Pending</option>
-                    <option value="approved_by_admin" ${proposal.finalStatus == 'approved_by_admin' ? 'selected' : ''}>Approved by Admin</option>
-                    <option value="rejected" ${proposal.finalStatus == 'rejected' ? 'selected' : ''}>Rejected</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Admin Reason</label>
-                <textarea name="adminReason" class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical min-h-[100px]">${proposal.approval.adminReason}</textarea>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Admin Note</label>
-                <textarea name="adminNote" class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical min-h-[100px]">${proposal.approval.adminNote}</textarea>
-            </div>
-
-            <div class="flex justify-end">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition duration-200">
-                    Save & Submit
-                </button>
-            </div>
-        </form>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+        <select name="finalStatus" class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                <c:if test="${!editable}">disabled</c:if>>
+            <option value="pending" ${proposal.finalStatus == 'pending' ? 'selected' : ''}>Pending</option>
+            <option value="approved_by_admin" ${proposal.finalStatus == 'approved_by_admin' ? 'selected' : ''}>Approved by Admin</option>
+            <option value="rejected" ${proposal.finalStatus == 'rejected' ? 'selected' : ''}>Rejected</option>
+        </select>
     </div>
+
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Admin Reason</label>
+        <textarea name="adminReason" class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical min-h-[100px]"
+                <c:if test="${!editable}">readonly</c:if>>${proposal.approval.adminReason}</textarea>
+    </div>
+
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Admin Note</label>
+        <textarea name="adminNote" class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical min-h-[100px]"
+                <c:if test="${!editable}">readonly</c:if>>${proposal.approval.adminNote}</textarea>
+    </div>
+
+    <c:if test="${editable}">
+        <div class="flex justify-end">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition duration-200">
+                Save & Submit
+            </button>
+        </div>
+    </c:if>
+
+    <c:if test="${!editable}">
+        <div class="text-red-600 font-medium text-right">
+            This proposal has already been processed and cannot be edited.
+        </div>
+    </c:if>
+    </form>
+    </div>
+    
+<div class="mb-4">
+    <button onclick="history.back()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded">
+        ← Back
+    </button>
+</div>
+
+    
 </body>
 </html>
