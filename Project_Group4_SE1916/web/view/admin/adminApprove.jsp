@@ -52,7 +52,8 @@
                                 onchange="document.getElementById('filterForm').submit()">
                             <option value="" ${empty status ? 'selected' : ''}>All Status</option>
                             <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
-                            <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
+                            <option value="approved_by_admin" ${status == 'approved_by_admin' ? 'selected' : ''}>Approved by Admin</option>
+                            <option value="approved_by_director" ${status == 'approved_by_director' ? 'selected' : ''}>Approved by Director</option>
                             <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
                         </select>
                         <i class="fas fa-filter absolute left-3 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
@@ -82,7 +83,8 @@
                         <th class="py-4 px-6 text-left"><i class="fas fa-user mr-2"></i>Sender</th>
                         <th class="py-4 px-6 text-left"><i class="fas fa-calendar-alt mr-2"></i>Send Date</th>
                         <th class="py-4 px-6 text-left"><i class="fas fa-calendar-check mr-2"></i>Approval Date</th>
-                        <th class="py-4 px-6 text-left"><i class="fas fa-check-circle mr-2"></i>Status</th>
+                        <th class="py-4 px-6 text-left"><i class="fas fa-check-circle mr-2"></i>Admin Status</th>
+                        <th class="py-4 px-6 text-left"><i class="fas fa-check-circle mr-2"></i>Director Status</th>
                         <th class="py-4 px-6 text-left rounded-tr-2xl"><i class="fas fa-eye mr-2"></i>Action</th>
                     </tr>
                 </thead>
@@ -98,13 +100,28 @@
                             <td class="py-4 px-6">
                                 <span class="px-3 py-1 rounded-full font-semibold <c:choose>
                                     <c:when test="${proposal.finalStatus == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
-                                    <c:when test="${proposal.finalStatus == 'approved'}">bg-green-300 text-green-900</c:when>
-                                    <c:otherwise>bg-red-300 text-red-900</c:otherwise>
+                                    <c:when test="${proposal.finalStatus == 'approved_by_admin'}">bg-green-300 text-green-900</c:when>
+                                    <c:when test="${proposal.finalStatus == 'rejected'}">bg-red-300 text-red-900</c:when>
+                                    <c:otherwise>bg-gray-300 text-gray-900</c:otherwise>
                                 </c:choose>">
                                     <c:choose>
                                         <c:when test="${proposal.finalStatus == 'pending'}">Pending</c:when>
-                                        <c:when test="${proposal.finalStatus == 'approved'}">Approved</c:when>
-                                        <c:otherwise>Rejected</c:otherwise>
+                                        <c:when test="${proposal.finalStatus == 'approved_by_admin'}">Approved</c:when>
+                                        <c:when test="${proposal.finalStatus == 'rejected'}">Rejected</c:when>
+                                        <c:otherwise>Unknown</c:otherwise>
+                                    </c:choose>
+                                </span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="px-3 py-1 rounded-full font-semibold <c:choose>
+                                    <c:when test="${proposal.directorStatus == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
+                                    <c:when test="${proposal.directorStatus == 'approved_by_director'}">bg-blue-300 text-blue-900</c:when>
+                                    <c:otherwise>bg-gray-300 text-gray-900</c:otherwise>
+                                </c:choose>">
+                                    <c:choose>
+                                        <c:when test="${proposal.directorStatus == 'pending'}">Pending</c:when>
+                                        <c:when test="${proposal.directorStatus == 'approved_by_director'}">Approved</c:when>
+                                        <c:otherwise>Unknown</c:otherwise>
                                     </c:choose>
                                 </span>
                             </td>

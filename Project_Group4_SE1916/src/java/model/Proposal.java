@@ -4,16 +4,18 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public class Proposal {
+
     private int proposalId;
     private String proposalType;
     private int proposerId;
-    private String senderName; // New field for sender's full name
+    private String senderName;
     private String note;
     private Timestamp proposalSentDate;
     private String finalStatus;
-    private Timestamp approvalDate; // New field for approval date
+    private Timestamp approvalDate;
     private List<ProposalDetails> proposalDetails;
     private ProposalApprovals approval;
+    private String directorStatus; // New field for director status
 
     public Proposal() {
     }
@@ -96,5 +98,13 @@ public class Proposal {
 
     public void setProposalDetails(List<ProposalDetails> proposalDetails) {
         this.proposalDetails = proposalDetails;
+    }
+
+    public String getDirectorStatus() {
+        return directorStatus;
+    }
+
+    public void setDirectorStatus(String directorStatus) {
+        this.directorStatus = directorStatus;
     }
 }
