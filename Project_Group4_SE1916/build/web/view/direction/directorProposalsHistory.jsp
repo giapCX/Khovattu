@@ -59,7 +59,8 @@
             <div id="endDateError" class="error-message"></div>
           </div>
         </div>
-        <select id="statusFilter" name="status" class="p-3 border-2 border-sky-300 rounded-xl w-full md:w-1/4 focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
+        <select id="statusFilter" name="status" onchange="this.form.submit()" 
+                class="p-3 border-2 border-sky-300 rounded-xl w-full md:w-1/4 focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
           <option value="">All Statuses</option>
           <option value="pending" ${param.status == 'pending' ? 'selected' : ''}>Pending</option>
           <option value="approved" ${param.status == 'approved' ? 'selected' : ''}>Approved</option>
@@ -69,7 +70,8 @@
 
       <!-- Items per Page Selector -->
       <div class="flex justify-end mb-4">
-        <select id="itemsPerPage" name="itemsPerPage" class="p-3 border-2 border-sky-300 rounded-xl w-full md:w-1/5 focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
+        <select id="itemsPerPage" name="itemsPerPage" onchange="this.form.submit()" 
+                class="p-3 border-2 border-sky-300 rounded-xl w-full md:w-1/5 focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
           <option value="10" ${param.itemsPerPage == '10' ? 'selected' : ''}>10 items/page</option>
           <option value="20" ${param.itemsPerPage == '20' ? 'selected' : ''}>20 items/page</option>
           <option value="30" ${param.itemsPerPage == '30' ? 'selected' : ''}>30 items/page</option>

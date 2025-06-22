@@ -27,17 +27,17 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     // Validate dates
     if (!startDate.isEmpty() && !isValidDate(startDate)) {
         request.setAttribute("error", "Invalid start date format.");
-        request.getRequestDispatcher("view/direction/directorApprovalHistory.jsp").forward(request, response);
+        request.getRequestDispatcher("view/direction/directorProposalsHistory.jsp").forward(request, response);
         return;
     }
     if (!endDate.isEmpty() && !isValidDate(endDate)) {
         request.setAttribute("error", "Invalid end date format.");
-        request.getRequestDispatcher("view/direction/directorApprovalHistory.jsp").forward(request, response);
+        request.getRequestDispatcher("view/direction/directorProposalsHistory.jsp").forward(request, response);
         return;
     }
     if (!startDate.isEmpty() && !endDate.isEmpty() && endDate.compareTo(startDate) < 0) {
         request.setAttribute("error", "End date must be on or after start date.");
-        request.getRequestDispatcher("view/direction/directorApprovalHistory.jsp").forward(request, response);
+        request.getRequestDispatcher("view/direction/directorProposalsHistory.jsp").forward(request, response);
         return;
     }
 
@@ -79,7 +79,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         request.setAttribute("status", status);
         request.setAttribute("itemsPerPage", itemsPerPage);
 
-        request.getRequestDispatcher("view/direction/directorApprovalHistory.jsp").forward(request, response);
+        request.getRequestDispatcher("view/direction/directorProposalsHistory.jsp").forward(request, response);
     } catch (SQLException e) {
         throw new ServletException("Database error: " + e.getMessage(), e);
     }
