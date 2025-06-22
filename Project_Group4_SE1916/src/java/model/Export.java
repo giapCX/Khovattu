@@ -1,3 +1,4 @@
+//Export.java
 package model;
 
 import java.time.LocalDate;
@@ -5,7 +6,7 @@ import java.time.LocalDate;
 public class Export {
     private int exportId;
     private String voucherId; 
-    private String userId;       
+    private int userId;       
     private LocalDate exportDate;
     private String note;
     private String exporterName;
@@ -13,7 +14,7 @@ public class Export {
     public String getExporterName() {
         return exporterName;
     }
-
+ 
     public void setExporterName(String exporterName) {
         this.exporterName = exporterName;
     }
@@ -25,7 +26,7 @@ public class Export {
     public Export() {
     }
 
-    public Export(int exportId, String voucherId, String userId, LocalDate exportDate, String note) {
+    public Export(int exportId, String voucherId, int userId, LocalDate exportDate, String note) {
         this.exportId = exportId;
         this.voucherId = voucherId;
         this.userId = userId;
@@ -49,11 +50,11 @@ public class Export {
         this.voucherId = voucherId;
     }
 
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 

@@ -18,7 +18,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-// em note các bước ra để sau đọc lại hiểu luôn nên thầy đừng bắt bẻ em nhá =(( 
 public class EditMaterialController extends HttpServlet {
 
     private MaterialDAO materialDAO;
@@ -41,6 +40,9 @@ public class EditMaterialController extends HttpServlet {
         try {
             // 1. Lấy ID vật tư từ tham số URL
             int materialId = Integer.parseInt(request.getParameter("id"));
+            String origin = request.getParameter("origin");
+            String supplierId = request.getParameter("supplierId");
+            String supplierName = request.getParameter("supplierName");
 
             // 2. Lấy thông tin vật tư, danh mục và nhà cung cấp từ database
             Material material = materialDAO.getMaterialById(materialId);
@@ -51,6 +53,9 @@ public class EditMaterialController extends HttpServlet {
             request.setAttribute("material", material);
             request.setAttribute("categories", categories);
             request.setAttribute("suppliers", suppliers);
+            request.setAttribute("origin", origin);
+            request.setAttribute("supplierId", supplierId);
+            request.setAttribute("supplierName", supplierName);
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
         } catch (SQLException e) {
             // Nếu có lỗi khi lấy dữ liệu, báo lỗi chi tiết
@@ -65,7 +70,9 @@ public class EditMaterialController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Material material = new Material();
-
+        String origin = request.getParameter("origin");
+        String supplierId = request.getParameter("supplierId");
+        String supplierName = request.getParameter("supplierName");
         try {
             material.setMaterialId(Integer.parseInt(request.getParameter("id")));
             material.setCode(request.getParameter("code"));
@@ -89,7 +96,7 @@ public class EditMaterialController extends HttpServlet {
 
             // Cập nhật vào DB
             materialDAO.updateMaterial(material, supplierIdList);
-
+            
             // Gán thông báo thành công vào request (ko dùng session nữa)
             request.setAttribute("message", "Update material success!");
             request.setAttribute("messageType", "success");
@@ -100,6 +107,9 @@ public class EditMaterialController extends HttpServlet {
             // Lấy lại thông tin vật tư mới nhất để hiển thị
             Material updatedMaterial = materialDAO.getMaterialById(material.getMaterialId());
             request.setAttribute("material", updatedMaterial);
+            request.setAttribute("origin", origin);
+            request.setAttribute("supplierId", supplierId);
+            request.setAttribute("supplierName", supplierName);
 
             // Hiển thị lại trang chỉnh sửa
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
@@ -108,11 +118,17 @@ public class EditMaterialController extends HttpServlet {
             request.setAttribute("message", "Invalid input! Please check your data.");
             request.setAttribute("messageType", "danger");
             reloadFormData(request);
+            request.setAttribute("origin", origin);
+            request.setAttribute("supplierId", supplierId);
+            request.setAttribute("supplierName", supplierName);
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
         } catch (SQLException e) {
             request.setAttribute("message", "Error updating material: " + e.getMessage());
             request.setAttribute("messageType", "danger");
             reloadFormData(request);
+            request.setAttribute("origin", origin);
+            request.setAttribute("supplierId", supplierId);
+            request.setAttribute("supplierName", supplierName);
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
         }
     }

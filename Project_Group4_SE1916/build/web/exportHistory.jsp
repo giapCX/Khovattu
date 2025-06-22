@@ -1,5 +1,3 @@
-
-
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -109,50 +107,115 @@
         .back-btn:hover {
             background-color: #2563eb;
         }
+        .error-message {
+            color: red;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h2>Export History</h2>
+            <h2>Lịch sử xuất kho</h2>
         </div>
-        <form method="get" action="exporthistory" class="filter-form">
+        <form method="get" action="exportHistory" class="filter-form">
             <input type="date" name="fromDate" value="${fromDate}" class="form-control" />
             <span>to</span>
             <input type="date" name="toDate" value="${toDate}" class="form-control" />
-            <input type="text" name="exporter" value="${exporter}" placeholder="Input name of exporter" class="form-control" />
-            <button type="submit" class="btn">Do</button>
+            <input type="text" name="exporter" value="${exporter}" placeholder="Nhập tên người xuất" class="form-control" />
+            <button type="submit" class="btn">Tìm kiếm</button>
         </form>
-        <table>
-            <thead>
-                <tr>
-                    <th>Code</th>
-                    <th>Date</th>
-                    <th>Exporter</th>
-                    <th>Note</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="item" items="${historyData}">
+
+        <!-- Hiển thị thông báo lỗi nếu có -->
+        <c:if test="${not empty errorMessage}">
+            <p class="error-message">${errorMessage}</p>
+        </c:if>
+
+        <!-- Hiển thị thông báo nếu không có dữ liệu -->
+        <c:if test="${empty historyData}">
+            <p>Không tìm thấy dữ liệu.</p>
+        </c:if>
+
+        <!-- Bảng lịch sử xuất kho -->
+        <c:if test="${not empty historyData}">
+            <table border="1">
+                <thead>
                     <tr>
-                        <td>${item.code}</td>
-                        <td>${item.date}</td>
-                        <td>${item.exporter}</td>
-                        <td>${item.note}</td>
-                        <td class="action"><a href="exporthistorydetail?exportId=${item.exportId}&keyword=${param.keyword}&sort=${param.sort}&page=1">View</a></td>
+                        <th>No</th>
+                        <th>Code</th>
+                        <th>Date</th>
+                        <th>Exporter</th>
+                        <th>Note</th>
+                        <th>Action</th>
                     </tr>
-                </c:forEach>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <c:forEach items="${historyData}" var="item" varStatus="loop">
+                        <tr>
+                            <td>${loop.index + 1}</td>
+                            <td>${item.voucherId}</td>
+                            <td>${item.exportDate}</td>
+                            <td>${item.exporterName}</td>
+                            <td>${item.note}</td>
+                            <td class="action"><a href="#">Xem</a></td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </c:if>
+
+        <!-- Phân trang -->
         <div class="pagination mt-4">
             <c:forEach begin="1" end="${totalPages}" var="i">
-                <a href="exportHistory?page=${i}&fromDate=${param.fromDate}&toDate=${param.toDate}&importer=${param.importer}"
+                <a href="exportHistory?page=${i}&fromDate=${param.fromDate}&toDate=${param.toDate}&exporter=${param.exporter}"
                    class="${i == currentPage ? 'active' : ''}">${i}</a>
             </c:forEach>
         </div>
-        <a href="/" class="back-btn">Back to home</a>
+        <%
+                String role = (String) session.getAttribute("role");
+                String redirectUrl = "../login.jsp"; // Default fallback
+                if (role != null) {
+                    switch (role.toLowerCase()) {
+                        case "direction":
+                            redirectUrl = request.getContextPath() + "/view/direction/directionDashboard.jsp";
+                            break;
+                        case "employee":
+                            redirectUrl = request.getContextPath() + "/view/employee/employeeDashboard.jsp";
+                            break;
+                        case "warehouse":
+                            redirectUrl = request.getContextPath() + "/view/warehouse/warehouseDashboard.jsp";
+                            break;
+                        case "admin":
+                            redirectUrl = request.getContextPath() + "/view/admin/adminDashboard.jsp";
+                            break;
+                    }
+                }
+            %>
+        <a href="<%= redirectUrl%>" class="back-btn">Quay lại trang chủ</a>
     </div>
+
+    <script>
+        // Hàm mã hóa chuỗi để thay thế ký tự đặc biệt
+        function escapeString(str) {
+            if (str == null) return "";
+            return str.replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+        }
+
+        // Chuyển historyData thành mảng JavaScript
+        const historyData = [
+            <c:forEach items="${historyData}" var="item" varStatus="loop">
+                {
+                    exportId: ${item.exportId},
+                    voucherId: escapeString("${item.voucherId}"),
+                    exportDate: "${item.exportDate}",
+                    exporterName: escapeString("${item.exporterName}"),
+                    note: escapeString("${item.note}")
+                }${loop.last ? '' : ','}
+            </c:forEach>
+        ];
+
+        // In historyData ra console
+        console.log("historyData:", historyData);
+    </script>
 </body>
 </html>
-

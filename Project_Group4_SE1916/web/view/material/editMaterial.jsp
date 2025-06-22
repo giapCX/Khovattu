@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -102,6 +103,13 @@
                 border-radius: var(--border-radius);
             }
 
+            .error-message {
+                color: #dc3545;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+                display: none;
+            }
+
             @media (max-width: 768px) {
                 .form-container {
                     padding: 1.5rem;
@@ -126,8 +134,11 @@
                             <i class="fas fa-edit me-2"></i>Edit Material
                         </h2>
 
-                        <form action="${pageContext.request.contextPath}/EditMaterialController" method="post">
+                        <form id="editMaterialForm" action="${pageContext.request.contextPath}/EditMaterialController" method="post">
                             <input type="hidden" name="id" value="${material.materialId}" />
+                            <input type="hidden" name="origin" value="${origin}" />
+                            <input type="hidden" name="supplierId" value="${supplierId}" />
+                            <input type="hidden" name="supplierName" value="${supplierName}" />
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="code" class="form-label">Material Code</label>
@@ -173,13 +184,22 @@
                                             <div class="col-md-6">
                                                 <div class="supplier-item">
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" 
+                                                        <input class="form-check-input supplier-checkbox" type="checkbox" 
                                                                id="supplier_${sup.supplierId}" name="suppliers" 
                                                                value="${sup.supplierId}"
-                                                               <c:forEach var="matSup" items="${material.suppliers}">
-                                                                   <c:if test="${matSup.supplierId == sup.supplierId}">checked</c:if>
+                                                               <c:set var="isChecked" value="false" />
+                                                               <c:forEach var="s" items="${material.suppliers}">
+                                                                   <c:if test="${s.supplierId == sup.supplierId}">
+                                                                       <c:set var="isChecked" value="true" />
+                                                                   </c:if>
                                                                </c:forEach>
-                                                               >
+                                                               <input
+                                                               class="form-check-input supplier-checkbox"
+                                                               type="checkbox"
+                                                               id="supplier_${sup.supplierId}"
+                                                               name="suppliers"
+                                                               value="${sup.supplierId}"
+                                                               <c:if test="${isChecked}">checked</c:if>>
                                                         <label class="form-check-label" for="supplier_${sup.supplierId}">
                                                             <i class="fas fa-truck me-2"></i>${sup.supplierName}
                                                         </label>
@@ -189,13 +209,23 @@
                                         </c:forEach>
                                     </div>
                                 </div>
+                                <div id="supplierError" class="error-message">Please select at least one supplier.</div>
                             </div>
 
                             <div class="d-flex justify-content-between">
                                 <div>
-                                    <a onclick ="history.back()" class="btn btn-secondary">
-                                        <i class="fas fa-arrow-left me-2"></i>Back to List
-                                    </a>
+                                    <c:choose>
+                                        <c:when test="${origin == 'listMaterialOfSupplier'}">
+                                            <a href="${pageContext.request.contextPath}/FilterSupplierServlet?supplierId=${supplierId}&supplierName=${fn:escapeXml(supplierName)}" class="btn btn-secondary">
+                                                <i class="fas fa-arrow-left me-2"></i>Back to List
+                                            </a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="${pageContext.request.contextPath}/ListMaterialController" class="btn btn-secondary">
+                                                <i class="fas fa-arrow-left me-2"></i>Back to List
+                                            </a>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                                 <div>
                                     <button type="reset" class="btn btn-outline-secondary me-2">
@@ -226,8 +256,18 @@
                 $('#imageUrl').on('change', function () {
                     const url = $(this).val();
                     if (url) {
-                        // You could add image preview functionality here
                         console.log('Image URL changed:', url);
+                    }
+                });
+
+                // Validate at least one supplier is selected
+                $('#editMaterialForm').on('submit', function (e) {
+                    const checkedSuppliers = $('.supplier-checkbox:checked').length;
+                    if (checkedSuppliers === 0) {
+                        e.preventDefault();
+                        $('#supplierError').show();
+                    } else {
+                        $('#supplierError').hide();
                     }
                 });
             });

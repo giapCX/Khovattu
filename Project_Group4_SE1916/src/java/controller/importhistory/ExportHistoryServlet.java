@@ -1,6 +1,7 @@
-//exportHistory
+//ExportHistory.java
 package controller.importhistory;
 
+import Dal.DBContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -11,59 +12,22 @@ import java.sql.Date;
 import java.util.List;
 import model.Export;
 import dao.ExportHistoryDAO;
-import java.io.PrintWriter;
-import model.Export;
+import java.sql.Connection;
 
-/**
- *
- * @author quanh
- */
 public class ExportHistoryServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ExportHistoryServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ExportHistoryServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Lấy tham số từ request
         String fromDateStr = request.getParameter("fromDate");
         String toDateStr = request.getParameter("toDate");
         String exporter = request.getParameter("exporter");
         String pageParam = request.getParameter("page");
 
+        // Thiết lập phân trang
         int page = 1;
         int pageSize = 10;
-
         if (pageParam != null) {
             try {
                 page = Integer.parseInt(pageParam);
@@ -71,9 +35,9 @@ public class ExportHistoryServlet extends HttpServlet {
             }
         }
 
+        // Chuyển đổi ngày
         Date fromDate = null;
         Date toDate = null;
-
         try {
             if (fromDateStr != null && !fromDateStr.isEmpty()) {
                 fromDate = java.sql.Date.valueOf(fromDateStr);
@@ -82,47 +46,53 @@ public class ExportHistoryServlet extends HttpServlet {
                 toDate = java.sql.Date.valueOf(toDateStr);
             }
         } catch (IllegalArgumentException e) {
-            // ignore invalid date format
+            request.setAttribute("errorMessage", "Định dạng ngày không hợp lệ.");
+        }
+        
+        Connection conn = DBContext.getConnection();
+        
+        // Truy vấn dữ liệu
+        ExportHistoryDAO dao = new ExportHistoryDAO();
+        List<Export> receipts;
+        int totalRecords;
+
+        if (exporter != null && !exporter.trim().isEmpty()) {
+            // Tìm kiếm theo tên người xuất
+            receipts = dao.searchByExporterName(exporter);
+            totalRecords = receipts.size(); // Không phân trang nếu searchByExporterName không hỗ trợ
+            System.out.println("Tìm kiếm theo exporter: " + exporter);
+            System.out.println("Kích thước results: " + receipts.size());
+        } else {
+            // Lấy tất cả dữ liệu với bộ lọc ngày và phân trang
+            receipts = dao.searchExportReceipts(fromDate, toDate, exporter, page, pageSize);
+            totalRecords = dao.countExportReceipts(fromDate, toDate, exporter);
+            System.out.println("Kích thước receipts: " + receipts.size());
+            System.out.println("Tổng số bản ghi: " + totalRecords);
         }
 
-        ExportHistoryDAO dao = new ExportHistoryDAO();
-        List<Export> receipts = dao.searchExportReceipts(fromDate, toDate, exporter, page, pageSize);
-        int totalRecords = dao.countExportReceipts(fromDate, toDate, exporter);
-
+        // Tính toán số trang
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
+        // Đặt thuộc tính cho JSP
         request.setAttribute("historyData", receipts);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("currentPage", page);
-
         request.setAttribute("fromDate", fromDateStr);
         request.setAttribute("toDate", toDateStr);
         request.setAttribute("exporter", exporter);
 
+        // Chuyển tiếp đến JSP
         request.getRequestDispatcher("exportHistory.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        doGet(request, response); // Gọi doGet để xử lý POST nếu cần
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Servlet to handle export history requests";
     }
 }

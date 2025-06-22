@@ -47,7 +47,7 @@ public class MaterialDAO {
                 category.setCategoryId(rs.getInt("category_id"));
                 category.setName(rs.getString("category_name"));
                 category.setParentCategoryName(rs.getString("parent_category_name"));
-                category.setParentId(rs.getInt("parent_id")); 
+                category.setParentId(rs.getInt("parent_id"));
                 material.setCategory(category);
 
                 String supplierNames = rs.getString("supplier_names");
@@ -148,6 +148,19 @@ public class MaterialDAO {
             }
         }
         return material;
+    }
+
+    public int getMaterialIdByCode(String code) throws SQLException {
+        String sql = "SELECT material_id FROM Materials WHERE code = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, code);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("material_id");
+                }
+            }
+        }
+        return -1; // hoặc throw exception nếu muốn báo lỗi không tìm thấy
     }
 
     public void addMaterial(Material material, List<Integer> supplierIdList) throws SQLException {

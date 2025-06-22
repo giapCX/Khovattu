@@ -1,4 +1,6 @@
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="vi">
@@ -59,7 +61,7 @@
                     <input type="hidden" name="supplierId" value="${supplierId}" />
                     <input type="hidden" name="searchCategory" />
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchName" placeholder="Search name of material"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="searchName" placeholder="Search name of material" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg flex items-center">
                         <i class="fas fa-search mr-2"></i> Search
@@ -79,7 +81,6 @@
                                     <th class="p-4 text-left">Image</th>
                                     <th class="p-4 text-left">Unit</th>
                                     <th class="p-4 text-left">Action</th>
-
                                 </tr>
                             </thead>
                             <tbody>
@@ -97,7 +98,7 @@
                                                 </td>
                                                 <td class="p-4 font-medium">${item.unit}</td>
                                                 <td class="p-4 font-medium">
-                                                    <a href="${pageContext.request.contextPath}/EditMaterialController?id=${item.materialId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
+                                                    <a href="${pageContext.request.contextPath}/EditMaterialController?id=${item.materialId}&origin=listMaterialOfSupplier&supplierId=${supplierId}&supplierName=${fn:escapeXml(supplierName)}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
                                                 </td>
                                             </tr>
                                         </c:forEach>

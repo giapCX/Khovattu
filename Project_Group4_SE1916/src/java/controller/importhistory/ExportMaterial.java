@@ -1,7 +1,6 @@
 package controller.importhistory;
 
 import Dal.DBContext;
-import com.google.gson.Gson;
 import dao.ExportDAO;
 import dao.UserDAO;
 import dao.MaterialDAO;
@@ -9,7 +8,6 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -19,27 +17,44 @@ import model.Export;
 import model.ExportDetail;
 import model.Material;
 import model.User;
+import com.google.gson.Gson;
 
 
 public class ExportMaterial extends HttpServlet {
 
+    private static final String ID_REGEX = "^[A-Za-z0-9-_]+$";
+    private static final String TEXT_REGEX = "^[A-Za-z0-9\\s,.()-]+$";
+    private static final int EXPORT_ID_MAX_LENGTH = 50;
+    private static final int VOUCHER_ID_MAX_LENGTH = 50;
+    private static final int PURPOSE_MAX_LENGTH = 500;
+    private static final int NOTE_MAX_LENGTH = 1000;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            
-            MaterialDAO materialDAO = new MaterialDAO();
-            List<Material> materials = materialDAO.getAllMaterials();
-            Gson gson = new Gson();
-            String json = gson.toJson(materials);
-            out.print(json);
-            out.flush();
-        } catch (SQLException e) {
-            
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"error\":\"Database error: " + e.getMessage() + "\"}");
+        String fetch = request.getParameter("fetch");
+        if ("materials".equals(fetch)) {
+            try {
+                MaterialDAO materialDAO = new MaterialDAO();
+                List<Material> materials = materialDAO.getAllMaterials();
+                Gson gson = new Gson();
+                String json = gson.toJson(materials);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(json);
+            } catch (SQLException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("{\"error\": \"Database error: " + e.getMessage() + "\"}");
+            }
+        } else {
+            try {
+                MaterialDAO materialDAO = new MaterialDAO();
+                List<Material> materials = materialDAO.getAllMaterials();
+                request.setAttribute("material", materials);
+                request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            } catch (SQLException e) {
+                throw new ServletException("Database error: " + e.getMessage(), e);
+            }
         }
     }
 
@@ -47,35 +62,75 @@ public class ExportMaterial extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String errorMessage = null;
-        Integer errorRow = null; // To store the index of the invalid row
+        Integer errorRow = null;
 
-        // Get input parameters
         HttpSession session = request.getSession();
         String username = (String) session.getAttribute("username");
-        Connection con = DBContext.getConnection();
         String exportIdStr = request.getParameter("exportId");
         String voucherIdStr = request.getParameter("voucherId");
         String[] materialCodes = request.getParameterValues("materialCode[]");
         String[] quantities = request.getParameterValues("quantity[]");
         String[] conditions = request.getParameterValues("condition[]");
         String purpose = request.getParameter("purpose");
-
+        String note = request.getParameter("additionalNote");
         UserDAO userDAO = new UserDAO();
         User user = userDAO.getUserByUsername(username);
 
-        // Validate inputs for null or empty
+        // Server-side validation
         if (exportIdStr == null || exportIdStr.trim().isEmpty()) {
             errorMessage = "Export ID cannot be empty.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
         }
+        if (exportIdStr.length() > EXPORT_ID_MAX_LENGTH) {
+            errorMessage = "Export ID cannot exceed " + EXPORT_ID_MAX_LENGTH + " characters.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+        if (!exportIdStr.matches(ID_REGEX)) {
+            errorMessage = "Export ID can only contain alphanumeric characters, hyphens, or underscores.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+
         if (voucherIdStr == null || voucherIdStr.trim().isEmpty()) {
             errorMessage = "Voucher ID cannot be empty.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
         }
+        if (voucherIdStr.length() > VOUCHER_ID_MAX_LENGTH) {
+            errorMessage = "Voucher ID cannot exceed " + VOUCHER_ID_MAX_LENGTH + " characters.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+        if (!voucherIdStr.matches(ID_REGEX)) {
+            errorMessage = "Voucher ID can only contain alphanumeric characters, hyphens, or underscores.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+
+        // Check for duplicate voucherId
+        try (Connection conn = DBContext.getConnection()) {
+            ExportDAO dao = new ExportDAO(conn);
+            if (dao.checkVoucherIdExists(voucherIdStr)) {
+                errorMessage = "Voucher ID already exists. Please use a unique Voucher ID.";
+                request.setAttribute("error", errorMessage);
+                request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+                return;
+            }
+        } catch (SQLException e) {
+            errorMessage = "Database error while checking Voucher ID: " + e.getMessage();
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+
         if (materialCodes == null || materialCodes.length == 0 || isArrayEmpty(materialCodes)) {
             errorMessage = "Material code list cannot be empty.";
             request.setAttribute("error", errorMessage);
@@ -100,8 +155,31 @@ public class ExportMaterial extends HttpServlet {
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
         }
+        if (purpose.length() > PURPOSE_MAX_LENGTH) {
+            errorMessage = "Export purpose cannot exceed " + PURPOSE_MAX_LENGTH + " characters.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+        if (!purpose.matches(TEXT_REGEX)) {
+            errorMessage = "Export purpose can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+        if (note != null && note.length() > NOTE_MAX_LENGTH) {
+            errorMessage = "Additional note cannot exceed " + NOTE_MAX_LENGTH + " characters.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+        if (note != null && !note.isEmpty() && !note.matches(TEXT_REGEX)) {
+            errorMessage = "Additional note can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
 
-        // Validate array lengths
         if (materialCodes.length != quantities.length || materialCodes.length != conditions.length) {
             errorMessage = "Material codes, quantities, and conditions are not synchronized.";
             request.setAttribute("error", errorMessage);
@@ -109,24 +187,15 @@ public class ExportMaterial extends HttpServlet {
             return;
         }
 
-        // Validate userId
-        String userId = user.getCode();
-        if (userId == null || userId.trim().isEmpty()) {
-            errorMessage = "Employee code cannot be empty.";
-            request.setAttribute("error", errorMessage);
-            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
-            return;
-        }
+        int userId = user.getUserId();
 
         try (Connection conn = DBContext.getConnection()) {
             ExportDAO dao = new ExportDAO(conn);
-
-            // Create Export object
             Export export = new Export();
             export.setUserId(userId);
+            export.setVoucherId(voucherIdStr);
             export.setExportDate(LocalDate.now());
-            export.setNote(purpose);
-            // Save export
+            export.setNote(note);
             int exportId = dao.saveExport(export);
             if (exportId <= 0) {
                 errorMessage = "Unable to save export voucher. Please try again.";
@@ -134,13 +203,12 @@ public class ExportMaterial extends HttpServlet {
                 request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                 return;
             }
-            // Process export details
             List<ExportDetail> detailList = new ArrayList<>();
             for (int i = 0; i < materialCodes.length; i++) {
                 if (materialCodes[i] == null || materialCodes[i].trim().isEmpty()) {
                     errorMessage = "Material code cannot be empty at row " + (i + 1);
                     request.setAttribute("error", errorMessage);
-                    request.setAttribute("errorRow", i); // Set error row index
+                    request.setAttribute("errorRow", i);
                     request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                     return;
                 }
@@ -159,12 +227,13 @@ public class ExportMaterial extends HttpServlet {
                     return;
                 }
                 try {
-                    int materialId = Integer.parseInt(materialCodes[i]);
+                    MaterialDAO m = new MaterialDAO();
+                    int materialId = m.getMaterialIdByCode(materialCodes[i]);
                     int quantity = Integer.parseInt(quantities[i]);
                     if (quantity <= 0) {
                         errorMessage = "Quantity must be greater than 0 at row " + (i + 1);
                         request.setAttribute("error", errorMessage);
-                        request.setAttribute("errorRow", i); // Set error row index
+                        request.setAttribute("errorRow", i);
                         request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                         return;
                     }
@@ -184,7 +253,6 @@ public class ExportMaterial extends HttpServlet {
                 }
             }
 
-            // Save export details
             try {
                 dao.saveExportDetails(detailList, exportId);
             } catch (SQLException e) {
@@ -194,7 +262,6 @@ public class ExportMaterial extends HttpServlet {
                 return;
             }
 
-            // Success
             request.setAttribute("message", "Export voucher saved successfully!");
             request.setAttribute("exportId", exportId);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);

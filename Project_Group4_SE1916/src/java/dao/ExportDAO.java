@@ -1,3 +1,4 @@
+//ExportDAO
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -16,12 +17,13 @@ import java.util.List;
 
 import model.Export;
 import model.ExportDetail;
+
 /**
  *
  * @author ASUS
  */
 public class ExportDAO {
-    
+
     private Connection conn;
 
     public ExportDAO() {
@@ -31,13 +33,12 @@ public class ExportDAO {
     public ExportDAO(Connection conn) {
         this.conn = conn;
     }
-    
-    
+
     public int saveExport(Export export) throws SQLException {
         String sql = "INSERT INTO ExportReceipts (voucher_id, user_id, export_date, note) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, export.getVoucherId());
-            stmt.setString(2, export.getUserId()); // Sửa: userId là int
+            stmt.setInt(2, export.getUserId());
             stmt.setDate(3, Date.valueOf(export.getExportDate()));
             stmt.setString(4, export.getNote());
             stmt.executeUpdate();
@@ -62,6 +63,18 @@ public class ExportDAO {
                 stmt.addBatch();
             }
             stmt.executeBatch();
+        }
+    }
+
+    public boolean checkVoucherIdExists(String voucherId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Export WHERE voucherId = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, voucherId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+            return false;
         }
     }
 

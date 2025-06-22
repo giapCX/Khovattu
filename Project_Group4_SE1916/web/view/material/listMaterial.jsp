@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -198,7 +199,7 @@
                                 <img src="${mat.imageUrl}" class="thumbnail" alt="Material image">
                             </td>
                             <td>
-                                <a href="${pageContext.request.contextPath}/EditMaterialController?id=${mat.materialId}" class="btn btn-sm btn-warning action-btn">Edit</a>
+                                <a href="${pageContext.request.contextPath}/EditMaterialController?id=${mat.materialId}&origin=listMaterial" class="btn btn-sm btn-warning action-btn">Edit</a>
                                 <form action="${pageContext.request.contextPath}/ListMaterialController" method="post" style="display:inline;">
                                     <input type="hidden" name="action" value="delete"/>
                                     <input type="hidden" name="id" value="${mat.materialId}"/>
@@ -307,14 +308,12 @@ $(document).ready(function () {
         }
     }
 
-    // Khởi tạo childCategorySelect dựa trên selectedParentCategory
     <c:if test="${not empty selectedParentCategory}">
         updateChildCategorySelect('${selectedParentCategory}');
     </c:if>
 
     $('#filterParentCategory').on('change', function () {
         var selectedParentCategoryId = $(this).val();
-        // Tải lại trang với bộ lọc mới
         var url = '${pageContext.request.contextPath}/ListMaterialController';
         if (selectedParentCategoryId) {
             url += '?filterParentCategory=' + selectedParentCategoryId;
@@ -332,8 +331,6 @@ $(document).ready(function () {
         var searchValue = $('#searchInput').val();
         table.column(1).search(searchValue).draw();
     });
-
-    
 });
     </script>
 </body>
