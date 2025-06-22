@@ -46,21 +46,21 @@
                 <form action="AddSupplierServlet" method="post" class="space-y-4">
                     <div class="space-y-2">
                         <label for="supplierName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
-                        <input type="text" id="supplierName" name="supplierName" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
+                        <input type="text" id="supplierName" value="${not empty param.supplierName ? param.supplierName : ''}" name="supplierName" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
 
                     <div class="space-y-2">
                         <label for="supplierPhone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone number</label>
-                        <input type="text" id="supplierPhone" name="supplierPhone" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
+                        <input type="text" id="supplierPhone" name="supplierPhone" value="${not empty param.supplierPhone ? param.supplierPhone : ''}" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
 
                     <div class="space-y-2">
                         <label for="supplierAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
-                        <input type="text" id="supplierAddress" name="supplierAddress" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
+                        <input type="text" id="supplierAddress" name="supplierAddress" value="${not empty param.supplierAddress ? param.supplierAddress : ''}" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
                     <div class="space-y-2">
                         <label for="supplierEmail" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                        <input type="email" id="supplierEmail" name="supplierEmail" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
+                        <input type="email" id="supplierEmail" name="supplierEmail" value="${not empty param.supplierEmail ? param.supplierEmail : ''}" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
                     <div class="space-y-2">
                         <label for="supplierStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
@@ -88,28 +88,57 @@
 
         <!--JavaScript -->
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
-        <script>
-            
+        <script>           
             // Client-side validation
             const form = document.querySelector('form');
             form.addEventListener('submit', (e) => {
                 const email = document.getElementById('supplierEmail').value.trim();
                 const phone = document.getElementById('supplierPhone').value.trim();
+                const name = document.getElementById('supplierName').value.trim();
+                const address = document.getElementById('supplierAddress').value.trim();
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 const phoneRegex = /^\d{10}$/;
 
+               // Email validation
                 if (!emailRegex.test(email)) {
                     e.preventDefault();
                     alert('Please re-enter the correct email format.');
+                     return;
+                }
+                             
+                // Phone number validation
+                if (!phoneRegex.test(phone)) {
+                    e.preventDefault();
+                    alert('Phone number must have 10 digits. Please re-enter the correct phone number format.');
                     return;
                 }
 
-                if (!phoneRegex.test(phone)) {
+                // Name validation
+                if (name === '') {
                     e.preventDefault();
-                    alert('Phone number must have 10 number. Please re-enter the correct phone number format.');
+                    alert('Name cannot be empty.');
                     return;
                 }
-            });
+
+                if (name.length < 3 || name.length > 100) {
+                    e.preventDefault();
+                    alert('Name must be between 3 and 100 characters.');
+                    return;
+                }
+
+                // Address validation
+                    if (address === '') {
+                    e.preventDefault();
+                    alert('Address cannot be empty.');
+                    return;
+                }
+
+                if (address.length < 5 || address.length > 255) {
+                    e.preventDefault();
+                    alert('Address must be between 5 and 255 characters.');
+                    return;
+                }
+});
         </script>
     </body>
 </html>

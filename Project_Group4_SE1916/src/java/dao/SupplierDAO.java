@@ -11,8 +11,6 @@ import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
-
 public class SupplierDAO {
 
     private Connection conn;
@@ -346,71 +344,70 @@ public class SupplierDAO {
         return 0; // Nếu không có vật tư nào thỏa mãn điều kiện
     }
 
-    public List<Material> searchMaterialOfSuppliersBySupplierIdCategoryNameMaterialNameWithPaging( 
-        int supplierId, String categoryName, String materialName,
-        int offset, int recordsPerPage) throws SQLException {
+    public List<Material> searchMaterialOfSuppliersBySupplierIdCategoryNameMaterialNameWithPaging(
+            int supplierId, String categoryName, String materialName,
+            int offset, int recordsPerPage) throws SQLException {
 
-    StringBuilder sql = new StringBuilder(
-        "SELECT DISTINCT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, "
-      + "mc.category_id, mc.name AS category_name, "
-      + "mc.parent_id, mc2.name AS parent_category_name "
-      + "FROM Materials m "
-      + "JOIN SupplierMaterials sm ON m.material_id = sm.material_id "
-      + "JOIN MaterialCategories mc ON m.category_id = mc.category_id "
-      + "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id "
-      + "WHERE sm.supplier_id = ? "
-    );
+        StringBuilder sql = new StringBuilder(
+                "SELECT DISTINCT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, "
+                + "mc.category_id, mc.name AS category_name, "
+                + "mc.parent_id, mc2.name AS parent_category_name "
+                + "FROM Materials m "
+                + "JOIN SupplierMaterials sm ON m.material_id = sm.material_id "
+                + "JOIN MaterialCategories mc ON m.category_id = mc.category_id "
+                + "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id "
+                + "WHERE sm.supplier_id = ? "
+        );
 
-    List<Object> params = new ArrayList<>();
-    params.add(supplierId);
+        List<Object> params = new ArrayList<>();
+        params.add(supplierId);
 
-    if (categoryName != null && !categoryName.trim().isEmpty()) {
-        sql.append(" AND mc.name LIKE ? ");
-        params.add("%" + categoryName.trim() + "%");
-    }
-
-    if (materialName != null && !materialName.trim().isEmpty()) {
-        sql.append(" AND m.name LIKE ? ");
-        params.add("%" + materialName.trim() + "%");
-    }
-
-    sql.append(" ORDER BY m.material_id LIMIT ? OFFSET ? ");
-    params.add(recordsPerPage);
-    params.add(offset);
-
-    List<Material> materials = new ArrayList<>();
-
-    try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-        for (int i = 0; i < params.size(); i++) {
-            stmt.setObject(i + 1, params.get(i));
+        if (categoryName != null && !categoryName.trim().isEmpty()) {
+            sql.append(" AND mc.name LIKE ? ");
+            params.add("%" + categoryName.trim() + "%");
         }
 
-        try (ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                Material material = new Material();
-                material.setMaterialId(rs.getInt("material_id"));
-                material.setCode(rs.getString("code"));
-                material.setName(rs.getString("name"));
-                material.setDescription(rs.getString("description"));
-                material.setUnit(rs.getString("unit"));
-                material.setImageUrl(rs.getString("image_url"));
+        if (materialName != null && !materialName.trim().isEmpty()) {
+            sql.append(" AND m.name LIKE ? ");
+            params.add("%" + materialName.trim() + "%");
+        }
 
-                MaterialCategory category = new MaterialCategory();
-                category.setCategoryId(rs.getInt("category_id"));
-                category.setName(rs.getString("category_name"));
-                category.setParentId(rs.getInt("parent_id"));
-                category.setParentCategoryName(rs.getString("parent_category_name"));
+        sql.append(" ORDER BY m.material_id LIMIT ? OFFSET ? ");
+        params.add(recordsPerPage);
+        params.add(offset);
 
-                material.setCategory(category);
+        List<Material> materials = new ArrayList<>();
 
-                materials.add(material);
+        try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Material material = new Material();
+                    material.setMaterialId(rs.getInt("material_id"));
+                    material.setCode(rs.getString("code"));
+                    material.setName(rs.getString("name"));
+                    material.setDescription(rs.getString("description"));
+                    material.setUnit(rs.getString("unit"));
+                    material.setImageUrl(rs.getString("image_url"));
+
+                    MaterialCategory category = new MaterialCategory();
+                    category.setCategoryId(rs.getInt("category_id"));
+                    category.setName(rs.getString("category_name"));
+                    category.setParentId(rs.getInt("parent_id"));
+                    category.setParentCategoryName(rs.getString("parent_category_name"));
+
+                    material.setCategory(category);
+
+                    materials.add(material);
+                }
             }
         }
+
+        return materials;
     }
-
-    return materials;
-}
-
 
     // Thêm phương thức kiểm tra nhà cung cấp tồn tại theo ID
     public boolean supplierExists(int supplierId) throws SQLException {
@@ -426,9 +423,7 @@ public class SupplierDAO {
         return false;
     }
 
-    
     // Thêm phương thức kiểm tra nhà cung cấp tồn tại theo tên
-
     public boolean supplierExistsByName(String name) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Suppliers WHERE name = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -441,32 +436,116 @@ public class SupplierDAO {
         }
         return false;
     }
+
     public void addMaterialsToSupplier(int supplierId, List<Integer> materialIds) throws SQLException {
-    String sql = "INSERT INTO SupplierMaterials (supplier_id, material_id) VALUES (?, ?)";
+        String sql = "INSERT INTO SupplierMaterials (supplier_id, material_id) VALUES (?, ?)";
 
-    try (Connection conn = DBContext.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        for (int materialId : materialIds) {
-            ps.setInt(1, supplierId);
-            ps.setInt(2, materialId);
-            ps.addBatch();
+            for (int materialId : materialIds) {
+                ps.setInt(1, supplierId);
+                ps.setInt(2, materialId);
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
         }
-
-        ps.executeBatch();
     }
-}
+
     public boolean isMaterialAlreadyExists(int supplierId, int materialId) throws SQLException {
-    String sql = "SELECT COUNT(*) FROM SupplierMaterials WHERE supplier_id = ? AND material_id = ?";
-    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setInt(1, supplierId);
-        stmt.setInt(2, materialId);
-        try (ResultSet rs = stmt.executeQuery()) {
+        String sql = "SELECT COUNT(*) FROM SupplierMaterials WHERE supplier_id = ? AND material_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, supplierId);
+            stmt.setInt(2, materialId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkPhoneExists(String phone) {
+        String sql = "SELECT COUNT(*) FROM Suppliers WHERE phone = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            return rs.getInt(1) > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean checkEmailExists(String email) {
+        String sql = "SELECT COUNT(*) FROM Suppliers WHERE email = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            return rs.getInt(1) > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean checkNameExists(String name) {
+        String sql = "SELECT COUNT(*) FROM Suppliers WHERE name = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            return rs.getInt(1) > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean checkPhoneExistsExcept(String phone, int supplierId) {
+        String sql = "SELECT COUNT(*) FROM Suppliers WHERE phone = ? AND supplier_id != ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            ps.setInt(2, supplierId);
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1) > 0;
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        return false;
     }
-    return false;
-}
+
+    public boolean checkEmailExistsExcept(String email, int supplierId) {
+        String sql = "SELECT COUNT(*) FROM Suppliers WHERE email = ? AND supplier_id != ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setInt(2, supplierId);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            return rs.getInt(1) > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean checkNameExistsExcept(String name, int supplierId) {
+        String sql = "SELECT COUNT(*) FROM Suppliers WHERE name = ? AND supplier_id != ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setInt(2, supplierId);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            return rs.getInt(1) > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }
