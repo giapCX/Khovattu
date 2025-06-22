@@ -15,10 +15,19 @@ public class Proposal {
     private Timestamp approvalDate;
     private List<ProposalDetails> proposalDetails;
     private ProposalApprovals approval;
+    private String adminStatus;
     private String directorStatus;
     private String finalApprover; // New field for final approver name
 
     public Proposal() {
+    }
+
+    public String getAdminStatus() {
+        return adminStatus;
+    }
+
+    public void setAdminStatus(String adminStatus) {
+        this.adminStatus = adminStatus;
     }
 
     public ProposalApprovals getApproval() {

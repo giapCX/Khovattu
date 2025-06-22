@@ -126,7 +126,7 @@
     </servlet>
     <servlet>
         <servlet-name>AdminUpdateProposalServlet</servlet-name>
-        <servlet-class>AdminUpdateProposalServlet</servlet-class>
+        <servlet-class>controller.proposal.AdminUpdateProposalServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DirectorProposalsServlet</servlet-name>

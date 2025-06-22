@@ -81,12 +81,12 @@ public class ProposalDAO {
     public List<Proposal> getPendingProposals(String search, String dateFrom, String dateTo, String status, int limit, int offset) throws SQLException {
         List<Proposal> proposals = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-            "SELECT ep.proposal_id, ep.proposal_type, ep.proposer_id, u.full_name AS sender_name, ep.note, ep.proposal_sent_date, " +
-            "COALESCE(ep.final_status, 'pending') AS admin_status, pa.admin_approval_date, pa.director_approval_date " +
-            "FROM EmployeeProposals ep " +
-            "LEFT JOIN Users u ON ep.proposer_id = u.user_id " +
-            "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id " +
-            "WHERE 1=1"
+                "SELECT ep.proposal_id, ep.proposal_type, ep.proposer_id, u.full_name AS sender_name, ep.note, ep.proposal_sent_date, "
+                + "COALESCE(ep.final_status, 'pending') AS admin_status, pa.admin_approval_date, pa.director_approval_date "
+                + "FROM EmployeeProposals ep "
+                + "LEFT JOIN Users u ON ep.proposer_id = u.user_id "
+                + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
+                + "WHERE 1=1"
         );
 
         List<Object> params = new ArrayList<>();
@@ -138,11 +138,11 @@ public class ProposalDAO {
 
     public int getPendingProposalsCount(String search, String dateFrom, String dateTo, String status) throws SQLException {
         StringBuilder sql = new StringBuilder(
-            "SELECT COUNT(*) " +
-            "FROM EmployeeProposals ep " +
-            "LEFT JOIN Users u ON ep.proposer_id = u.user_id " +
-            "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id " +
-            "WHERE 1=1"
+                "SELECT COUNT(*) "
+                + "FROM EmployeeProposals ep "
+                + "LEFT JOIN Users u ON ep.proposer_id = u.user_id "
+                + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
+                + "WHERE 1=1"
         );
 
         List<Object> params = new ArrayList<>();
@@ -180,15 +180,15 @@ public class ProposalDAO {
     public List<Proposal> directorGetPendingProposals(String search, String startDate, String endDate, String status, int limit, int offset) throws SQLException {
         List<Proposal> proposals = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-            "SELECT ep.proposal_id, ep.proposal_type, ep.proposer_id, u.full_name AS sender_name, ep.note, ep.proposal_sent_date, " +
-            "COALESCE(ep.final_status, 'pending') AS admin_status, pa.admin_approval_date, pa.director_approval_date, " +
-            "ua.full_name AS admin_approver_name, pa.approval_id, pa.admin_approver_id, pa.director_approver_id, " +
-            "pa.admin_reason, pa.admin_note, pa.director_reason, pa.director_note " +
-            "FROM EmployeeProposals ep " +
-            "LEFT JOIN Users u ON ep.proposer_id = u.user_id " +
-            "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id " +
-            "LEFT JOIN Users ua ON pa.admin_approver_id = ua.user_id " +
-            "WHERE ep.final_status = 'approved_by_admin'"
+                "SELECT ep.proposal_id, ep.proposal_type, ep.proposer_id, u.full_name AS sender_name, ep.note, ep.proposal_sent_date, "
+                + "COALESCE(ep.final_status, 'pending') AS admin_status, pa.admin_approval_date, pa.director_approval_date, "
+                + "ua.full_name AS admin_approver_name, pa.approval_id, pa.admin_approver_id, pa.director_approver_id, "
+                + "pa.admin_reason, pa.admin_note, pa.director_reason, pa.director_note "
+                + "FROM EmployeeProposals ep "
+                + "LEFT JOIN Users u ON ep.proposer_id = u.user_id "
+                + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
+                + "LEFT JOIN Users ua ON pa.admin_approver_id = ua.user_id "
+                + "WHERE ep.final_status = 'approved_by_admin'"
         );
 
         List<Object> params = new ArrayList<>();
@@ -257,11 +257,11 @@ public class ProposalDAO {
 
     public int directorGetPendingProposalsCount(String search, String startDate, String endDate, String status) throws SQLException {
         StringBuilder sql = new StringBuilder(
-            "SELECT COUNT(*) " +
-            "FROM EmployeeProposals ep " +
-            "LEFT JOIN Users u ON ep.proposer_id = u.user_id " +
-            "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id " +
-            "WHERE ep.final_status = 'approved_by_admin'"
+                "SELECT COUNT(*) "
+                + "FROM EmployeeProposals ep "
+                + "LEFT JOIN Users u ON ep.proposer_id = u.user_id "
+                + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
+                + "WHERE ep.final_status = 'approved_by_admin'"
         );
 
         List<Object> params = new ArrayList<>();
@@ -300,21 +300,20 @@ public class ProposalDAO {
 
     public Proposal getProposalById(int proposalId) {
         Proposal proposal = null;
-        String sql = "SELECT ep.*, u.full_name, " +
-                    "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, m.name AS material_name, " +
-                    "pa.approval_id, pa.admin_approver_id, pa.director_approver_id, " +
-                    "pa.admin_approval_date, pa.admin_reason, pa.admin_note, " +
-                    "pa.director_approval_date, pa.director_reason, pa.director_note " +
-                    "FROM EmployeeProposals ep " +
-                    "JOIN Users u ON ep.proposer_id = u.user_id " +
-                    "LEFT JOIN ProposalDetails pd ON ep.proposal_id = pd.proposal_id " +
-                    "LEFT JOIN Materials m ON pd.material_id = m.material_id " +
-                    "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id " +
-                    "WHERE ep.proposal_id = ?";
+        String sql = "SELECT ep.*, u.full_name, "
+                + "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, m.name AS material_name, "
+                + "pa.approval_id, pa.admin_approver_id, pa.director_approver_id, "
+                + "pa.admin_status, pa.director_status, "
+                + "pa.admin_approval_date, pa.admin_reason, pa.admin_note, "
+                + "pa.director_approval_date, pa.director_reason, pa.director_note "
+                + "FROM EmployeeProposals ep "
+                + "JOIN Users u ON ep.proposer_id = u.user_id "
+                + "LEFT JOIN ProposalDetails pd ON ep.proposal_id = pd.proposal_id "
+                + "LEFT JOIN Materials m ON pd.material_id = m.material_id "
+                + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
+                + "WHERE ep.proposal_id = ?";
 
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, proposalId);
             ResultSet rs = ps.executeQuery();
 
@@ -331,11 +330,9 @@ public class ProposalDAO {
                     proposal.setNote(rs.getString("note"));
                     proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
                     proposal.setFinalStatus(rs.getString("final_status"));
-                    proposal.setApprovalDate(rs.getTimestamp("admin_approval_date") != null ? rs.getTimestamp("admin_approval_date") : rs.getTimestamp("director_approval_date"));
-                    String directorStatus = rs.getTimestamp("director_approval_date") != null ? "approved_by_director" : "pending";
-                    proposal.setDirectorStatus(directorStatus);
                 }
 
+                // Detail
                 int detailId = rs.getInt("proposal_detail_id");
                 if (detailId > 0 && !detailsMap.containsKey(detailId)) {
                     ProposalDetails detail = new ProposalDetails();
@@ -348,12 +345,15 @@ public class ProposalDAO {
                     detailsMap.put(detailId, detail);
                 }
 
-                if (approval == null && rs.getInt("approval_id") > 0) {
+                // Approval (nếu có)
+                if (approval == null && rs.getObject("approval_id") != null) {
                     approval = new ProposalApprovals();
                     approval.setApprovalId(rs.getInt("approval_id"));
                     approval.setProposal(proposal);
                     approval.setAdminApproverId(rs.getInt("admin_approver_id"));
                     approval.setDirectorApproverId(rs.getInt("director_approver_id"));
+                    approval.setAdminStatus(rs.getString("admin_status"));
+                    approval.setDirectorStatus(rs.getString("director_status"));
                     approval.setAdminApprovalDate(rs.getTimestamp("admin_approval_date"));
                     approval.setAdminReason(rs.getString("admin_reason"));
                     approval.setAdminNote(rs.getString("admin_note"));
@@ -365,10 +365,26 @@ public class ProposalDAO {
 
             if (proposal != null) {
                 proposal.setProposalDetails(new ArrayList<>(detailsMap.values()));
+
+                // nếu không có dòng nào trong bảng ProposalApprovals, gán approval dummy
+                if (approval == null) {
+                    approval = new ProposalApprovals();
+                    approval.setAdminStatus("pending");
+                    approval.setDirectorStatus("pending");
+                    approval.setProposal(proposal);
+                }
+
                 proposal.setApproval(approval);
+
+                // Thiết lập approvalDate nếu có
+                if (approval.getDirectorApprovalDate() != null) {
+                    proposal.setApprovalDate(approval.getDirectorApprovalDate());
+                } else if (approval.getAdminApprovalDate() != null) {
+                    proposal.setApprovalDate(approval.getAdminApprovalDate());
+                }
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -377,25 +393,27 @@ public class ProposalDAO {
 
     public List<ProposalDetails> getProposalDetailsByProposalId(int proposalId) {
         List<ProposalDetails> list = new ArrayList<>();
-        String sql = "SELECT * FROM ProposalDetails WHERE proposal_id = ?";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT pd.*, m.name AS material_name, m.unit AS material_unit, m.price AS material_price "
+                + "FROM ProposalDetails pd "
+                + "LEFT JOIN Materials m ON pd.material_id = m.material_id "
+                + "WHERE pd.proposal_id = ?";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, proposalId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 ProposalDetails detail = new ProposalDetails();
                 detail.setProposalDetailId(rs.getInt("proposal_detail_id"));
                 detail.setMaterialId(rs.getInt("material_id"));
+                detail.setMaterialName(rs.getString("material_name"));
                 detail.setQuantity(rs.getDouble("quantity"));
                 detail.setMaterialCondition(rs.getString("material_condition"));
-
                 Proposal p = new Proposal();
                 p.setProposalId(proposalId);
                 detail.setProposal(p);
 
                 list.add(detail);
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return list;
@@ -403,9 +421,11 @@ public class ProposalDAO {
 
     public ProposalApprovals getApprovalByProposalId(int proposalId) {
         ProposalApprovals approval = null;
-        String sql = "SELECT * FROM ProposalApprovals WHERE proposal_id = ?";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT approval_id, proposal_id, admin_approver_id, director_approver_id, "
+                + "admin_status, director_status, admin_approval_date, admin_reason, admin_note, "
+                + "director_approval_date, director_reason, director_note "
+                + "FROM ProposalApprovals WHERE proposal_id = ?";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, proposalId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -413,6 +433,8 @@ public class ProposalDAO {
                 approval.setApprovalId(rs.getInt("approval_id"));
                 approval.setAdminApproverId(rs.getInt("admin_approver_id"));
                 approval.setDirectorApproverId(rs.getInt("director_approver_id"));
+                approval.setAdminStatus(rs.getString("admin_status"));
+                approval.setDirectorStatus(rs.getString("director_status"));
                 approval.setAdminApprovalDate(rs.getTimestamp("admin_approval_date"));
                 approval.setAdminReason(rs.getString("admin_reason"));
                 approval.setAdminNote(rs.getString("admin_note"));
@@ -424,46 +446,70 @@ public class ProposalDAO {
                 p.setProposalId(proposalId);
                 approval.setProposal(p);
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Error retrieving approval for proposal ID: " + proposalId, e);
         }
         return approval;
     }
 
-    public void adminUpdateProposal(int proposalId, String finalStatus, String adminReason, String adminNote) throws SQLException {
-        String updateProposalSql = "UPDATE EmployeeProposals SET final_status = ?, executed_date = CASE WHEN ? = 'approved_by_admin' THEN CURRENT_TIMESTAMP ELSE executed_date END WHERE proposal_id = ?";
-        String updateApprovalSql = "INSERT INTO ProposalApprovals (proposal_id, admin_reason, admin_note, admin_approval_date) " +
-                                  "VALUES (?, ?, ?, CURRENT_TIMESTAMP) " +
-                                  "ON DUPLICATE KEY UPDATE admin_reason = ?, admin_note = ?, admin_approval_date = CURRENT_TIMESTAMP";
+    public void adminUpdateProposal(int proposalId, String adminStatus, String adminReason, String adminNote, int adminApproverId) throws SQLException {
+        String checkSql = "SELECT admin_status FROM ProposalApprovals WHERE proposal_id = ?";
+        String insertOrUpdateSql = "INSERT INTO ProposalApprovals (proposal_id, admin_approver_id, admin_status, admin_reason, admin_note, admin_approval_date) "
+                + "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP) "
+                + "ON DUPLICATE KEY UPDATE admin_status = VALUES(admin_status), admin_reason = VALUES(admin_reason), admin_note = VALUES(admin_note), admin_approval_date = CURRENT_TIMESTAMP, admin_approver_id = VALUES(admin_approver_id)";
+        String updateFinalStatusSql = "UPDATE EmployeeProposals ep "
+                + "SET final_status = CASE "
+                + "    WHEN (SELECT admin_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'approved' "
+                + "         AND (SELECT director_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'approved' THEN 'approved_but_not_executed' "
+                + "    WHEN (SELECT admin_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'rejected' "
+                + "         OR (SELECT director_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'rejected' THEN 'rejected' "
+                + "    WHEN (SELECT admin_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'approved' "
+                + "         AND (SELECT director_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'pending' THEN 'approved_by_admin' "
+                + "    ELSE 'pending' END "
+                + "WHERE proposal_id = ?";
 
-        try (PreparedStatement ps1 = conn.prepareStatement(updateProposalSql);
-             PreparedStatement ps2 = conn.prepareStatement(updateApprovalSql)) {
+        try (
+                PreparedStatement checkStmt = conn.prepareStatement(checkSql); PreparedStatement updateStmt = conn.prepareStatement(insertOrUpdateSql); PreparedStatement updateFinalStatusStmt = conn.prepareStatement(updateFinalStatusSql)) {
+            // Check if proposal already has an approval
+            checkStmt.setInt(1, proposalId);
+            ResultSet rs = checkStmt.executeQuery();
 
-            // Cập nhật bảng EmployeeProposals
-            ps1.setString(1, finalStatus);
-            ps1.setString(2, finalStatus);
-            ps1.setInt(3, proposalId);
-            ps1.executeUpdate();
+            boolean hasApproval = false;
+            String currentAdminStatus = "pending";
 
-            // Cập nhật hoặc chèn bảng ProposalApprovals
-            ps2.setInt(1, proposalId);
-            ps2.setString(2, adminReason);
-            ps2.setString(3, adminNote);
-            ps2.setString(4, adminReason);
-            ps2.setString(5, adminNote);
-            ps2.executeUpdate();
+            if (rs.next()) {
+                hasApproval = true;
+                currentAdminStatus = rs.getString("admin_status");
+            }
+
+            if (hasApproval && !"pending".equalsIgnoreCase(currentAdminStatus)) {
+                throw new SQLException("Admin can only update when admin_status is 'pending'. Current: " + currentAdminStatus);
+            }
+
+            // Update or insert
+            updateStmt.setInt(1, proposalId);
+            updateStmt.setInt(2, adminApproverId);
+            updateStmt.setString(3, adminStatus);
+            updateStmt.setString(4, adminReason);
+            updateStmt.setString(5, adminNote);
+            updateStmt.executeUpdate();
+
+            // Update final_status
+            updateFinalStatusStmt.setInt(1, proposalId);
+            updateFinalStatusStmt.executeUpdate();
+
         }
     }
 
-    public void directorUpdateProposal(int proposalId, String finalStatus, int directorApproverId, String directorReason, String directorNote) throws SQLException {
+public void directorUpdateProposal(int proposalId, String finalStatus, int directorApproverId, String directorReason, String directorNote) throws SQLException {
         String updateProposalSql = "UPDATE EmployeeProposals SET final_status = ?, executed_date = CASE WHEN ? = 'executed' THEN CURRENT_TIMESTAMP ELSE executed_date END WHERE proposal_id = ?";
-        String updateApprovalSql = "INSERT INTO ProposalApprovals (proposal_id, director_approver_id, director_reason, director_note, director_approval_date) " +
-                                  "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP) " +
-                                  "ON DUPLICATE KEY UPDATE director_approver_id = ?, director_reason = ?, director_note = ?, director_approval_date = CURRENT_TIMESTAMP";
+        String updateApprovalSql = "INSERT INTO ProposalApprovals (proposal_id, director_approver_id, director_reason, director_note, director_approval_date) "
+                + "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP) "
+                + "ON DUPLICATE KEY UPDATE director_approver_id = ?, director_reason = ?, director_note = ?, director_approval_date = CURRENT_TIMESTAMP";
 
         conn.setAutoCommit(false);
-        try (PreparedStatement ps1 = conn.prepareStatement(updateProposalSql);
-             PreparedStatement ps2 = conn.prepareStatement(updateApprovalSql)) {
+        try (PreparedStatement ps1 = conn.prepareStatement(updateProposalSql); PreparedStatement ps2 = conn.prepareStatement(updateApprovalSql)) {
 
             // Cập nhật bảng EmployeeProposals
             ps1.setString(1, finalStatus);

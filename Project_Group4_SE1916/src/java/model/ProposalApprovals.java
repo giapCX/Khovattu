@@ -16,7 +16,9 @@ public class ProposalApprovals {
     private String adminNote;       
     private Timestamp directorApprovalDate; 
     private String directorReason;    
-    private String directorNote;   
+    private String directorNote;  
+    private String adminStatus;
+    private String directorStatus;
 
     public ProposalApprovals() {
     }
@@ -32,6 +34,22 @@ public class ProposalApprovals {
         this.directorApprovalDate = directorApprovalDate;
         this.directorReason = directorReason;
         this.directorNote = directorNote;
+    }
+
+    public String getAdminStatus() {
+        return adminStatus;
+    }
+
+    public void setAdminStatus(String adminStatus) {
+        this.adminStatus = adminStatus;
+    }
+
+    public String getDirectorStatus() {
+        return directorStatus;
+    }
+
+    public void setDirectorStatus(String directorStatus) {
+        this.directorStatus = directorStatus;
     }
 
     public int getApprovalId() {
