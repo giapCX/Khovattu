@@ -245,7 +245,7 @@
                     <span class="text-lg">Danh sách nhà cung cấp</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/pendingRequests.jsp" class="nav-item active flex items-center p-3">
+                <a href="${pageContext.request.contextPath}/DirectorProposalsServlet" class="nav-item active flex items-center p-3">
                     <i class="fas fa-clipboard-list mr-3 w-6 text-center"></i>
                     <span class="text-lg">Phê duyệt yêu cầu</span>
                     <span class="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full">3</span>

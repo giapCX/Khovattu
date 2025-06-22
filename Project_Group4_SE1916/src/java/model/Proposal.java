@@ -15,7 +15,8 @@ public class Proposal {
     private Timestamp approvalDate;
     private List<ProposalDetails> proposalDetails;
     private ProposalApprovals approval;
-    private String directorStatus; // New field for director status
+    private String directorStatus;
+    private String finalApprover; // New field for final approver name
 
     public Proposal() {
     }
@@ -106,5 +107,13 @@ public class Proposal {
 
     public void setDirectorStatus(String directorStatus) {
         this.directorStatus = directorStatus;
+    }
+
+    public String getFinalApprover() {
+        return finalApprover;
+    }
+
+    public void setFinalApprover(String finalApprover) {
+        this.finalApprover = finalApprover;
     }
 }

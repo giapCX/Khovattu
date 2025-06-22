@@ -177,6 +177,127 @@ public class ProposalDAO {
         return 0;
     }
 
+    public List<Proposal> directorGetPendingProposals(String search, String startDate, String endDate, String status, int limit, int offset) throws SQLException {
+        List<Proposal> proposals = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT ep.proposal_id, ep.proposal_type, ep.proposer_id, u.full_name AS sender_name, ep.note, ep.proposal_sent_date, " +
+            "COALESCE(ep.final_status, 'pending') AS admin_status, pa.admin_approval_date, pa.director_approval_date, " +
+            "ua.full_name AS admin_approver_name, pa.approval_id, pa.admin_approver_id, pa.director_approver_id, " +
+            "pa.admin_reason, pa.admin_note, pa.director_reason, pa.director_note " +
+            "FROM EmployeeProposals ep " +
+            "LEFT JOIN Users u ON ep.proposer_id = u.user_id " +
+            "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id " +
+            "LEFT JOIN Users ua ON pa.admin_approver_id = ua.user_id " +
+            "WHERE ep.final_status = 'approved_by_admin'"
+        );
+
+        List<Object> params = new ArrayList<>();
+        if (status != null && !status.isEmpty()) {
+            // Lọc dựa trên director_status (pending, approved_by_director, rejected)
+            sql.append(" AND CASE WHEN pa.director_approval_date IS NOT NULL THEN 'approved_by_director' ELSE 'pending' END = ?");
+            params.add(status);
+        }
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND (u.full_name LIKE ? OR ep.proposal_id LIKE ?)");
+            params.add("%" + search + "%");
+            params.add("%" + search + "%");
+        }
+        if (startDate != null && !startDate.isEmpty()) {
+            sql.append(" AND ep.proposal_sent_date >= ?");
+            params.add(startDate);
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            sql.append(" AND ep.proposal_sent_date <= ?");
+            params.add(endDate);
+        }
+
+        sql.append(" ORDER BY ep.proposal_sent_date DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        System.out.println("Executing SQL: " + sql.toString() + " with params: " + params);
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Proposal proposal = new Proposal();
+                    proposal.setProposalId(rs.getInt("proposal_id"));
+                    proposal.setProposalType(rs.getString("proposal_type"));
+                    proposal.setProposerId(rs.getInt("proposer_id"));
+                    proposal.setSenderName(rs.getString("sender_name"));
+                    proposal.setNote(rs.getString("note"));
+                    proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
+                    proposal.setFinalStatus(rs.getString("admin_status"));
+                    proposal.setApprovalDate(rs.getTimestamp("admin_approval_date"));
+
+                    // Tạo và gán ProposalApprovals
+                    ProposalApprovals approval = new ProposalApprovals();
+                    approval.setApprovalId(rs.getInt("approval_id"));
+                    approval.setAdminApproverId(rs.getInt("admin_approver_id"));
+                    approval.setDirectorApproverId(rs.getInt("director_approver_id"));
+                    approval.setAdminApprovalDate(rs.getTimestamp("admin_approval_date"));
+                    approval.setDirectorApprovalDate(rs.getTimestamp("director_approval_date"));
+                    approval.setAdminReason(rs.getString("admin_reason"));
+                    approval.setAdminNote(rs.getString("admin_note"));
+                    approval.setDirectorReason(rs.getString("director_reason"));
+                    approval.setDirectorNote(rs.getString("director_note"));
+                    proposal.setApproval(approval);
+
+                    // Xác định directorStatus
+                    proposal.setDirectorStatus(rs.getTimestamp("director_approval_date") != null ? "approved_by_director" : "pending");
+                    proposal.setFinalApprover(rs.getString("admin_approver_name"));
+                    proposals.add(proposal);
+                }
+            }
+        }
+        return proposals;
+    }
+
+    public int directorGetPendingProposalsCount(String search, String startDate, String endDate, String status) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+            "SELECT COUNT(*) " +
+            "FROM EmployeeProposals ep " +
+            "LEFT JOIN Users u ON ep.proposer_id = u.user_id " +
+            "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id " +
+            "WHERE ep.final_status = 'approved_by_admin'"
+        );
+
+        List<Object> params = new ArrayList<>();
+        if (status != null && !status.isEmpty()) {
+            // Lọc dựa trên director_status
+            sql.append(" AND CASE WHEN pa.director_approval_date IS NOT NULL THEN 'approved_by_director' ELSE 'pending' END = ?");
+            params.add(status);
+        }
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND (u.full_name LIKE ? OR ep.proposal_id LIKE ?)");
+            params.add("%" + search + "%");
+            params.add("%" + search + "%");
+        }
+        if (startDate != null && !startDate.isEmpty()) {
+            sql.append(" AND ep.proposal_sent_date >= ?");
+            params.add(startDate);
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            sql.append(" AND ep.proposal_sent_date <= ?");
+            params.add(endDate);
+        }
+
+        System.out.println("Executing Count SQL: " + sql.toString() + " with params: " + params);
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
     public Proposal getProposalById(int proposalId) {
         Proposal proposal = null;
         String sql = "SELECT ep.*, u.full_name, " +
@@ -331,6 +452,41 @@ public class ProposalDAO {
             ps2.setString(4, adminReason);
             ps2.setString(5, adminNote);
             ps2.executeUpdate();
+        }
+    }
+
+    public void directorUpdateProposal(int proposalId, String finalStatus, int directorApproverId, String directorReason, String directorNote) throws SQLException {
+        String updateProposalSql = "UPDATE EmployeeProposals SET final_status = ?, executed_date = CASE WHEN ? = 'executed' THEN CURRENT_TIMESTAMP ELSE executed_date END WHERE proposal_id = ?";
+        String updateApprovalSql = "INSERT INTO ProposalApprovals (proposal_id, director_approver_id, director_reason, director_note, director_approval_date) " +
+                                  "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP) " +
+                                  "ON DUPLICATE KEY UPDATE director_approver_id = ?, director_reason = ?, director_note = ?, director_approval_date = CURRENT_TIMESTAMP";
+
+        conn.setAutoCommit(false);
+        try (PreparedStatement ps1 = conn.prepareStatement(updateProposalSql);
+             PreparedStatement ps2 = conn.prepareStatement(updateApprovalSql)) {
+
+            // Cập nhật bảng EmployeeProposals
+            ps1.setString(1, finalStatus);
+            ps1.setString(2, finalStatus);
+            ps1.setInt(3, proposalId);
+            ps1.executeUpdate();
+
+            // Cập nhật hoặc chèn bảng ProposalApprovals
+            ps2.setInt(1, proposalId);
+            ps2.setInt(2, directorApproverId);
+            ps2.setString(3, directorReason);
+            ps2.setString(4, directorNote);
+            ps2.setInt(5, directorApproverId);
+            ps2.setString(6, directorReason);
+            ps2.setString(7, directorNote);
+            ps2.executeUpdate();
+
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
         }
     }
 }

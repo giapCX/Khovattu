@@ -2,32 +2,47 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lịch Sử Yêu Cầu Vật Liệu Xây Dựng</title>
+  <title>Construction Material Request History</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    .view-details-cell {
+      min-width: 120px;
+      word-break: break-word;
+    }
+    .view-details-cell a {
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .error-message {
+      color: red;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+  </style>
 </head>
 <body class="bg-gradient-to-br from-sky-100 via-cyan-100 to-blue-100 font-sans min-h-screen">
   <div class="container mx-auto p-6">
-    <!-- Tiêu đề -->
+    <!-- Title -->
     <h1 class="text-4xl font-extrabold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-blue-600 animate-pulse">
-      Lịch Sử Yêu Cầu Vật Liệu Xây Dựng
+      Construction Material Request History
     </h1>
 
-    <!-- Thanh tìm kiếm và bộ lọc -->
-    <form action="${pageContext.request.contextPath}/proposals" method="get">
+    <!-- Search and Filter Bar -->
+    <form id="searchForm" action="${pageContext.request.contextPath}/proposals" method="get" onsubmit="return validateForm()">
       <div class="flex flex-col md:flex-row justify-between mb-6 gap-4">
         <div class="flex w-full md:w-1/3 gap-2">
           <div class="relative flex-1">
-            <input type="text" id="searchInput" name="search" value="${param.search}" placeholder="Tìm kiếm Mã đề xuất hoặc Người gửi..." 
+            <input type="text" id="searchInput" name="search" value="${param.search}" placeholder="Search by Proposal ID or Sender..." 
                    class="p-3 pl-10 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md">
             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
           </div>
           <button type="submit" id="searchButton" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md">
-            <i class="fas fa-search mr-2"></i>Tìm
+            <i class="fas fa-search mr-2"></i>Search
           </button>
         </div>
         <div class="flex flex-col md:flex-row gap-4 w-full md:w-2/3">
@@ -35,76 +50,79 @@
             <input type="date" id="startDate" name="startDate" value="${param.startDate}" 
                    class="p-3 pl-10 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md">
             <i class="fas fa-calendar-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
+            <div id="startDateError" class="error-message"></div>
           </div>
           <div class="relative w-full md:w-1/2">
             <input type="date" id="endDate" name="endDate" value="${param.endDate}" 
                    class="p-3 pl-10 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md">
             <i class="fas fa-calendar-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
+            <div id="endDateError" class="error-message"></div>
           </div>
         </div>
         <select id="statusFilter" name="status" class="p-3 border-2 border-sky-300 rounded-xl w-full md:w-1/4 focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
-          <option value="">Tất cả trạng thái</option>
-          <option value="pending" ${param.status == 'pending' ? 'selected' : ''}>Đang chờ</option>
-          <option value="approved" ${param.status == 'approved' ? 'selected' : ''}>Đã phê duyệt</option>
-          <option value="approved_by_admin" ${param.status == 'approved_by_admin' ? 'selected' : ''}>Đã phê duyệt (Admin)</option>
-          <option value="rejected" ${param.status == 'rejected' ? 'selected' : ''}>Từ chối</option>
+          <option value="">All Statuses</option>
+          <option value="pending" ${param.status == 'pending' ? 'selected' : ''}>Pending</option>
+          <option value="approved" ${param.status == 'approved' ? 'selected' : ''}>Approved</option>
+          <option value="rejected" ${param.status == 'rejected' ? 'selected' : ''}>Rejected</option>
         </select>
       </div>
 
-      <!-- Bộ chọn số lượng danh mục mỗi trang -->
+      <!-- Items per Page Selector -->
       <div class="flex justify-end mb-4">
         <select id="itemsPerPage" name="itemsPerPage" class="p-3 border-2 border-sky-300 rounded-xl w-full md:w-1/5 focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
-          <option value="10" ${param.itemsPerPage == '10' ? 'selected' : ''}>10 danh mục/trang</option>
-          <option value="20" ${param.itemsPerPage == '20' ? 'selected' : ''}>20 danh mục/trang</option>
-          <option value="30" ${param.itemsPerPage == '30' ? 'selected' : ''}>30 danh mục/trang</option>
+          <option value="10" ${param.itemsPerPage == '10' ? 'selected' : ''}>10 items/page</option>
+          <option value="20" ${param.itemsPerPage == '20' ? 'selected' : ''}>20 items/page</option>
+          <option value="30" ${param.itemsPerPage == '30' ? 'selected' : ''}>30 items/page</option>
         </select>
       </div>
     </form>
 
-    <!-- Bảng danh sách đề xuất -->
+    <!-- Proposals Table -->
     <div class="overflow-x-auto rounded-2xl shadow-xl">
       <table class="min-w-full bg-white">
         <thead class="bg-gradient-to-r from-sky-600 to-blue-600 text-white">
           <tr>
-            <th class="py-4 px-6 text-left rounded-tl-2xl"><i class="fas fa-list-ol mr-2"></i>STT</th>
-            <th class="py-4 px-6 text-left"><i class="fas fa-id-badge mr-2"></i>Mã Đề Xuất</th>
-            <th class="py-4 px-6 text-left"><i class="fas fa-box mr-2"></i>Loại Đề Xuất</th>
-            <th class="py-4 px-6 text-left"><i class="fas fa-user mr-2"></i>Người Gửi</th>
-            <th class="py-4 px-6 text-left"><i class="fas fa-calendar-alt mr-2"></i>Ngày Gửi</th>
-            <th class="py-4 px-6 text-left"><i class="fas fa-user-check mr-2"></i>Người Duyệt Cuối</th>
-            <th class="py-4 px-6 text-left"><i class="fas fa-calendar-check mr-2"></i>Ngày Duyệt</th>
-            <th class="py-4 px-6 text-left"><i class="fas fa-info-circle mr-2"></i>Trạng Thái Duyệt</th>
-            <th class="py-4 px-6 text-left rounded-tr-2xl"><i class="fas fa-eye mr-2"></i>Xem Chi Tiết</th>
+            <th class="py-4 px-6 text-left rounded-tl-2xl"><i class="fas fa-list-ol mr-2"></i>No.</th>
+            <th class="py-4 px-6 text-left"><i class="fas fa-box mr-2"></i>Proposal Type</th>
+            <th class="py-4 px-6 text-left"><i class="fas fa-user mr-2"></i>Sender</th>
+            <th class="py-4 px-6 text-left"><i class="fas fa-calendar-alt mr-2"></i>Submission Date</th>
+            <th class="py-4 px-6 text-left"><i class="fas fa-user-check mr-2"></i>Last Approver</th>
+            <th class="py-4 px-6 text-left"><i class="fas fa-calendar-check mr-2"></i>Approval Date Admin</th>
+            <th class="py-4 px-6 text-left"><i class="fas fa-calendar-check mr-2"></i>Approval Date Director</th>
+            <th class="py-4 px-6 text-left"><i class="fas fa-user-tie mr-2"></i>Director Status</th>
+            <th class="py-4 px-6 text-center view-details-cell rounded-tr-2xl"><i class="fas fa-eye mr-2"></i>View Details</th>
           </tr>
         </thead>
         <tbody id="requestTableBody" class="divide-y divide-gray-200">
-          <c:forEach var="request" items="${requests}" varStatus="loop">
+          <c:forEach var="proposal" items="${requests}" varStatus="loop">
             <tr class="hover:bg-gradient-to-r hover:from-sky-50 hover:to-cyan-50 transition-all duration-300">
               <td class="py-4 px-6 font-medium">${(param.page == null ? 1 : param.page - 1) * (param.itemsPerPage == null ? 10 : param.itemsPerPage) + loop.count}</td>
-              <td class="py-4 px-6">${request.id}</td>
-              <td class="py-4 px-6">${request.type}</td>
-              <td class="py-4 px-6">${request.sender}</td>
-              <td class="py-4 px-6"><fmt:formatDate value="${request.sendDate}" pattern="yyyy-MM-dd"/></td>
-              <td class="py-4 px-6">${request.finalApprover == null ? 'Chưa có' : request.finalApprover}</td>
-              <td class="py-4 px-6">${request.approvalDate == null ? 'Chưa duyệt' : request.approvalDate}</td>
+              <td class="py-4 px-6">${proposal.proposalType}</td>
+              <td class="py-4 px-6">${proposal.senderName}</td>
+              <td class="py-4 px-6"><fmt:formatDate value="${proposal.proposalSentDate}" pattern="yyyy-MM-dd"/></td>
+              <td class="py-4 px-6">${proposal.finalApprover == null ? 'Not Available' : proposal.finalApprover}</td>
+              <td class="py-4 px-6"><fmt:formatDate value="${proposal.approvalDate}" pattern="yyyy-MM-dd" var="formattedDate"/>${empty formattedDate ? 'Not Approved' : formattedDate}</td>
+              <td class="py-4 px-6">
+                <fmt:formatDate value="${proposal.approval.directorApprovalDate}" pattern="yyyy-MM-dd" var="directorFormattedDate"/>
+                ${empty directorFormattedDate ? 'Not Approved' : directorFormattedDate}
+              </td>
               <td class="py-4 px-6">
                 <span class="px-3 py-1 rounded-full font-semibold <c:choose>
-                  <c:when test="${request.status == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
-                  <c:when test="${request.status == 'approved' || request.status == 'approved_by_admin'}">bg-green-300 text-green-900</c:when>
+                  <c:when test="${proposal.directorStatus == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
+                  <c:when test="${proposal.directorStatus == 'approved_by_director'}">bg-green-300 text-green-900</c:when>
                   <c:otherwise>bg-red-300 text-red-900</c:otherwise>
                 </c:choose>">
                   <c:choose>
-                    <c:when test="${request.status == 'pending'}">Đang chờ</c:when>
-                    <c:when test="${request.status == 'approved'}">Đã phê duyệt</c:when>
-                    <c:when test="${request.status == 'approved_by_admin'}">Đã phê duyệt (Admin)</c:when>
-                    <c:otherwise>Từ chối</c:otherwise>
+                    <c:when test="${proposal.directorStatus == 'pending'}">Pending</c:when>
+                    <c:when test="${proposal.directorStatus == 'approved_by_director'}">Approved by Director</c:when>
+                    <c:otherwise>Rejected</c:otherwise>
                   </c:choose>
                 </span>
               </td>
-              <td class="py-4 px-6">
-                <a href="${pageContext.request.contextPath}/proposal-detail?id=${request.id}" 
+              <td class="py-4 px-6 text-center view-details-cell">
+                <a href="${pageContext.request.contextPath}/proposal-detail?id=${proposal.proposalId}" 
                    class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md">
-                  <i class="fas fa-eye mr-2"></i>Xem
+                  <i class="fas fa-eye mr-2"></i>View Details
                 </a>
               </td>
             </tr>
@@ -113,13 +131,13 @@
       </table>
     </div>
 
-    <!-- Phân trang -->
+    <!-- Pagination -->
     <div class="flex justify-center mt-6 gap-2">
       <c:set var="currentPage" value="${param.page == null ? 1 : param.page}"/>
       <c:set var="totalPages" value="${totalPages}"/>
       <a href="${pageContext.request.contextPath}/proposals?page=${currentPage - 1}&search=${param.search}&status=${param.status}&startDate=${param.startDate}&endDate=${param.endDate}&itemsPerPage=${param.itemsPerPage}" 
          class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md ${currentPage == 1 ? 'opacity-50 pointer-events-none' : ''}">
-        <i class="fas fa-chevron-left mr-2"></i>Trang trước
+        <i class="fas fa-chevron-left mr-2"></i>Previous Page
       </a>
       <div class="flex gap-2">
         <c:forEach begin="1" end="${totalPages}" var="i">
@@ -129,9 +147,45 @@
       </div>
       <a href="${pageContext.request.contextPath}/proposals?page=${currentPage + 1}&search=${param.search}&status=${param.status}&startDate=${param.startDate}&endDate=${param.endDate}&itemsPerPage=${param.itemsPerPage}" 
          class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md ${currentPage == totalPages ? 'opacity-50 pointer-events-none' : ''}">
-        Trang sau<i class="fas fa-chevron-right ml-2"></i>
+        Next Page<i class="fas fa-chevron-right ml-2"></i>
       </a>
     </div>
   </div>
+
+  <script>
+    function validateForm() {
+      const startDateInput = document.getElementById('startDate').value;
+      const endDateInput = document.getElementById('endDate').value;
+      const startDateError = document.getElementById('startDateError');
+      const endDateError = document.getElementById('endDateError');
+
+      // Reset error messages
+      startDateError.textContent = '';
+      endDateError.textContent = '';
+
+      // Check if dates are provided and valid
+      if (startDateInput && !isValidDate(startDateInput)) {
+        startDateError.textContent = 'Please enter a valid start date.';
+        return false;
+      }
+      if (endDateInput && !isValidDate(endDateInput)) {
+        endDateError.textContent = 'Please enter a valid end date.';
+        return false;
+      }
+
+      // Check if end date is not before start date
+      if (startDateInput && endDateInput && new Date(endDateInput) < new Date(startDateInput)) {
+        endDateError.textContent = 'End date must be on or after start date.';
+        return false;
+      }
+
+      return true;
+    }
+
+    function isValidDate(dateString) {
+      const date = new Date(dateString);
+      return !isNaN(date.getTime());
+    }
+  </script>
 </body>
-</html> 
+</html>
