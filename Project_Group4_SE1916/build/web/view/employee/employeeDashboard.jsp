@@ -317,72 +317,30 @@
                     </div>
                 </div>
                 <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                    <a href="${pageContext.request.contextPath}/requestHistory.jsp" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                    <a href="${pageContext.request.contextPath}/ListProposalServlet.jsp" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
                 </div>
             </div>
         </div>
 
         <!-- Quick Actions -->
         <div class="mb-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <button onclick="window.location.href='${pageContext.request.contextPath}/createRequest.jsp'" 
+            <button onclick="window.location.href='${pageContext.request.contextPath}/ProposalServlet'" 
                     class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
                 <i class="fas fa-file-alt text-3xl mb-3"></i>
                 <span class="text-lg">Tạo yêu cầu mới</span>
             </button>
-            <button onclick="window.location.href='${pageContext.request.contextPath}/requestRistory.jsp'" 
+            <button onclick="window.location.href='${pageContext.request.contextPath}/ListProposalServlet'" 
                     class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
                 <i class="fas fa-history text-3xl mb-3"></i>
                 <span class="text-lg">Xem lịch sử yêu cầu</span>
             </button>
         </div>
-
-        <!-- Request History Table -->
-        <div class="table-container bg-white dark:bg-gray-800">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Lịch sử yêu cầu</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-300">Danh sách các yêu cầu đã gửi</p>
-                </div>
-                <a href="${pageContext.request.contextPath}/requestHistory.jsp" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full table-auto">
-                    <thead>
-                        <tr class="bg-primary-600 text-white">
-                            <th class="p-4 text-left">Thời gian</th>
-                            <th class="p-4 text-left">Loại yêu cầu</th>
-                            <th class="p-4 text-left">Nội dung</th>
-                            <th class="p-4 text-left">Trạng thái</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-b border-gray-200 dark:border-gray-700">
-                            <td class="p-4">10:30 23/05/2025</td>
-                            <td class="p-4">Yêu cầu xuất kho</td>
-                            <td class="p-4">10 bàn gỗ cao cấp</td>
-                            <td class="p-4"><span class="badge badge-warning">Chờ duyệt</span></td>
-                        </tr>
-                        <tr class="border-b border-gray-200 dark:border-gray-700">
-                            <td class="p-4">09:15 23/05/2025</td>
-                            <td class="p-4">Đề nghị mua vật tư</td>
-                            <td class="p-4">5 màn hình LCD 24"</td>
-                            <td class="p-4"><span class="badge badge-success">Đã duyệt</span></td>
-                        </tr>
-                        <tr class="border-b border-gray-200 dark:border-gray-700">
-                            <td class="p-4">08:45 23/05/2025</td>
-                            <td class="p-4">Đề nghị sửa chữa</td>
-                            <td class="p-4">3 bàn phím cơ hỏng</td>
-                            <td class="p-4"><span class="badge badge-danger">Bị từ chối</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+     
     </main>
 
     <!-- Footer -->
     <footer class="bg-gray-100 dark:bg-gray-800 text-center p-6 mt-8 border-t border-gray-200 dark:border-gray-700 transition-all duration-300">
-        <p class="text-gray-600 dark:text-gray-300 text-sm">Hệ thống Quản lý Vật tư - Phiên bản 2.0 © 2025 | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Liên hệ hỗ trợ</a></p>
+        <p class="text-gray-600 dark:text-gray-300 text-sm">Hệ thống Quản lý Vật tư | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Liên hệ hỗ trợ</a></p>
     </footer>
 
     <!-- JavaScript -->
@@ -432,35 +390,6 @@
                 style: {borderRadius: "0.5rem"}
             }).showToast();
         }
-
-        // Table Sorting
-        document.querySelectorAll('th').forEach(th => {
-            th.addEventListener('click', () => {
-                const table = th.closest('table');
-                const tbody = table.querySelector('tbody');
-                const rows = Array.from(tbody.querySelectorAll('tr'));
-                const columnIndex = th.cellIndex;
-                const isNumeric = columnIndex === 0; // Only "Thời gian" is sortable as text for simplicity
-                const isAsc = th.classList.toggle('asc');
-                th.classList.toggle('desc', !isAsc);
-                table.querySelectorAll('th').forEach(header => {
-                    if (header !== th)
-                        header.classList.remove('asc', 'desc');
-                });
-                rows.sort((a, b) => {
-                    let aValue = a.cells[columnIndex].textContent;
-                    let bValue = b.cells[columnIndex].textContent;
-                    if (isNumeric) {
-                        aValue = new Date(aValue).getTime();
-                        bValue = new Date(bValue).getTime();
-                        return isAsc ? aValue - bValue : bValue - aValue;
-                    }
-                    return isAsc ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-                });
-                tbody.innerHTML = '';
-                rows.forEach(row => tbody.appendChild(row));
-            });
-        });
     </script>
 </body>
 </html>

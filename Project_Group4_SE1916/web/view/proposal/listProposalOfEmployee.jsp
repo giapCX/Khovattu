@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -16,6 +17,29 @@
 
         <!-- style CSS -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
+        <style>
+            .badge {
+                padding: 0.25rem 0.75rem;
+                border-radius: 0.5rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+
+            .badge-success {
+                background-color: #d1fae5;
+                color: #065f46;
+            }
+
+            .badge-warning {
+                background-color: #fef3c7;
+                color: #92400e;
+            }
+
+            .badge-danger {
+                background-color: #fee2e2;
+                color: #991b1b;
+            }
+        </style>
 
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
@@ -116,8 +140,29 @@
                                         <c:forEach var="item" items="${proposals}">
                                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                                 <td class="p-4 font-medium">${item.proposalType}</td>
-                                                <td class="p-4 font-medium">${item.proposalSentDate}</td>
-                                                <td class="p-4 font-medium">${item.finalStatus}</td>
+                                                <td class="p-4 font-medium">
+                                                    <fmt:formatDate value="${item.proposalSentDate}" pattern="HH:mm, dd MMM yyyy"/>
+                                                </td>
+                                                <td class="p-4 font-medium">
+                                                    <c:choose>
+                                                        <c:when test="${item.finalStatus == 'rejected'}">
+                                                            <span class="badge badge-danger">${item.finalStatus}</span> 
+                                                        </c:when>
+                                                        <c:when test="${item.finalStatus == 'pending'}">
+                                                            <span class="badge badge-warning">${item.finalStatus}</span> 
+                                                        </c:when>
+                                                        <c:when test="${item.finalStatus == 'approved_by_admin'}">
+                                                            <span class="badge badge-success-border-subtle">${item.finalStatus}</span> 
+                                                        </c:when>
+                                                        <c:when test="${item.finalStatus == 'approved_but_not_executed'}">
+                                                            <span class="badge badge-success-bg-subtle">${item.finalStatus}</span> 
+                                                        </c:when>
+                                                        <c:when test="${item.finalStatus == 'executed'}">
+                                                            <span class="badge badge-success">${item.finalStatus}</span> 
+                                                        </c:when>
+                                                    </c:choose>
+                                                </td>
+
                                                 <td class="p-4 font-medium">${item.note}</td>
                                                 <td class="p-4 font-medium">
                                                     <a href="DetailProposalServlet?proposalId=${item.proposalId}" class="text-primary-600 dark:text-primary-400 hover:underline">Detail </a>
