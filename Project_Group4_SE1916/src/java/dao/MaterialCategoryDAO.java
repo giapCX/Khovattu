@@ -66,6 +66,23 @@ public class MaterialCategoryDAO {
         return categories;
     }
 
+    public MaterialCategory getParentCategoryById(int categoryId) throws SQLException {
+        String sql = "SELECT category_id, name, status FROM MaterialCategories WHERE category_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, categoryId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    MaterialCategory category = new MaterialCategory();
+                    category.setCategoryId(rs.getInt("category_id"));
+                    category.setName(rs.getString("name"));
+                    category.setStatus(rs.getString("status"));
+                    return category;
+                }
+            }
+        }
+        return null;
+    }
+
     public void addChildCategory(String name, int parentId) throws SQLException {
         String sql = "INSERT INTO MaterialCategories (name, parent_id) VALUES (?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -74,25 +91,22 @@ public class MaterialCategoryDAO {
             ps.executeUpdate();
         }
     }
-    public boolean updateChildCategory(int categoryId, String newName, int parentId) {
-        String query = "UPDATE MaterialCategories SET name = ?, parent_id = ? WHERE category_id = ? AND status = 'active'";
-        
-        try (PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setString(1, newName);
-            ps.setInt(2, parentId);
-            ps.setInt(3, categoryId);
-            int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+
     public void addParentCategory(String name, String status) throws SQLException {
         String sql = "INSERT INTO MaterialCategories (name, parent_id, status) VALUES (?, NULL, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ps.setString(2, status);
+            ps.executeUpdate();
+        }
+    }
+
+    public void updateParentCategory(int categoryId, String name, String status) throws SQLException {
+        String sql = "UPDATE MaterialCategories SET name = ?, status = ? WHERE category_id = ? AND parent_id IS NULL";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setString(2, status);
+            ps.setInt(3, categoryId);
             ps.executeUpdate();
         }
     }
@@ -133,5 +147,20 @@ public class MaterialCategoryDAO {
             }
         }
         return categories;
+    }
+
+    public boolean updateChildCategory(int categoryId, String newName, int parentId) {
+        String query = "UPDATE MaterialCategories SET name = ?, parent_id = ? WHERE category_id = ? AND status = 'active'";
+        
+        try (PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, newName);
+            ps.setInt(2, parentId);
+            ps.setInt(3, categoryId);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

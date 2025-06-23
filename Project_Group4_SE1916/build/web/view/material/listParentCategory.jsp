@@ -86,6 +86,17 @@
             color: #dc3545;
             font-weight: 500;
         }
+        .filter-section {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .search-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -99,8 +110,22 @@
             <div class="alert alert-success" role="alert">${successMessage}</div>
         </c:if>
 
+        <div class="filter-section">
+            <div class="search-group">
+                <input type="text" id="searchName" class="form-control" placeholder="Search by Name Parent Category" style="width: 300px;">
+                <button id="searchBtn" class="btn btn-primary">Search</button>
+            </div>
+            <div>
+                <select id="filterStatus" class="form-select" style="width: 150px;">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+        </div>
+
         <div class="table-responsive">
-            <table id="parentCategoryTable" class="table table-striped">
+            <table id="parentCategoryTable" class="table table-striped" style="width:100%">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -118,6 +143,8 @@
                             <td>
                                 <a href="${pageContext.request.contextPath}/ListMaterialController?filterParentCategory=${cat.categoryId}" 
                                    class="btn btn-sm btn-info action-btn">View Details</a>
+                                <a href="${pageContext.request.contextPath}/EditParentCategoryController?categoryId=${cat.categoryId}" 
+                                   class="btn btn-sm btn-warning action-btn">Edit</a>
                             </td>
                         </tr>
                     </c:forEach>
@@ -133,11 +160,26 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function () {
-            $('#parentCategoryTable').DataTable({
+            var table = $('#parentCategoryTable').DataTable({
                 dom: '<"top"lf>rt<"bottom"p><"clear">',
                 pagingType: 'full_numbers',
                 pageLength: 10,
-                lengthMenu: [5, 10, 25, 50]
+                lengthMenu: [5, 10, 25, 50],
+                order: [[1, 'asc']] // Sắp xếp theo cột tên mặc định
+            });
+
+            // Lọc theo trạng thái
+            $('#filterStatus').on('change', function () {
+                var status = this.value;
+                var name = $('#searchName').val();
+                table.column(1).search(name).column(2).search(status).draw();
+            });
+
+            // Nút Search để áp dụng cả tên và trạng thái
+            $('#searchBtn').on('click', function () {
+                var name = $('#searchName').val();
+                var status = $('#filterStatus').val();
+                table.column(1).search(name).column(2).search(status).draw();
             });
 
             <c:if test="${not empty sessionScope.successMessage}">

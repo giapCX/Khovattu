@@ -144,6 +144,10 @@
         <servlet-name>DirectorApproveProposal</servlet-name>
         <servlet-class>controller.proposal.DirectorApproveProposal</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>EditParentCategoryController</servlet-name>
+        <servlet-class>controller.material.EditParentCategoryController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -287,6 +291,10 @@
     <servlet-mapping>
         <servlet-name>DirectorApproveProposal</servlet-name>
         <url-pattern>/DirectorApproveProposal</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditParentCategoryController</servlet-name>
+        <url-pattern>/EditParentCategoryController</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>
