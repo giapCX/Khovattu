@@ -36,6 +36,11 @@ public class ProposalDAO {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
                         int proposalId = rs.getInt(1);
+                        String insertApprovalSQL = "INSERT INTO ProposalApprovals (proposal_id, admin_status, director_status) VALUES (?, 'pending', 'pending')";
+                        try (PreparedStatement approvalStmt = conn.prepareStatement(insertApprovalSQL)) {
+                            approvalStmt.setInt(1, proposalId);
+                            approvalStmt.executeUpdate();
+                        }
                         if (proposal.getProposalDetails() != null && !proposal.getProposalDetails().isEmpty()) {
                             if (addProposalDetails(proposalId, proposal.getProposalDetails())) {
                                 conn.commit();
@@ -393,7 +398,7 @@ public class ProposalDAO {
 
     public List<ProposalDetails> getProposalDetailsByProposalId(int proposalId) {
         List<ProposalDetails> list = new ArrayList<>();
-        String sql = "SELECT pd.*, m.name AS material_name, m.unit AS material_unit, m.price AS material_price "
+        String sql = "SELECT pd.*, m.name AS material_name, m.unit AS material_unit "
                 + "FROM ProposalDetails pd "
                 + "LEFT JOIN Materials m ON pd.material_id = m.material_id "
                 + "WHERE pd.proposal_id = ?";
@@ -455,84 +460,59 @@ public class ProposalDAO {
 
     public void adminUpdateProposal(int proposalId, String adminStatus, String adminReason, String adminNote, int adminApproverId) throws SQLException {
         String checkSql = "SELECT admin_status FROM ProposalApprovals WHERE proposal_id = ?";
-        String insertOrUpdateSql = "INSERT INTO ProposalApprovals (proposal_id, admin_approver_id, admin_status, admin_reason, admin_note, admin_approval_date) "
-                + "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP) "
-                + "ON DUPLICATE KEY UPDATE admin_status = VALUES(admin_status), admin_reason = VALUES(admin_reason), admin_note = VALUES(admin_note), admin_approval_date = CURRENT_TIMESTAMP, admin_approver_id = VALUES(admin_approver_id)";
-        String updateFinalStatusSql = "UPDATE EmployeeProposals ep "
-                + "SET final_status = CASE "
+        String insertSql = "INSERT INTO ProposalApprovals (proposal_id, admin_approver_id, admin_status, admin_reason, admin_note, admin_approval_date) "
+                + "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
+        String updateSql = "UPDATE ProposalApprovals SET admin_status = ?, admin_reason = ?, admin_note = ?, admin_approver_id = ?, admin_approval_date = CURRENT_TIMESTAMP "
+                + "WHERE proposal_id = ?";
+        String updateFinalStatusSql
+                = "UPDATE EmployeeProposals ep SET final_status = "
+                + "  CASE "
                 + "    WHEN (SELECT admin_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'approved' "
-                + "         AND (SELECT director_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'approved' THEN 'approved_but_not_executed' "
+                + "     AND (SELECT director_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'approved' THEN 'approved_but_not_executed' "
                 + "    WHEN (SELECT admin_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'rejected' "
-                + "         OR (SELECT director_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'rejected' THEN 'rejected' "
+                + "     OR (SELECT director_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'rejected' THEN 'rejected' "
                 + "    WHEN (SELECT admin_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'approved' "
-                + "         AND (SELECT director_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'pending' THEN 'approved_by_admin' "
-                + "    ELSE 'pending' END "
+                + "     AND (SELECT director_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'pending' THEN 'approved_by_admin' "
+                + "    ELSE 'pending' "
+                + "  END "
                 + "WHERE proposal_id = ?";
 
         try (
-                PreparedStatement checkStmt = conn.prepareStatement(checkSql); PreparedStatement updateStmt = conn.prepareStatement(insertOrUpdateSql); PreparedStatement updateFinalStatusStmt = conn.prepareStatement(updateFinalStatusSql)) {
-            // Check if proposal already has an approval
+                PreparedStatement checkStmt = conn.prepareStatement(checkSql); PreparedStatement insertStmt = conn.prepareStatement(insertSql); PreparedStatement updateStmt = conn.prepareStatement(updateSql); PreparedStatement updateFinalStmt = conn.prepareStatement(updateFinalStatusSql)) {
+            // Kiểm tra trạng thái hiện tại
             checkStmt.setInt(1, proposalId);
             ResultSet rs = checkStmt.executeQuery();
 
-            boolean hasApproval = false;
+            boolean isUpdate = false;
             String currentAdminStatus = "pending";
-
             if (rs.next()) {
-                hasApproval = true;
                 currentAdminStatus = rs.getString("admin_status");
+                if (currentAdminStatus != null && !"pending".equals(currentAdminStatus)) {
+                    throw new SQLException("Admin can only update when admin_status is 'pending'. Current status: " + currentAdminStatus);
+                }
+                isUpdate = true;
             }
 
-            if (hasApproval && !"pending".equalsIgnoreCase(currentAdminStatus)) {
-                throw new SQLException("Admin can only update when admin_status is 'pending'. Current: " + currentAdminStatus);
+            // Thực hiện insert hoặc update tùy vào trạng thái
+            if (isUpdate) {
+                updateStmt.setString(1, adminStatus);
+                updateStmt.setString(2, adminReason);
+                updateStmt.setString(3, adminNote);
+                updateStmt.setInt(4, adminApproverId);
+                updateStmt.setInt(5, proposalId);
+                updateStmt.executeUpdate();
+            } else {
+                insertStmt.setInt(1, proposalId);
+                insertStmt.setInt(2, adminApproverId);
+                insertStmt.setString(3, adminStatus);
+                insertStmt.setString(4, adminReason);
+                insertStmt.setString(5, adminNote);
+                insertStmt.executeUpdate();
             }
 
-            // Update or insert
-            updateStmt.setInt(1, proposalId);
-            updateStmt.setInt(2, adminApproverId);
-            updateStmt.setString(3, adminStatus);
-            updateStmt.setString(4, adminReason);
-            updateStmt.setString(5, adminNote);
-            updateStmt.executeUpdate();
-
-            // Update final_status
-            updateFinalStatusStmt.setInt(1, proposalId);
-            updateFinalStatusStmt.executeUpdate();
-
-        }
-    }
-
-    public void directorUpdateProposal(int proposalId, String finalStatus, int directorApproverId, String directorReason, String directorNote) throws SQLException {
-        String updateProposalSql = "UPDATE EmployeeProposals SET final_status = ?, executed_date = CASE WHEN ? = 'executed' THEN CURRENT_TIMESTAMP ELSE executed_date END WHERE proposal_id = ?";
-        String updateApprovalSql = "INSERT INTO ProposalApprovals (proposal_id, director_approver_id, director_reason, director_note, director_approval_date) "
-                + "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP) "
-                + "ON DUPLICATE KEY UPDATE director_approver_id = ?, director_reason = ?, director_note = ?, director_approval_date = CURRENT_TIMESTAMP";
-
-        conn.setAutoCommit(false);
-        try (PreparedStatement ps1 = conn.prepareStatement(updateProposalSql); PreparedStatement ps2 = conn.prepareStatement(updateApprovalSql)) {
-
-            // Cập nhật bảng EmployeeProposals
-            ps1.setString(1, finalStatus);
-            ps1.setString(2, finalStatus);
-            ps1.setInt(3, proposalId);
-            ps1.executeUpdate();
-
-            // Cập nhật hoặc chèn bảng ProposalApprovals
-            ps2.setInt(1, proposalId);
-            ps2.setInt(2, directorApproverId);
-            ps2.setString(3, directorReason);
-            ps2.setString(4, directorNote);
-            ps2.setInt(5, directorApproverId);
-            ps2.setString(6, directorReason);
-            ps2.setString(7, directorNote);
-            ps2.executeUpdate();
-
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
+            // Cập nhật trạng thái cuối cùng của proposal
+            updateFinalStmt.setInt(1, proposalId);
+            updateFinalStmt.executeUpdate();
         }
     }
 
@@ -628,7 +608,7 @@ public class ProposalDAO {
                 p.setNote(rs.getString("note"));
                 p.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
                 p.setFinalStatus(rs.getString("final_status"));
-        
+
                 list.add(p);
             }
         } catch (SQLException e) {

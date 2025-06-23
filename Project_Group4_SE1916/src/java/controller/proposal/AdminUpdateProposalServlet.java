@@ -90,12 +90,14 @@ public class AdminUpdateProposalServlet extends HttpServlet {
             int proposalId = Integer.parseInt(rawProposalId);
             int adminApproverId = Integer.parseInt(rawAdminApproverId);
 
-            // Validate input
+            // Validate status
             if (adminStatus == null || !adminStatus.matches("approved|rejected")) {
                 System.err.println("Invalid admin status: " + adminStatus);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid status provided.");
                 return;
             }
+
+            // Default value if null
             if (adminReason == null) {
                 adminReason = "";
             }
@@ -115,16 +117,9 @@ public class AdminUpdateProposalServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid input format.");
 
         } catch (SQLException e) {
-            String errorMessage = e.getMessage();
             System.err.println("Database error updating proposal ID: " + request.getParameter("proposalId"));
             e.printStackTrace();
-
-            if (errorMessage != null && errorMessage.contains("only update when admin_status is 'pending'")) {
-                request.getSession().setAttribute("errorMessage", "This proposal has already been processed.");
-                response.sendRedirect(request.getContextPath() + "/AdminProposalDetailServlet?proposalId=" + request.getParameter("proposalId"));
-            } else {
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error updating proposal.");
-            }
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error updating proposal.");
 
         } catch (Exception e) {
             System.err.println("Unexpected error updating proposal");

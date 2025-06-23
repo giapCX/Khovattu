@@ -1,7 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<c:set var="editable" value="${proposal.approval != null and proposal.approval.adminStatus == 'pending'}" />
+<c:set var="editable" value="${proposal.approval != null and (empty proposal.approval.adminStatus or proposal.approval.adminStatus eq 'pending')}" />
+
 <html>
 <head>
     <title>Proposal Detail</title>

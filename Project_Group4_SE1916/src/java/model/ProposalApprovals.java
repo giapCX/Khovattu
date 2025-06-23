@@ -7,20 +7,23 @@ package model;
 import java.sql.Timestamp;
 
 public class ProposalApprovals {
+
     private int approvalId;
-    private Proposal proposal;    
-    private int adminApproverId; 
-    private int directorApproverId; 
-    private Timestamp adminApprovalDate;   
-    private String adminReason;   
-    private String adminNote;       
-    private Timestamp directorApprovalDate; 
-    private String directorReason;    
-    private String directorNote;  
+    private Proposal proposal;
+    private int adminApproverId;
+    private int directorApproverId;
+    private Timestamp adminApprovalDate;
+    private String adminReason;
+    private String adminNote;
+    private Timestamp directorApprovalDate;
+    private String directorReason;
+    private String directorNote;
     private String adminStatus;
     private String directorStatus;
 
     public ProposalApprovals() {
+        this.adminStatus = "pending";
+        this.directorStatus = "pending";
     }
 
     public ProposalApprovals(int approvalId, Proposal proposal, int adminApproverId, int directorApproverId, Timestamp adminApprovalDate, String adminReason, String adminNote, Timestamp directorApprovalDate, String directorReason, String directorNote) {
@@ -131,5 +134,5 @@ public class ProposalApprovals {
     public void setDirectorNote(String directorNote) {
         this.directorNote = directorNote;
     }
-    
+
 }
