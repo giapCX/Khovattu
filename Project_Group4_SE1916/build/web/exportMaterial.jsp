@@ -3,9 +3,6 @@
     Created on : Jun 9, 2025, 7:27:11 PM
     Author     : ASUS
 --%>
-<%@page import="dao.MaterialDAO"%>
-<%@page import="model.Material"%>
-<%@ page import="java.util.List" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -52,7 +49,6 @@
         .table {
             background: #fff;
             border-radius: 10px;
-/*            overflow: hidden;*/
         }
         .table th {
             background: #6e8efb;
@@ -102,11 +98,6 @@
     </style>
 </head>
 <body>
-    <%
-        MaterialDAO materialDAO = new MaterialDAO();
-        List<Material> allMaterials = materialDAO.getAllMaterials();
-    %>
-
     <div class="container">
         <h1 class="text-center mb-4">Export Materials</h1>
 
@@ -135,20 +126,20 @@
 
             <div class="mb-3">
                 <label for="exportId" class="form-label">Export ID</label>
-                <input type="text" class="form-control" id="exportId" name="exportId" required>
-                <div class="invalid-feedback">Please enter the export ID.</div>
+                <input type="text" class="form-control" id="exportId" name="exportId" required maxlength="50" pattern="[A-Za-z0-9-_]+">
+                <div class="invalid-feedback">Export ID is required, max 50 characters, alphanumeric, hyphens, or underscores only.</div>
             </div>
 
             <div class="mb-3">
                 <label for="voucherId" class="form-label">Voucher ID</label>
-                <input type="text" class="form-control" id="voucherId" name="voucherId" required>
-                <div class="invalid-feedback">Please enter the voucher ID.</div>
+                <input type="text" class="form-control" id="voucherId" name="voucherId" required maxlength="50" pattern="[A-Za-z0-9-_]+">
+                <div class="invalid-feedback">Voucher ID is required, max 50 characters, alphanumeric, hyphens, or underscores only.</div>
             </div>    
 
             <div class="mb-3">
                 <label for="purpose" class="form-label">Export Purpose</label>
-                <textarea class="form-control" id="purpose" name="purpose" rows="3" required></textarea>
-                <div class="invalid-feedback">Please enter the export purpose.</div>
+                <textarea class="form-control" id="purpose" name="purpose" rows="3" required maxlength="500" pattern="[A-Za-z0-9\s,.()-]+"></textarea>
+                <div class="invalid-feedback">Purpose is required, max 500 characters, alphanumeric, spaces, commas, periods, parentheses, or hyphens only.</div>
             </div>
 
             <div class="mb-3">
@@ -198,17 +189,43 @@
 
             <div class="mb-3">
                 <label for="additionalNote" class="form-label">Additional Notes</label>
-                <textarea class="form-control" id="additionalNote" name="additionalNote" rows="3"></textarea>
+                <textarea class="form-control" id="additional printable" name="additionalNote" rows="3" maxlength="1000" pattern="[A-Za-z0-9\s,.()-]+"></textarea>
+                <div class="invalid-feedback">Notes max 1000 characters, alphanumeric, spaces, commas, periods, parentheses, or hyphens only.</div>
             </div>
 
             <button type="submit" class="btn btn-primary">Save Export Voucher</button>
             <button type="reset" class="btn btn-info">Reset</button>
+            <button type="button" class="btn btn-success" onclick="window.print()">Print Voucher</button>
             <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn btn-secondary">Back to Dashboard</a>
         </form>
     </div>
 
     <script>
+        // Initialize materialData
         let materialData = [];
+
+        // Fetch materials from Servlet via AJAX
+        async function fetchMaterials() {
+            try {
+                const response = await fetch('${pageContext.request.contextPath}/exportMaterial?fetch=materials');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                materialData = data.map(item => ({
+                    name: item.name || '',
+                    code: item.code || '',
+                    unit: item.unit || ''
+                }));
+                console.log("Material Data:", materialData);
+                if (materialData.length === 0) {
+                    showAlert('warning', 'No material data available.');
+                }
+            } catch (error) {
+                console.error("Error fetching materials:", error);
+                showAlert('error', 'Failed to load material data. Please try again.');
+            }
+        }
 
         // Show alert
 //        function showAlert(type, message) {
@@ -249,7 +266,7 @@
                 <td class="serial-number"></td>
                 <td style="position: relative;">
                     <input type="text" class="form-control material-name-input" name="materialName[]" required autocomplete="off">
-                    <div class="autocomplete-suggestions" style="display: none;"></div>
+                    <div class="autocomplete-suggestions" style="1"></div>
                 </td>
                 <td><input type="text" class="form-control material-code-input" name="materialCode[]" readonly></td>
                 <td><input type="number" class="form-control" name="quantity[]" min="1" required></td>
@@ -267,7 +284,7 @@
             tableBody.appendChild(row);
             attachAutocomplete(row.querySelector('.material-name-input'));
             updateSerialNumbers();
-            updateRemoveButtons();
+            1;
             showAlert('success', 'Added new material row.');
         }
 
@@ -322,7 +339,7 @@
         }
 
         // Bootstrap form validation
-        (function () {
+        (function() {
             'use strict';
             const forms = document.querySelectorAll('.needs-validation');
             Array.from(forms).forEach(form => {
@@ -338,9 +355,10 @@
 
         // Client-side form validation
         function validateForm() {
-            const purpose = document.getElementById('purpose').value.trim();
             const exportId = document.getElementById('exportId').value.trim();
             const voucherId = document.getElementById('voucherId').value.trim();
+            const purpose = document.getElementById('purpose').value.trim();
+            const additionalNote = document.getElementById('additionalNote').value.trim();
             const materialNames = document.getElementsByName('materialName[]');
             const materialCodes = document.getElementsByName('materialCode[]');
             const quantities = document.getElementsByName('quantity[]');
@@ -350,47 +368,86 @@
 
             rows.forEach(row => row.classList.remove('error-row'));
 
+            // Regex for allowed characters
+            const idRegex = /^[A-Za-z0-9-_]+$/;
+            const textRegex = /^[A-Za-z0-9\s,.()-]+$/;
+
             if (!exportId) {
-                showAlert('danger', 'Export ID cannot be empty.');
+                showAlert('error', 'Export ID cannot be empty.');
                 return false;
             }
+            if (exportId.length > 50) {
+                showAlert('error', 'Export ID cannot exceed 50 characters.');
+                return false;
+            }
+            if (!idRegex.test(exportId)) {
+                showAlert('error', 'Export ID can only contain alphanumeric characters, hyphens, or underscores.');
+                return false;
+            }
+
             if (!voucherId) {
-                showAlert('danger', 'Voucher ID cannot be empty.');
+                showAlert('error', 'Voucher ID cannot be empty.');
                 return false;
             }
+            if (voucherId.length > 50) {
+                showAlert('error', 'Voucher ID cannot exceed 50 characters.');
+                return false;
+            }
+            if (!idRegex.test(voucherId)) {
+                showAlert('error', 'Voucher ID can only contain alphanumeric characters, hyphens, or underscores.');
+                return false;
+            }
+
             if (!purpose) {
-                showAlert('danger', 'Export purpose cannot be empty.');
+                showAlert('error', 'Export purpose cannot be empty.');
+                return false;
+            }
+            if (purpose.length > 500) {
+                showAlert('error', 'Export purpose cannot exceed 500 characters.');
+                return false;
+            }
+            if (!textRegex.test(purpose)) {
+                showAlert('error', 'Export purpose can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.');
+                return false;
+            }
+
+            if (additionalNote && additionalNote.length > 1000) {               
+                showAlert('error', 'Additional notes cannot exceed 1000 characters.');
+                return false;
+            }
+            if (additionalNote && !textRegex.test(additionalNote)) {
+                showAlert('error', 'Additional notes can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.');
                 return false;
             }
 
             if (materialNames.length === 0) {
-                showAlert('danger', 'At least one material is required.');
+                showAlert('error', 'At least one material is required.');
                 return false;
             }
 
             for (let i = 0; i < materialNames.length; i++) {
                 if (!materialNames[i].value.trim()) {
-                    showAlert('danger', `Material name cannot be empty at row ${i + 1}`);
+                    showAlert('error', `Material name cannot be empty at row ${i + 1}`);
                     rows[i].classList.add('error-row');
                     return false;
                 }
                 if (!materialCodes[i].value.trim()) {
-                    showAlert('danger', `Material code cannot be empty at row ${i + 1}`);
+                    showAlert('error', `Material code cannot be empty at row ${i + 1}`);
                     rows[i].classList.add('error-row');
                     return false;
                 }
                 if (!quantities[i].value || quantities[i].value <= 0) {
-                    showAlert('danger', `Quantity must be greater than 0 at row ${i + 1}`);
+                    showAlert('error', `Quantity must be greater than 0 at row ${i + 1}`);
                     rows[i].classList.add('error-row');
                     return false;
                 }
                 if (!units[i].value) {
-                    showAlert('danger', `Unit cannot be empty at row ${i + 1}`);
+                    showAlert('error', `Unit cannot be empty at row ${i + 1}`);
                     rows[i].classList.add('error-row');
                     return false;
                 }
                 if (!conditions[i].value) {
-                    showAlert('danger', `Condition cannot be empty at row ${i + 1}`);
+                    showAlert('error', `Condition cannot be empty at row ${i + 1}`);
                     rows[i].classList.add('error-row');
                     return false;
                 }
@@ -405,33 +462,13 @@
 
             if (!tableBody || !addButton) {
                 console.error('Required elements not found');
-                showAlert('danger', 'System error: Table or add button not found.');
+                showAlert('error', 'System error: Table or add button not found.');
                 return;
             }
 
-            // Fetch materials
-            fetch('${pageContext.request.contextPath}/exportMaterial', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(errorText => {
-                        throw new Error(`Server error: ${response.status} - ${errorText || 'No error details'}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                materialData = data;
-                console.log('Material data loaded:', materialData);
+            // Fetch materials and attach autocomplete
+            fetchMaterials().then(() => {
                 document.querySelectorAll(".material-name-input").forEach(attachAutocomplete);
-            })
-            .catch(error => {
-                console.error('Error fetching materials:', error);
-                showAlert('danger', `Failed to load material data. Error: ${error.message}`);
             });
 
             // Add row event

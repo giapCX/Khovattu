@@ -67,7 +67,7 @@ public class ExportDAO {
     }
 
     public boolean checkVoucherIdExists(String voucherId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Export WHERE voucherId = ?";
+        String sql = "SELECT COUNT(*) FROM ExportReceipts WHERE voucher_id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, voucherId);
             ResultSet rs = stmt.executeQuery();
