@@ -11,6 +11,7 @@ public class ProposalDetails {
     private int materialId;  
     private double quantity;
     private String materialCondition;
+    private String unit;
 
     public ProposalDetails() {
     }
@@ -23,14 +24,26 @@ public class ProposalDetails {
         this.materialCondition = materialCondition;
     }
 
-    public ProposalDetails(int proposalDetailId, String materialName, Proposal proposal, int materialId, double quantity, String materialCondition) {
+    public ProposalDetails(int proposalDetailId, String materialName, Proposal proposal, int materialId, double quantity, String materialCondition,String unit) {
         this.proposalDetailId = proposalDetailId;
         this.materialName = materialName;
         this.proposal = proposal;
         this.materialId = materialId;
         this.quantity = quantity;
         this.materialCondition = materialCondition;
+        this.unit = unit;
     }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+    
+    
+    
 
     public String getMaterialName() {
         return materialName;

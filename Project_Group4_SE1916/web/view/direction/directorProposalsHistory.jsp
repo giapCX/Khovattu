@@ -32,6 +32,14 @@
       Construction Material Request History
     </h1>
 
+    <!-- Back Button -->
+    <div class="mb-6">
+      <a href="${pageContext.request.contextPath}/view/direction/directionDashboard.jsp" 
+         class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md inline-flex items-center">
+        <i class="fas fa-arrow-left mr-2"></i>Previous page 
+      </a>
+    </div>
+
     <!-- Search and Filter Bar -->
     <form id="searchForm" action="${pageContext.request.contextPath}/proposals" method="get" onsubmit="return validateForm()">
       <div class="flex flex-col md:flex-row justify-between mb-6 gap-4">
@@ -108,21 +116,29 @@
                 <fmt:formatDate value="${proposal.approval.directorApprovalDate}" pattern="yyyy-MM-dd" var="directorFormattedDate"/>
                 ${empty directorFormattedDate ? 'Not Approved' : directorFormattedDate}
               </td>
+       
+              
               <td class="py-4 px-6">
-                <span class="px-3 py-1 rounded-full font-semibold <c:choose>
-                  <c:when test="${proposal.directorStatus == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
-                  <c:when test="${proposal.directorStatus == 'approved_by_director'}">bg-green-300 text-green-900</c:when>
-                  <c:otherwise>bg-red-300 text-red-900</c:otherwise>
-                </c:choose>">
-                  <c:choose>
-                    <c:when test="${proposal.directorStatus == 'pending'}">Pending</c:when>
-                    <c:when test="${proposal.directorStatus == 'approved_by_director'}">Approved by Director</c:when>
-                    <c:otherwise>Rejected</c:otherwise>
-                  </c:choose>
-                </span>
-              </td>
+    <span class="px-3 py-1 rounded-full font-semibold 
+        <c:choose>
+            <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
+            <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'approved'}">bg-green-300 text-green-900</c:when>
+            <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'rejected'}">bg-red-300 text-red-900</c:when>
+            <c:otherwise>bg-gray-300 text-gray-900</c:otherwise>
+        </c:choose>">
+        <c:choose>
+            <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'pending'}">Pending</c:when>
+            <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'approved'}">Approved</c:when>
+            <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'rejected'}">Rejected</c:when>
+            <c:otherwise>Unknown</c:otherwise>
+        </c:choose>
+    </span>
+</td>
+              
+              
+              
               <td class="py-4 px-6 text-center view-details-cell">
-                <a href="${pageContext.request.contextPath}/proposal-detail?id=${proposal.proposalId}" 
+                <a href="${pageContext.request.contextPath}/DirectorApproveProposal?id=${proposal.proposalId}" 
                    class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md">
                   <i class="fas fa-eye mr-2"></i>View Details
                 </a>

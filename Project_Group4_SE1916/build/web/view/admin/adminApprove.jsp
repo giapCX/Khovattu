@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -40,15 +41,15 @@
                     <div class="relative w-full md:w-1/3">
                         <input type="date" id="dateFrom" name="dateFrom" value="${dateFrom}"
                                class="p-3 pl-10 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md">
-                        <i class="fas fa-calendar-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
+                        <i class="fas fa-calendar-alt absolute left-2 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
                     </div>
                     <div class="relative w-full md:w-1/3">
                         <input type="date" id="dateTo" name="dateTo" value="${dateTo}"
                                class="p-3 pl-10 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md">
-                        <i class="fas fa-calendar-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
+                        <i class="fas fa-calendar-alt absolute left-2 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
                     </div>
                     <div class="relative w-full md:w-1/3">
-                        <select id="status" name="status" class="p-3 pl-10 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white"
+                        <select id="status" name="status" class="p-3 pl-10 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white"
                                 onchange="document.getElementById('filterForm').submit()">
                             <option value="" ${empty status ? 'selected' : ''}>All Status</option>
                             <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
@@ -56,14 +57,14 @@
                             <option value="approved_by_director" ${status == 'approved_by_director' ? 'selected' : ''}>Approved by Director</option>
                             <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
                         </select>
-                        <i class="fas fa-filter absolute left-3 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
+                        <i class="fas fa-filter absolute left-2 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
                     </div>
                 </div>
             </div>
 
             <!-- Items per Page Selector -->
             <div class="flex justify-end mb-4">
-                <select id="itemsPerPage" name="itemsPerPage" class="p-3 border-2 border-sky-300 rounded-xl w-full md:w-1/5 focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white"
+                <select id="itemsPerPage" name="itemsPerPage" class="p-2 border-2 border-sky-400 rounded-xl w-full md:w-1/5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white"
                         onchange="document.getElementById('filterForm').submit()">
                     <option value="10" ${itemsPerPage == '10' ? 'selected' : ''}>10 proposals/page</option>
                     <option value="20" ${itemsPerPage == '20' ? 'selected' : ''}>20 proposals/page</option>
@@ -98,29 +99,33 @@
                             <td class="py-4 px-6"><fmt:formatDate value="${proposal.proposalSentDate}" pattern="yyyy-MM-dd" /></td>
                             <td class="py-4 px-6">${proposal.approvalDate == null ? 'Not Approved' : ''}<fmt:formatDate value="${proposal.approvalDate}" pattern="yyyy-MM-dd" /></td>
                             <td class="py-4 px-6">
-                                <span class="px-3 py-1 rounded-full font-semibold <c:choose>
-                                    <c:when test="${proposal.finalStatus == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
-                                    <c:when test="${proposal.finalStatus == 'approved_by_admin'}">bg-green-300 text-green-900</c:when>
-                                    <c:when test="${proposal.finalStatus == 'rejected'}">bg-red-300 text-red-900</c:when>
-                                    <c:otherwise>bg-gray-300 text-gray-900</c:otherwise>
-                                </c:choose>">
+                                <span class="px-3 py-1 rounded-full font-semibold 
                                     <c:choose>
-                                        <c:when test="${proposal.finalStatus == 'pending'}">Pending</c:when>
-                                        <c:when test="${proposal.finalStatus == 'approved_by_admin'}">Approved</c:when>
-                                        <c:when test="${proposal.finalStatus == 'rejected'}">Rejected</c:when>
+                                        <c:when test="${proposal.approval != null and proposal.approval.adminStatus == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
+                                        <c:when test="${proposal.approval != null and proposal.approval.adminStatus == 'approved'}">bg-blue-300 text-blue-900</c:when>
+                                        <c:when test="${proposal.approval != null and proposal.approval.adminStatus == 'rejected'}">bg-red-300 text-red-900</c:when>
+                                        <c:otherwise>bg-gray-300 text-gray-900</c:otherwise>
+                                    </c:choose>">
+                                    <c:choose>
+                                        <c:when test="${proposal.approval != null and proposal.approval.adminStatus == 'pending'}">Pending</c:when>
+                                        <c:when test="${proposal.approval != null and proposal.approval.adminStatus == 'approved'}">Approved</c:when>
+                                        <c:when test="${proposal.approval != null and proposal.approval.adminStatus == 'rejected'}">Rejected</c:when>
                                         <c:otherwise>Unknown</c:otherwise>
                                     </c:choose>
                                 </span>
                             </td>
                             <td class="py-4 px-6">
-                                <span class="px-3 py-1 rounded-full font-semibold <c:choose>
-                                    <c:when test="${proposal.directorStatus == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
-                                    <c:when test="${proposal.directorStatus == 'approved_by_director'}">bg-blue-300 text-blue-900</c:when>
-                                    <c:otherwise>bg-gray-300 text-gray-900</c:otherwise>
-                                </c:choose>">
+                                <span class="px-3 py-1 rounded-full font-semibold 
                                     <c:choose>
-                                        <c:when test="${proposal.directorStatus == 'pending'}">Pending</c:when>
-                                        <c:when test="${proposal.directorStatus == 'approved_by_director'}">Approved</c:when>
+                                        <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
+                                        <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'approved'}">bg-blue-300 text-blue-900</c:when>
+                                        <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'rejected'}">bg-red-300 text-red-900</c:when>
+                                        <c:otherwise>bg-gray-300 text-gray-900</c:otherwise>
+                                    </c:choose>">
+                                    <c:choose>
+                                        <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'pending'}">Pending</c:when>
+                                        <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'approved'}">Approved</c:when>
+                                        <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'rejected'}">Rejected</c:when>
                                         <c:otherwise>Unknown</c:otherwise>
                                     </c:choose>
                                 </span>

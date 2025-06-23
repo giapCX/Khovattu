@@ -87,7 +87,8 @@ public class ProposalDAO {
         List<Proposal> proposals = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT ep.proposal_id, ep.proposal_type, ep.proposer_id, u.full_name AS sender_name, ep.note, ep.proposal_sent_date, "
-                + "COALESCE(ep.final_status, 'pending') AS admin_status, pa.admin_approval_date, pa.director_approval_date "
+                + "COALESCE(ep.final_status, 'pending') AS final_status, pa.admin_approval_date, pa.director_approval_date, "
+                + "pa.approval_id, pa.admin_status, pa.director_status, pa.admin_reason, pa.admin_note, pa.director_reason, pa.director_note "
                 + "FROM EmployeeProposals ep "
                 + "LEFT JOIN Users u ON ep.proposer_id = u.user_id "
                 + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
@@ -130,10 +131,25 @@ public class ProposalDAO {
                     proposal.setSenderName(rs.getString("sender_name"));
                     proposal.setNote(rs.getString("note"));
                     proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
-                    proposal.setFinalStatus(rs.getString("admin_status"));
+                    proposal.setFinalStatus(rs.getString("final_status"));
                     proposal.setApprovalDate(rs.getTimestamp("admin_approval_date") != null ? rs.getTimestamp("admin_approval_date") : rs.getTimestamp("director_approval_date"));
-                    String directorStatus = rs.getTimestamp("director_approval_date") != null ? "approved_by_director" : "pending";
-                    proposal.setDirectorStatus(directorStatus);
+
+                    // Gán đối tượng ProposalApprovals
+                    ProposalApprovals approval = new ProposalApprovals();
+                    approval.setApprovalId(rs.getInt("approval_id"));
+                    approval.setAdminStatus(rs.getString("admin_status"));
+                    approval.setDirectorStatus(rs.getString("director_status"));
+                    approval.setAdminApprovalDate(rs.getTimestamp("admin_approval_date"));
+                    approval.setDirectorApprovalDate(rs.getTimestamp("director_approval_date"));
+                    approval.setAdminReason(rs.getString("admin_reason"));
+                    approval.setAdminNote(rs.getString("admin_note"));
+                    approval.setDirectorReason(rs.getString("director_reason"));
+                    approval.setDirectorNote(rs.getString("director_note"));
+                    proposal.setApproval(approval);
+
+                    // Gán directorStatus để tương thích với mã cũ (tùy chọn)
+                    proposal.setDirectorStatus(rs.getString("director_status"));
+
                     proposals.add(proposal);
                 }
             }
@@ -186,20 +202,19 @@ public class ProposalDAO {
         List<Proposal> proposals = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT ep.proposal_id, ep.proposal_type, ep.proposer_id, u.full_name AS sender_name, ep.note, ep.proposal_sent_date, "
-                + "COALESCE(ep.final_status, 'pending') AS admin_status, pa.admin_approval_date, pa.director_approval_date, "
+                + "COALESCE(ep.final_status, 'pending') AS final_status, pa.admin_approval_date, pa.director_approval_date, "
                 + "ua.full_name AS admin_approver_name, pa.approval_id, pa.admin_approver_id, pa.director_approver_id, "
-                + "pa.admin_reason, pa.admin_note, pa.director_reason, pa.director_note "
+                + "pa.admin_status, pa.director_status, pa.admin_reason, pa.admin_note, pa.director_reason, pa.director_note "
                 + "FROM EmployeeProposals ep "
                 + "LEFT JOIN Users u ON ep.proposer_id = u.user_id "
                 + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
                 + "LEFT JOIN Users ua ON pa.admin_approver_id = ua.user_id "
-                + "WHERE ep.final_status = 'approved_by_admin'"
+                + "WHERE pa.admin_status = 'approved'"
         );
 
         List<Object> params = new ArrayList<>();
         if (status != null && !status.isEmpty()) {
-            // Lọc dựa trên director_status (pending, approved_by_director, rejected)
-            sql.append(" AND CASE WHEN pa.director_approval_date IS NOT NULL THEN 'approved_by_director' ELSE 'pending' END = ?");
+            sql.append(" AND pa.director_status = ?");
             params.add(status);
         }
         if (search != null && !search.trim().isEmpty()) {
@@ -234,14 +249,15 @@ public class ProposalDAO {
                     proposal.setSenderName(rs.getString("sender_name"));
                     proposal.setNote(rs.getString("note"));
                     proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
-                    proposal.setFinalStatus(rs.getString("admin_status"));
+                    proposal.setFinalStatus(rs.getString("final_status"));
                     proposal.setApprovalDate(rs.getTimestamp("admin_approval_date"));
 
-                    // Tạo và gán ProposalApprovals
                     ProposalApprovals approval = new ProposalApprovals();
                     approval.setApprovalId(rs.getInt("approval_id"));
                     approval.setAdminApproverId(rs.getInt("admin_approver_id"));
                     approval.setDirectorApproverId(rs.getInt("director_approver_id"));
+                    approval.setAdminStatus(rs.getString("admin_status"));
+                    approval.setDirectorStatus(rs.getString("director_status"));
                     approval.setAdminApprovalDate(rs.getTimestamp("admin_approval_date"));
                     approval.setDirectorApprovalDate(rs.getTimestamp("director_approval_date"));
                     approval.setAdminReason(rs.getString("admin_reason"));
@@ -250,8 +266,7 @@ public class ProposalDAO {
                     approval.setDirectorNote(rs.getString("director_note"));
                     proposal.setApproval(approval);
 
-                    // Xác định directorStatus
-                    proposal.setDirectorStatus(rs.getTimestamp("director_approval_date") != null ? "approved_by_director" : "pending");
+                    proposal.setDirectorStatus(rs.getString("director_status"));
                     proposal.setFinalApprover(rs.getString("admin_approver_name"));
                     proposals.add(proposal);
                 }
@@ -266,13 +281,12 @@ public class ProposalDAO {
                 + "FROM EmployeeProposals ep "
                 + "LEFT JOIN Users u ON ep.proposer_id = u.user_id "
                 + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
-                + "WHERE ep.final_status = 'approved_by_admin'"
+                + "WHERE pa.admin_status = 'approved'"
         );
 
         List<Object> params = new ArrayList<>();
         if (status != null && !status.isEmpty()) {
-            // Lọc dựa trên director_status
-            sql.append(" AND CASE WHEN pa.director_approval_date IS NOT NULL THEN 'approved_by_director' ELSE 'pending' END = ?");
+            sql.append(" AND pa.director_status = ?");
             params.add(status);
         }
         if (search != null && !search.trim().isEmpty()) {
@@ -301,6 +315,58 @@ public class ProposalDAO {
             }
         }
         return 0;
+    }
+
+    public void directorUpdateProposal(int proposalId, String directorStatus, String directorReason, String directorNote, int directorApproverId) throws SQLException {
+        String checkSql = "SELECT director_status FROM ProposalApprovals WHERE proposal_id = ?";
+        String updateSql = "UPDATE ProposalApprovals SET director_status = ?, director_approver_id = ?, director_reason = ?, director_note = ?, director_approval_date = CURRENT_TIMESTAMP WHERE proposal_id = ?";
+        String updateFinalStatusSql = "UPDATE EmployeeProposals ep SET final_status = "
+                + "CASE "
+                + "    WHEN (SELECT admin_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'approved' "
+                + "     AND (SELECT director_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'approved' THEN 'approved_but_not_executed' "
+                + "    WHEN (SELECT admin_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'rejected' "
+                + "     OR (SELECT director_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'rejected' THEN 'rejected' "
+                + "    WHEN (SELECT admin_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'approved' "
+                + "     AND (SELECT director_status FROM ProposalApprovals WHERE proposal_id = ep.proposal_id) = 'pending' THEN 'approved_by_admin' "
+                + "    ELSE 'pending' "
+                + "END "
+                + "WHERE proposal_id = ?";
+
+        conn.setAutoCommit(false);
+        try (
+                PreparedStatement checkStmt = conn.prepareStatement(checkSql); PreparedStatement updateStmt = conn.prepareStatement(updateSql); PreparedStatement updateFinalStmt = conn.prepareStatement(updateFinalStatusSql)) {
+            // Kiểm tra trạng thái hiện tại
+            checkStmt.setInt(1, proposalId);
+            ResultSet rs = checkStmt.executeQuery();
+            String currentDirectorStatus = "pending";
+            if (rs.next()) {
+                currentDirectorStatus = rs.getString("director_status");
+                if (currentDirectorStatus != null && !"pending".equals(currentDirectorStatus)) {
+                    throw new SQLException("Director can only update when director_status is 'pending'. Current status: " + currentDirectorStatus);
+                }
+            } else {
+                throw new SQLException("No approval record found for proposal ID: " + proposalId);
+            }
+
+            // Cập nhật ProposalApprovals
+            updateStmt.setString(1, directorStatus);
+            updateStmt.setInt(2, directorApproverId);
+            updateStmt.setString(3, directorReason);
+            updateStmt.setString(4, directorNote);
+            updateStmt.setInt(5, proposalId);
+            updateStmt.executeUpdate();
+
+            // Cập nhật final_status trong EmployeeProposals
+            updateFinalStmt.setInt(1, proposalId);
+            updateFinalStmt.executeUpdate();
+
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
     }
 
     public Proposal getProposalById(int proposalId) {
