@@ -502,7 +502,7 @@ public class ProposalDAO {
         }
     }
 
-public void directorUpdateProposal(int proposalId, String finalStatus, int directorApproverId, String directorReason, String directorNote) throws SQLException {
+    public void directorUpdateProposal(int proposalId, String finalStatus, int directorApproverId, String directorReason, String directorNote) throws SQLException {
         String updateProposalSql = "UPDATE EmployeeProposals SET final_status = ?, executed_date = CASE WHEN ? = 'executed' THEN CURRENT_TIMESTAMP ELSE executed_date END WHERE proposal_id = ?";
         String updateApprovalSql = "INSERT INTO ProposalApprovals (proposal_id, director_approver_id, director_reason, director_note, director_approval_date) "
                 + "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP) "
@@ -535,4 +535,106 @@ public void directorUpdateProposal(int proposalId, String finalStatus, int direc
             conn.setAutoCommit(true);
         }
     }
+
+    public int countProposalsByProposerTypeStatusFromStartDateToEndDate(int proposerId, String type, String status, Timestamp startDate, Timestamp endDate) {
+        int total = 0;
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM EmployeeProposals WHERE proposer_id = ?");
+
+        List<Object> parameters = new ArrayList<>();
+        parameters.add(proposerId);
+
+        if (type != null && !type.isEmpty()) {
+            sql.append(" AND proposal_type = ?");
+            parameters.add(type);
+        }
+
+        if (status != null && !status.isEmpty()) {
+            sql.append(" AND final_status = ?");
+            parameters.add(status);
+        }
+
+        if (startDate != null) {
+            sql.append(" AND proposal_sent_date >= ?");
+            parameters.add(startDate);
+        }
+
+        if (endDate != null) {
+            sql.append(" AND proposal_sent_date <= ?");
+            parameters.add(endDate);
+        }
+
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < parameters.size(); i++) {
+                ps.setObject(i + 1, parameters.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return total;
+    }
+
+    public List<Proposal> searchProposalsByProposerTypeStatusFromStartDateToEndDateWithPaging(
+            int proposerId, String type, String status, Timestamp startDate, Timestamp endDate, int offset, int limit) {
+
+        List<Proposal> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM EmployeeProposals WHERE proposer_id = ?");
+
+        List<Object> params = new ArrayList<>();
+        params.add(proposerId);
+
+        if (type != null && !type.isEmpty()) {
+            sql.append(" AND proposal_type = ?");
+            params.add(type);
+        }
+
+        if (status != null && !status.isEmpty()) {
+            sql.append(" AND final_status = ?");
+            params.add(status);
+        }
+
+        if (startDate != null) {
+            sql.append(" AND proposal_sent_date >= ?");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sql.append(" AND proposal_sent_date <= ?");
+            params.add(endDate);
+        }
+
+        sql.append(" ORDER BY proposal_sent_date DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Proposal p = new Proposal();
+                p.setProposalId(rs.getInt("proposal_id"));
+                p.setProposalType(rs.getString("proposal_type"));
+                p.setProposerId(rs.getInt("proposer_id"));
+                p.setNote(rs.getString("note"));
+                p.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
+                p.setFinalStatus(rs.getString("final_status"));
+        
+                list.add(p);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 }

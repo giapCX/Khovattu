@@ -132,6 +132,10 @@
         <servlet-name>DirectorProposalsServlet</servlet-name>
         <servlet-class>controller.proposal.DirectorProposalsServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ListProposalServlet</servlet-name>
+        <servlet-class>controller.proposal.ListProposalServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -263,6 +267,10 @@
     <servlet-mapping>
         <servlet-name>DirectorProposalsServlet</servlet-name>
         <url-pattern>/DirectorProposalsServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ListProposalServlet</servlet-name>
+        <url-pattern>/ListProposalServlet</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

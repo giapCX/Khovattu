@@ -12,65 +12,161 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
         <!-- Custom CSS -->
         <style>
-            body {
-                background-color: #f5f7fa;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Reset mặc định nhẹ */
+            * {
+                box-sizing: border-box;
             }
+
+            body {
+                background-color: #f4f6f9;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                color: #2c3e50;
+                margin: 0;
+                padding: 0;
+            }
+
             .container {
                 max-width: 1200px;
-                background: #fff;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                margin-top: 20px;
+                background-color: #fff;
+                margin: 30px auto;
+                padding: 25px 30px;
+                border-radius: 10px;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
             }
+
+            /* Tiêu đề */
             h1, h2 {
-                color: #2c3e50;
+                font-weight: bold;
+                margin-bottom: 20px;
             }
+
+            h1 {
+                font-size: 2rem;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: #1d3557;
+            }
+
+            .card {
+                border: none;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .card-header {
+                padding: 15px 20px;
+            }
+
+            .card-header.bg-primary {
+                background-color: #0284c7 !important;
+                color: white;
+            }
+
+            .card-body {
+                padding: 20px;
+            }
+
+            /* Form */
+            .form-control,
+            .form-select {
+                border-radius: 6px;
+                padding: 10px;
+                font-size: 0.95rem;
+            }
+
+            /* Table */
+            .table {
+                margin-bottom: 0;
+            }
+
+            .table th,
+            .table td {
+                vertical-align: middle !important;
+                text-align: center;
+                font-size: 0.95rem;
+            }
+
             .table thead {
                 background-color: #34495e;
-                color: #fff;
+                color: white;
             }
-            .table th, .table td {
-                vertical-align: middle;
+
+            /* Button styles */
+            .btn {
+                border-radius: 5px;
+                font-weight: 500;
             }
-            .form-control, .form-select {
-                border-radius: 4px;
-            }
+
             .btn-primary {
                 background-color: #0284c7;
                 border: none;
             }
+
             .btn-primary:hover {
                 background-color: #3498db;
             }
-            .btn-danger {
-                background-color: #e74c3c;
-            }
-            .btn-danger:hover {
-                background-color: #c0392b;
-            }
+
             .btn-success {
                 background-color: #27ae60;
+                border: none;
             }
+
             .btn-success:hover {
                 background-color: #219653;
             }
-            .error {
-                color: #e74c3c;
-                font-size:  2.5em;
+
+            .btn-danger {
+                background-color: #e74c3c;
+                border: none;
             }
+
+            .btn-danger:hover {
+                background-color: #c0392b;
+            }
+
+            .btn-secondary {
+                background-color: #95a5a6;
+                border: none;
+            }
+
+            .btn-secondary:hover {
+                background-color: #7f8c8d;
+            }
+
+            /* Thông báo */
+            .success,
+            .error {
+                font-size: 1.3rem;
+                margin-top: 20px;
+                font-weight: bold;
+            }
+
             .success {
                 color: #27ae60;
-                font-size: 2.5em;
             }
+
+            .error {
+                color: #e74c3c;
+            }
+
+            /* Autocomplete suggestion */
             .autocomplete-suggestion {
                 padding: 8px;
                 cursor: pointer;
             }
+
             .autocomplete-suggestion:hover {
                 background-color: #e9ecef;
             }
+
+            /* Responsive table */
+            @media screen and (max-width: 768px) {
+                .table-responsive {
+                    overflow-x: auto;
+                }
+            }
+
         </style>
     </head>
     <body>
@@ -125,8 +221,6 @@
                             <table class="table table-bordered" id="importDetailsTable">
                                 <thead>
                                     <tr>
-                                        <th style="width: 10%">Parent Category</th>
-                                        <th style="width: 10%">Child Category</th>
                                         <th style="width: 10%">Name of Material</th>
                                         <th style="width: 10%">Unit</th>
                                         <th style="width: 15%">Quantity</th>
@@ -137,36 +231,22 @@
                                 <tbody id="itemsBody">
                                     <tr>
                                         <td>
-                                            <select class="parentCategory" name="parentCategoryId[]">
-                                                <option value="">Choose parent category</option>
-                                                <c:forEach var="cat" items="${parentCategories}">
-                                                    <option value="${cat.categoryId}">${cat.name}</option>
-                                                </c:forEach>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select class="childCategory" name="childCategoryId[]">
-                                                <option value="">Choose child category</option>
-                                                <c:forEach var="cat" items="${childCategories}">
-                                                    <option value="${cat.categoryId}" data-parent="${cat.parentId}">${cat.name}</option>
-                                                </c:forEach>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select class="nameMaterial" name="materialId[]">
-                                                <option value="">Choose name of material</option>
+                                            <input list="materialList" class="form-control nameMaterialInput" name="materialName[]" autocomplete="off">
+                                            <datalist id="materialList">
                                                 <c:forEach var="cat" items="${material}">
-                                                    <option value="${cat.materialId}"  data-parent="${cat.category.categoryId}">${cat.name}</option>
+                                                    <option 
+                                                        value="${cat.name}" 
+                                                        data-id="${cat.materialId}" 
+                                                        data-parent="${cat.category.categoryId}" 
+                                                        data-unit="${cat.unit}">
+                                                        ${cat.name}
+                                                    </option>
                                                 </c:forEach>
-                                            </select>
+                                            </datalist>
+                                            <input type="hidden" name="materialId[]" class="materialIdHidden">
                                         </td>
                                         <td>
-                                            <select class="unitMaterial" name="unit[]">
-                                                <option value="">Unit</option>
-                                                <c:forEach var="cat" items="${material}">
-                                                    <option value="${cat.unit}"  data-parent="${cat.materialId}">${cat.unit}</option>
-                                                </c:forEach>
-                                            </select>
+                                            <input type="text" name="unit[]" class="form-control unitMaterial" readonly>
                                         </td>
                                         <td><input type="number" name="quantity[]" class="form-control" value="0.00" step="0.01" min="0.01" required></td>
                                         <td>
@@ -220,76 +300,48 @@
         </div>
 
         <script>
-                            function addRow() {
-                                const tbody = document.getElementById('itemsBody');
-                                const newRow = tbody.rows[0].cloneNode(true);
-                                newRow.querySelectorAll('input').forEach(input => input.value = '');
-                                newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
-                                tbody.appendChild(newRow);
-                                document.getElementById('itemCount').value = tbody.rows.length;
-                            }
-                            function removeRow(btn) {
-                                const tbody = document.getElementById('itemsBody');
-                                if (tbody.rows.length > 1) {
-                                    btn.closest('tr').remove();
-                                    document.getElementById('itemCount').value = tbody.rows.length;
-                                }
-                            }
-                            // Khi chọn parent category, lọc lại child category
-                            document.addEventListener('change', function (e) {
-                                if (e.target.classList.contains('parentCategory')) {
-                                    const parentId = e.target.value;
-                                    const row = e.target.closest('tr');
-                                    const childSelect = row.querySelector('.childCategory');
+            function addRow() {
+                const tbody = document.getElementById('itemsBody');
+                const newRow = tbody.rows[0].cloneNode(true);
+                newRow.querySelectorAll('input').forEach(input => input.value = '');
+                newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+                tbody.appendChild(newRow);
+                document.getElementById('itemCount').value = tbody.rows.length;
+            }
+            function removeRow(btn) {
+                const tbody = document.getElementById('itemsBody');
+                if (tbody.rows.length > 1) {
+                    btn.closest('tr').remove();
+                    document.getElementById('itemCount').value = tbody.rows.length;
+                }
+            }
+            document.addEventListener('input', function (e) {
+                if (e.target.classList.contains('nameMaterialInput')) {
+                    const input = e.target;
+                    const value = input.value.trim();
+                    const row = input.closest('tr');
+                    const hiddenInput = row.querySelector('.materialIdHidden');
+                    const unitInput = row.querySelector('.unitMaterial');
+                    const datalist = document.getElementById('materialList');
+                    const options = datalist.options;
 
-                                    childSelect.querySelectorAll('option').forEach(function (option) {
-                                        const optionParentId = option.getAttribute('data-parent');
-                                        option.style.display = (!parentId || optionParentId === parentId) ? '' : 'none';
-                                    });
-                                    childSelect.value = '';
+                    let foundId = '';
+                    let foundUnit = '';
 
-                                    // Reset material + unit
-                                    const materialSelect = row.querySelector('.nameMaterial');
-                                    filterMaterialByCategory(materialSelect, parentId);
-                                }
-                            });
+                    for (let i = 0; i < options.length; i++) {
+                        if (options[i].value === value) {
+                            foundId = options[i].getAttribute('data-id');
+                            foundUnit = options[i].getAttribute('data-unit');
+                            break;
+                        }
+                    }
 
-// Khi chọn child category, lọc lại material
-                            document.addEventListener('change', function (e) {
-                                if (e.target.classList.contains('childCategory')) {
-                                    const childId = e.target.value;
-                                    const row = e.target.closest('tr');
-                                    const materialSelect = row.querySelector('.nameMaterial');
-                                    filterMaterialByCategory(materialSelect, childId);
-                                }
-                            });
+                    hiddenInput.value = foundId;
+                    unitInput.value = foundUnit;
+                }
+            });
 
-// Khi chọn material, lọc lại unit
-                            document.addEventListener('change', function (e) {
-                                if (e.target.classList.contains('nameMaterial')) {
-                                    const selectedMaterialId = e.target.value;
-                                    const row = e.target.closest('tr');
-                                    const unitSelect = row.querySelector('.unitMaterial');
 
-                                    unitSelect.querySelectorAll('option').forEach(function (option) {
-                                        const optionParentId = option.getAttribute('data-parent');
-                                        if (!selectedMaterialId || optionParentId === selectedMaterialId) {
-                                            option.style.display = '';
-                                            unitSelect.value = option.value;
-                                        } else {
-                                            option.style.display = 'none';
-                                        }
-                                    });
-                                }
-                            });
-
-                            function filterMaterialByCategory(materialSelect, categoryId) {
-                                materialSelect.querySelectorAll('option').forEach(function (option) {
-                                    const optionCatId = option.getAttribute('data-parent');
-                                    option.style.display = (!categoryId || optionCatId === categoryId) ? '' : 'none';
-                                });
-                                materialSelect.value = '';
-                            }
 
         </script>
 
