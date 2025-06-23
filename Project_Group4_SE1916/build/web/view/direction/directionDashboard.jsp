@@ -240,7 +240,7 @@
                     <span class="text-lg">Danh mục vật tư</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-               <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="nav-item flex items-center p-3">
+                <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="nav-item flex items-center p-3">
                     <i class="fas fa-box-open mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh sách nhà cung cấp</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
@@ -254,6 +254,13 @@
                     <i class="fas fa-users mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh sách nhân viên</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
+                </a>
+                <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-history mr-2 w-5 text-center"></i>
+                        <span class="text-base">Lịch sử xuất kho</span>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
             </nav>
             <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">

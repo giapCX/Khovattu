@@ -1,179 +1,240 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8" />
-    <title>Lịch sử xuất kho</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-    <style>
-        body {
-            background-color: #f4f7fa;
-            font-family: 'Arial', sans-serif;
-            color: #333;
-        }
-        .container {
-            max-width: 90rem;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .header h2 {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1e3a8a;
-        }
-        .filter-form {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .form-control {
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .btn {
-            padding: 8px 16px;
-            background-color: #e5e7eb;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .btn:hover {
-            background-color: #d1d5db;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        thead {
-            background-color: #3b82f6;
-            color: white;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        tbody tr:hover {
-            background-color: #f3f4f6;
-        }
-        .action a {
-            color: #3b82f6;
-            text-decoration: none;
-        }
-        .action a:hover {
-            text-decoration: underline;
-        }
-        .pagination {
-            margin-top: 20px;
-            display: flex;
-            gap: 5px;
-        }
-        .pagination a {
-            padding: 8px 12px;
-            background-color: #e5e7eb;
-            color: #333;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        .pagination a.active {
-            background-color: #3b82f6;
-            color: white;
-        }
-        .back-btn {
-            display: block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #3b82f6;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 4px;
-            width: fit-content;
-        }
-        .back-btn:hover {
-            background-color: #2563eb;
-        }
-        .error-message {
-            color: red;
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h2>Lịch sử xuất kho</h2>
-        </div>
-        <form method="get" action="exportHistory" class="filter-form">
-            <input type="date" name="fromDate" value="${fromDate}" class="form-control" />
-            <span>to</span>
-            <input type="date" name="toDate" value="${toDate}" class="form-control" />
-            <input type="text" name="exporter" value="${exporter}" placeholder="Nhập tên người xuất" class="form-control" />
-            <button type="submit" class="btn">Tìm kiếm</button>
-        </form>
+<html>
+    <head>
+        <title>Export History</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                font-family: 'Segoe UI', Arial, sans-serif;
+                background-color: #f0f2f5;
+                margin: 0;
+                padding: 20px;
+                color: #1a1a1a;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+                text-align: center;
+                color: #2c3e50;
+                margin-bottom: 20px;
+            }
+            .filter-form {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+            .filter-form label {
+                font-weight: bold;
+                color: #34495e;
+            }
+            .filter-form input[type="date"],
+            .filter-form input[type="text"] {
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+            .filter-form input[type="submit"] {
+                padding: 8px 16px;
+                background-color: #3498db;
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+            .filter-form input[type="reset"] {
+                padding: 8px 16px;
+                background-color: #1abc9c;
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+            .filter-form input[type="submit"]:hover {
+                background-color: #2980b9;
+            }
+            .filter-form input[type="reset"]:hover {
+                background-color: #16a085;
+            }
+            .error-message {
+                color: #e74c3c;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+            }
+            th, td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+            th {
+                background-color: #3498db;
+                color: #fff;
+                font-weight: bold;
+            }
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            tr:hover {
+                background-color: #f1f1f1;
+            }
+            td a {
+                color: #3498db;
+                text-decoration: none;
+                font-weight: bold;
+            }
+            td a:hover {
+                color: #2980b9;
+                text-decoration: underline;
+            }
+            .no-data {
+                text-align: center;
+                color: #7f8c8d;
+                padding: 20px;
+            }
+            .pagination {
+                text-align: center;
+                margin-top: 20px;
+            }
+            .pagination a {
+                display: inline-block;
+                padding: 8px 12px;
+                margin: 0 5px;
+                text-decoration: none;
+                color: #3498db;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                transition: background-color 0.3s;
+            }
+            .pagination a.active {
+                background-color: #3498db;
+                color: #fff;
+                border-color: #3498db;
+            }
+            .pagination a:hover {
+                background-color: #ecf0f1;
+            }
+            
+            .home-link {
+                display: inline-block;
+                margin-top: 20px;
+                text-align: center;
+                color: #3498db;
+                text-decoration: none;
+                font-weight: bold;
+            }
+            .home-link:hover {
+                color: #2980b9;
+                text-decoration: underline;
+            }
+            @media (max-width: 768px) {
+                .filter-form {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+                .filter-form input {
+                    width: 100%;
+                    margin-bottom: 10px;
+                }
+                table {
+                    font-size: 14px;
+                }
+            }
+        </style>
+        <script>
+            function clearFormAndSubmit() {
+                // Get the form
+                const form = document.querySelector('.filter-form');
+                
+                // Clear input fields
+                document.getElementById('fromDate').value = '';
+                document.getElementById('toDate').value = '';
+                document.getElementById('exporter').value = '';
+                
+                // Submit the form
+                form.submit();
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Export History</h1>
 
-        <!-- Hiển thị thông báo lỗi nếu có -->
-        <c:if test="${not empty errorMessage}">
-            <p class="error-message">${errorMessage}</p>
-        </c:if>
+            <form action="exportHistory" method="get" class="filter-form">
+                <label for="fromDate">From: </label>
+                <input type="date" id="fromDate" name="fromDate" value="${fromDate}">
+                <label for="toDate">To: </label>
+                <input type="date" id="toDate" name="toDate" value="${toDate}">
+                <label for="exporter">Exporter Name: </label>
+                <input type="text" id="exporter" name="exporter" value="${exporter}" placeholder="Exporter Name">
+                <input type="submit" value="Search">
+                <input type="reset" value="Reset" onclick="clearFormAndSubmit();">
+            </form>
 
-        <!-- Hiển thị thông báo nếu không có dữ liệu -->
-        <c:if test="${empty historyData}">
-            <p>Không tìm thấy dữ liệu.</p>
-        </c:if>
+            <c:if test="${not empty errorMessage}">
+                <p class="error-message">${errorMessage}</p>
+            </c:if>
 
-        <!-- Bảng lịch sử xuất kho -->
-        <c:if test="${not empty historyData}">
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Code</th>
-                        <th>Date</th>
-                        <th>Exporter</th>
-                        <th>Note</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach items="${historyData}" var="item" varStatus="loop">
+            <table>
+                <tr>
+                    <th>No.</th>
+                    <th>Code</th>
+                    <th>Date</th>
+                    <th>Exporter</th>
+                    <th>Note</th>
+                    <th>Action</th>
+                </tr>
+                <c:choose>
+                    <c:when test="${not empty historyData}">
+                        <c:forEach items="${historyData}" var="item" varStatus="loop">
+                            <tr>
+                                <td>${(currentPage - 1) * 10 + loop.index + 1}</td>
+                                <td>${item.voucherId}</td>
+                                <td>${item.exportDate}</td>
+                                <td>${item.exporterName}</td>
+                                <td>${item.note}</td>
+                                <td><a href="./viewExportHistoryDetail.jsp">View</a></td>
+                            </tr>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
                         <tr>
-                            <td>${loop.index + 1}</td>
-                            <td>${item.voucherId}</td>
-                            <td>${item.exportDate}</td>
-                            <td>${item.exporterName}</td>
-                            <td>${item.note}</td>
-                            <td class="action"><a href="#">Xem</a></td>
+                            <td colspan="6" class="no-data">No data found.</td>
                         </tr>
-                    </c:forEach>
-                </tbody>
+                    </c:otherwise>
+                </c:choose>
             </table>
-        </c:if>
 
-        <!-- Phân trang -->
-        <div class="pagination mt-4">
-            <c:forEach begin="1" end="${totalPages}" var="i">
-                <a href="exportHistory?page=${i}&fromDate=${param.fromDate}&toDate=${param.toDate}&exporter=${param.exporter}"
-                   class="${i == currentPage ? 'active' : ''}">${i}</a>
-            </c:forEach>
-        </div>
-        <%
+            <c:if test="${totalPages > 0}">
+                <div class="pagination">
+                    <c:forEach begin="1" end="${totalPages}" var="i">
+                        <a href="exportHistory?page=${i}&fromDate=${fromDate}&toDate=${toDate}&exporter=${exporter}"
+                           class="${i == currentPage ? 'active' : ''}">${i}</a>
+                    </c:forEach>
+                </div>
+            </c:if>
+
+            <%
                 String role = (String) session.getAttribute("role");
-                String redirectUrl = "../login.jsp"; // Default fallback
+                String redirectUrl = "./login.jsp"; // Default fallback
                 if (role != null) {
                     switch (role.toLowerCase()) {
                         case "direction":
@@ -191,31 +252,8 @@
                     }
                 }
             %>
-        <a href="<%= redirectUrl%>" class="back-btn">Quay lại trang chủ</a>
-    </div>
+            <a href="<%= redirectUrl%>" class="home-link">Return to Home</a>
 
-    <script>
-        // Hàm mã hóa chuỗi để thay thế ký tự đặc biệt
-        function escapeString(str) {
-            if (str == null) return "";
-            return str.replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
-        }
-
-        // Chuyển historyData thành mảng JavaScript
-        const historyData = [
-            <c:forEach items="${historyData}" var="item" varStatus="loop">
-                {
-                    exportId: ${item.exportId},
-                    voucherId: escapeString("${item.voucherId}"),
-                    exportDate: "${item.exportDate}",
-                    exporterName: escapeString("${item.exporterName}"),
-                    note: escapeString("${item.note}")
-                }${loop.last ? '' : ','}
-            </c:forEach>
-        ];
-
-        // In historyData ra console
-        console.log("historyData:", historyData);
-    </script>
-</body>
+        </div>
+    </body>
 </html>

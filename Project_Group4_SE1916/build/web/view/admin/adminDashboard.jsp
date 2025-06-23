@@ -292,15 +292,17 @@
                     <span class="text-lg">Báo cáo</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/importhistory" class="nav-item flex items-center p-3">
-                    <i class="fas fa-chart-bar mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Import History</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>    
                 <a href="${pageContext.request.contextPath}/listuser" class="nav-item flex items-center p-3">
                     <i class="fas fa-cog mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh sách người dùng</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
+                </a>
+                <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-history mr-2 w-5 text-center"></i>
+                        <span class="text-base">Lịch sử xuất kho</span>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
             </nav>
             <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">

@@ -1,7 +1,7 @@
-
+//HistoryDAO
 /**
- *
- * @author ASUS
+ * ExportHistoryDAO.java
+ * Data Access Object for handling export history operations
  */
 package dao;
 
@@ -13,17 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 
-import java.util.List;
-
-import model.Export;
-
 public class ExportHistoryDAO {
 
     private Connection conn;
 
-//    public ExportHistoryDAO(Connection conn) {
-//        this.conn = conn;
-//    }
+    public ExportHistoryDAO(Connection conn) {
+        this.conn = conn;
+    }
 
     public ExportHistoryDAO() {
         this.conn = DBContext.getConnection();
@@ -32,10 +28,10 @@ public class ExportHistoryDAO {
     public List<Export> searchExportReceipts(Date fromDate, Date toDate, String exporter, int page, int pageSize) {
         List<Export> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT er.export_id, er.voucher_id, er.export_date, er.note, u.full_name AS exporter_name, "
+                "SELECT er.export_id, er.voucher_id, er.export_date, er.note, u.full_name AS exporter_name "
                 + "FROM ExportReceipts er "
                 + "JOIN Users u ON er.user_id = u.user_id "
-                + "JOIN exportdetails ed ON er.export_id = ed.export_id "
+                + "JOIN ExportDetails ed ON er.export_id = ed.export_id " // Keep receipts with details
                 + "WHERE 1=1 "
         );
 
@@ -45,13 +41,16 @@ public class ExportHistoryDAO {
         if (toDate != null) {
             sql.append("AND er.export_date <= ? ");
         }
-        if (exporter != null && !exporter.isEmpty()) {
+        if (exporter != null && !exporter.trim().isEmpty()) {
             sql.append("AND u.full_name LIKE ? ");
         }
 
-        sql.append("GROUP BY er.export_id, er.voucher_id, er.export_date, er.note, u.full_name ");
         sql.append("ORDER BY er.export_date DESC ");
         sql.append("LIMIT ? OFFSET ?");
+
+        // Debug SQL
+        System.out.println("SQL Query: " + sql);
+        System.out.println("Parameters: fromDate=" + fromDate + ", toDate=" + toDate + ", exporter=" + exporter + ", page=" + page + ", pageSize=" + pageSize);
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int index = 1;
@@ -61,7 +60,7 @@ public class ExportHistoryDAO {
             if (toDate != null) {
                 ps.setDate(index++, toDate);
             }
-            if (exporter != null && !exporter.isEmpty()) {
+            if (exporter != null && !exporter.trim().isEmpty()) {
                 ps.setString(index++, "%" + exporter + "%");
             }
             ps.setInt(index++, pageSize);
@@ -87,19 +86,19 @@ public class ExportHistoryDAO {
     public int countExportReceipts(Date fromDate, Date toDate, String exporter) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(DISTINCT er.export_id) "
-                + "FROM exportreceipts er "
+                + "FROM ExportReceipts er "
                 + "JOIN Users u ON er.user_id = u.user_id "
-                + "WHERE 1=1 "
+                + "WHERE 1=1"
         );
 
         if (fromDate != null) {
-            sql.append("AND er.export_date >= ? ");
+            sql.append(" AND er.export_date >= ? ");
         }
         if (toDate != null) {
-            sql.append("AND er.export_date <= ? ");
+            sql.append(" AND er.export_date <= ? ");
         }
-        if (exporter != null && !exporter.isEmpty()) {
-            sql.append("AND u.full_name LIKE ? ");
+        if (exporter != null && !exporter.trim().isEmpty()) {
+            sql.append(" AND u.full_name LIKE ? ");
         }
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -110,8 +109,8 @@ public class ExportHistoryDAO {
             if (toDate != null) {
                 ps.setDate(index++, toDate);
             }
-            if (exporter != null && !exporter.isEmpty()) {
-                ps.setString(index++, "%" + exporter + "%");
+            if (exporter != null && !exporter.trim().isEmpty()) {
+                ps.setString(index++, "%" + exporter.trim() + "%");
             }
 
             ResultSet rs = ps.executeQuery();
@@ -128,9 +127,9 @@ public class ExportHistoryDAO {
     public List<Export> searchByExporterName(String exporter) {
         List<Export> list = new ArrayList<>();
         String sql = "SELECT er.export_id, er.voucher_id, er.export_date, er.note, u.full_name AS exporter_name "
-                + "FROM exportreceipts er "
+                + "FROM ExportReceipts er "
                 + "JOIN Users u ON er.user_id = u.user_id "
-                + "JOIN exportdetails ed ON er.export_id = ed.export_id "
+                + "JOIN ExportDetails ed ON er.export_id = ed.export_id "
                 + "WHERE u.full_name LIKE ? "
                 + "GROUP BY er.export_id, er.voucher_id, er.export_date, er.note, u.full_name "
                 + "ORDER BY er.export_date DESC";
@@ -152,5 +151,4 @@ public class ExportHistoryDAO {
         }
         return list;
     }
-
 }

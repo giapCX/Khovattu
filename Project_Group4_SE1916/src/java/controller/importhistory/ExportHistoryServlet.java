@@ -1,4 +1,4 @@
-//ExportHistory.java
+
 package controller.importhistory;
 
 import Dal.DBContext;
@@ -19,61 +19,58 @@ public class ExportHistoryServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy tham số từ request
+        // Retrieve parameters from the request
         String fromDateStr = request.getParameter("fromDate");
         String toDateStr = request.getParameter("toDate");
         String exporter = request.getParameter("exporter");
         String pageParam = request.getParameter("page");
 
-        // Thiết lập phân trang
-        int page = 1;
+        // Set up pagination
+        int page = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
         int pageSize = 10;
-        if (pageParam != null) {
-            try {
-                page = Integer.parseInt(pageParam);
-            } catch (NumberFormatException ignored) {
-            }
-        }
 
-        // Chuyển đổi ngày
-        Date fromDate = null;
-        Date toDate = null;
+        // Convert dates
+        Date fromDate = (fromDateStr != null && !fromDateStr.isEmpty()) ? java.sql.Date.valueOf(fromDateStr) : null;
+        Date toDate = (toDateStr != null && !toDateStr.isEmpty()) ? java.sql.Date.valueOf(toDateStr) : null;
+
         try {
-            if (fromDateStr != null && !fromDateStr.isEmpty()) {
-                fromDate = java.sql.Date.valueOf(fromDateStr);
+            if (fromDateStr != null && !fromDateStr.isEmpty() && fromDate == null) {
+                throw new IllegalArgumentException("Invalid date format.");
             }
-            if (toDateStr != null && !toDateStr.isEmpty()) {
-                toDate = java.sql.Date.valueOf(toDateStr);
+            if (toDateStr != null && !toDateStr.isEmpty() && toDate == null) {
+                throw new IllegalArgumentException("Invalid date format.");
             }
         } catch (IllegalArgumentException e) {
-            request.setAttribute("errorMessage", "Định dạng ngày không hợp lệ.");
+            request.setAttribute("errorMessage", "Invalid date format.");
         }
-        
+
         Connection conn = DBContext.getConnection();
-        
-        // Truy vấn dữ liệu
-        ExportHistoryDAO dao = new ExportHistoryDAO();
+
+        // Query data
+        ExportHistoryDAO dao = new ExportHistoryDAO(conn);
         List<Export> receipts;
         int totalRecords;
 
-        if (exporter != null && !exporter.trim().isEmpty()) {
-            // Tìm kiếm theo tên người xuất
-            receipts = dao.searchByExporterName(exporter);
-            totalRecords = receipts.size(); // Không phân trang nếu searchByExporterName không hỗ trợ
-            System.out.println("Tìm kiếm theo exporter: " + exporter);
-            System.out.println("Kích thước results: " + receipts.size());
-        } else {
-            // Lấy tất cả dữ liệu với bộ lọc ngày và phân trang
+        // Handle default action (display all) or search-based action
+        if ((exporter != null && !exporter.trim().isEmpty()) || (fromDate != null || toDate != null)) {
+            // Search by exporter name and/or dates
             receipts = dao.searchExportReceipts(fromDate, toDate, exporter, page, pageSize);
             totalRecords = dao.countExportReceipts(fromDate, toDate, exporter);
-            System.out.println("Kích thước receipts: " + receipts.size());
-            System.out.println("Tổng số bản ghi: " + totalRecords);
+            System.out.println("Searching by exporter: " + exporter + ", fromDate: " + fromDate + ", toDate: " + toDate);
+            System.out.println("Result size: " + receipts.size());
+        } else {
+            // Display all records by default
+            receipts = dao.searchExportReceipts(null, null, null, page, pageSize);
+            totalRecords = dao.countExportReceipts(null, null, null);
         }
 
-        // Tính toán số trang
+        System.out.println("Receipts size: " + receipts.size());
+        System.out.println("Total records: " + totalRecords);
+
+        // Calculate total pages
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
-        // Đặt thuộc tính cho JSP
+        // Set attributes for JSP
         request.setAttribute("historyData", receipts);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("currentPage", page);
@@ -81,18 +78,18 @@ public class ExportHistoryServlet extends HttpServlet {
         request.setAttribute("toDate", toDateStr);
         request.setAttribute("exporter", exporter);
 
-        // Chuyển tiếp đến JSP
+        // Forward to JSP
         request.getRequestDispatcher("exportHistory.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response); // Gọi doGet để xử lý POST nếu cần
+        doGet(request, response); // Call doGet to handle POST if needed
     }
 
     @Override
     public String getServletInfo() {
-        return "Servlet to handle export history requests";
+        return "Servlet to handle warehouse export history requests";
     }
 }

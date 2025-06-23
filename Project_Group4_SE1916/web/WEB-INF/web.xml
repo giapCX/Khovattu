@@ -254,7 +254,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ExportHistoryServlet</servlet-name>
-        <url-pattern>/exportHistoryServlet</url-pattern>
+        <url-pattern>/exportHistory</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminApproveServlet</servlet-name>
