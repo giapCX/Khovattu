@@ -74,7 +74,20 @@ public class MaterialCategoryDAO {
             ps.executeUpdate();
         }
     }
-
+    public boolean updateChildCategory(int categoryId, String newName, int parentId) {
+        String query = "UPDATE MaterialCategories SET name = ?, parent_id = ? WHERE category_id = ? AND status = 'active'";
+        
+        try (PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, newName);
+            ps.setInt(2, parentId);
+            ps.setInt(3, categoryId);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     public void addParentCategory(String name, String status) throws SQLException {
         String sql = "INSERT INTO MaterialCategories (name, parent_id, status) VALUES (?, NULL, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

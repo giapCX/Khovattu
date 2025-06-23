@@ -124,6 +124,7 @@
             <div>
                 <a href="${pageContext.request.contextPath}/AddMaterialController" class="btn btn-primary mr-2">Add Material</a>
                 <a href="${pageContext.request.contextPath}/AddChildCategoryController" class="btn btn-primary">Add Child Category</a>
+                <a href="${pageContext.request.contextPath}/EditChildCategoryController" class="btn btn-primary">Edit Child Category</a>
             </div>
         </div>
 
