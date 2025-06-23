@@ -136,6 +136,10 @@
         <servlet-name>ListProposalServlet</servlet-name>
         <servlet-class>controller.proposal.ListProposalServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>EditChildCategoryController</servlet-name>
+        <servlet-class>controller.material.EditChildCategoryController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -271,6 +275,10 @@
     <servlet-mapping>
         <servlet-name>ListProposalServlet</servlet-name>
         <url-pattern>/ListProposalServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditChildCategoryController</servlet-name>
+        <url-pattern>/EditChildCategoryController</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

@@ -292,6 +292,11 @@
                     <span class="text-lg">Báo cáo</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
+                <a href="${pageContext.request.contextPath}/importhistory" class="nav-item flex items-center p-3">
+                    <i class="fas fa-chart-bar mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Import History</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
+                </a>    
                 <a href="${pageContext.request.contextPath}/listuser" class="nav-item flex items-center p-3">
                     <i class="fas fa-cog mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh sách người dùng</span>
