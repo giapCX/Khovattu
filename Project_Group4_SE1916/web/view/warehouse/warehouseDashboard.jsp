@@ -309,7 +309,7 @@
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/exportHistory.jsp" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between">
                     <div class="flex items-center">
                         <i class="fas fa-history mr-2 w-5 text-center"></i>
                         <span class="text-base">Lịch sử xuất kho</span>
