@@ -275,10 +275,10 @@
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/requests.jsp" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/ProposalServlet" class="nav-item flex items-center p-2 justify-between">
                     <div class="flex items-center">
                         <i class="fas fa-clipboard-list mr-2 w-5 text-center"></i>
-                        <span class="text-base">Yêu cầu xuất/mua</span>
+                        <span class="text-base">Yêu cầu xuất/nhập/sửa</span>
                     </div>
                     <span class="ml-auto bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">3</span>
                 </a>
