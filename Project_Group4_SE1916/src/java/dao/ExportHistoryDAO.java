@@ -28,10 +28,10 @@ public class ExportHistoryDAO {
     public List<Export> searchExportReceipts(Date fromDate, Date toDate, String exporter, int page, int pageSize) {
         List<Export> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT er.export_id, er.voucher_id, er.export_date, er.note, u.full_name AS exporter_name "
+                "SELECT DISTINCT er.export_id, er.voucher_id, er.export_date, er.note, u.full_name AS exporter_name "
                 + "FROM ExportReceipts er "
                 + "JOIN Users u ON er.user_id = u.user_id "
-                + "JOIN ExportDetails ed ON er.export_id = ed.export_id " // Keep receipts with details
+                + "LEFT JOIN ExportDetails ed ON er.export_id = ed.export_id " // Use LEFT JOIN to include receipts without details
                 + "WHERE 1=1 "
         );
 
@@ -46,7 +46,11 @@ public class ExportHistoryDAO {
         }
 
         sql.append("ORDER BY er.export_date DESC ");
-        sql.append("LIMIT ? OFFSET ?");
+
+        // Only apply LIMIT and OFFSET if pageSize > 0
+        if (pageSize > 0) {
+            sql.append("LIMIT ? OFFSET ?");
+        }
 
         // Debug SQL
         System.out.println("SQL Query: " + sql);
@@ -63,8 +67,10 @@ public class ExportHistoryDAO {
             if (exporter != null && !exporter.trim().isEmpty()) {
                 ps.setString(index++, "%" + exporter + "%");
             }
-            ps.setInt(index++, pageSize);
-            ps.setInt(index, (page - 1) * pageSize);
+            if (pageSize > 0) {
+                ps.setInt(index++, pageSize);
+                ps.setInt(index++, (page - 1) * pageSize);
+            }
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
