@@ -191,6 +191,20 @@ public class UserDAO {
         }
     }
 
+    public boolean isUsernameOrEmailExists(String username, String email) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            stmt.setString(2, email);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
     public List<User> searchUsersByName(String keyword) throws SQLException {
         List<User> users = new ArrayList<>();
         String sql = "SELECT u.*, r.role_id, r.role_name "
