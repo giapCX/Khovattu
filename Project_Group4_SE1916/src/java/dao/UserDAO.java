@@ -1,3 +1,4 @@
+//UserDAO
 package dao;
 
 import Dal.DBContext;
@@ -50,6 +51,41 @@ public class UserDAO {
             }
         }
         return users;
+    }
+
+    public User getUserByEmail(String email) {
+        User user = null;
+        String sql = "SELECT u.*, r.role_id, r.role_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE u.email = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setCode(rs.getString("code"));
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password_hash"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setAddress(rs.getString("address"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPhone(rs.getString("phone_number"));
+                    user.setImg(rs.getString("imageUrl"));
+                    user.setDateOfBirth(rs.getString("date_of_birth"));
+                    user.setStatus(rs.getString("status"));
+
+                    Role role = new Role();
+                    role.setRoleId(rs.getInt("role_id"));
+                    role.setRoleName(rs.getString("role_name"));
+                    user.setRole(role);
+                }
+            }
+        } catch (SQLException ex) {
+            // Silently handle exception
+        }
+        return user;
     }
 
     public void updateUser(User user) throws SQLException {
@@ -189,20 +225,6 @@ public class UserDAO {
 
             stmt.executeUpdate();
         }
-    }
-
-    public boolean isUsernameOrEmailExists(String username, String email) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            stmt.setString(2, email);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
     }
 
     public List<User> searchUsersByName(String keyword) throws SQLException {
@@ -490,5 +512,19 @@ public class UserDAO {
             }
         }
         return null;
+    }
+    
+      public boolean isUsernameOrEmailExists(String username, String email) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            stmt.setString(2, email);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
     }
 }

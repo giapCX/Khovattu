@@ -1,8 +1,8 @@
+//forgetPass
 package controller.auth;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
-//import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,24 +38,24 @@ public class ForgetPassword extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String username = request.getParameter("username");
-        String Email = request.getParameter("Email");
+        String email = request.getParameter("Email");
         HttpSession session = request.getSession();
 
-        if (username == null || Email == null) {
-            setErrorAndForward(request, response, "Invalid account name or email, please re-enter!");
+        if (email == null) {
+            setErrorAndForward(request, response, "Please enter a valid email!");
             return;
         }
 
+        User user = getUserByEmail(email);
+        if (user == null) {
+            setErrorAndForward(request, response, "Email not found, please check and try again!");
+            return;
+        }
+
+        String username = user.getUsername();
         Account account = getAccountByUsername(username);
         if (account == null) {
-            setErrorAndForward(request, response, "Invalid account name or email, please re-enter!");
-            return;
-        }
-
-        User user = getUserByUsername(username);
-        if (user == null || !Email.equals(user.getEmail())) {
-            setErrorAndForward(request, response, "Invalid account name or email, please re-enter!");
+            setErrorAndForward(request, response, "Account not found for this email!");
             return;
         }
 
@@ -66,17 +66,17 @@ public class ForgetPassword extends HttpServlet {
         updatePassword(username, newPassword);
 
         // Send the new password via email
-        if (!sendEmail(Email, newPassword)) {
+        if (!sendEmail(email, newPassword)) {
             setErrorAndForward(request, response, "Failed to send email. Please try again.");
             return;
         }
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("../forgetPassword/confirmEmail.jsp");
-        request.setAttribute("message", "A new password has been sent to you, please check your email.");
+        request.setAttribute("message", "A new password has been sent to your email.");
         session.setAttribute("passGen", newPassword);
         session.setAttribute("userForgetPass", username);
+        session.setAttribute("email", email);
         session.setMaxInactiveInterval(300);
-        session.setAttribute("email", Email);
         dispatcher.forward(request, response);
     }
 
@@ -90,10 +90,10 @@ public class ForgetPassword extends HttpServlet {
         }
     }
 
-    private User getUserByUsername(String username) {
+    private User getUserByEmail(String email) {
         UserDAO userDB = new UserDAO();
         try {
-            return userDB.getUserByUsername(username);
+            return userDB.getUserByEmail(email);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -130,9 +130,8 @@ public class ForgetPassword extends HttpServlet {
             MimeMessage message = new MimeMessage(emailSession);
             message.setFrom(new InternetAddress(from));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            message.setSubject("Hello guys!");
-            message.setText("This is your verify code: " + newPassword);
-
+            message.setSubject("Reset Password");
+            message.setText("This is your verify code: " + newPassword + "\nPlease change your password.");
             Transport.send(message);
             return true;
         } catch (MessagingException e) {

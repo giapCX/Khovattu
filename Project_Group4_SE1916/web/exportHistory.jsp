@@ -7,16 +7,21 @@
         <title>Export History</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+        <!-- Liên kết đến file CSS -->
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
         <style>
             body {
                 font-family: 'Segoe UI', Arial, sans-serif;
                 background-color: #f0f2f5;
-                margin: 0;
-                padding: 20px;
                 color: #1a1a1a;
             }
             .container {
-                max-width: 1200px;
                 margin: 0 auto;
                 background-color: #fff;
                 padding: 20px;
@@ -132,7 +137,6 @@
             .pagination a:hover {
                 background-color: #ecf0f1;
             }
-            
             .home-link {
                 display: inline-block;
                 margin-top: 20px;
@@ -161,99 +165,121 @@
         </style>
         <script>
             function clearFormAndSubmit() {
-                // Get the form
                 const form = document.querySelector('.filter-form');
-                
-                // Clear input fields
                 document.getElementById('fromDate').value = '';
                 document.getElementById('toDate').value = '';
                 document.getElementById('exporter').value = '';
-                
-                // Submit the form
                 form.submit();
             }
         </script>
     </head>
-    <body>
-        <div class="container">
-            <h1>Export History</h1>
-
-            <form action="exportHistory" method="get" class="filter-form">
-                <label for="fromDate">From: </label>
-                <input type="date" id="fromDate" name="fromDate" value="${fromDate}">
-                <label for="toDate">To: </label>
-                <input type="date" id="toDate" name="toDate" value="${toDate}">
-                <label for="exporter">Exporter Name: </label>
-                <input type="text" id="exporter" name="exporter" value="${exporter}" placeholder="Exporter Name">
-                <input type="submit" value="Search">
-                <input type="reset" value="Reset" onclick="clearFormAndSubmit();">
-            </form>
-
-            <c:if test="${not empty errorMessage}">
-                <p class="error-message">${errorMessage}</p>
-            </c:if>
-
-            <table>
-                <tr>
-                    <th>No.</th>
-                    <th>Code</th>
-                    <th>Date</th>
-                    <th>Exporter</th>
-                    <th>Note</th>
-                    <th>Action</th>
-                </tr>
-                <c:choose>
-                    <c:when test="${not empty historyData}">
-                        <c:forEach items="${historyData}" var="item" varStatus="loop">
-                            <tr>
-                                <td>${(currentPage - 1) * 10 + loop.index + 1}</td>
-                                <td>${item.voucherId}</td>
-                                <td>${item.exportDate}</td>
-                                <td>${item.exporterName}</td>
-                                <td>${item.note}</td>
-                                <td><a href="./viewExportHistoryDetail.jsp">View</a></td>
-                            </tr>
-                        </c:forEach>
-                    </c:when>
-                    <c:otherwise>
-                        <tr>
-                            <td colspan="6" class="no-data">No data found.</td>
-                        </tr>
-                    </c:otherwise>
-                </c:choose>
-            </table>
-
-            <c:if test="${totalPages > 0}">
-                <div class="pagination">
-                    <c:forEach begin="1" end="${totalPages}" var="i">
-                        <a href="exportHistory?page=${i}&fromDate=${fromDate}&toDate=${toDate}&exporter=${exporter}"
-                           class="${i == currentPage ? 'active' : ''}">${i}</a>
-                    </c:forEach>
+    <body class="bg-gray-50 min-h-screen font-sans antialiased">
+        <%
+            String role = (String) session.getAttribute("role");
+        %>
+        <!-- Sidebar -->
+        <c:choose>
+            <c:when test="${role == 'admin'}">
+                <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
+            </c:when>
+            <c:when test="${role == 'direction'}">
+                <jsp:include page="/view/sidebar/sidebarDirection.jsp" />
+            </c:when>
+            <c:when test="${role == 'warehouse'}">
+                <jsp:include page="/view/sidebar/sidebarWarehouse.jsp" />
+            </c:when>
+            <c:when test="${role == 'employee'}">
+                <jsp:include page="/view/sidebar/sidebarEmployee.jsp" />
+            </c:when>
+        </c:choose>
+        <main class="flex-1 p-8 transition-all duration-300">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-4">
+                        <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
+                            <i class="fas fa-bars text-2xl"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Export History</h2>
+                    </div>
                 </div>
-            </c:if>
 
-            <%
-                String role = (String) session.getAttribute("role");
-                String redirectUrl = "./login.jsp"; // Default fallback
-                if (role != null) {
-                    switch (role.toLowerCase()) {
-                        case "direction":
-                            redirectUrl = request.getContextPath() + "/view/direction/directionDashboard.jsp";
-                            break;
-                        case "employee":
-                            redirectUrl = request.getContextPath() + "/view/employee/employeeDashboard.jsp";
-                            break;
-                        case "warehouse":
-                            redirectUrl = request.getContextPath() + "/view/warehouse/warehouseDashboard.jsp";
-                            break;
-                        case "admin":
-                            redirectUrl = request.getContextPath() + "/view/admin/adminDashboard.jsp";
-                            break;
+                <form action="exportHistory" method="get" class="filter-form">
+                    <label for="fromDate">From: </label>
+                    <input type="date" id="fromDate" name="fromDate" value="${fromDate}">
+                    <label for="toDate">To: </label>
+                    <input type="date" id="toDate" name="toDate" value="${toDate}">
+                    <label for="exporter">Exporter Name: </label>
+                    <input type="text" id="exporter" name="exporter" value="${exporter}" placeholder="Exporter Name">
+                    <input type="submit" value="Search">
+                    <input type="reset" value="Reset" onclick="clearFormAndSubmit();">
+                </form>
+
+                <c:if test="${not empty errorMessage}">
+                    <p class="error-message">${errorMessage}</p>
+                </c:if>
+
+                <table>
+                    <tr>
+                        <th>No.</th>
+                        <th>Code</th>
+                        <th>Date</th>
+                        <th>Exporter</th>
+                        <th>Note</th>
+                        <th>Action</th>
+                    </tr>
+                    <c:choose>
+                        <c:when test="${not empty historyData}">
+                            <c:forEach items="${historyData}" var="item" varStatus="loop">
+                                <tr>
+                                    <td>${(currentPage - 1) * 10 + loop.index + 1}</td>
+                                    <td>${item.voucherId}</td>
+                                    <td>${item.exportDate}</td>
+                                    <td>${item.exporterName}</td>
+                                    <td>${item.note}</td>
+                                    <td><button onclick="window.location.href='./viewExportHistoryDetail.jsp'" class="text-primary-600 font-medium hover:underline">View</button></td>
+                                </tr>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <tr>
+                                <td colspan="6" class="no-data">No data found.</td>
+                            </tr>
+                        </c:otherwise>
+                    </c:choose>
+                </table>
+
+                <c:if test="${totalPages > 0}">
+                    <div class="pagination">
+                        <c:forEach begin="1" end="${totalPages}" var="i">
+                            <a href="exportHistory?page=${i}&fromDate=${fromDate}&toDate=${toDate}&exporter=${exporter}"
+                               class="${i == currentPage ? 'active' : ''}">${i}</a>
+                        </c:forEach>
+                    </div>
+                </c:if>
+
+                <%
+                    String redirectUrl = "./login.jsp";
+                    if (role != null) {
+                        switch (role.toLowerCase()) {
+                            case "direction":
+                                redirectUrl = request.getContextPath() + "/view/direction/directionDashboard.jsp";
+                                break;
+                            case "employee":
+                                redirectUrl = request.getContextPath() + "/view/employee/employeeDashboard.jsp";
+                                break;
+                            case "warehouse":
+                                redirectUrl = request.getContextPath() + "/view/warehouse/warehouseDashboard.jsp";
+                                break;
+                            case "admin":
+                                redirectUrl = request.getContextPath() + "/view/admin/adminDashboard.jsp";
+                                break;
+                        }
                     }
-                }
-            %>
-            <a href="<%= redirectUrl%>" class="home-link">Return to Home</a>
-
-        </div>
+                %>
+                <button onclick="window.location.href='<%= redirectUrl%>'" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to Home</button>
+            </div>
+        </main>
+        <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
     </body>
 </html>

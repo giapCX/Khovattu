@@ -183,9 +183,6 @@
                 ${mess}
             </div>
             <form id="myForm" action="./forget_password" method="POST" class="login-form" autocomplete="off">
-                <label for="username" class="login-label">Username</label>
-                <input type="text" name="username" class="login-input" placeholder="VD: abc" required>
-
                 <label for="Email" class="login-label">Email</label>
                 <input type="email" name="Email" class="login-input" placeholder="VD: abc@gmail.com" required>
 
