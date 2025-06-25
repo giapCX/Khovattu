@@ -71,12 +71,11 @@ public class AddUserServlet extends HttpServlet {
 
             request.setAttribute("roles", roles);
             request.getRequestDispatcher("/view/admin/addUser.jsp").forward(request, response);
-            
 
         } catch (Exception e) {
             throw new ServletException(e);
         }
-        
+
     }
 
     /**
@@ -91,43 +90,48 @@ public class AddUserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-         // Lấy dữ liệu từ form
-    String code = request.getParameter("code"); 
-    String username = request.getParameter("username");
-    String fullName = request.getParameter("fullName");
-    String address = request.getParameter("address");
-    String email = request.getParameter("email");
-    String phone = request.getParameter("phone");
-    String dob = request.getParameter("dob"); 
-    String status = request.getParameter("status");
-    int roleId = Integer.parseInt(request.getParameter("roleId"));
+        // Lấy dữ liệu từ form
+        String code = request.getParameter("code");
+        String username = request.getParameter("username");
+        String fullName = request.getParameter("fullName");
+        String address = request.getParameter("address");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String dob = request.getParameter("dob");
+        String status = request.getParameter("status");
+        int roleId = Integer.parseInt(request.getParameter("roleId"));
 
-    try (Connection conn = DBContext.getConnection()) {
-        UserDAO userDAO = new UserDAO(conn);
+        try (Connection conn = DBContext.getConnection()) {
+            UserDAO userDAO = new UserDAO(conn);
+            boolean exists = userDAO.isUsernameOrEmailExists(username, email);
+            if (exists) {
+                request.setAttribute("error", "Username or Email existed.");
+                request.getRequestDispatcher("view/admin/addUser.jsp").forward(request, response);
+                return;
+            }
+            // Mật khẩu mặc định (chưa mã hóa)
+            String defaultPassword = "123456";
 
-        // Mật khẩu mặc định (chưa mã hóa)
-        String defaultPassword = "123456";
+            // Tạo user và set thông tin
+            User user = new User();
+            user.setCode(code);
+            user.setUsername(username);
+            user.setFullName(fullName);
+            user.setAddress(address != null ? address : "");
+            user.setEmail(email);
+            user.setPhone(phone != null ? phone : "");
+            user.setDateOfBirth((dob != null && !dob.isEmpty()) ? dob : null);
+            user.setStatus(status);
+            user.setPassword(defaultPassword);
 
-        // Tạo user và set thông tin
-        User user = new User();
-        user.setCode(code); 
-        user.setUsername(username);
-        user.setFullName(fullName);
-        user.setAddress(address != null ? address : "");
-        user.setEmail(email);
-        user.setPhone(phone != null ? phone : "");
-        user.setDateOfBirth((dob != null && !dob.isEmpty()) ? dob : null);
-        user.setStatus(status);
-        user.setPassword(defaultPassword);
+            // Gọi DAO thêm user và gán role
+            userDAO.insertUserWithRole(user, roleId);
 
-        // Gọi DAO thêm user và gán role
-        userDAO.insertUserWithRole(user, roleId);
-
-        // Redirect về trang list user sau khi thêm thành công
-        response.sendRedirect("listuser");
-    } catch (Exception e) {
-        throw new ServletException(e);
-    }
+            // Redirect về trang list user sau khi thêm thành công
+            response.sendRedirect("listuser");
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
     }
 
     /**
