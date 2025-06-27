@@ -78,4 +78,23 @@ public class ExportDAO {
         }
     }
 
+    //hàm getExportById
+    public Export getExportById(int exportId) throws SQLException {
+        String sql = "SELECT export_id, voucher_id, user_id, export_date, note FROM ExportReceipts WHERE export_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, exportId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Export export = new Export();
+                export.setExportId(rs.getInt("export_id"));
+                export.setVoucherId(rs.getString("voucher_id"));
+                export.setUserId(rs.getInt("user_id"));
+                export.setExportDate(rs.getDate("export_date").toLocalDate());
+                export.setNote(rs.getString("note"));
+                return export;
+            }
+        }
+        return null; // Return null if no export is found
+    }
+
 }
