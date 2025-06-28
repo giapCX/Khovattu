@@ -6,298 +6,154 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Proposal</title>
-        <!-- Bootstrap 5 CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <!-- Font Awesome for icons -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-        <!-- Custom CSS -->
-        <style>
-            /* Reset mặc định nhẹ */
-            * {
-                box-sizing: border-box;
-            }
-
-            body {
-                background-color: #f4f6f9;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                color: #2c3e50;
-                margin: 0;
-                padding: 0;
-            }
-
-            .container {
-                max-width: 1200px;
-                background-color: #fff;
-                margin: 30px auto;
-                padding: 25px 30px;
-                border-radius: 10px;
-                box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
-            }
-
-            /* Tiêu đề */
-            h1, h2 {
-                font-weight: bold;
-                margin-bottom: 20px;
-            }
-
-            h1 {
-                font-size: 2rem;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                color: #1d3557;
-            }
-
-            .card {
-                border: none;
-                border-radius: 8px;
-                overflow: hidden;
-            }
-
-            .card-header {
-                padding: 15px 20px;
-            }
-
-            .card-header.bg-primary {
-                background-color: #0284c7 !important;
-                color: white;
-            }
-
-            .card-body {
-                padding: 20px;
-            }
-
-            /* Form */
-            .form-control,
-            .form-select {
-                border-radius: 6px;
-                padding: 10px;
-                font-size: 0.95rem;
-            }
-
-            /* Table */
-            .table {
-                margin-bottom: 0;
-            }
-
-            .table th,
-            .table td {
-                vertical-align: middle !important;
-                text-align: center;
-                font-size: 0.95rem;
-            }
-
-            .table thead {
-                background-color: #34495e;
-                color: white;
-            }
-
-            /* Button styles */
-            .btn {
-                border-radius: 5px;
-                font-weight: 500;
-            }
-
-            .btn-primary {
-                background-color: #0284c7;
-                border: none;
-            }
-
-            .btn-primary:hover {
-                background-color: #3498db;
-            }
-
-            .btn-success {
-                background-color: #27ae60;
-                border: none;
-            }
-
-            .btn-success:hover {
-                background-color: #219653;
-            }
-
-            .btn-danger {
-                background-color: #e74c3c;
-                border: none;
-            }
-
-            .btn-danger:hover {
-                background-color: #c0392b;
-            }
-
-            .btn-secondary {
-                background-color: #95a5a6;
-                border: none;
-            }
-
-            .btn-secondary:hover {
-                background-color: #7f8c8d;
-            }
-
-            /* Thông báo */
-            .success,
-            .error {
-                font-size: 1.3rem;
-                margin-top: 20px;
-                font-weight: bold;
-            }
-
-            .success {
-                color: #27ae60;
-            }
-
-            .error {
-                color: #e74c3c;
-            }
-
-            /* Autocomplete suggestion */
-            .autocomplete-suggestion {
-                padding: 8px;
-                cursor: pointer;
-            }
-
-            .autocomplete-suggestion:hover {
-                background-color: #e9ecef;
-            }
-
-            /* Responsive table */
-            @media screen and (max-width: 768px) {
-                .table-responsive {
-                    overflow-x: auto;
-                }
-            }
-
-        </style>
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_add_edit.css">
     </head>
-    <body>
+    <body class="bg-gray-50 min-h-screen font-sans antialiased">
         <%
             String role = (String) session.getAttribute("role");
             Integer userId = (Integer) session.getAttribute("userId");
             String userFullName = (String) session.getAttribute("userFullName");
         %>
-        <div class="container">
-            <h1 class="mb-4"><i class="fas fa-warehouse me-2"></i>Proposal</h1>
-
-            <form action="${pageContext.request.contextPath}/ProposalServlet" method="post">
-                <!-- Information -->
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h2 class="mb-0"><i class="fas fa-info-circle me-2"></i>Information Proposal</h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="row mb-3">
-                                <label class="col-sm-2 col-form-label">Proposer</label>
-                                <div class="col-sm-10">
-                                    <input class="form-control" value="${sessionScope.userFullName}" readonly>
-                                </div>
-                            </div>
-                            <label class="col-sm-2 col-form-label">Proposal Type</label>
-                            <div class="col-sm-10">
-                                <select name="proposalType" class="form-select" required>
-                                    <option value="export">Export</option>
-                                    <option value="import">Import</option>
-                                    <c:if test="${role == 'warehouse'}">
-                                        <option value="repair">Repair</option>               
-                                    </c:if>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label class="col-sm-2 col-form-label">Note</label>
-                            <div class="col-sm-10">
-                                <textarea class="form-control" name="note" rows="3"></textarea>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Sidebar -->
+        <c:choose>
+            <c:when test="${role == 'admin'}">
+                <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
+            </c:when>
+            <c:when test="${role == 'direction'}">
+                <jsp:include page="/view/sidebar/sidebarDirection.jsp" />
+            </c:when>
+            <c:when test="${role == 'warehouse'}">
+                <jsp:include page="/view/sidebar/sidebarWarehouse.jsp" />
+            </c:when>
+            <c:when test="${role == 'employee'}">
+                <jsp:include page="/view/sidebar/sidebarEmployee.jsp" />
+            </c:when>
+        </c:choose>
+        <!-- Main Content -->
+        <main class="flex-1 p-8 transition-all duration-300 min-h-screen">
+            <div class="max-w-full mx-auto card bg-white dark:bg-gray-800 p-6">
+                <div class="flex items-center gap-4 mb-6">
+                    <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Proposal Material</h2>
                 </div>
 
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h2 class="mb-0"><i class="fas fa-list-alt me-2"></i>List of Proposed Materials </h2>
+                <form action="ProposalServlet" method="post" class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Proposer</label>
+                        <input type="text" value="${sessionScope.userFullName}" readonly class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered" id="importDetailsTable">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 10%">Name of Material</th>
-                                        <th style="width: 10%">Unit</th>
-                                        <th style="width: 15%">Quantity</th>
-                                        <th style="width: 10%">Material Condition </th>
-                                        <th style="width: 5%">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="itemsBody">
-                                    <tr>
-                                        <td>
-                                            <input list="materialList" class="form-control nameMaterialInput" name="materialName[]" autocomplete="off">
-                                            <datalist id="materialList">
-                                                <c:forEach var="cat" items="${material}">
-                                                    <option 
-                                                        value="${cat.name}" 
-                                                        data-id="${cat.materialId}" 
-                                                        data-parent="${cat.category.categoryId}" 
-                                                        data-unit="${cat.unit}">
-                                                        ${cat.name}
-                                                    </option>
-                                                </c:forEach>
-                                            </datalist>
-                                            <input type="hidden" name="materialId[]" class="materialIdHidden">
-                                        </td>
-                                        <td>
-                                            <input type="text" name="unit[]" class="form-control unitMaterial" readonly>
-                                        </td>
-                                        <td><input type="number" name="quantity[]" class="form-control" value="0.00" step="0.01" min="0.01" required></td>
-                                        <td>
-                                            <select name="materialCondition[]" class="form-select" required>
-                                                <option value="new">New</option>
-                                                <option value="used">Used</option>
-                                                <option value="damaged">Damaged</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+
+                    <div class="space-y-2">
+                        <label for="proposalType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                        <select id="proposalType" name="proposalType" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                            <option value="export">Export</option>
+                            <option value="import">Import</option>
+                            <c:if test="${role == 'warehouse'}">
+                                <option value="repair">Repair</option>               
+                            </c:if>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Note</label>
+                        <textarea class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" name="note" rows="3"></textarea>
+                    </div> 
+
+                    <div class="space-y-2">
+                        <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">List of Proposed Materials</label>
+                        <br/>
+                        <div class="table-container bg-white dark:bg-gray-800">
+                            <div class="overflow-x-auto">
+                                <table class="w-full table-auto" id="importDetailsTable">
+                                    <thead>
+                                        <tr class="bg-primary-600 text-white">
+                                            <th class="p-4 text-left">Name of Material</th>
+                                            <th class="p-4 text-left">Unit</th>
+                                            <th class="p-4 text-left">Quantity</th>
+                                            <th class="p-4 text-left">Material Condition </th>
+                                            <th class="p-4 text-left">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="itemsBody">
+                                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                                            <td>
+                                                <input list="materialList" class="w-lg px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md nameMaterialInput" name="materialName[]" autocomplete="off">
+                                                <datalist id="materialList">
+                                                    <c:forEach var="cat" items="${material}">
+                                                        <option 
+                                                            value="${cat.name}" 
+                                                            data-id="${cat.materialId}" 
+                                                            data-parent="${cat.category.categoryId}" 
+                                                            data-unit="${cat.unit}">
+                                                            ${cat.name}
+                                                        </option>
+                                                    </c:forEach>
+                                                </datalist>
+                                                <input type="hidden" name="materialId[]" class="materialIdHidden">
+                                            </td>
+                                            <td>
+                                                <input type="text" name="unit[]" class="w-lg px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md unitMaterial" readonly>
+                                            </td>
+                                            <td><input type="number" name="quantity[]" class="w-lg px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" value="0.00" step="0.01" min="0.01" required></td>
+                                            <td>
+                                                <select name="materialCondition[]" class="w-3/4 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" required>
+                                                    <option value="new">New</option>
+                                                    <option value="used">Used</option>
+                                                    <option value="damaged">Damaged</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="p-4 px-12 font-medium " onclick="removeRow(this)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="p-2 font-medium bg-green-500 hover:bg-green-600 text-white rounded-md border border-green-500 hover:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-all duration-200 flex items-center" onclick="addRow()">
+                                <i class="fas fa-plus me-2"></i>Add
+                            </button>
                         </div>
-                        <button type="button" class="btn btn-success mt-2" onclick="addRow()">
-                            <i class="fas fa-plus me-2"></i>Add
+                    </div>
+                    <div class="flex gap-4 justify-center">
+                        <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-plus-circle mr-2"></i> Submit 
                         </button>
+
+                        <a href="${pageContext.request.contextPath}/ProposalServlet" onclick="event.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg inline-flex items-center">
+                            <i class="fas fa-undo mr-2"></i> Reset form
+                        </a>
                     </div>
-                </div>
 
-                <div class="d-flex justify-content-end gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Submit Proposal
-                    </button>                   
-                    <c:choose>
-                        <c:when test="${role == 'warehouse'}">
-                            <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left me-2"></i>Back to home 
-                            </a>
-                        </c:when>
-                        <c:when test="${role == 'employee'}">
-                            <a href="${pageContext.request.contextPath}/view/employee/employeeDashboard.jsp" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left me-2"></i>Back to home 
-                            </a>                    
-                        </c:when>
-                    </c:choose>
-                </div>
+                </form>
 
-                <!-- Thông báo -->
-                <c:if test="${not empty message}">
-                    <p class="success mt-3">${message}</p>
-                </c:if>
                 <c:if test="${not empty error}">
-                    <p class="error mt-3">${error}</p>
+                    <div class="mb-4 p-3 rounded
+                         ${error == 'successful!' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                        ${error}
+                    </div>
                 </c:if>
-            </form>
-        </div>
+                <c:choose>
+                    <c:when test="${role == 'warehouse'}">
+                        <div class="mt-4 flex justify-center">
+                            <a href="${pageContext.request.contextPath}/ListProposalServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to list proposal</a>
+                        </div>
+                    </c:when>
+                    <c:when test="${role == 'employee'}">
+                        <div class="mt-4 flex justify-center">
+                            <a href="${pageContext.request.contextPath}/ListProposalServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to list proposal</a>
+                        </div>
+                    </c:when>
+                </c:choose>
+            </div>
+        </main>
 
         <script>
             function addRow() {
@@ -341,9 +197,8 @@
                 }
             });
 
-
-
         </script>
-
+        <!--JavaScript -->
+        <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
     </body>
 </html>

@@ -102,7 +102,7 @@ public class ProposalServlet extends HttpServlet {
                 proposalDetail.setQuantity(Double.parseDouble(quantities[i]));
                 proposalDetail.setMaterialCondition(materialConditions[i]);
             } catch (NumberFormatException e) {
-                request.setAttribute("error", "Invalid quantity or material ID");
+                request.setAttribute("error", "Invalid material ID");
                 request.getRequestDispatcher("/view/proposal/proposalOfEmployee.jsp").forward(request, response);
                 return;
             }
@@ -115,8 +115,7 @@ public class ProposalServlet extends HttpServlet {
             ProposalDAO proposalDAO = new ProposalDAO(conn);
             boolean isInserted = proposalDAO.addProposal(proposal);
             if (isInserted) {
-                request.setAttribute("message", "Proposal material sent successfully");
-                request.getRequestDispatcher("/view/proposal/proposalOfEmployee.jsp").forward(request, response);
+                response.sendRedirect("ListProposalServlet");
             } else {
                 request.setAttribute("error", "Failed to submit proposal");
                 request.getRequestDispatcher("/view/proposal/proposalOfEmployee.jsp").forward(request, response);
