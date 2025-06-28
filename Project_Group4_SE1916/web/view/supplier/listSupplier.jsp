@@ -16,7 +16,24 @@
 
         <!-- style CSS -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
+              <style>
+            .badge {
+                padding: 0.25rem 0.75rem;
+                border-radius: 0.5rem;
+                font-size: 1rem;
+                font-weight: 600;
+            }
 
+            .badge-success {
+                background-color: #d1fae5;
+                color: #065f46;
+            }
+
+            .badge-danger {
+                background-color: #fee2e2;
+                color: #991b1b;
+            }
+        </style>
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
 
@@ -57,19 +74,19 @@
                 <!-- Search and Filter Form -->
                 <form action="ListSupplierServlet" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchName" placeholder="Search name"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="searchName" placeholder="Search name"  value="${param.searchName}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchPhone" placeholder="Search phone"  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="searchPhone" placeholder="Search phone" value="${param.searchPhone}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchAddress" placeholder="Search address "  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="searchAddress" placeholder="Search address " value="${param.searchAddress}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <div class="flex-1 min-w-[150px]">
                         <select name="searchStatus" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">                         
                             <option value="">All Status</option>
-                            <option value="active" ${param.status == 'active' ? 'selected' : ''}>Active</option>
-                            <option value="inactive" ${param.status == 'inactive' ? 'selected' : ''}>Inactive</option>
+                            <option value="active" ${param.searchStatus == 'active' ? 'selected' : ''}>Active</option>
+                            <option value="inactive" ${param.searchStatus == 'inactive' ? 'selected' : ''}>Inactive</option>
                         </select>
                     </div>
                     <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg flex items-center">
@@ -89,7 +106,7 @@
                                     <th class="p-4 text-left">Address</th>
                                     <th class="p-4 text-left">Email</th>
                                     <th class="p-4 text-left">Status</th>
-                                    <th class="p-4 text-left">List material</th>
+                                    <th class="p-4 text-left">Supplied materials</th>
                                     <th class="p-4 text-left">Action</th>
                                 </tr>
                             </thead>
@@ -103,9 +120,18 @@
                                                 <td class="p-4 font-medium">${item.supplierPhone}</td>
                                                 <td class="p-4 font-medium">${item.supplierAddress}</td>
                                                 <td class="p-4 font-medium">${item.supplierEmail}</td>
-                                                <td class="p-4 font-medium">${item.supplierStatus}</td>
                                                 <td class="p-4 font-medium">
-                                                    <a href="FilterSupplierServlet?supplierId=${item.supplierId}&supplierName=${item.supplierName}" class="text-primary-600 dark:text-primary-400 hover:underline">List </a>
+                                                    <c:choose>
+                                                        <c:when test="${item.supplierStatus == 'inactive'}">
+                                                            <span class="badge badge-danger">Inactive</span> 
+                                                        </c:when>
+                                                        <c:when test="${item.supplierStatus == 'active'}">
+                                                            <span class="badge badge-success">Active</span> 
+                                                        </c:when>
+                                                    </c:choose>
+                                                </td>
+                                                <td class="p-4 font-medium">
+                                                    <a href="FilterSupplierServlet?supplierId=${item.supplierId}&supplierName=${item.supplierName}" class="text-primary-600 dark:text-primary-400 hover:underline">View details</a>
                                                 </td>
                                                 <td class="p-4 font-medium">
                                                     <a href="EditSupplierServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>

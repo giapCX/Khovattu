@@ -170,10 +170,10 @@ public class SupplierDAO {
         }
         if (status != null && !status.trim().isEmpty()) {
             sql.append(" AND status LIKE ? ");
-            params.add("%" + status.trim() + "%");
+            params.add(status.trim());
         }
 
-        sql.append(" ORDER BY supplier_id LIMIT ? OFFSET ? ");
+        sql.append(" ORDER BY supplier_id DESC LIMIT ? OFFSET ? ");
         params.add(limit);
         params.add(offset);
 

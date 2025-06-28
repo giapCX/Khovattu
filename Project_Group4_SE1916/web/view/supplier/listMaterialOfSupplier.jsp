@@ -73,9 +73,9 @@
                         <table class="w-full table-auto">
                             <thead>
                                 <tr class="bg-primary-600 text-white">
-                                    <th class="p-4 text-left">Parent Category Name</th>
-                                    <th class="p-4 text-left">Child Category Name</th>
-                                    <th class="p-4 text-left">Code of material</th>
+                                    <th class="p-4 text-left">Parent Category </th>
+                                    <th class="p-4 text-left">Child Category</th>
+                                    <th class="p-4 text-left">Code</th>
                                     <th class="p-4 text-left">Material Name</th>
                                     <th class="p-4 text-left">Description</th>
                                     <th class="p-4 text-left">Image</th>

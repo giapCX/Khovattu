@@ -141,8 +141,7 @@ public class EditSupplierServlet extends HttpServlet {
             }
             boolean updated = supplierDAO.updateSupplier(supplier);
             errorMessage = updated ? "Update successful!" : "Update failful!";
-            request.setAttribute("errorMessage", errorMessage);
-            doGet(request, response);
+            response.sendRedirect("ListSupplierServlet");
         }
     }
 

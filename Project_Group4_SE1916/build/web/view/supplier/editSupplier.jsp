@@ -37,8 +37,12 @@
         <!-- Main Content -->
         <main class="flex-1 p-8">
             <div class="max-w-md mx-auto card bg-white dark:bg-gray-800 p-6">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">Edit supplier</h2>
-
+                 <div class="flex items-center gap-4 mb-6">
+                    <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit supplier</h2>
+                </div>
                 <form action="EditSupplierServlet" method="post" class="space-y-4">
                     <input type="hidden" name="supplierId" value="${supplier.supplierId}" />
 
@@ -47,7 +51,6 @@
                         <input type="text" id="supplierName" name="supplierName" value="${supplier.supplierName}" 
                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" required />
                     </div>
-
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
                         <input type="text" id="supplierPhone" name="supplierPhone" value="${supplier.supplierPhone}" 
@@ -143,6 +146,9 @@
                     return;
                 }
             });
+            
         </script>
+        <!--JavaScript -->
+        <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
     </body>
 </html>

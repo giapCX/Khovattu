@@ -2,6 +2,14 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/supplier/listMaterialOfSupplier.jsp</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/supplier/listSupplier.jsp</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/supplier/AddSupplierServlet.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/supplier/EditSupplierServlet.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/SupplierDAO.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/supplier/ListSupplierServlet.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/supplier/editSupplier.jsp</file>
+        </group>
     </open-files>
 </project-private>
