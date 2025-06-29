@@ -39,6 +39,17 @@
                 background-color: #fee2e2;
                 color: #991b1b;
             }
+            
+            .badge-success-border-subtle {
+                background-color: #ecfdf5;
+                color: #047857;
+                border: 1px solid #34d399;
+            }
+
+            .badge-success-bg-subtle {
+                background-color: #bbf7d0;
+                color: #065f46;
+            }
         </style>
 
     </head>
@@ -139,26 +150,32 @@
                                     <c:when test="${not empty proposals}">
                                         <c:forEach var="item" items="${proposals}">
                                             <tr class="border-b border-gray-200 dark:border-gray-700">
-                                                <td class="p-4 font-medium">${item.proposalType}</td>
+                                                <td class="p-4 font-medium">
+                                                    <c:choose>
+                                                        <c:when test="${item.proposalType == 'export'}">Export</c:when>
+                                                        <c:when test="${item.proposalType == 'import'}">Import</c:when>
+                                                        <c:when test="${item.proposalType == 'repair'}">Repair</c:when>
+                                                    </c:choose>
+                                                </td>
                                                 <td class="p-4 font-medium">
                                                     <fmt:formatDate value="${item.proposalSentDate}" pattern="HH:mm, dd MMM yyyy"/>
                                                 </td>
                                                 <td class="p-4 font-medium">
                                                     <c:choose>
                                                         <c:when test="${item.finalStatus == 'rejected'}">
-                                                            <span class="badge badge-danger">${item.finalStatus}</span> 
+                                                            <span class="badge badge-danger">Rejected</span> 
                                                         </c:when>
                                                         <c:when test="${item.finalStatus == 'pending'}">
-                                                            <span class="badge badge-warning">${item.finalStatus}</span> 
+                                                            <span class="badge badge-warning">Pending</span> 
                                                         </c:when>
                                                         <c:when test="${item.finalStatus == 'approved_by_admin'}">
-                                                            <span class="badge badge-success-border-subtle">${item.finalStatus}</span> 
+                                                            <span class="badge badge-success-border-subtle">Approved by admin</span> 
                                                         </c:when>
                                                         <c:when test="${item.finalStatus == 'approved_but_not_executed'}">
-                                                            <span class="badge badge-success-bg-subtle">${item.finalStatus}</span> 
+                                                            <span class="badge badge-success-bg-subtle">Approved but not executed</span> 
                                                         </c:when>
                                                         <c:when test="${item.finalStatus == 'executed'}">
-                                                            <span class="badge badge-success">${item.finalStatus}</span> 
+                                                            <span class="badge badge-success">Executed</span> 
                                                         </c:when>
                                                     </c:choose>
                                                 </td>
@@ -168,7 +185,16 @@
                                                     <a href="DetailProposalServlet?proposalId=${item.proposalId}" class="text-primary-600 dark:text-primary-400 hover:underline">Detail </a>
                                                 </td>
                                                 <td class="p-4 font-medium">
-                                                    <a href="EditProposalServlet?proposalId=${item.proposalId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
+                                                    <c:choose>
+                                                        <c:when test="${item.finalStatus == 'rejected'}">
+                                                            <a href="EditProposalServlet?proposalId=${item.proposalId}" class="text-primary-600 dark:text-primary-400 hover:underline">
+                                                                Edit
+                                                            </a>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-gray-400 italic">Cannot edit</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </td>
                                             </tr>
                                         </c:forEach>

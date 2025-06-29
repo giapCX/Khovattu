@@ -41,10 +41,7 @@ public class ProposalDetails {
     public void setUnit(String unit) {
         this.unit = unit;
     }
-    
-    
-    
-
+   
     public String getMaterialName() {
         return materialName;
     }

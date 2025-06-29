@@ -683,4 +683,114 @@ public class ProposalDAO {
         return list;
     }
 
+    public Proposal getProposalWithDetailsById(int proposalId) throws SQLException {
+        Proposal proposal = null;
+        String sql = "SELECT ep.proposal_id, ep.proposal_type, ep.proposer_id, u.full_name AS sender_name, "
+                + "ep.note, ep.proposal_sent_date, ep.final_status, "
+                + "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, "
+                + "m.name AS material_name, m.unit AS material_unit "
+                + "FROM EmployeeProposals ep "
+                + "JOIN Users u ON ep.proposer_id = u.user_id "
+                + "LEFT JOIN ProposalDetails pd ON ep.proposal_id = pd.proposal_id "
+                + "LEFT JOIN Materials m ON pd.material_id = m.material_id "
+                + "WHERE ep.proposal_id = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, proposalId);
+            try (ResultSet rs = ps.executeQuery()) {
+                List<ProposalDetails> detailsList = new ArrayList<>();
+                while (rs.next()) {
+
+                    if (proposal == null) {
+                        proposal = new Proposal();
+                        proposal.setProposalId(rs.getInt("proposal_id"));
+                        proposal.setProposalType(rs.getString("proposal_type"));
+                        proposal.setProposerId(rs.getInt("proposer_id"));
+                        proposal.setSenderName(rs.getString("sender_name"));
+                        proposal.setNote(rs.getString("note"));
+                        proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
+                        proposal.setFinalStatus(rs.getString("final_status"));
+                    }
+
+                    int detailId = rs.getInt("proposal_detail_id");
+                    if (detailId > 0) {
+                        ProposalDetails detail = new ProposalDetails();
+                        detail.setProposalDetailId(detailId);
+                        detail.setProposal(proposal); // liên kết lại
+                        detail.setMaterialId(rs.getInt("material_id"));
+                        detail.setMaterialName(rs.getString("material_name"));
+                        detail.setQuantity(rs.getDouble("quantity"));
+                        detail.setUnit(rs.getString("material_unit"));
+                        detail.setMaterialCondition(rs.getString("material_condition"));
+                        detailsList.add(detail);
+                    }
+                }
+                if (proposal != null) {
+                    proposal.setProposalDetails(detailsList);
+                }
+            }
+        }
+
+        return proposal;
+    }
+
+public boolean updateProposalById(int proposalId, Proposal proposal) throws SQLException {
+    String updateProposalSQL = "UPDATE EmployeeProposals SET proposal_type = ?, proposer_id = ?, note = ?, proposal_sent_date = ?, final_status = ? WHERE proposal_id = ?";
+    String deleteProposalDetailsSQL = "DELETE FROM ProposalDetails WHERE proposal_id = ?";
+    String insertProposalDetailSQL = "INSERT INTO ProposalDetails (proposal_id, material_id, quantity, material_condition) VALUES (?, ?, ?, ?)";
+
+    conn.setAutoCommit(false);
+    try (
+        PreparedStatement updateStmt = conn.prepareStatement(updateProposalSQL);
+        PreparedStatement deleteStmt = conn.prepareStatement(deleteProposalDetailsSQL);
+        PreparedStatement insertStmt = conn.prepareStatement(insertProposalDetailSQL)
+    ) {
+        // Cập nhật thông tin Proposal chính
+        updateStmt.setString(1, proposal.getProposalType());
+        updateStmt.setInt(2, proposal.getProposerId());
+        updateStmt.setString(3, proposal.getNote());
+        updateStmt.setTimestamp(4, proposal.getProposalSentDate() != null ? proposal.getProposalSentDate() : new Timestamp(System.currentTimeMillis()));
+        updateStmt.setString(5, proposal.getFinalStatus() != null ? proposal.getFinalStatus() : "pending");
+        updateStmt.setInt(6, proposalId);
+
+        int rowsAffected = updateStmt.executeUpdate();
+        if (rowsAffected == 0) {
+            conn.rollback();
+            throw new SQLException("Proposal ID không tồn tại: " + proposalId);
+        }
+
+        // Xóa hết chi tiết cũ
+        deleteStmt.setInt(1, proposalId);
+        deleteStmt.executeUpdate();
+
+        // Thêm chi tiết mới (nếu có)
+        if (proposal.getProposalDetails() != null && !proposal.getProposalDetails().isEmpty()) {
+            for (ProposalDetails detail : proposal.getProposalDetails()) {
+                insertStmt.setInt(1, proposalId);
+                insertStmt.setInt(2, detail.getMaterialId());
+                insertStmt.setDouble(3, detail.getQuantity());
+                insertStmt.setString(4, detail.getMaterialCondition());
+                insertStmt.addBatch();
+            }
+            int[] result = insertStmt.executeBatch();
+            for (int res : result) {
+                if (res == PreparedStatement.EXECUTE_FAILED) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+        }
+
+        conn.commit();
+        return true;
+
+    } catch (SQLException e) {
+        conn.rollback();
+        throw e;
+    } finally {
+        conn.setAutoCommit(true);
+    }
+}
+
+
 }

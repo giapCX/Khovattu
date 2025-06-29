@@ -36,7 +36,7 @@
         </c:choose>
         <!-- Main Content -->
         <main class="flex-1 p-8 transition-all duration-300 min-h-screen">
-            <div class="max-w-full mx-auto card bg-white dark:bg-gray-800 p-6">
+            <div class="max-w-5xl mx-auto card bg-white dark:bg-gray-800 p-6">
                 <div class="flex items-center gap-4 mb-6">
                     <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>
@@ -51,7 +51,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label for="proposalType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                        <label for="proposalType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Type of proposal</label>
                         <select id="proposalType" name="proposalType" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                             <option value="export">Export</option>
                             <option value="import">Import</option>
