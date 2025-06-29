@@ -196,7 +196,7 @@
             <button type="submit" class="btn btn-primary">Save Export Voucher</button>
             <button type="reset" class="btn btn-info">Reset</button>
             <button type="button" class="btn btn-success" onclick="window.print()">Print Voucher</button>
-            <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn btn-secondary">Back to Dashboard</a>
+            <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn btn-secondary">Back to Home</a>
         </form>
     </div>
 
