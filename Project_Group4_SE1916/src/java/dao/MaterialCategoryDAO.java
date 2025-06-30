@@ -101,16 +101,15 @@ public class MaterialCategoryDAO {
         }
     }
 
-    public void updateParentCategory(int categoryId, String name, String status) throws SQLException {
-        String sql = "UPDATE MaterialCategories SET name = ?, status = ? WHERE category_id = ? AND parent_id IS NULL";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, name);
-            ps.setString(2, status);
-            ps.setInt(3, categoryId);
-            ps.executeUpdate();
-        }
+public void updateParentCategory(int categoryId, String name, String status) throws SQLException {
+    String sql = "CALL UpdateCategoryAndChildren(?, ?, ?)";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, categoryId);
+        ps.setString(2, name);
+        ps.setString(3, status);
+        ps.executeUpdate();
     }
-
+}
     public boolean categoryExistsByName(String name, int parentId) throws SQLException {
         String sql;
         if (parentId == 0) {
