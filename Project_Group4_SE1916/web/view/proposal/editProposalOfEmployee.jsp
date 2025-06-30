@@ -41,7 +41,7 @@
                     <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Proposal Material</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Proposal Material ID:${proposalId}</h2>
                 </div>
 
                 <form action="EditProposalServlet" method="post" class="space-y-4">

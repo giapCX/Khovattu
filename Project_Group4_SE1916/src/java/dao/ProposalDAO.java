@@ -734,63 +734,82 @@ public class ProposalDAO {
         return proposal;
     }
 
-public boolean updateProposalById(int proposalId, Proposal proposal) throws SQLException {
-    String updateProposalSQL = "UPDATE EmployeeProposals SET proposal_type = ?, proposer_id = ?, note = ?, proposal_sent_date = ?, final_status = ? WHERE proposal_id = ?";
-    String deleteProposalDetailsSQL = "DELETE FROM ProposalDetails WHERE proposal_id = ?";
-    String insertProposalDetailSQL = "INSERT INTO ProposalDetails (proposal_id, material_id, quantity, material_condition) VALUES (?, ?, ?, ?)";
+    public boolean updateProposalById(int proposalId, Proposal proposal) throws SQLException {
+        String updateProposalSQL = "UPDATE EmployeeProposals SET proposal_type = ?, proposer_id = ?, note = ?, proposal_sent_date = ?, final_status = ? WHERE proposal_id = ?";
+        String deleteProposalDetailsSQL = "DELETE FROM ProposalDetails WHERE proposal_id = ?";
+        String insertProposalDetailSQL = "INSERT INTO ProposalDetails (proposal_id, material_id, quantity, material_condition) VALUES (?, ?, ?, ?)";
 
-    conn.setAutoCommit(false);
-    try (
-        PreparedStatement updateStmt = conn.prepareStatement(updateProposalSQL);
-        PreparedStatement deleteStmt = conn.prepareStatement(deleteProposalDetailsSQL);
-        PreparedStatement insertStmt = conn.prepareStatement(insertProposalDetailSQL)
-    ) {
-        // Cập nhật thông tin Proposal chính
-        updateStmt.setString(1, proposal.getProposalType());
-        updateStmt.setInt(2, proposal.getProposerId());
-        updateStmt.setString(3, proposal.getNote());
-        updateStmt.setTimestamp(4, proposal.getProposalSentDate() != null ? proposal.getProposalSentDate() : new Timestamp(System.currentTimeMillis()));
-        updateStmt.setString(5, proposal.getFinalStatus() != null ? proposal.getFinalStatus() : "pending");
-        updateStmt.setInt(6, proposalId);
+        conn.setAutoCommit(false);
+        try (
+                PreparedStatement updateStmt = conn.prepareStatement(updateProposalSQL); PreparedStatement deleteStmt = conn.prepareStatement(deleteProposalDetailsSQL); PreparedStatement insertStmt = conn.prepareStatement(insertProposalDetailSQL)) {
+            // Cập nhật thông tin Proposal chính
+            updateStmt.setString(1, proposal.getProposalType());
+            updateStmt.setInt(2, proposal.getProposerId());
+            updateStmt.setString(3, proposal.getNote());
+            updateStmt.setTimestamp(4, proposal.getProposalSentDate() != null ? proposal.getProposalSentDate() : new Timestamp(System.currentTimeMillis()));
+            updateStmt.setString(5, proposal.getFinalStatus() != null ? proposal.getFinalStatus() : "pending");
+            updateStmt.setInt(6, proposalId);
 
-        int rowsAffected = updateStmt.executeUpdate();
-        if (rowsAffected == 0) {
-            conn.rollback();
-            throw new SQLException("Proposal ID không tồn tại: " + proposalId);
-        }
-
-        // Xóa hết chi tiết cũ
-        deleteStmt.setInt(1, proposalId);
-        deleteStmt.executeUpdate();
-
-        // Thêm chi tiết mới (nếu có)
-        if (proposal.getProposalDetails() != null && !proposal.getProposalDetails().isEmpty()) {
-            for (ProposalDetails detail : proposal.getProposalDetails()) {
-                insertStmt.setInt(1, proposalId);
-                insertStmt.setInt(2, detail.getMaterialId());
-                insertStmt.setDouble(3, detail.getQuantity());
-                insertStmt.setString(4, detail.getMaterialCondition());
-                insertStmt.addBatch();
+            int rowsAffected = updateStmt.executeUpdate();
+            if (rowsAffected == 0) {
+                conn.rollback();
+                throw new SQLException("Proposal ID không tồn tại: " + proposalId);
             }
-            int[] result = insertStmt.executeBatch();
-            for (int res : result) {
-                if (res == PreparedStatement.EXECUTE_FAILED) {
-                    conn.rollback();
-                    return false;
+
+            // Xóa hết chi tiết cũ
+            deleteStmt.setInt(1, proposalId);
+            deleteStmt.executeUpdate();
+
+            // Thêm chi tiết mới (nếu có)
+            if (proposal.getProposalDetails() != null && !proposal.getProposalDetails().isEmpty()) {
+                for (ProposalDetails detail : proposal.getProposalDetails()) {
+                    insertStmt.setInt(1, proposalId);
+                    insertStmt.setInt(2, detail.getMaterialId());
+                    insertStmt.setDouble(3, detail.getQuantity());
+                    insertStmt.setString(4, detail.getMaterialCondition());
+                    insertStmt.addBatch();
+                }
+                int[] result = insertStmt.executeBatch();
+                for (int res : result) {
+                    if (res == PreparedStatement.EXECUTE_FAILED) {
+                        conn.rollback();
+                        return false;
+                    }
                 }
             }
+
+            conn.commit();
+            return true;
+
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
         }
-
-        conn.commit();
-        return true;
-
-    } catch (SQLException e) {
-        conn.rollback();
-        throw e;
-    } finally {
-        conn.setAutoCommit(true);
     }
-}
 
+    public void updateApprovedByProposalId(int proposalId) throws SQLException {
+        String updateApprovalStatusSql = "UPDATE ProposalApprovals "
+                + "SET admin_status = 'pending', director_status = 'pending' "
+                + "WHERE proposal_id = ?";
+
+        conn.setAutoCommit(false); 
+        try (PreparedStatement updateStmt = conn.prepareStatement(updateApprovalStatusSql)) {
+            updateStmt.setInt(1, proposalId);
+
+            int rowsAffected = updateStmt.executeUpdate();
+            if (rowsAffected == 0) {
+                conn.rollback();
+                throw new SQLException("Không tìm thấy Proposal với proposal_id: " + proposalId);
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback(); 
+            throw e;
+        } finally {
+            conn.setAutoCommit(true); 
+        }
+    }
 
 }

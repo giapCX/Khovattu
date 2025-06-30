@@ -148,6 +148,7 @@ public class EditProposalServlet extends HttpServlet {
         try (Connection conn = DBContext.getConnection()) {
             ProposalDAO proposalDAO = new ProposalDAO(conn);
             boolean isInserted = proposalDAO.updateProposalById(proposalId,proposal);
+            proposalDAO.updateApprovedByProposalId(proposalId);
             if (isInserted) {
                 response.sendRedirect("ListProposalServlet");
             } else {

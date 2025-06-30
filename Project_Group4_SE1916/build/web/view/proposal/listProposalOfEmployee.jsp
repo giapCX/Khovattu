@@ -137,6 +137,7 @@
                         <table class="w-full table-auto">
                             <thead>
                                 <tr class="bg-primary-600 text-white">
+                                    <th class="p-4 text-left">ID</th>
                                     <th class="p-4 text-left">Type</th>
                                     <th class="p-4 text-left">Time Sent</th>
                                     <th class="p-4 text-left">Status</th>
@@ -150,6 +151,7 @@
                                     <c:when test="${not empty proposals}">
                                         <c:forEach var="item" items="${proposals}">
                                             <tr class="border-b border-gray-200 dark:border-gray-700">
+                                                <td class="p-4 font-medium">${item.proposalId}</td>
                                                 <td class="p-4 font-medium">
                                                     <c:choose>
                                                         <c:when test="${item.proposalType == 'export'}">Export</c:when>
