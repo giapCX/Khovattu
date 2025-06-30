@@ -66,6 +66,88 @@ public class MaterialCategoryDAO {
         return categories;
     }
 
+    public List<MaterialCategory> getParentCategoriesWithFilters(String search, String status, int page, int itemsPerPage) throws SQLException {
+        List<MaterialCategory> categories = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT category_id, name, status FROM MaterialCategories WHERE parent_id IS NULL");
+        
+        // Thêm điều kiện tìm kiếm và lọc trạng thái
+        List<String> conditions = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+        
+        if (search != null && !search.isEmpty()) {
+            conditions.add("name LIKE ?");
+            params.add("%" + search + "%");
+        }
+        
+        if (status != null && !status.isEmpty()) {
+            conditions.add("status = ?");
+            params.add(status);
+        }
+        
+        if (!conditions.isEmpty()) {
+            sql.append(" AND ").append(String.join(" AND ", conditions));
+        }
+        
+        // Thêm phân trang
+        sql.append(" ORDER BY category_id LIMIT ? OFFSET ?");
+        params.add(itemsPerPage);
+        params.add((page - 1) * itemsPerPage);
+
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            // Gán các tham số
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    MaterialCategory category = new MaterialCategory();
+                    category.setCategoryId(rs.getInt("category_id"));
+                    category.setName(rs.getString("name"));
+                    category.setStatus(rs.getString("status"));
+                    categories.add(category);
+                }
+            }
+        }
+        return categories;
+    }
+
+    public int getTotalParentCategories(String search, String status) throws SQLException {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM MaterialCategories WHERE parent_id IS NULL");
+        
+        // Thêm điều kiện tìm kiếm và lọc trạng thái
+        List<String> conditions = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+        
+        if (search != null && !search.isEmpty()) {
+            conditions.add("name LIKE ?");
+            params.add("%" + search + "%");
+        }
+        
+        if (status != null && !status.isEmpty()) {
+            conditions.add("status = ?");
+            params.add(status);
+        }
+        
+        if (!conditions.isEmpty()) {
+            sql.append(" AND ").append(String.join(" AND ", conditions));
+        }
+
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            // Gán các tham số
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
     public MaterialCategory getParentCategoryById(int categoryId) throws SQLException {
         String sql = "SELECT category_id, name, status FROM MaterialCategories WHERE category_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -101,15 +183,16 @@ public class MaterialCategoryDAO {
         }
     }
 
-public void updateParentCategory(int categoryId, String name, String status) throws SQLException {
-    String sql = "CALL UpdateCategoryAndChildren(?, ?, ?)";
-    try (PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, categoryId);
-        ps.setString(2, name);
-        ps.setString(3, status);
-        ps.executeUpdate();
+    public void updateParentCategory(int categoryId, String name, String status) throws SQLException {
+        String sql = "CALL UpdateCategoryAndChildren(?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, categoryId);
+            ps.setString(2, name);
+            ps.setString(3, status);
+            ps.executeUpdate();
+        }
     }
-}
+
     public boolean categoryExistsByName(String name, int parentId) throws SQLException {
         String sql;
         if (parentId == 0) {
