@@ -236,7 +236,8 @@
                                     <td>${item.exportDate}</td>
                                     <td>${item.exporterName}</td>
                                     <td>${item.note}</td>
-                                    <td><a href="exportHistoryDetail?exportId=${item.exportId}&keyword=${param.keyword}&sort=${param.sort}&page=1">View</a></td>
+                                    <td><a href="viewExportHistoryDetail.jsp">View</a></td>
+<!--                                    <td><a href="exportHistoryDetail?exportId=${item.exportId}&keyword=${param.keyword}&sort=${param.sort}&page=1">View</a></td>-->
                                 </tr>
                             </c:forEach>
                         </c:when>
