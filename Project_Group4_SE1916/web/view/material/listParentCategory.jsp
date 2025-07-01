@@ -111,7 +111,7 @@
                 <table class="min-w-full bg-white">
                     <thead class="bg-gradient-to-r from-sky-600 to-blue-600 text-white">
                         <tr>
-                            <th class="py-4 px-6 text-left rounded-tl-2xl"><i class="fas fa-list-ol mr-2"></i>No.</th>
+                            <th class="py-4 px-6 text-left rounded-tl-2xl"><i class="fas fa-list-ol mr-2"></i>Id</th>
                             <th class="py-4 px-6 text-left"><i class="fas fa-box mr-2"></i>Category Name</th>
                             <th class="py-4 px-6 text-left"><i class="fas fa-check-circle mr-2"></i>Status</th>
                             <th class="py-4 px-6 text-center view-details-cell rounded-tr-2xl"><i class="fas fa-eye mr-2"></i>Actions</th>
@@ -120,7 +120,7 @@
                     <tbody id="categoryTableBody" class="divide-y divide-gray-200">
                         <c:forEach var="cat" items="${parentCategories}" varStatus="loop">
                             <tr class="hover:bg-gradient-to-r hover:from-sky-50 hover:to-cyan-50 transition-all duration-300">
-                                <td class="py-4 px-6 font-medium">${(param.page == null ? 1 : param.page - 1) * (param.itemsPerPage == null ? 10 : param.itemsPerPage) + loop.count}</td>
+                                <td class="py-4 px-6 font-medium">${cat.categoryId}</td>
                                 <td class="py-4 px-6">${cat.name}</td>
                                 <td class="py-4 px-6">
                                     <span class="px-3 py-1 rounded-full font-semibold 
