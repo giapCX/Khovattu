@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,8 +27,10 @@ import model.User;
 import model.Supplier;
 
 public class ImportMaterialServlet extends HttpServlet {
-
     private static final Gson GSON = new Gson();
+    private static final String ID_REGEX = "^[A-Za-z0-9-_]+$";
+    private static final int VOUCHER_ID_MAX_LENGTH = 50;
+    private static final int NOTE_MAX_LENGTH = 1000;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -34,21 +38,29 @@ public class ImportMaterialServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            String getSuppliers = request.getParameter("getSuppliers");
-            if ("true".equals(getSuppliers)) {
-                try (Connection conn = DBContext.getConnection()) {
-                    SupplierDAO supplierDAO = new SupplierDAO(conn);
-                    List<Supplier> suppliers = supplierDAO.getAllSuppliers();
-                    out.print(GSON.toJson(suppliers));
-                    out.flush();
-                } catch (SQLException e) {
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.print(GSON.toJson(new ResponseMessage("error", "Database error: " + e.getMessage(), 0, null)));
-                }
-                return;
-            }
             MaterialDAO materialDAO = new MaterialDAO();
             List<Material> materials = materialDAO.getAllMaterials();
+            // Fetch suppliers for each material
+            for (Material material : materials) {
+                List<Supplier> suppliers = new ArrayList<>();
+                String sql = "SELECT s.supplier_id, s.name AS supplier_name FROM Suppliers s " +
+                             "JOIN SupplierMaterials sm ON s.supplier_id = sm.supplier_id " +
+                             "WHERE sm.material_id = ?";
+                try (Connection conn = DBContext.getConnection();
+                     PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setInt(1, material.getMaterialId());
+                    ResultSet rs = ps.executeQuery();
+                    while (rs.next()) {
+                        Supplier supplier = new Supplier();
+                        supplier.setSupplierId(rs.getInt("supplier_id"));
+                        supplier.setSupplierName(rs.getString("supplier_name"));
+                        suppliers.add(supplier);
+                    }
+                    material.setSuppliers(suppliers);
+                } catch (SQLException e) {
+                    throw new SQLException("Error fetching suppliers for material ID " + material.getMaterialId(), e);
+                }
+            }
             out.print(GSON.toJson(materials));
             out.flush();
         } catch (SQLException e) {
@@ -66,12 +78,6 @@ public class ImportMaterialServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            String path = request.getServletPath();
-            if ("/check_voucher_id".equals(path)) {
-                handleCheckVoucherId(request, response);
-                return;
-            }
-
             String errorMessage = null;
             Integer errorRow = null;
 
@@ -84,22 +90,28 @@ public class ImportMaterialServlet extends HttpServlet {
             }
 
             String voucherId = request.getParameter("voucher_id");
-            System.out.println("Received raw voucherId from request: '" + voucherId + "'");
             if (voucherId == null || voucherId.trim().isEmpty()) {
                 errorMessage = "The import voucher code was not submitted.";
                 sendErrorResponse(response, errorMessage, null);
                 return;
             }
             String trimmedVoucherId = voucherId.trim();
-            System.out.println("Received trimmed voucherId: '" + trimmedVoucherId + "'");
+            if (trimmedVoucherId.length() > VOUCHER_ID_MAX_LENGTH) {
+                errorMessage = "Voucher ID cannot exceed " + VOUCHER_ID_MAX_LENGTH + " characters.";
+                sendErrorResponse(response, errorMessage, null);
+                return;
+            }
+            if (!trimmedVoucherId.matches(ID_REGEX)) {
+                errorMessage = "Voucher ID can only contain alphanumeric characters, hyphens, or underscores.";
+                sendErrorResponse(response, errorMessage, null);
+                return;
+            }
 
             String[] materialIds = request.getParameterValues("materialId[]");
             String[] quantities = request.getParameterValues("quantity[]");
             String[] unitPrices = request.getParameterValues("price_per_unit[]");
             String[] conditions = request.getParameterValues("materialCondition[]");
-            String[] supplierIds = request.getParameterValues("supplierId[]"); // Lấy supplierId từ bảng
-            String note = request.getParameter("note");
-            String importDateStr = request.getParameter("import_date");
+            String[] supplierIds = request.getParameterValues("supplierId[]");
 
             // Validate input arrays
             if (materialIds == null || materialIds.length == 0 || isArrayEmpty(materialIds)) {
@@ -133,6 +145,19 @@ public class ImportMaterialServlet extends HttpServlet {
                 sendErrorResponse(response, errorMessage, null);
                 return;
             }
+
+            String note = request.getParameter("note");
+            String importDateStr = request.getParameter("import_date");
+            if (note != null && note.length() > NOTE_MAX_LENGTH) {
+                errorMessage = "Note cannot exceed " + NOTE_MAX_LENGTH + " characters.";
+                sendErrorResponse(response, errorMessage, null);
+                return;
+            }
+            if (note != null && !note.isEmpty() && !note.matches("^[A-Za-z0-9\\s,.()-]+$")) {
+                errorMessage = "Note can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.";
+                sendErrorResponse(response, errorMessage, null);
+                return;
+            }
             if (importDateStr == null || importDateStr.trim().isEmpty()) {
                 errorMessage = "The import date must not be empty.";
                 sendErrorResponse(response, errorMessage, null);
@@ -140,140 +165,158 @@ public class ImportMaterialServlet extends HttpServlet {
             }
 
             try (Connection conn = DBContext.getConnection()) {
-                ImportDAO dao = new ImportDAO(conn);
-                SupplierDAO supplierDAO = new SupplierDAO(conn);
-                UserDAO userDAO = new UserDAO();
-                MaterialDAO materialDAO = new MaterialDAO();
+                conn.setAutoCommit(false); // Start transaction
+                try {
+                    ImportDAO dao = new ImportDAO(conn);
+                    SupplierDAO supplierDAO = new SupplierDAO(conn);
+                    UserDAO userDAO = new UserDAO();
+                    MaterialDAO materialDAO = new MaterialDAO();
 
-                // Check voucher ID uniqueness
-                if (dao.voucherIdExists(trimmedVoucherId)) {
-                    errorMessage = "The import voucher code already exists. Please use a different code.";
-                    sendErrorResponse(response, errorMessage, null);
-                    return;
-                }
-
-                // Validate user
-                User user = userDAO.getUserByUsername(username);
-                if (user == null || user.getUserId() == 0) {
-                    errorMessage = "Invalid user information. Please log in again.";
-                    sendErrorResponse(response, errorMessage, null);
-                    return;
-                }
-
-                // Create ImportReceipt object (supplierId sẽ lấy từ detail đầu tiên)
-                ImportReceipt importReceipt = new ImportReceipt();
-                importReceipt.setVoucherId(trimmedVoucherId);
-                importReceipt.setUserId(user.getUserId());
-                importReceipt.setImportDate(java.sql.Date.valueOf(LocalDate.parse(importDateStr)));
-                importReceipt.setNote(note != null ? note.trim() : "");
-                // Lấy supplierId từ hàng đầu tiên làm supplierId cho biên lai
-                int supplierId = Integer.parseInt(supplierIds[0].trim());
-                importReceipt.setSupplierId(supplierId);
-
-                // Validate materials and create ImportDetail list
-                List<ImportDetail> detailList = new ArrayList<>();
-                for (int i = 0; i < materialIds.length; i++) {
-                    try {
-                        if (materialIds[i] == null || materialIds[i].trim().isEmpty()) {
-                            errorMessage = "Material ID must not be empty at row " + (i + 1);
-                            sendErrorResponse(response, errorMessage, i);
-                            return;
-                        }
-                        if (quantities[i] == null || quantities[i].trim().isEmpty()) {
-                            errorMessage = "Quantity must not be empty at row " + (i + 1);
-                            sendErrorResponse(response, errorMessage, i);
-                            return;
-                        }
-                        if (unitPrices[i] == null || unitPrices[i].trim().isEmpty()) {
-                            errorMessage = "Unit price must not be empty at row " + (i + 1);
-                            sendErrorResponse(response, errorMessage, i);
-                            return;
-                        }
-                        if (conditions[i] == null || conditions[i].trim().isEmpty()) {
-                            errorMessage = "Condition must not be empty at row " + (i + 1);
-                            sendErrorResponse(response, errorMessage, i);
-                            return;
-                        }
-                        if (supplierIds[i] == null || supplierIds[i].trim().isEmpty()) {
-                            errorMessage = "Supplier ID must not be empty at row " + (i + 1);
-                            sendErrorResponse(response, errorMessage, i);
-                            return;
-                        }
-
-                        int materialId = Integer.parseInt(materialIds[i].trim());
-                        supplierId = Integer.parseInt(supplierIds[i].trim());
-                        // Validate material existence
-                        if (!materialDAO.materialExists(materialId)) {
-                            errorMessage = "Material ID " + materialId + " does not exist at row " + (i + 1);
-                            sendErrorResponse(response, errorMessage, i);
-                            return;
-                        }
-
-                        // Validate supplier existence
-                        if (!supplierDAO.supplierExists(supplierId)) {
-                            errorMessage = "Supplier ID " + supplierId + " does not exist at row " + (i + 1);
-                            sendErrorResponse(response, errorMessage, i);
-                            return;
-                        }
-
-                        // Validate supplier-material relationship
-                        Material material = materialDAO.getMaterialById(materialId);
-                        boolean supplierValid = false;
-                        for (Supplier supplier : material.getSuppliers()) {
-                            if (supplier.getSupplierId() == supplierId) {
-                                supplierValid = true;
-                                break;
-                            }
-                        }
-                        if (!supplierValid) {
-                            errorMessage = "Material '" + material.getName() + "' at row " + (i + 1) + " is not associated with the selected supplier.";
-                            sendErrorResponse(response, errorMessage, i);
-                            return;
-                        }
-
-                        double quantity = Double.parseDouble(quantities[i].trim());
-                        double unitPrice = Double.parseDouble(unitPrices[i].trim());
-
-                        if (quantity <= 0) {
-                            errorMessage = "Quantity must be greater than 0 at row " + (i + 1);
-                            sendErrorResponse(response, errorMessage, i);
-                            return;
-                        }
-                        if (unitPrice <= 0) {
-                            errorMessage = "Unit price must be greater than 0 at row " + (i + 1);
-                            sendErrorResponse(response, errorMessage, i);
-                            return;
-                        }
-
-                        ImportDetail detail = new ImportDetail();
-                        detail.setImportId(0); // Will be set by DAO
-                        detail.setMaterialId(materialId);
-                        detail.setQuantity(quantity);
-                        detail.setPricePerUnit(unitPrice);
-                        detail.setMaterialCondition(conditions[i].trim());
-                        detail.setMaterialCode(material.getCode());
-                        detail.setMaterialName(material.getName());
-                        detail.setUnit(material.getUnit());
-                        detail.setSupplierId(supplierId); // Set supplierId from table
-                        detailList.add(detail);
-                    } catch (NumberFormatException e) {
-                        errorMessage = "Invalid number format for material ID, quantity, unit price, or supplier ID at row " + (i + 1);
-                        sendErrorResponse(response, errorMessage, i);
+                    // Check voucher ID uniqueness
+                    if (dao.voucherIdExists(trimmedVoucherId)) {
+                        errorMessage = "The import voucher code already exists. Please use a different code.";
+                        sendErrorResponse(response, errorMessage, null);
                         return;
                     }
-                }
 
-                // Save to database
-                int importId = dao.saveImport(importReceipt, detailList);
-                if (importId <= 0) {
-                    errorMessage = "Failed to save the import voucher. Please try again.";
-                    sendErrorResponse(response, errorMessage, null);
-                    return;
-                }
+                    // Validate user
+                    User user = userDAO.getUserByUsername(username);
+                    if (user == null || user.getUserId() == 0) {
+                        errorMessage = "Invalid user information. Please log in again.";
+                        sendErrorResponse(response, errorMessage, null);
+                        return;
+                    }
 
-                String successMessage = "The import voucher has been saved successfully! Data has been updated to the database. (Import Voucher ID: " + importId + ")";
-                out.print(GSON.toJson(new ResponseMessage("success", successMessage, importId, null)));
-                out.flush();
+                    // Validate supplier consistency
+                    int supplierId = Integer.parseInt(supplierIds[0].trim());
+                    for (int i = 1; i < supplierIds.length; i++) {
+                        if (!supplierIds[i].trim().equals(String.valueOf(supplierId))) {
+                            errorMessage = "All materials must be supplied by the same supplier in a single import.";
+                            sendErrorResponse(response, errorMessage, i);
+                            return;
+                        }
+                    }
+                    if (!supplierDAO.supplierExists(supplierId)) {
+                        errorMessage = "Supplier ID " + supplierId + " does not exist.";
+                        sendErrorResponse(response, errorMessage, null);
+                        return;
+                    }
+
+                    // Create ImportReceipt object
+                    ImportReceipt importReceipt = new ImportReceipt();
+                    importReceipt.setVoucherId(trimmedVoucherId);
+                    importReceipt.setUserId(user.getUserId());
+                    importReceipt.setImportDate(java.sql.Date.valueOf(LocalDate.parse(importDateStr)));
+                    importReceipt.setNote(note != null ? note.trim() : "");
+                    importReceipt.setSupplierId(supplierId);
+
+                    // Validate materials and create ImportDetail list
+                    List<ImportDetail> detailList = new ArrayList<>();
+                    for (int i = 0; i < materialIds.length; i++) {
+                        try {
+                            if (materialIds[i] == null || materialIds[i].trim().isEmpty()) {
+                                errorMessage = "Material ID must not be empty at row " + (i + 1);
+                                sendErrorResponse(response, errorMessage, i);
+                                return;
+                            }
+                            if (quantities[i] == null || quantities[i].trim().isEmpty()) {
+                                errorMessage = "Quantity must not be empty at row " + (i + 1);
+                                sendErrorResponse(response, errorMessage, i);
+                                return;
+                            }
+                            if (unitPrices[i] == null || unitPrices[i].trim().isEmpty()) {
+                                errorMessage = "Unit price must not be empty at row " + (i + 1);
+                                sendErrorResponse(response, errorMessage, i);
+                                return;
+                            }
+                            if (conditions[i] == null || conditions[i].trim().isEmpty()) {
+                                errorMessage = "Condition must not be empty at row " + (i + 1);
+                                sendErrorResponse(response, errorMessage, i);
+                                return;
+                            }
+                            if (supplierIds[i] == null || supplierIds[i].trim().isEmpty()) {
+                                errorMessage = "Supplier ID must not be empty at row " + (i + 1);
+                                sendErrorResponse(response, errorMessage, i);
+                                return;
+                            }
+
+                            int materialId = Integer.parseInt(materialIds[i].trim());
+                            double quantity = Double.parseDouble(quantities[i].trim());
+                            double unitPrice = Double.parseDouble(unitPrices[i].trim());
+
+                            // Validate material existence
+                            if (!materialDAO.materialExists(materialId)) {
+                                errorMessage = "Material ID " + materialId + " does not exist at row " + (i + 1);
+                                sendErrorResponse(response, errorMessage, i);
+                                return;
+                            }
+
+                            // Validate supplier-material relationship
+                            Material material = materialDAO.getMaterialById(materialId);
+                            boolean supplierValid = false;
+                            for (Supplier supplier : material.getSuppliers()) {
+                                if (supplier.getSupplierId() == supplierId) {
+                                    supplierValid = true;
+                                    break;
+                                }
+                            }
+                            if (!supplierValid) {
+                                errorMessage = "Material '" + material.getName() + "' at row " + (i + 1) + " is not associated with the selected supplier.";
+                                sendErrorResponse(response, errorMessage, i);
+                                return;
+                            }
+
+                            // Validate quantity and unit price
+                            if (quantity <= 0) {
+                                errorMessage = "Quantity must be greater than 0 at row " + (i + 1);
+                                sendErrorResponse(response, errorMessage, i);
+                                return;
+                            }
+                            if (unitPrice <= 0) {
+                                errorMessage = "Unit price must be greater than 0 at row " + (i + 1);
+                                sendErrorResponse(response, errorMessage, i);
+                                return;
+                            }
+
+                            // Validate material condition
+                            if (!conditions[i].matches("new|used|damaged")) {
+                                errorMessage = "Invalid material condition at row " + (i + 1);
+                                sendErrorResponse(response, errorMessage, i);
+                                return;
+                            }
+
+                            ImportDetail detail = new ImportDetail();
+                            detail.setMaterialId(materialId);
+                            detail.setQuantity(quantity);
+                            detail.setPricePerUnit(unitPrice);
+                            detail.setMaterialCondition(conditions[i].trim());
+                            detailList.add(detail);
+                        } catch (NumberFormatException e) {
+                            errorMessage = "Invalid number format for material ID, quantity, unit price, or supplier ID at row " + (i + 1);
+                            sendErrorResponse(response, errorMessage, i);
+                            return;
+                        }
+                    }
+
+                    // Save to database
+                    int importId = dao.saveImport(importReceipt, detailList);
+                    if (importId <= 0) {
+                        errorMessage = "Failed to save the import voucher. Please try again.";
+                        sendErrorResponse(response, errorMessage, null);
+                        return;
+                    }
+
+                    // Update inventory
+                    materialDAO.updateInventoryFromImport(detailList);
+
+                    conn.commit(); // Commit transaction
+                    String successMessage = "The import voucher has been saved successfully! Data has been updated to the database. (Import Voucher ID: " + importId + ")";
+                    out.print(GSON.toJson(new ResponseMessage("success", successMessage, importId, null)));
+                    out.flush();
+                } catch (SQLException e) {
+                    conn.rollback(); // Rollback on error
+                    throw e;
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
                 errorMessage = "Database error: " + e.getMessage();
@@ -285,35 +328,6 @@ public class ImportMaterialServlet extends HttpServlet {
             }
         }
     }
-
-    private void handleCheckVoucherId(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setContentType("application/json");
-    response.setCharacterEncoding("UTF-8");
-    try (PrintWriter out = response.getWriter()) {
-        String voucherId = request.getParameter("voucher_id");
-        if (voucherId == null || voucherId.trim().isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print(GSON.toJson(new VoucherCheckResponse(false, "The import voucher code must not be empty")));
-            return;
-        }
-        ImportDAO dao = new ImportDAO(); // Sử dụng constructor mặc định, đảm bảo DBContext được cấu hình
-        boolean exists = dao.voucherIdExists(voucherId.trim());
-        out.print(GSON.toJson(new VoucherCheckResponse(exists, null)));
-        out.flush();
-    } catch (SQLException e) {
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        try (PrintWriter out = response.getWriter()) {
-            out.print(GSON.toJson(new VoucherCheckResponse(false, "Database error: " + e.getMessage())));
-            out.flush();
-        }
-    } catch (Exception e) {
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        try (PrintWriter out = response.getWriter()) {
-            out.print(GSON.toJson(new VoucherCheckResponse(false, "Server error: " + e.getMessage())));
-            out.flush();
-        }
-    }
-}
 
     private void sendErrorResponse(HttpServletResponse response, String errorMessage, Integer errorRow)
             throws IOException {
@@ -344,16 +358,6 @@ public class ImportMaterialServlet extends HttpServlet {
             this.message = message;
             this.importId = importId;
             this.errorRow = errorRow;
-        }
-    }
-
-    private static class VoucherCheckResponse {
-        boolean exists;
-        String error;
-
-        VoucherCheckResponse(boolean exists, String error) {
-            this.exists = exists;
-            this.error = error;
         }
     }
 }
