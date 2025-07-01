@@ -1,3 +1,4 @@
+
 <%-- 
     Document   : exportMaterial
     Created on : Jun 9, 2025, 7:27:11 PM
@@ -65,7 +66,7 @@
             padding: 10px 20px;
             font-weight: 600;
         }
-        .btn-danger, .btn-secondary, .btn-success, .btn-info {
+        .btn-danger, .btn-secondary, .btn-success, .btn-info, .btn-warning {
             border-radius: 8px;
         }
         .alert {
@@ -174,7 +175,10 @@
                                     <option value="damaged">Damaged</option>
                                 </select>
                             </td>
-                            <td><button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button></td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button>
+                                <button type="button" class="btn btn-success btn-sm edit-row">Save</button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -189,13 +193,12 @@
 
             <div class="mb-3">
                 <label for="additionalNote" class="form-label">Additional Notes</label>
-                <textarea class="form-control" id="additional printable" name="additionalNote" rows="3" maxlength="1000" pattern="[A-Za-z0-9\s,.()-]+"></textarea>
+                <textarea class="form-control" id="additionalNote" name="additionalNote" rows="3" maxlength="1000" pattern="[A-Za-z0-9\s,.()-]+"></textarea>
                 <div class="invalid-feedback">Notes max 1000 characters, alphanumeric, spaces, commas, periods, parentheses, or hyphens only.</div>
             </div>
 
-            <button type="submit" class="btn btn-primary">Save Export Voucher</button>
+            <button type="submit" class="btn btn-primary">Save Export</button>
             <button type="reset" class="btn btn-info">Reset</button>
-            <button type="button" class="btn btn-success" onclick="window.print()">Print Voucher</button>
             <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn btn-secondary">Back to Home</a>
         </form>
     </div>
@@ -266,7 +269,7 @@
                 <td class="serial-number"></td>
                 <td style="position: relative;">
                     <input type="text" class="form-control material-name-input" name="materialName[]" required autocomplete="off">
-                    <div class="autocomplete-suggestions" style="1"></div>
+                    <div class="autocomplete-suggestions" style="display: none;"></div>
                 </td>
                 <td><input type="text" class="form-control material-code-input" name="materialCode[]" readonly></td>
                 <td><input type="number" class="form-control" name="quantity[]" min="1" required></td>
@@ -279,12 +282,15 @@
                         <option value="damaged">Damaged</option>
                     </select>
                 </td>
-                <td><button type="button" class="btn btn-danger btn-sm remove-row">Delete</button></td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button>
+                    <button type="button" class="btn btn-success btn-sm edit-row">Save</button>
+                </td>
             `;
             tableBody.appendChild(row);
             attachAutocomplete(row.querySelector('.material-name-input'));
             updateSerialNumbers();
-            1;
+            updateRemoveButtons();
             showAlert('success', 'Added new material row.');
         }
 
@@ -301,9 +307,54 @@
             showAlert('success', 'Deleted material row.');
         }
 
+        // Toggle edit mode for a row
+        function toggleEditRow(button) {
+            const row = button.closest('tr');
+            const isEditing = button.textContent === 'Save';
+            const materialNameInput = row.querySelector('.material-name-input');
+            const quantityInput = row.querySelector('input[name="quantity[]"]');
+            const conditionSelect = row.querySelector('select[name="condition[]"]');
+
+            if (isEditing) {
+                // Save mode: validate and lock the row
+                if (!materialNameInput.value.trim()) {
+                    showAlert('error', 'Material name cannot be empty.');
+                    row.classList.add('error-row');
+                    return;
+                }
+                if (!quantityInput.value || quantityInput.value <= 0) {
+                    showAlert('error', 'Quantity must be greater than 0.');
+                    row.classList.add('error-row');
+                    return;
+                }
+                if (!conditionSelect.value) {
+                    showAlert('error', 'Condition cannot be empty.');
+                    row.classList.add('error-row');
+                    return;
+                }
+                materialNameInput.readOnly = true;
+                quantityInput.readOnly = true;
+                conditionSelect.disabled = true;
+                button.textContent = 'Edit';
+                button.classList.remove('btn-success');
+                button.classList.add('btn-warning');
+                row.classList.remove('error-row');
+                showAlert('success', 'Row saved successfully.');
+            } else {
+                // Edit mode: unlock the row
+                materialNameInput.readOnly = false;
+                quantityInput.readOnly = false;
+                conditionSelect.disabled = false;
+                button.textContent = 'Save';
+                button.classList.remove('btn-warning');
+                button.classList.add('btn-success');
+            }
+        }
+
         // Autocomplete functionality
         function attachAutocomplete(input) {
             input.addEventListener('input', function() {
+                if (this.readOnly) return; // Prevent input when readOnly
                 const value = this.value.toLowerCase();
                 const suggestionsDiv = this.nextElementSibling;
                 suggestionsDiv.innerHTML = '';
@@ -478,6 +529,8 @@
             tableBody.addEventListener('click', (event) => {
                 if (event.target.classList.contains('remove-row')) {
                     removeRow(event.target);
+                } else if (event.target.classList.contains('edit-row')) {
+                    toggleEditRow(event.target);
                 }
             });
 

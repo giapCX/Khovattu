@@ -95,34 +95,36 @@ public class EditMaterialController extends HttpServlet {
                 errorMessage.append("Material ID must be a number. ");
             }
 
-            // Validate code: not blank, max 50 chars, alphanumeric only
+            // Validate code: not blank, max 50 chars, alphanumeric, underscore, and hyphen
             if (code == null || code.trim().isEmpty()) {
                 errorMessage.append("Code is required. ");
             } else if (code.length() > 50) {
                 errorMessage.append("Code must not exceed 50 characters. ");
-            } else if (!Pattern.matches("^[a-zA-Z0-9]+$", code)) {
-                errorMessage.append("Code can only contain letters and numbers. ");
+            } else if (!Pattern.matches("^[a-zA-Z0-9_.-]+$", code)) {
+                errorMessage.append("Code can only contain letters, numbers, underscores, dots, and hyphens. ");
             }
 
-            // Validate name: not blank, max 100 chars
+            // Validate name: not blank, max 100 chars, allow Vietnamese characters
             if (name == null || name.trim().isEmpty()) {
                 errorMessage.append("Name is required. ");
             } else if (name.length() > 100) {
                 errorMessage.append("Name must not exceed 100 characters. ");
+            } else if (!Pattern.matches("^[\\p{L}\\d\\s_.-]+$", name)) {
+                errorMessage.append("Name can only contain letters (including Vietnamese), numbers, spaces, underscores, dots, and hyphens. ");
             }
 
-            // Validate description: max 500 chars (can be empty)
+            // Validate description: max 500 chars (can be empty), allow Vietnamese characters
             if (description != null && description.length() > 500) {
                 errorMessage.append("Description must not exceed 500 characters. ");
-            }
+            } 
 
-            // Validate unit: not blank, max 20 chars, alphanumeric only
+            // Validate unit: not blank, max 20 chars, allow Vietnamese characters
             if (unit == null || unit.trim().isEmpty()) {
                 errorMessage.append("Unit is required. ");
             } else if (unit.length() > 20) {
                 errorMessage.append("Unit must not exceed 20 characters. ");
-            } else if (!Pattern.matches("^[a-zA-Z0-9]+$", unit)) {
-                errorMessage.append("Unit can only contain letters and numbers. ");
+            } else if (!Pattern.matches("^[\\p{L}\\d\\s_-]+$", unit)) {
+                errorMessage.append("Unit can only contain letters (including Vietnamese), numbers, spaces, underscores, and hyphens. ");
             }
 
             // Validate imageUrl: max 255 chars (can be empty)

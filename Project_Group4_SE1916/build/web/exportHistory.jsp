@@ -236,7 +236,7 @@
                                     <td>${item.exportDate}</td>
                                     <td>${item.exporterName}</td>
                                     <td>${item.note}</td>
-                                    <td><button onclick="window.location.href='./viewExportHistoryDetail.jsp'" class="text-primary-600 font-medium hover:underline">View</button></td>
+                                    <td><a href="exportHistoryDetail?exportId=${item.exportId}&keyword=${param.keyword}&sort=${param.sort}&page=1">View</a></td>
                                 </tr>
                             </c:forEach>
                         </c:when>

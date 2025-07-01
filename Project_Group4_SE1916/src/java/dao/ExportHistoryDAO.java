@@ -1,3 +1,4 @@
+
 //HistoryDAO
 /**
  * ExportHistoryDAO.java
@@ -156,5 +157,37 @@ public class ExportHistoryDAO {
             e.printStackTrace();
         }
         return list;
+    }
+    
+     public Export getReceiptById(int exportId) {
+        Export receipt = null;
+        String sql = """
+            SELECT 
+                er.export_id, 
+                er.voucher_id, 
+                er.export_date, 
+                er.note, 
+                u.full_name AS exporter_name
+            FROM ExportReceipts er
+            JOIN Users u ON er.user_id = u.user_id
+            WHERE er.export_id = ?
+        """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, exportId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                receipt = new Export();
+                receipt.setExportId(rs.getInt("export_id"));
+                receipt.setVoucherId(rs.getString("voucher_id"));
+                receipt.setExportDate(rs.getDate("export_date").toLocalDate());
+                receipt.setNote(rs.getString("note"));
+                receipt.setExporterName(rs.getString("exporter_name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return receipt;
     }
 }

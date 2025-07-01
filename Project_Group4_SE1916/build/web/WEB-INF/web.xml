@@ -310,7 +310,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ExportHistoryDetailServlet</servlet-name>
-        <url-pattern>/exportHistoryDetailServlet</url-pattern>
+        <url-pattern>/exportHistoryDetail</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>EditProposalServlet</servlet-name>

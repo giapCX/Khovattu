@@ -271,11 +271,7 @@ public class ExportMaterial extends HttpServlet {
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
         }
-
-        //            ExportDAO exportDAO = new ExportDAO();
-//            int exportId = Integer.parseInt(request.getParameter("exportId"));
-//            Export export = exportDAO.getExportById(exportId); // Fetch from database
-//            request.getSession().setAttribute("receipt", export); // Store in session
+      
     }
 
     private boolean isArrayEmpty(String[] array) {
