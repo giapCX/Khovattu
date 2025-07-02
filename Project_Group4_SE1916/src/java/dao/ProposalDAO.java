@@ -794,7 +794,7 @@ public class ProposalDAO {
                 + "SET admin_status = 'pending', director_status = 'pending' "
                 + "WHERE proposal_id = ?";
 
-        conn.setAutoCommit(false); 
+        conn.setAutoCommit(false);
         try (PreparedStatement updateStmt = conn.prepareStatement(updateApprovalStatusSql)) {
             updateStmt.setInt(1, proposalId);
 
@@ -805,11 +805,129 @@ public class ProposalDAO {
             }
             conn.commit();
         } catch (SQLException e) {
-            conn.rollback(); 
+            conn.rollback();
             throw e;
         } finally {
-            conn.setAutoCommit(true); 
+            conn.setAutoCommit(true);
         }
+    }
+
+    public int countProposalsByTypeExecuteStatusFromStartDateToEndDate(String searchType, String searchStatus, Timestamp searchStartDate, Timestamp searchEndDate) {
+        int total = 0;
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM EmployeeProposals WHERE final_status IN ('approved_but_not_executed', 'executed')");
+
+        List<Object> parameters = new ArrayList<>();
+
+        // Kiểm tra nếu searchType không null hoặc rỗng, thêm điều kiện vào truy vấn
+        if (searchType != null && !searchType.isEmpty()) {
+            sql.append(" AND proposal_type = ?");
+            parameters.add(searchType);
+        }
+
+        // Kiểm tra nếu searchStatus không null hoặc rỗng, thêm điều kiện vào truy vấn
+        if (searchStatus != null && !searchStatus.isEmpty()) {
+            sql.append(" AND final_status = ?");
+            parameters.add(searchStatus);
+        }
+
+        // Kiểm tra nếu searchStartDate không null, thêm điều kiện vào truy vấn
+        if (searchStartDate != null) {
+            sql.append(" AND proposal_sent_date >= ?");
+            parameters.add(searchStartDate);
+        }
+
+        // Kiểm tra nếu searchEndDate không null, thêm điều kiện vào truy vấn
+        if (searchEndDate != null) {
+            sql.append(" AND proposal_sent_date <= ?");
+            parameters.add(searchEndDate);
+        }
+
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            // Thiết lập các tham số cho câu lệnh SQL
+            for (int i = 0; i < parameters.size(); i++) {
+                ps.setObject(i + 1, parameters.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                total = rs.getInt(1);  // Lấy số lượng kết quả từ cột đầu tiên (COUNT)
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return total;
+    }
+
+    public List<Proposal> searchProposalsByTypeExecuteStatusFromStartDateToEndDateWithPaging(
+            String searchType, String searchStatus, Timestamp searchStartDate, Timestamp searchEndDate,
+            int offset, int recordsPerPage) {
+
+        List<Proposal> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT ep.*, u.full_name AS sender_name "
+                + "FROM EmployeeProposals ep "
+                + "LEFT JOIN Users u ON ep.proposer_id = u.user_id "
+                + "WHERE ep.final_status IN ('approved_but_not_executed', 'executed') ");
+
+        List<Object> params = new ArrayList<>();
+
+        // Lọc theo proposal_type nếu có
+        if (searchType != null && !searchType.isEmpty()) {
+            sql.append(" AND ep.proposal_type = ?");
+            params.add(searchType);
+        }
+
+        // Lọc sâu hơn theo final_status nếu truyền đúng giá trị
+        if (searchStatus != null && !searchStatus.isEmpty()) {
+            if (searchStatus.equals("approved_but_not_executed") || searchStatus.equals("executed")) {
+                sql.append(" AND ep.final_status = ?");
+                params.add(searchStatus);
+            } else {
+                // Nếu giá trị searchStatus không nằm trong 2 giá trị hợp lệ, trả list rỗng
+                return list;
+            }
+        }
+
+        // Lọc theo ngày bắt đầu
+        if (searchStartDate != null) {
+            sql.append(" AND ep.proposal_sent_date >= ?");
+            params.add(searchStartDate);
+        }
+
+        // Lọc theo ngày kết thúc
+        if (searchEndDate != null) {
+            sql.append(" AND ep.proposal_sent_date <= ?");
+            params.add(searchEndDate);
+        }
+
+        // Phân trang
+        sql.append(" ORDER BY ep.proposal_sent_date DESC LIMIT ? OFFSET ?");
+        params.add(recordsPerPage);
+        params.add(offset);
+
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Proposal p = new Proposal();
+                p.setProposalId(rs.getInt("proposal_id"));
+                p.setProposalType(rs.getString("proposal_type"));
+                p.setProposerId(rs.getInt("proposer_id"));
+                p.setSenderName(rs.getString("sender_name"));
+                p.setNote(rs.getString("note"));
+                p.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
+                p.setFinalStatus(rs.getString("final_status"));
+                p.setExecuteDate(rs.getTimestamp("executed_date"));
+                list.add(p);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
 }

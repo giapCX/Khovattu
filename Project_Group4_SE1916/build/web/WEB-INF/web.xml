@@ -164,6 +164,14 @@
         <servlet-name>CheckVoucherIdServlet</servlet-name>
         <servlet-class>controller.importhistory.CheckVoucherIdServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ExecuteProposalServlet</servlet-name>
+        <servlet-class>controller.proposal.ExecuteProposalServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ListProposalExecute</servlet-name>
+        <servlet-class>controller.proposal.ListProposalExecute</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -327,6 +335,14 @@
     <servlet-mapping>
         <servlet-name>CheckVoucherIdServlet</servlet-name>
         <url-pattern>/check_voucher_id</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExecuteProposalServlet</servlet-name>
+        <url-pattern>/ExecuteProposalServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ListProposalExecute</servlet-name>
+        <url-pattern>/ListProposalExecute</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

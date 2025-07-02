@@ -12,6 +12,7 @@ public class Proposal {
     private String note;
     private Timestamp proposalSentDate;
     private String finalStatus;
+    private Timestamp executeDate;
     private Timestamp approvalDate;
     private List<ProposalDetails> proposalDetails;
     private ProposalApprovals approval;
@@ -125,4 +126,13 @@ public class Proposal {
     public void setFinalApprover(String finalApprover) {
         this.finalApprover = finalApprover;
     }
+
+    public Timestamp getExecuteDate() {
+        return executeDate;
+    }
+
+    public void setExecuteDate(Timestamp executeDate) {
+        this.executeDate = executeDate;
+    }
+
 }

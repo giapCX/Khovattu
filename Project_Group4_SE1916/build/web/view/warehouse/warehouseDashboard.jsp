@@ -282,6 +282,13 @@
                     </div>
                     <span class="ml-auto bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">3</span>
                 </a>
+                <a href="${pageContext.request.contextPath}/ListProposalExecute" class="nav-item flex items-center p-2 justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-clipboard-list mr-2 w-5 text-center"></i>
+                        <span class="text-base">Danh sách yêu cầu cần thực thi</span>
+                    </div>
+                    <span class="ml-auto bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">3</span>
+                </a>
                 <a href="${pageContext.request.contextPath}/importhistory" class="nav-item flex items-center p-3">
                     <i class="fas fa-chart-bar mr-3 w-6 text-center"></i>
                     <span class="text-lg">Import History</span>
