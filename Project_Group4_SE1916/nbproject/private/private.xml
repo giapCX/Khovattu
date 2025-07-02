@@ -3,8 +3,18 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/material/listParentCategory.jsp</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/material/ListParentCategoryController.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/assets/js/tailwind_config.js</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/assets/css/style_add_edit.css</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/sidebar/sidebarAdmin.jsp</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/supplier/listSupplier.jsp</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/assets/css/style_list.css</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dal/DBContext.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/MaterialCategoryDAO.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/assets/js/idebar_darkmode.js</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/password/PasswordMigration.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/assets/js/tablesort.js</file>
         </group>
     </open-files>
 </project-private>
