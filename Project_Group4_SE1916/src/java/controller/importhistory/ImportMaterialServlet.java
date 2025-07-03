@@ -253,18 +253,21 @@ public class ImportMaterialServlet extends HttpServlet {
 
                             // Validate supplier-material relationship
                             Material material = materialDAO.getMaterialById(materialId);
-                            boolean supplierValid = false;
-                            for (Supplier supplier : material.getSuppliers()) {
-                                if (supplier.getSupplierId() == supplierId) {
-                                    supplierValid = true;
-                                    break;
-                                }
-                            }
-                            if (!supplierValid) {
-                                errorMessage = "Material '" + material.getName() + "' at row " + (i + 1) + " is not associated with the selected supplier.";
-                                sendErrorResponse(response, errorMessage, i);
-                                return;
-                            }
+                              boolean supplierValid = false;
+     List<Supplier> suppliers = material.getSuppliers();
+     if (suppliers != null) {
+         for (Supplier supplier : suppliers) {
+             if (supplier.getSupplierId() == supplierId) {
+                 supplierValid = true;
+                 break;
+             }
+         }
+     }
+     if (!supplierValid) {
+         errorMessage = "Material '" + material.getName() + "' at row " + (i + 1) + " is not associated with the selected supplier.";
+         sendErrorResponse(response, errorMessage, i);
+         return;
+     }
 
                             // Validate quantity and unit price
                             if (quantity <= 0) {

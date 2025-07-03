@@ -18,10 +18,16 @@ public class UserProfileDAO {
 
     public UserProfileDAO() {
         this.conn = DBContext.getConnection();
+        if (this.conn == null) {
+            Logger.getLogger(UserProfileDAO.class.getName()).log(Level.SEVERE, "Database connection is null");
+        }
     }
 
     public UserProfileDAO(Connection conn) {
         this.conn = conn;
+        if (this.conn == null) {
+            Logger.getLogger(UserProfileDAO.class.getName()).log(Level.SEVERE, "Provided connection is null");
+        }
     }
 
     public User getUserProfileByUsername(String username) {
@@ -52,12 +58,16 @@ public class UserProfileDAO {
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserProfileDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserProfileDAO.class.getName()).log(Level.SEVERE, "Error fetching user profile for username: " + username, ex);
         }
         return user;
     }
 
     public void updateUserProfile(User user) throws SQLException {
+        if (conn == null) {
+            throw new SQLException("Database connection is null");
+        }
+
         StringBuilder sql = new StringBuilder("UPDATE Users SET ");
         List<String> updates = new ArrayList<>();
         List<Object> params = new ArrayList<>();
@@ -86,8 +96,13 @@ public class UserProfileDAO {
             updates.add("date_of_birth = ?");
             params.add(user.getDateOfBirth());
         }
+        if (user.getStatus() != null && !user.getStatus().isEmpty()) {
+            updates.add("status = ?");
+            params.add(user.getStatus());
+        }
 
         if (updates.isEmpty()) {
+            Logger.getLogger(UserProfileDAO.class.getName()).log(Level.INFO, "No fields to update for username: " + user.getUsername());
             return; // Không có gì để cập nhật
         }
 
@@ -99,17 +114,37 @@ public class UserProfileDAO {
             for (int i = 0; i < params.size(); i++) {
                 stmt.setObject(i + 1, params.get(i));
             }
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                Logger.getLogger(UserProfileDAO.class.getName()).log(Level.WARNING, "No rows updated for username: " + user.getUsername());
+            } else {
+                Logger.getLogger(UserProfileDAO.class.getName()).log(Level.INFO, "Updated " + rowsAffected + " row(s) for username: " + user.getUsername());
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserProfileDAO.class.getName()).log(Level.SEVERE, "Error updating user profile for username: " + user.getUsername(), ex);
+            throw ex;
         }
     }
 
     public void updateUserPassword(String username, String newPassword) throws SQLException {
+        if (conn == null) {
+            throw new SQLException("Database connection is null");
+        }
+
         String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
         String sql = "UPDATE Users SET password_hash = ? WHERE username = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, hashedPassword);
             stmt.setString(2, username);
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                Logger.getLogger(UserProfileDAO.class.getName()).log(Level.WARNING, "No rows updated for password change of username: " + username);
+            } else {
+                Logger.getLogger(UserProfileDAO.class.getName()).log(Level.INFO, "Password updated for username: " + username);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserProfileDAO.class.getName()).log(Level.SEVERE, "Error updating password for username: " + username, ex);
+            throw ex;
         }
     }
 }

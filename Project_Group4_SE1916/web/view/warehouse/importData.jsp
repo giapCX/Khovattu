@@ -155,20 +155,31 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
                             let materialData = [];
-                            let selectedSupplierId = null;
 
                             function attachMaterialAutocomplete(materialInput) {
                                 $(materialInput).autocomplete({
                                     source: function (request, response) {
                                         const term = request.term.toLowerCase();
-                                        const filtered = materialData.filter(mat => mat.name.toLowerCase().includes(term));
-                                        response(filtered.map(mat => ({
-                                                label: mat.name,
-                                                value: mat.materialId,
-                                                code: mat.code,
-                                                unit: mat.unit,
-                                                suppliers: mat.suppliers || []
-                                            })));
+                                        fetch('${pageContext.request.contextPath}/ImportMaterialServlet', {
+                                            method: 'GET',
+                                            headers: {'Accept': 'application/json'}
+                                        })
+                                                .then(res => res.json())
+                                                .then(data => {
+                                                    materialData = data; // Lưu dữ liệu để sử dụng sau
+                                                    const filtered = materialData.filter(mat => mat.name.toLowerCase().includes(term));
+                                                    response(filtered.map(mat => ({
+                                                            label: mat.name,
+                                                            value: mat.materialId,
+                                                            code: mat.code,
+                                                            unit: mat.unit,
+                                                            suppliers: mat.suppliers || []
+                                                        })));
+                                                })
+                                                .catch(error => {
+                                                    console.error('Error loading materials:', error);
+                                                    alert(`Unable to load material data: ${error.message}`);
+                                                });
                                     },
                                     select: function (event, ui) {
                                         const row = $(this).closest("tr");
@@ -176,24 +187,20 @@
                                         row.find(".material-id-hidden").val(ui.item.value);
                                         row.find(".material-code-select").val(ui.item.code);
                                         row.find(".unit-display").val(ui.item.unit);
+
                                         const supplierSelect = row.find(".supplier-select");
-                                        supplierSelect.html('<option value="">-- Select Supplier --</option>');
+                                        supplierSelect.empty().append('<option value="">-- Select Supplier --</option>');
                                         if (ui.item.suppliers && ui.item.suppliers.length > 0) {
                                             ui.item.suppliers.forEach(supplier => {
                                                 supplierSelect.append(new Option(supplier.supplierName, supplier.supplierId));
                                             });
                                             supplierSelect.prop('disabled', false);
-                                            if (selectedSupplierId && ui.item.suppliers.some(s => s.supplierId == selectedSupplierId)) {
-                                                supplierSelect.val(selectedSupplierId);
-                                            } else {
-                                                selectedSupplierId = ui.item.suppliers[0].supplierId;
-                                                supplierSelect.val(selectedSupplierId);
-                                            }
                                         } else {
                                             supplierSelect.html('<option value="">No Suppliers Available</option>');
                                             supplierSelect.prop('disabled', true);
                                             alert('No suppliers are associated with material "' + ui.item.label + '". Please contact the administrator.');
                                         }
+
                                         updateTotalPrice(row[0]);
                                         validateSuppliers();
                                         return false;
@@ -204,10 +211,13 @@
 
                             function validateSuppliers() {
                                 const supplierSelects = document.querySelectorAll('.supplier-select');
-                                let firstSupplierId = selectedSupplierId;
+                                let firstSupplierId = null;
                                 let isValid = true;
+
                                 supplierSelects.forEach((select, index) => {
-                                    if (select.value && select.value !== firstSupplierId) {
+                                    if (select.value && !firstSupplierId) {
+                                        firstSupplierId = select.value;
+                                    } else if (select.value && select.value !== firstSupplierId) {
                                         isValid = false;
                                         alert(`All materials must be supplied by the same supplier. Please select supplier ${firstSupplierId} for row ${index + 1}.`);
                                         select.classList.add('is-invalid');
@@ -215,7 +225,7 @@
                                         select.classList.remove('is-invalid');
                                     }
                                 });
-                                document.getElementById('saveImportBtn').disabled = !isValid;
+                                document.getElementById('saveImportBtn').disabled = !isValid || supplierSelects.length === 0 || [...supplierSelects].every(select => !select.value);
                             }
 
                             function updateSerialNumbers() {
@@ -478,9 +488,6 @@
                                 });
                                 tableBody.addEventListener('change', (e) => {
                                     if (e.target.classList.contains('supplier-select')) {
-                                        if (!selectedSupplierId && e.target.value) {
-                                            selectedSupplierId = e.target.value;
-                                        }
                                         validateSuppliers();
                                     }
                                 });
@@ -586,7 +593,6 @@
                                                     updateSerialNumbers();
                                                     updateRemoveButtons();
                                                     updateTotals();
-                                                    selectedSupplierId = null;
                                                     document.querySelectorAll(".material-name-select").forEach(attachMaterialAutocomplete);
                                                 } else {
                                                     errorAlert.textContent = data.message;
