@@ -1,3 +1,4 @@
+
 package controller.importhistory;
 
 import Dal.DBContext;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import model.Export;
@@ -23,7 +25,6 @@ public class ExportMaterial extends HttpServlet {
 
     private static final String ID_REGEX = "^[A-Za-z0-9-_]+$";
     private static final String TEXT_REGEX = "^[A-Za-z0-9\\s,.()-]+$";
-    private static final int EXPORT_ID_MAX_LENGTH = 50;
     private static final int VOUCHER_ID_MAX_LENGTH = 50;
     private static final int PURPOSE_MAX_LENGTH = 500;
     private static final int NOTE_MAX_LENGTH = 1000;
@@ -65,7 +66,6 @@ public class ExportMaterial extends HttpServlet {
 
         HttpSession session = request.getSession();
         String username = (String) session.getAttribute("username");
-        String exportIdStr = request.getParameter("exportId");
         String voucherIdStr = request.getParameter("voucherId");
         String[] materialCodes = request.getParameterValues("materialCode[]");
         String[] quantities = request.getParameterValues("quantity[]");
@@ -75,26 +75,10 @@ public class ExportMaterial extends HttpServlet {
         UserDAO userDAO = new UserDAO();
         User user = userDAO.getUserByUsername(username);
 
-        // Server-side validation
-        if (exportIdStr == null || exportIdStr.trim().isEmpty()) {
-            errorMessage = "Export ID cannot be empty.";
-            request.setAttribute("error", errorMessage);
-            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
-            return;
-        }
-        if (exportIdStr.length() > EXPORT_ID_MAX_LENGTH) {
-            errorMessage = "Export ID cannot exceed " + EXPORT_ID_MAX_LENGTH + " characters.";
-            request.setAttribute("error", errorMessage);
-            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
-            return;
-        }
-        if (!exportIdStr.matches(ID_REGEX)) {
-            errorMessage = "Export ID can only contain alphanumeric characters, hyphens, or underscores.";
-            request.setAttribute("error", errorMessage);
-            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
-            return;
-        }
+        // Generate exportId automatically
+        //String exportIdStr = "EXP-" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "-" + System.currentTimeMillis();
 
+        // Server-side validation
         if (voucherIdStr == null || voucherIdStr.trim().isEmpty()) {
             errorMessage = "Voucher ID cannot be empty.";
             request.setAttribute("error", errorMessage);
@@ -271,7 +255,6 @@ public class ExportMaterial extends HttpServlet {
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
         }
-      
     }
 
     private boolean isArrayEmpty(String[] array) {
