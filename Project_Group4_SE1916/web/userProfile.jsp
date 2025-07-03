@@ -1,411 +1,241 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="vi">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>User Profile - Material Management System</title>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .container {
+            max-width: 750px;
+            margin: 40px auto;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #007bff;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+        .profile-pic:hover {
+            transform: scale(1.05);
+        }
+        .info-group {
+            margin-bottom: 20px;
+        }
+        .info-group label {
+            font-weight: 600;
+            color: #495057;
+            margin-right: 15px;
+            min-width: 120px;
+            display: inline-block;
+        }
+        .info-value {
+            color: #212529;
+            font-size: 1.1em;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            display: none;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-control {
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+        .form-control[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .edit-mode .info-group {
+            display: none;
+        }
+        .edit-mode .form-group {
+            display: block;
+        }
+        .edit-mode .btn-edit, .edit-mode .btn-return {
+            display: none;
+        }
+        .edit-mode .btn-update, .edit-mode .btn-cancel {
+            display: inline-block;
+        }
+        .btn-edit, .btn-return {
+            margin-right: 10px;
+        }
+        .btn-update, .btn-cancel {
+            display: none;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container ${param.edit == 'true' ? 'edit-mode' : ''}">
+        <div class="profile-header">
+            <h2>User Profile</h2>
+            <c:if test="${not empty user.image}">
+                <img src="${pageContext.request.contextPath}/${user.image}" alt="Profile Picture" class="profile-pic">
+            </c:if>
+            <c:if test="${empty user.image}">
+                <img src="${pageContext.request.contextPath}/images/default-profile.png" alt="Default Profile Picture" class="profile-pic">
+            </c:if>
+        </div>
 
-        <!-- Tailwind CSS -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            primary: {
-                                50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
-                                400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
-                                800: '#075985', 900: '#0c4a6e'
-                            },
-                            secondary: {
-                                50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe', 300: '#c4b5fd',
-                                400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9',
-                                800: '#5b21b6', 900: '#4c1d95'
-                            }
-                        },
-                        fontFamily: {
-                            sans: ['Inter', 'sans-serif']
-                        }
-                    }
-                }
-            }
-        </script>
-        <!-- Font Awesome -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <!-- Toastify CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-            body {
-                font-family: 'Inter', sans-serif;
-                background-color: #f8fafc;
-            }
-
-            .card {
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-                border-radius: 1rem;
-                border: 1px solid #e5e7eb;
-            }
-
-            .card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            }
-
-            .btn-primary {
-                background: linear-gradient(to right, #3b82f6, #6366f1);
-                transition: all 0.3s ease;
-            }
-
-            .btn-primary:hover {
-                transform: scale(1.05);
-                box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
-            }
-
-            .btn-secondary {
-                background: linear-gradient(to right, #9ca3af, #6b7280);
-                transition: all 0.3s ease;
-            }
-
-            .btn-secondary:hover {
-                transform: scale(1.05);
-                box-shadow: 0 10px 15px -3px rgba(107, 114, 128, 0.3), 0 4px 6px -2px rgba(107, 114, 128, 0.1);
-            }
-
-            .dark-mode {
-                background-color: #1a202c;
-                color: #e2e8f0;
-            }
-
-            .dark-mode .card {
-                background-color: #2d3748;
-                color: #e2e8f0;
-                border-color: #4a5568;
-            }
-
-            .profile-pic {
-                width: 120px;
-                height: 120px;
-                object-fit: cover;
-                border: 4px solid #e5e7eb;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            }
-
-            .dark-mode .profile-pic {
-                border-color: #4a5568;
-            }
-        </style>
-    </head>
-    <body class="bg-gray-50 min-h-screen font-sans antialiased">
-        <!-- Session Check -->
-        <c:if test="${empty sessionScope.username}">
-            <c:redirect url="login.jsp"/>
-        </c:if>
-
-        <!-- Main Content -->
-        <main class="flex-1 p-6 md:p-8">
-            <div class="max-w-3xl mx-auto card bg-white dark:bg-gray-800 p-6 md:p-8">
-                <c:set var="isEditMode" value="${param.edit == 'true'}"/>
-                <c:set var="profilePicUrl" value="${not empty user.img ? user.img : 'images/default-avatar.png'}"/>
-
-                <div class="flex flex-col items-center mb-6">
-                    <img id="profilePicPreview" src="${pageContext.request.contextPath}/${profilePicUrl}?t=${System.currentTimeMillis()}" alt="Ảnh đại diện" class="profile-pic rounded-full mb-4" onerror="this.src='${pageContext.request.contextPath}/images/default-avatar.png'; console.log('Image load failed, using default: ${profilePicUrl}');">
-                    <div id="profilePicInput" class="space-y-2 ${isEditMode ? '' : 'hidden'}">
-                        <label for="profilePic" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Profile Picture</label>
-                        <input type="file" id="profilePic" name="profilePic" accept="image/jpeg,image/png,image/gif" onchange="previewImage()" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white text-center">User Profile</h2>
-                </div>
-
-                <!-- Determine the homepage based on the user's role -->
-                <c:set var="homePage" value="${pageContext.request.contextPath}/home.jsp"/>
-                <c:choose>
-                    <c:when test="${user.role.roleName == 'direction'}">
-                        <c:set var="homePage" value="${pageContext.request.contextPath}/view/direction/directionDashboard.jsp"/>
-                    </c:when>
-                    <c:when test="${user.role.roleName == 'admin'}">
-                        <c:set var="homePage" value="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp"/>
-                    </c:when>
-                    <c:when test="${user.role.roleName == 'employee'}">
-                        <c:set var="homePage" value="${pageContext.request.contextPath}/view/employee/employeeDashboard.jsp"/>
-                    </c:when>
-                    <c:when test="${user.role.roleName == 'warehouse'}">
-                        <c:set var="homePage" value="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp"/>
-                    </c:when>
-                    <c:otherwise>
-                        <c:set var="error" value="Không thể xác định vai trò cho người dùng: ${sessionScope.username}"/>
-                    </c:otherwise>
-                </c:choose>
-
-                <form id="profileForm" action="${pageContext.request.contextPath}/userprofile" method="post" enctype="multipart/form-data" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
-                            <input type="text" id="username" name="username" value="${user.username}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" readonly>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name*</label>
-                            <input type="text" id="fullName" name="fullName" value="${user.fullName != null ? user.fullName : 'Chưa cập nhật'}" 
-                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
-                                   ${isEditMode ? 'required' : 'readonly'}>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email *</label>
-                            <input type="email" id="email" name="email" value="${user.email}" 
-                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
-                                   ${isEditMode ? 'required' : 'readonly'}>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone number</label>
-                            <input type="text" id="phone" name="phone" value="${user.phone}" 
-                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
-                                   ${isEditMode ? '' : 'readonly'}>
-                        </div>
-
-                        <div class="space-y-2 md:col-span-2">
-                            <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Address *</label>
-                            <input type="text" id="address" name="address" value="${user.address}" 
-                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
-                                   ${isEditMode ? 'required' : 'readonly'}>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date of birth</label>
-                            <input type="date" id="dateOfBirth" name="dateOfBirth" value="${user.dateOfBirth}" 
-                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
-                                   ${isEditMode ? '' : 'readonly'}>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                            <select id="status" name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" ${isEditMode ? '' : 'disabled'}>
-                                <option value="active" ${user.status == 'active' ? 'selected' : ''}>Active</option>
-                                <option value="inactive" ${user.status == 'inactive' ? 'selected' : ''}>Inactive</option>
-                            </select>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
-                            <input type="text" id="role" name="role" value="${user.role.roleName}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white" readonly>
-                        </div>
-                    </div>
-
-                    <div class="flex space-x-4">
-                        <c:choose>
-                            <c:when test="${isEditMode}">
-                                <button type="submit" id="saveButton" class="btn-primary text-white px-6 py-3 rounded-lg flex-1">Save</button>
-                                <button type="button" id="cancelButton" class="btn-secondary text-white px-6 py-3 rounded-lg flex-1 text-center" onclick="window.location.href = '${pageContext.request.contextPath}/userprofile'">Cancel</button>
-                            </c:when>
-                            <c:otherwise>
-                                <button type="button" id="editButton" class="btn-primary text-white px-6 py-3 rounded-lg flex-1" onclick="window.location.href = '${pageContext.request.contextPath}/userprofile?edit=true'">Edit</button>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
-                </form>
-
-                <div class="mt-6 flex justify-center space-x-4">
-                    <%
-                        String role = (String) session.getAttribute("role");
-                        String redirectUrl = "../login.jsp"; // Default fallback
-                        if (role != null) {
-                            switch (role.toLowerCase()) {
-                                case "director":
-                                    redirectUrl = request.getContextPath() + "/view/direction/directionDashboard.jsp";
-                                    break;
-                                case "admin":
-                                    redirectUrl = request.getContextPath() + "/view/admin/adminDashboard.jsp";
-                                    break;
-                                case "employee":
-                                    redirectUrl = request.getContextPath() + "/view/employee/employeeDashboard.jsp";
-                                    break;
-                                case "warehouse":
-                                    redirectUrl = request.getContextPath() + "/view/warehouse/warehouseDashboard.jsp";
-                                    break;
-                            }
-                        }
-                    %>
-                    <a href="<%= redirectUrl%>" class="text-primary-600 dark:text-primary-400 hover:underline">Return to the Homepage</a>
-                    <a href="${pageContext.request.contextPath}/logout" class="text-red-500 hover:underline">Logout</a>
-                </div>
+        <!-- Read-only View -->
+        <div class="info-section">
+            <div class="info-group">
+                <label>Username:</label>
+                <span class="info-value">${user.username}</span>
             </div>
-        </main>
+            <div class="info-group">
+                <label>Full Name:</label>
+                <span class="info-value">${user.fullName}</span>
+            </div>
+            <div class="info-group">
+                <label>Email:</label>
+                <span class="info-value">${user.email}</span>
+            </div>
+            <div class="info-group">
+                <label>Phone Number:</label>
+                <span class="info-value">${user.phone}</span>
+            </div>
+            <div class="info-group">
+                <label>Address:</label>
+                <span class="info-value">${user.address}</span>
+            </div>
+            <div class="info-group">
+                <label>Date of Birth:</label>
+                <span class="info-value">${user.dateOfBirth}</span>
+            </div>
+            <div class="info-group">
+                <label>Status:</label>
+                <span class="info-value">${user.status}</span>
+            </div>
+            <div class="info-group">
+                <label>Role:</label>
+                <span class="info-value">${role}</span>
+            </div>
+            <div class="info-group">
+                <label>Profile Picture:</label>
+                <span class="info-value">${not empty user.image ? user.image : 'Default'}</span>
+            </div>
+            <div class="button-group mt-3">
+                <a href="${pageContext.request.contextPath}/userprofile?edit=true" class="btn btn-primary btn-edit">Edit</a>
+   
+            </div>
+        </div>
 
-        <!-- Toastify JS -->
-        <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-        <script>
-                                    // Show toast notifications for errors or messages
-            <c:if test="${not empty error}">
-                                    Toastify({
-                                        text: "${error.replaceAll("\"", "'")}",
-                                        duration: 3000,
-                                        gravity: "top",
-                                        position: "center",
-                                        backgroundColor: "#ef4444",
-                                        stopOnFocus: true
-                                    }).showToast();
-            </c:if>
-            <c:if test="${not empty message}">
-                                    Toastify({
-                                        text: "${message.replaceAll("\"", "'")}",
-                                        duration: 3000,
-                                        gravity: "top",
-                                        position: "center",
-                                        backgroundColor: "#22c55e",
-                                        stopOnFocus: true
-                                    }).showToast();
-            </c:if>
+        <!-- Editable Form -->
+        <form action="${pageContext.request.contextPath}/userprofile" method="post" enctype="multipart/form-data" class="form-section">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" value="${user.username}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" class="form-control" id="fullName" name="fullName" value="${user.fullName}">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="${user.email}">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" class="form-control" id="phone" name="phone" value="${user.phone}">
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" class="form-control" id="address" name="address" value="${user.address}">
+            </div>
+            <div class="form-group">
+                <label for="dateOfBirth">Date of Birth</label>
+                <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" value="${user.dateOfBirth}">
+            </div>
+            <div class="form-group">
+                <label for="status">Status</label>
+                <input type="text" class="form-control" id="status" name="status" value="${user.status}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="role">Role</label>
+                <input type="text" class="form-control" id="role" value="${role}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="profilePic">Profile Picture</label>
+                <input type="file" class="form-control" id="profilePic" name="profilePic" accept="image/*">
+            </div>
+            <div class="button-group mt-3">
+                <button type="submit" class="btn btn-primary btn-update">Update Profile</button>
+                <a href="${pageContext.request.contextPath}/userprofile" class="btn btn-secondary btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
 
-                                    // Image Preview on File Selection
-                                    function previewImage() {
-                                        const profilePic = document.getElementById('profilePic');
-                                        const profilePicPreview = document.getElementById('profilePicPreview');
-                                        if (!profilePic || !profilePicPreview) {
-                                            console.error("DOM elements not found: profilePic or profilePicPreview");
-                                            Toastify({
-                                                text: "Lỗi hệ thống: Không tìm thấy phần tử ảnh!",
-                                                duration: 3000,
-                                                gravity: "top",
-                                                position: "center",
-                                                backgroundColor: "#ef4444",
-                                                stopOnFocus: true
-                                            }).showToast();
-                                            return;
-                                        }
-
-                                        const file = profilePic.files[0];
-                                        if (!file) {
-                                            Toastify({
-                                                text: "Vui lòng chọn một file ảnh!",
-                                                duration: 3000,
-                                                gravity: "top",
-                                                position: "center",
-                                                backgroundColor: "#ef4444",
-                                                stopOnFocus: true
-                                            }).showToast();
-                                            return;
-                                        }
-
-                                        console.log("Selected file details: Name:", file.name, "Type:", file.type, "Size:", file.size + " bytes");
-
-                                        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-                                        if (!validTypes.includes(file.type)) {
-                                            Toastify({
-                                                text: "Vui lòng chọn file ảnh (JPEG, PNG, GIF)! Hỗ trợ: " + validTypes.join(", "),
-                                                duration: 3000,
-                                                gravity: "top",
-                                                position: "center",
-                                                backgroundColor: "#ef4444",
-                                                stopOnFocus: true
-                                            }).showToast();
-                                            profilePic.value = '';
-                                            return;
-                                        }
-
-                                        const maxSize = 5 * 1024 * 1024;
-                                        if (file.size > maxSize) {
-                                            Toastify({
-                                                text: "Kích thước ảnh tối đa là 5MB! Kích thước hiện tại: " + (file.size / 1024 / 1024).toFixed(2) + "MB",
-                                                duration: 3000,
-                                                gravity: "top",
-                                                position: "center",
-                                                backgroundColor: "#ef4444",
-                                                stopOnFocus: true
-                                            }).showToast();
-                                            profilePic.value = '';
-                                            return;
-                                        }
-
-                                        const reader = new FileReader();
-                                        reader.onload = (e) => {
-                                            profilePicPreview.src = e.target.result + "?t=" + new Date().getTime();
-                                            console.log("Preview loaded successfully for file:", file.name);
-                                        };
-                                        reader.onerror = (e) => {
-                                            console.error("FileReader error for file:", file.name, "Error:", e);
-                                            Toastify({
-                                                text: "Lỗi khi đọc file ảnh: " + file.name + ". Chi tiết: " + e.message,
-                                                duration: 3000,
-                                                gravity: "top",
-                                                position: "center",
-                                                backgroundColor: "#ef4444",
-                                                stopOnFocus: true
-                                            }).showToast();
-                                            profilePic.value = '';
-                                        };
-                                        reader.readAsDataURL(file);
-                                    }
-
-                                    // Form Validation on Submit
-                                    const profileForm = document.getElementById('profileForm');
-                                    profileForm.addEventListener('submit', (event) => {
-                                        const requiredFields = [
-                                            {id: 'fullName', label: 'Họ và tên'},
-                                            {id: 'email', label: 'Email'},
-                                            {id: 'address', label: 'Địa chỉ'}
-                                        ];
-
-                                        for (const field of requiredFields) {
-                                            const input = document.getElementById(field.id);
-                                            const value = input.value;
-                                            if (!value || value.trim() === '') {
-                                                event.preventDefault();
-                                                Toastify({
-                                                    text: `Vui lòng nhập ${field.label}!`,
-                                                    duration: 3000,
-                                                    gravity: "top",
-                                                    position: "center",
-                                                    backgroundColor: "#ef4444",
-                                                    stopOnFocus: true
-                                                }).showToast();
-                                                input.focus();
-                                                return;
-                                            }
-                                        }
-
-                                        const emailInput = document.getElementById('email');
-                                        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                                        if (!emailPattern.test(emailInput.value)) {
-                                            event.preventDefault();
-                                            Toastify({
-                                                text: "Vui lòng nhập email hợp lệ!",
-                                                duration: 3000,
-                                                gravity: "top",
-                                                position: "center",
-                                                backgroundColor: "#ef4444",
-                                                stopOnFocus: true
-                                            }).showToast();
-                                            emailInput.focus();
-                                            return;
-                                        }
-                                    });
-
-                                    // Dark Mode Toggle
-                                    const toggleDarkMode = document.createElement('button');
-                                    toggleDarkMode.id = 'toggleDarkMode';
-                                    toggleDarkMode.className = 'bg-gray-100 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 fixed top-4 right-4 z-50';
-                                    toggleDarkMode.innerHTML = '<i class="fas fa-moon text-gray-700 dark:text-yellow-300 text-xl"></i>';
-                                    document.body.appendChild(toggleDarkMode);
-
-                                    toggleDarkMode.addEventListener('click', () => {
-                                        document.body.classList.toggle('dark-mode');
-                                        const icon = toggleDarkMode.querySelector('i');
-                                        icon.classList.toggle('fa-moon');
-                                        icon.classList.toggle('fa-sun');
-                                        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-                                    });
-
-                                    if (localStorage.getItem('darkMode') === 'true') {
-                                        document.body.classList.add('dark-mode');
-                                        toggleDarkMode.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-                                    }
-        </script>
-    </body>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        <c:if test="${not empty message}">
+            Toastify({
+                text: "${message}",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#28a745"
+            }).showToast();
+        </c:if>
+        <c:if test="${not empty error}">
+            Toastify({
+                text: "${error}",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#dc3545"
+            }).showToast();
+        </c:if>
+    </script>
+</body>
 </html>

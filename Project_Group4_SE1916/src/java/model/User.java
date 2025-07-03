@@ -9,7 +9,7 @@ public class User {
     private String address;
     private String email;
     private String phone;
-    private String img;
+    private String Image; // Đổi từ imageUrl thành Image
     private String dateOfBirth;
     private String status;
     private Role role;
@@ -17,7 +17,7 @@ public class User {
     public User() {
     }
 
-    public User(int userId, String code, String username, String password, String fullName, String address, String email, String phone, String img, String dateOfBirth, String status, Role role) {
+    public User(int userId, String code, String username, String password, String fullName, String address, String email, String phone, String Image, String dateOfBirth, String status, Role role) {
         this.userId = userId;
         this.code = code;
         this.username = username;
@@ -26,7 +26,7 @@ public class User {
         this.address = address;
         this.email = email;
         this.phone = phone;
-        this.img = img;
+        this.Image = Image; // Đổi từ imageUrl thành Image
         this.dateOfBirth = dateOfBirth;
         this.status = status;
         this.role = role;
@@ -96,12 +96,12 @@ public class User {
         this.phone = phone;
     }
 
-    public String getImg() {
-        return img;
+    public String getImage() { // Đổi từ getImageUrl thành getImage
+        return Image;
     }
 
-    public void setImg(String img) {
-        this.img = img;
+    public void setImage(String Image) { // Đổi từ setImageUrl thành setImage
+        this.Image = Image;
     }
 
     public String getDateOfBirth() {

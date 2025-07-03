@@ -14,13 +14,20 @@ import org.mindrot.jbcrypt.BCrypt;
 public class UserDAO {
 
     private Connection conn;
+    private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
 
     public UserDAO() {
         this.conn = DBContext.getConnection();
+        if (this.conn == null) {
+            LOGGER.log(Level.SEVERE, "Database connection is null");
+        }
     }
 
     public UserDAO(Connection conn) {
         this.conn = conn;
+        if (this.conn == null) {
+            LOGGER.log(Level.SEVERE, "Provided connection is null");
+        }
     }
 
     public List<User> getAllUsersWithRoles() throws SQLException {
@@ -39,7 +46,7 @@ public class UserDAO {
                 user.setAddress(rs.getString("address"));
                 user.setEmail(rs.getString("email"));
                 user.setPhone(rs.getString("phone_number"));
-                user.setImg(rs.getString("imageUrl"));
+                user.setImage(rs.getString("imageUrl")); // Đổi từ setImg sang setImage
                 user.setDateOfBirth(rs.getString("date_of_birth"));
                 user.setStatus(rs.getString("status"));
 
@@ -49,6 +56,9 @@ public class UserDAO {
                 user.setRole(role);
                 users.add(user);
             }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error fetching all users with roles", ex);
+            throw ex;
         }
         return users;
     }
@@ -72,7 +82,7 @@ public class UserDAO {
                     user.setAddress(rs.getString("address"));
                     user.setEmail(rs.getString("email"));
                     user.setPhone(rs.getString("phone_number"));
-                    user.setImg(rs.getString("imageUrl"));
+                    user.setImage(rs.getString("imageUrl")); // Đổi từ setImg sang setImage
                     user.setDateOfBirth(rs.getString("date_of_birth"));
                     user.setStatus(rs.getString("status"));
 
@@ -83,7 +93,7 @@ public class UserDAO {
                 }
             }
         } catch (SQLException ex) {
-            // Silently handle exception
+            LOGGER.log(Level.SEVERE, "Error fetching user by email: " + email, ex);
         }
         return user;
     }
@@ -96,10 +106,18 @@ public class UserDAO {
             stmt.setString(3, user.getEmail());
             stmt.setString(4, user.getPhone() != null && !user.getPhone().isEmpty() ? user.getPhone() : null);
             stmt.setString(5, user.getDateOfBirth() != null && !user.getDateOfBirth().isEmpty() ? user.getDateOfBirth() : null);
-            stmt.setString(6, user.getImg() != null && !user.getImg().isEmpty() ? user.getImg() : null);
+            stmt.setString(6, user.getImage() != null && !user.getImage().isEmpty() ? user.getImage() : null); // Đổi từ getImg sang getImage
             stmt.setString(7, user.getStatus());
             stmt.setString(8, user.getUsername());
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                LOGGER.log(Level.WARNING, "No rows updated for username: " + user.getUsername());
+            } else {
+                LOGGER.log(Level.INFO, "Updated " + rowsAffected + " row(s) for username: " + user.getUsername());
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error updating user: " + user.getUsername(), ex);
+            throw ex;
         }
     }
 
@@ -122,7 +140,7 @@ public class UserDAO {
                     user.setAddress(rs.getString("address"));
                     user.setEmail(rs.getString("email"));
                     user.setPhone(rs.getString("phone_number"));
-                    user.setImg(rs.getString("imageUrl"));
+                    user.setImage(rs.getString("imageUrl")); // Đổi từ setImg sang setImage
                     user.setDateOfBirth(rs.getString("date_of_birth"));
                     user.setStatus(rs.getString("status"));
 
@@ -133,15 +151,15 @@ public class UserDAO {
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error fetching user by username: " + username, ex);
         }
         return user;
     }
 
     public String getUserRoleName(String username) {
         String sql = "SELECT r.role_name "
-                + "FROM users u "
-                + "JOIN roles r ON u.role_id = r.role_id "
+                + "FROM Users u "
+                + "JOIN Roles r ON u.role_id = r.role_id "
                 + "WHERE u.username = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -152,7 +170,7 @@ public class UserDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error fetching role name for username: " + username, e);
         }
         return null;
     }
@@ -163,7 +181,15 @@ public class UserDAO {
             stmt.setString(1, status);
             stmt.setInt(2, roleId);
             stmt.setInt(3, userId);
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                LOGGER.log(Level.WARNING, "No rows updated for userId: " + userId);
+            } else {
+                LOGGER.log(Level.INFO, "Updated " + rowsAffected + " row(s) for userId: " + userId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error updating role and status for userId: " + userId, ex);
+            throw ex;
         }
     }
 
@@ -185,7 +211,7 @@ public class UserDAO {
                     user.setAddress(rs.getString("address"));
                     user.setEmail(rs.getString("email"));
                     user.setPhone(rs.getString("phone_number"));
-                    user.setImg(rs.getString("imageUrl"));
+                    user.setImage(rs.getString("imageUrl")); // Đổi từ setImg sang setImage
                     user.setDateOfBirth(rs.getString("date_of_birth"));
                     user.setStatus(rs.getString("status"));
 
@@ -197,6 +223,9 @@ public class UserDAO {
                     return user;
                 }
             }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error fetching user by id: " + userId, ex);
+            throw ex;
         }
         return null;
     }
@@ -214,7 +243,7 @@ public class UserDAO {
             stmt.setString(5, user.getAddress());
             stmt.setString(6, user.getEmail());
             stmt.setString(7, user.getPhone());
-            stmt.setString(8, user.getImg());
+            stmt.setString(8, user.getImage()); // Đổi từ getImg sang getImage
             if (user.getDateOfBirth() != null && !user.getDateOfBirth().isEmpty()) {
                 stmt.setDate(9, java.sql.Date.valueOf(user.getDateOfBirth()));
             } else {
@@ -223,7 +252,15 @@ public class UserDAO {
             stmt.setString(10, user.getStatus());
             stmt.setInt(11, roleId);
 
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                LOGGER.log(Level.WARNING, "No rows inserted for username: " + user.getUsername());
+            } else {
+                LOGGER.log(Level.INFO, "Inserted " + rowsAffected + " row(s) for username: " + user.getUsername());
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error inserting user: " + user.getUsername(), ex);
+            throw ex;
         }
     }
 
@@ -249,7 +286,7 @@ public class UserDAO {
                     user.setAddress(rs.getString("address"));
                     user.setEmail(rs.getString("email"));
                     user.setPhone(rs.getString("phone_number"));
-                    user.setImg(rs.getString("imageUrl"));
+                    user.setImage(rs.getString("imageUrl")); // Đổi từ setImg sang setImage
                     user.setDateOfBirth(rs.getString("date_of_birth"));
                     user.setStatus(rs.getString("status"));
 
@@ -261,6 +298,9 @@ public class UserDAO {
                     users.add(user);
                 }
             }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error searching users by name: " + keyword, ex);
+            throw ex;
         }
         return users;
     }
@@ -294,7 +334,7 @@ public class UserDAO {
                     user.setAddress(rs.getString("address"));
                     user.setEmail(rs.getString("email"));
                     user.setPhone(rs.getString("phone_number"));
-                    user.setImg(rs.getString("imageUrl"));
+                    user.setImage(rs.getString("imageUrl")); // Đổi từ setImg sang setImage
                     user.setDateOfBirth(rs.getString("date_of_birth"));
                     user.setStatus(rs.getString("status"));
 
@@ -306,6 +346,9 @@ public class UserDAO {
                     users.add(user);
                 }
             }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error searching users by name and role: name=" + name + ", roleId=" + roleId, ex);
+            throw ex;
         }
         return users;
     }
@@ -319,6 +362,9 @@ public class UserDAO {
             stmt.setInt(1, limit);
             stmt.setInt(2, offset);
             return extractUsersFromResultSet(stmt.executeQuery());
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error fetching users by page: offset=" + offset + ", limit=" + limit, ex);
+            throw ex;
         }
     }
 
@@ -326,6 +372,9 @@ public class UserDAO {
         String sql = "SELECT COUNT(*) FROM Users";
         try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             return rs.next() ? rs.getInt(1) : 0;
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error counting all users", ex);
+            throw ex;
         }
     }
 
@@ -342,6 +391,9 @@ public class UserDAO {
             stmt.setInt(3, limit);
             stmt.setInt(4, offset);
             return extractUsersFromResultSet(stmt.executeQuery());
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error searching users by name with pagination: keyword=" + keyword, ex);
+            throw ex;
         }
     }
 
@@ -354,6 +406,9 @@ public class UserDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() ? rs.getInt(1) : 0;
             }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error counting users search: keyword=" + keyword, ex);
+            throw ex;
         }
     }
 
@@ -368,7 +423,7 @@ public class UserDAO {
             user.setAddress(rs.getString("address"));
             user.setEmail(rs.getString("email"));
             user.setPhone(rs.getString("phone_number"));
-            user.setImg(rs.getString("imageUrl"));
+            user.setImage(rs.getString("imageUrl")); // Đổi từ setImg sang setImage
             user.setDateOfBirth(rs.getString("date_of_birth"));
             user.setStatus(rs.getString("status"));
 
@@ -413,6 +468,9 @@ public class UserDAO {
                     return rs.getInt(1);
                 }
             }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error counting users by name, role, status: search=" + search + ", roleId=" + roleId + ", status=" + status, ex);
+            throw ex;
         }
         return 0;
     }
@@ -459,7 +517,7 @@ public class UserDAO {
                     user.setAddress(rs.getString("address"));
                     user.setEmail(rs.getString("email"));
                     user.setPhone(rs.getString("phone_number"));
-                    user.setImg(rs.getString("imageUrl"));
+                    user.setImage(rs.getString("imageUrl")); // Đổi từ setImg sang setImage
                     user.setDateOfBirth(rs.getString("date_of_birth"));
                     user.setStatus(rs.getString("status"));
 
@@ -471,6 +529,9 @@ public class UserDAO {
                     list.add(user);
                 }
             }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error searching users by name, role, status with paging: search=" + search + ", roleId=" + roleId + ", status=" + status, ex);
+            throw ex;
         }
         return list;
     }
@@ -494,6 +555,9 @@ public class UserDAO {
 
                 users.add(user);
             }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error fetching users with login info", ex);
+            throw ex;
         }
         return users;
     }
@@ -510,11 +574,14 @@ public class UserDAO {
                     return rs.getString("role_name");
                 }
             }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error fetching role name by username: " + username, ex);
+            throw ex;
         }
         return null;
     }
     
-      public boolean isUsernameOrEmailExists(String username, String email) throws SQLException {
+    public boolean isUsernameOrEmailExists(String username, String email) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
@@ -524,6 +591,9 @@ public class UserDAO {
                     return rs.getInt(1) > 0;
                 }
             }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error checking username or email existence: username=" + username + ", email=" + email, ex);
+            throw ex;
         }
         return false;
     }

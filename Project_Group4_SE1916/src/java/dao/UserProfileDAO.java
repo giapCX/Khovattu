@@ -49,7 +49,7 @@ public class UserProfileDAO {
                     user.setAddress(rs.getString("address"));
                     user.setEmail(rs.getString("email"));
                     user.setPhone(rs.getString("phone_number"));
-                    user.setImg(rs.getString("imageUrl"));
+                    user.setImage(rs.getString("imageUrl")); // Ánh xạ imageUrl từ DB sang Image trong User
                     user.setDateOfBirth(rs.getString("date_of_birth"));
                     user.setStatus(rs.getString("status"));
                     model.Role role = new model.Role();
@@ -88,9 +88,9 @@ public class UserProfileDAO {
             updates.add("phone_number = ?");
             params.add(user.getPhone());
         }
-        if (user.getImg() != null && !user.getImg().isEmpty()) {
-            updates.add("imageUrl = ?");
-            params.add(user.getImg());
+        if (user.getImage() != null && !user.getImage().isEmpty()) {
+            updates.add("imageUrl = ?"); // Cập nhật cột imageUrl trong DB với giá trị từ Image
+            params.add(user.getImage());
         }
         if (user.getDateOfBirth() != null && !user.getDateOfBirth().isEmpty()) {
             updates.add("date_of_birth = ?");
