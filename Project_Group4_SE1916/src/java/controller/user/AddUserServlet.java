@@ -99,8 +99,35 @@ public class AddUserServlet extends HttpServlet {
         String phone = request.getParameter("phone");
         String dob = request.getParameter("dob");
         String status = request.getParameter("status");
-        int roleId = Integer.parseInt(request.getParameter("roleId"));
-
+        String roleIdParam = request.getParameter("roleId");
+        if (username == null || username.trim().isEmpty()
+                || fullName == null || fullName.trim().isEmpty()
+                || email == null || email.trim().isEmpty()
+                || status == null || status.trim().isEmpty()
+                || roleIdParam == null || roleIdParam.trim().isEmpty()) {
+            request.setAttribute("error", "Vui lòng điền đầy đủ thông tin bắt buộc.");
+            request.getRequestDispatcher("view/admin/addUser.jsp").forward(request, response);
+            return;
+        }
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        if (!email.matches(emailRegex)) {
+            request.setAttribute("error", "Email không hợp lệ.");
+            request.getRequestDispatcher("view/admin/addUser.jsp").forward(request, response);
+            return;
+        }
+        if (phone != null && !phone.trim().isEmpty() && !phone.matches("^\\d{10}$")) {
+            request.setAttribute("error", "Số điện thoại phải gồm đúng 10 chữ số.");
+            request.getRequestDispatcher("view/admin/addUser.jsp").forward(request, response);
+            return;
+        }
+        int roleId;
+        try {
+            roleId = Integer.parseInt(roleIdParam);
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Role ID không hợp lệ.");
+            request.getRequestDispatcher("view/admin/addUser.jsp").forward(request, response);
+            return;
+        }
         try (Connection conn = DBContext.getConnection()) {
             UserDAO userDAO = new UserDAO(conn);
             boolean exists = userDAO.isUsernameOrEmailExists(username, email);
@@ -127,7 +154,6 @@ public class AddUserServlet extends HttpServlet {
             // Gọi DAO thêm user và gán role
             userDAO.insertUserWithRole(user, roleId);
 
-            // Redirect về trang list user sau khi thêm thành công
             response.sendRedirect("listuser");
         } catch (Exception e) {
             throw new ServletException(e);
