@@ -110,19 +110,19 @@
                             </select>
                         </div>
                         <div class="relative w-full md:w-1/2">
-                            <select id="filterCategory" class="p-3 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
-                                <option value="">All child categories</option>
-                                <c:if test="${not empty selectedParentCategory}">
-                                    <c:forEach var="childCat" items="${childCategoriesMap[selectedParentCategory]}">
-                                        <option value="${childCat.categoryId}">${childCat.name}</option>
-                                    </c:forEach>
-                                </c:if>
-                                <c:if test="${empty selectedParentCategory}">
-                                    <c:forEach var="cat" items="${categories}">
-                                        <option value="${cat.categoryId}">${cat.name}</option>
-                                    </c:forEach>
-                                </c:if>
-                            </select>
+                      <select id="filterCategory" class="p-3 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
+    <option value="">All child categories</option>
+    <c:if test="${not empty selectedParentCategory}">
+        <c:forEach var="childCat" items="${childCategoriesMap[selectedParentCategory]}">
+            <option value="${childCat.categoryId}" <c:if test="${childCat.categoryId == selectedChildCategory}">selected</c:if>>${childCat.name}</option>
+        </c:forEach>
+    </c:if>
+    <c:if test="${empty selectedParentCategory}">
+        <c:forEach var="cat" items="${categories}">
+            <option value="${cat.categoryId}" <c:if test="${cat.categoryId == selectedChildCategory}">selected</c:if>>${cat.name}</option>
+        </c:forEach>
+    </c:if>
+</select>
                         </div>
                         <div class="relative w-full md:w-1/2">
                             <form action="${pageContext.request.contextPath}/ListMaterialController" method="get" class="relative w-full md:w-1/2">
@@ -230,82 +230,110 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-           <script>
-        $(document).ready(function () {
-            var childCategoriesMap = {
-                <c:forEach var="parentCat" items="${parentCategories}" varStatus="status">
-                    "${parentCat.categoryId}": [
-                        <c:forEach var="childCat" items="${childCategoriesMap[parentCat.categoryId]}" varStatus="childStatus">
-                            { categoryId: ${childCat.categoryId}, name: "${fn:escapeXml(childCat.name)}" }<c:if test="${!childStatus.last}">,</c:if>
-                        </c:forEach>
-                    ]<c:if test="${!status.last}">,</c:if>
+        <script>
+$(document).ready(function () {
+    var childCategoriesMap = {
+        <c:forEach var="parentCat" items="${parentCategories}" varStatus="status">
+            "${parentCat.categoryId}": [
+                <c:forEach var="childCat" items="${childCategoriesMap[parentCat.categoryId]}" varStatus="childStatus">
+                    { categoryId: ${childCat.categoryId}, name: "${fn:escapeXml(childCat.name)}" }<c:if test="${!childStatus.last}">,</c:if>
                 </c:forEach>
-            };
+            ]<c:if test="${!status.last}">,</c:if>
+        </c:forEach>
+    };
 
-            var categories = [
-                <c:forEach var="cat" items="${categories}" varStatus="status">
-                    { categoryId: ${cat.categoryId}, name: "${fn:escapeXml(cat.name)}" }<c:if test="${!status.last}">,</c:if>
-                </c:forEach>
-            ];
+    function updateChildCategorySelect(parentCategoryId) {
+        var $childCategorySelect = $('#filterCategory');
+        var currentSelectedValue = $childCategorySelect.val(); // Lưu giá trị đang chọn
+        
+        $childCategorySelect.empty();
+        $childCategorySelect.append('<option value="">All child categories</option>');
 
-            var parentCategories = [
-                <c:forEach var="parentCat" items="${parentCategories}" varStatus="status">
-                    { categoryId: ${parentCat.categoryId}, name: "${fn:escapeXml(parentCat.name)}" }<c:if test="${!status.last}">,</c:if>
-                </c:forEach>
-            ];
-
-            function getCategoryName(categoryId) {
-                var cat = categories.find(c => c.categoryId == categoryId);
-                return cat ? cat.name : '';
-            }
-
-            function updateChildCategorySelect(parentCategoryId) {
-                var $childCategorySelect = $('#filterCategory');
-                $childCategorySelect.empty();
-                $childCategorySelect.append('<option value="">All child categories</option>');
-
-                if (!parentCategoryId) {
-                    categories.forEach(function(cat) {
-                        $childCategorySelect.append('<option value="' + cat.categoryId + '">' + cat.name + '</option>');
-                    });
-                } else {
-                    var childCategories = childCategoriesMap[parentCategoryId] || [];
-                    childCategories.forEach(function(cat) {
-                        $childCategorySelect.append('<option value="' + cat.categoryId + '">' + cat.name + '</option>');
-                    });
-                }
-            }
-
-            <c:if test="${not empty selectedParentCategory}">
-                updateChildCategorySelect('${selectedParentCategory}');
-            </c:if>
-
-            $('#filterParentCategory').on('change', function () {
-                var selectedParentCategoryId = $(this).val();
-                var url = '${pageContext.request.contextPath}/ListMaterialController';
-                if (selectedParentCategoryId) {
-                    url += '?filterParentCategory=' + selectedParentCategoryId;
-                }
-                window.location.href = url;
+        if (!parentCategoryId) {
+            // Nếu không chọn parent category, hiển thị tất cả child categories
+            <c:forEach var="cat" items="${categories}">
+                $childCategorySelect.append('<option value="${cat.categoryId}" ${cat.categoryId == selectedChildCategory ? "selected" : ""}>${fn:escapeXml(cat.name)}</option>');
+            </c:forEach>
+        } else {
+            // Nếu chọn parent category, chỉ hiển thị child categories của parent đó
+            var childCategories = childCategoriesMap[parentCategoryId] || [];
+            childCategories.forEach(function(cat) {
+                var selected = (cat.categoryId == "${selectedChildCategory}") ? "selected" : "";
+                $childCategorySelect.append('<option value="' + cat.categoryId + '" ' + selected + '>' + cat.name + '</option>');
             });
+        }
+        
+        // Khôi phục giá trị đã chọn nếu nó vẫn tồn tại trong danh sách mới
+        if (currentSelectedValue && $childCategorySelect.find('option[value="' + currentSelectedValue + '"]').length > 0) {
+            $childCategorySelect.val(currentSelectedValue);
+        }
+    }
 
-            $('#searchButton').on('click', function () {
-                var searchValue = $('#searchInput').val().toLowerCase();
-                $('tbody tr').each(function() {
-                    var rowText = $(this).text().toLowerCase();
-                    $(this).toggle(rowText.indexOf(searchValue) > -1);
-                });
-            });
+    // Khởi tạo select box khi trang được tải
+    updateChildCategorySelect('${selectedParentCategory}');
 
-            $('#filterCategory').on('change', function () {
-                var selectedCategoryId = $(this).val();
-                var categoryName = selectedCategoryId ? getCategoryName(selectedCategoryId) : '';
-                $('tbody tr').each(function() {
-                    var rowCategory = $(this).find('td:eq(3)').text().trim();
-                    $(this).toggle(categoryName === '' || rowCategory === categoryName);
-                });
-            });
-        });
-    </script>
+    $('#filterParentCategory').on('change', function () {
+        var selectedParentCategoryId = $(this).val();
+        var selectedChildCategoryId = $('#filterCategory').val();
+        
+        // Cập nhật dropdown child category
+        updateChildCategorySelect(selectedParentCategoryId);
+        
+        // Nếu có child category đang được chọn và nó thuộc parent category mới, giữ nguyên selection
+        if (selectedChildCategoryId && $('#filterCategory option[value="' + selectedChildCategoryId + '"]').length > 0) {
+            $('#filterCategory').val(selectedChildCategoryId);
+        } else {
+            // Nếu không, reset về "All child categories"
+            $('#filterCategory').val('');
+        }
+        
+        // Gửi request filter
+        var url = '${pageContext.request.contextPath}/ListMaterialController?filterParentCategory=' + selectedParentCategoryId;
+        if (selectedChildCategoryId) {
+            url += '&filterCategory=' + selectedChildCategoryId;
+        }
+        window.location.href = url;
+    });
+
+    $('#filterCategory').on('change', function () {
+        var selectedParentCategoryId = $('#filterParentCategory').val();
+        var selectedChildCategoryId = $(this).val();
+        
+        var url = '${pageContext.request.contextPath}/ListMaterialController';
+        var params = [];
+        
+        if (selectedParentCategoryId) {
+            params.push('filterParentCategory=' + selectedParentCategoryId);
+        }
+        
+        if (selectedChildCategoryId) {
+            params.push('filterCategory=' + selectedChildCategoryId);
+        }
+        
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+        
+        window.location.href = url;
+    });
+
+    $('#searchButton').on('click', function () {
+        var searchValue = $('#searchInput').val();
+        var selectedParentCategoryId = $('#filterParentCategory').val();
+        var selectedChildCategoryId = $('#filterCategory').val();
+        var url = '${pageContext.request.contextPath}/ListMaterialController?search=' + encodeURIComponent(searchValue);
+        
+        if (selectedParentCategoryId) {
+            url += '&filterParentCategory=' + selectedParentCategoryId;
+        }
+        
+        if (selectedChildCategoryId) {
+            url += '&filterCategory=' + selectedChildCategoryId;
+        }
+        
+        window.location.href = url;
+    });
+});
+</script>
     </body>
 </html>

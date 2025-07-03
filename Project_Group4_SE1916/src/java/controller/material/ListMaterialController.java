@@ -50,16 +50,26 @@ public class ListMaterialController extends HttpServlet {
         }
     }
 
-    private void listMaterials(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+    // Trong ListMaterialController.java
+private void listMaterials(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
     List<Material> materials;
-    String filterParentCategory = request.getParameter("filterParentCategory"); // Giả sử tên tham số là filterParentCategory
+    String filterParentCategory = request.getParameter("filterParentCategory");
+    String filterChildCategory = request.getParameter("filterCategory"); // Thêm tham số lọc child category
     String pageParam = request.getParameter("page");
     String itemsPerPageParam = request.getParameter("itemsPerPage");
 
     int page = (pageParam != null && !pageParam.isEmpty()) ? Integer.parseInt(pageParam) : 1;
     int itemsPerPage = (itemsPerPageParam != null && !itemsPerPageParam.isEmpty()) ? Integer.parseInt(itemsPerPageParam) : 10;
 
-    if (filterParentCategory != null && !filterParentCategory.isEmpty()) {
+    if (filterChildCategory != null && !filterChildCategory.isEmpty()) {
+        try {
+            int childCategoryId = Integer.parseInt(filterChildCategory);
+            materials = materialDAO.getMaterialsByChildCategory(childCategoryId, page, itemsPerPage);
+        } catch (NumberFormatException e) {
+            materials = materialDAO.getAllMaterials(page, itemsPerPage);
+            filterChildCategory = null;
+        }
+    } else if (filterParentCategory != null && !filterParentCategory.isEmpty()) {
         try {
             int parentCategoryId = Integer.parseInt(filterParentCategory);
             materials = materialDAO.getMaterialsByParentCategory(parentCategoryId, page, itemsPerPage);
@@ -71,11 +81,18 @@ public class ListMaterialController extends HttpServlet {
         materials = materialDAO.getAllMaterials(page, itemsPerPage);
     }
 
-    int totalRecords = filterParentCategory != null && !filterParentCategory.isEmpty()
-        ? materialDAO.getTotalMaterialsByParentCategory(Integer.parseInt(filterParentCategory))
-        : materialDAO.getTotalMaterials();
+    int totalRecords;
+    if (filterChildCategory != null && !filterChildCategory.isEmpty()) {
+        totalRecords = materialDAO.getTotalMaterialsByChildCategory(Integer.parseInt(filterChildCategory));
+    } else if (filterParentCategory != null && !filterParentCategory.isEmpty()) {
+        totalRecords = materialDAO.getTotalMaterialsByParentCategory(Integer.parseInt(filterParentCategory));
+    } else {
+        totalRecords = materialDAO.getTotalMaterials();
+    }
+    
     int totalPages = (int) Math.ceil((double) totalRecords / itemsPerPage);
 
+    // Các phần còn lại giữ nguyên
     List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
     List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
 
@@ -90,9 +107,12 @@ public class ListMaterialController extends HttpServlet {
     request.setAttribute("parentCategories", parentCategories);
     request.setAttribute("childCategoriesMap", childCategoriesMap);
     request.setAttribute("selectedParentCategory", filterParentCategory);
+    request.setAttribute("selectedChildCategory", filterChildCategory); // Thêm selectedChildCategory
     request.setAttribute("currentPage", page);
     request.setAttribute("itemsPerPage", itemsPerPage);
     request.setAttribute("totalPages", totalPages);
+    
+    
     request.getRequestDispatcher("/view/material/listMaterial.jsp").forward(request, response);
 }
 
