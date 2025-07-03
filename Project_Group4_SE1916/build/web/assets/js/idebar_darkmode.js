@@ -11,6 +11,18 @@ function toggleSidebarVisibility() {
 toggleSidebar.addEventListener('click', toggleSidebarVisibility);
 toggleSidebarMobile.addEventListener('click', toggleSidebarVisibility);
 
+document.addEventListener('DOMContentLoaded', () => {
+    const toggles = document.querySelectorAll('.toggle-submenu');
+    toggles.forEach(toggle => {
+        toggle.addEventListener('click', () => {
+            const submenu = toggle.parentElement.querySelector('.submenu');
+            submenu.classList.toggle('hidden');
+            const icon = toggle.querySelector('.fa-chevron-down');
+            icon.classList.toggle('rotate-180');
+        });
+    });
+});
+
 // Initialize sidebar as hidden
 sidebar.classList.add('hidden');
 

@@ -77,26 +77,27 @@
                             <option value="">All Type</option>
                             <option value="import" ${param.searchType == 'import' ? 'selected' : ''}>Import</option>
                             <option value="export" ${param.searchType == 'export' ? 'selected' : ''}>Export</option>
-                            <option value="repair" ${param.searchType == 'repair' ? 'selected' : ''}>Repair</option>
                         </select>                   
                     </div>
                     <div class="flex-1 min-w-[200px]">
                         <select name="searchStatus" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">                         
                             <option value="">All Status</option>                           
-                            <option value="approved_but_not_executed" ${param.searchStatus == 'approved_but_not_executed' ? 'selected' : ''}>Approved But Not Executed</option>
+                            <option value="approved_but_not_executed" ${param.searchStatus == 'approved_but_not_executed' ? 'selected' : ''}>To Be Execute</option>
                             <option value="executed" ${param.searchStatus == 'executed' ? 'selected' : ''}>Executed</option>                            
                         </select>                 
                     </div>
                     <div class="flex-1 min-w-[200px]">
-                        <input type="date" name="searchStartDate"
+                        <input type="date" name="searchStartDate" id="searchStartDate"
                                value="${param.searchStartDate}"
+                               max="<%= java.time.LocalDate.now()%>"
                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
                                focus:outline-none focus:ring-2 focus:ring-primary-500
                                dark:bg-gray-700 dark:text-white" />       
                     </div>
                     <div class="flex-1 min-w-[150px]">
-                        <input type="date" name="searchEndDate"
+                        <input type="date" name="searchEndDate" id="searchEndDate"
                                value="${param.searchEndDate}"
+                               max="<%= java.time.LocalDate.now()%>"
                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
                                focus:outline-none focus:ring-2 focus:ring-primary-500
                                dark:bg-gray-700 dark:text-white" />
@@ -104,6 +105,9 @@
                     <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg flex items-center">
                         <i class="fas fa-search mr-2"></i> Search
                     </button>
+                    <a href="${pageContext.request.contextPath}/ListProposalExecute" onclick="Listevent.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" class="bg-yellow-500 text-white px-6 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-undo mr-2"></i> Reset form
+                    </a>
                 </form>
 
                 <!-- Table -->
@@ -131,7 +135,6 @@
                                                     <c:choose>
                                                         <c:when test="${item.proposalType == 'export'}">Export</c:when>
                                                         <c:when test="${item.proposalType == 'import'}">Import</c:when>
-                                                        <c:when test="${item.proposalType == 'repair'}">Repair</c:when>
                                                     </c:choose>
                                                 </td>
                                                 <td class="p-4 font-medium">${item.senderName}</td>
@@ -144,7 +147,7 @@
                                                 <td class="p-4 font-medium">
                                                     <c:choose>
                                                         <c:when test="${item.finalStatus == 'approved_but_not_executed'}">
-                                                            <span class="badge badge-success-bg-subtle">Approved but not executed</span> 
+                                                            <span class="badge badge-success-bg-subtle">To Be Execute</span> 
                                                         </c:when>
                                                         <c:when test="${item.finalStatus == 'executed'}">
                                                             <span class="badge badge-success">Executed</span> 
@@ -259,6 +262,38 @@
         </main>
 
         <!--JavaScript -->
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const form = document.querySelector('form');
+                const startDateInput = document.getElementById('searchStartDate');
+                const endDateInput = document.getElementById('searchEndDate');
+
+                form.addEventListener('submit', function (e) {
+                    const today = new Date().toISOString().split('T')[0];
+                    const startDate = startDateInput.value;
+                    const endDate = endDateInput.value;
+                    // Kiểm tra startDate định dạng hợp lệ
+                    if (startDate && isNaN(Date.parse(startDate))) {
+                        alert("Start date is invalid.");
+                        e.preventDefault();
+                        return;
+                    }
+
+                    // Kiểm tra endDate định dạng hợp lệ
+                    if (endDate && isNaN(Date.parse(endDate))) {
+                        alert("End date is invalid.");
+                        e.preventDefault();
+                        return;
+                    }
+
+
+                    if (startDate && endDate && endDate < startDate) {
+                        alert("End date cannot be earlier than start date.");
+                        e.preventDefault();
+                    }
+                });
+            });
+        </script>
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
         <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
     </body>

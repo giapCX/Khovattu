@@ -216,49 +216,71 @@
         </style>
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
+        <!-- Session Check -->
+        <%
+            String username = (String) session.getAttribute("username");
+            if (username == null) {
+                response.sendRedirect("Login.jsp");
+                return;
+            }
+        %>
         <!-- Sidebar -->
         <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50 hidden">
             <div class="flex items-center mb-8">
                 <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
                     <i class="fas fa-boxes text-primary-600 text-2xl"></i>
                 </div>
-                <h2 class="text-2xl font-bold">QL Vật Tư</h2>
-                <button id="toggleSidebar" class="ml-auto text-white opacity-70 hover:opacity-100">
+                <h2 class="text-xl font-bold">Materials Management</h2>
+                <button id="toggleSidebar" class="ml-auto text-white opacity-75 hover:opacity-100">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <nav class="space-y-2">
-                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-3">
-                    <i class="fas fa-user mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Thông tin cá nhân</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/ProposalServlet" class="nav-item flex items-center p-3">
-                    <i class="fas fa-file-alt mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Tạo yêu cầu</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/requestHistory.jsp" class="nav-item flex items-center p-3">
-                    <i class="fas fa-history mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Lịch sử yêu cầu</span>
-                    <span class="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full">2</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-2 justify-between">
                     <div class="flex items-center">
-                        <i class="fas fa-history mr-2 w-5 text-center"></i>
-                        <span class="text-base">Lịch sử xuất kho</span>
+                        <i class="fas fa-user mr-2 w-5 text-center"></i>
+                        <span class="text-base">My Information</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
+                <a href="${pageContext.request.contextPath}/ListMaterialController" class="nav-item flex items-center p-2 justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-box-open mr-2 w-5 text-center"></i>
+                        <span class="text-base">Materials List</span>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
+                </a>
+                <!-- Proposal - Menu cha -->
+                <div class="nav-item flex flex-col">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                        <div class="flex items-center">
+                            <i class="fas fas fa-file-alt mr-2 w-5 text-center"></i>
+                            <span class="text-base">Proposals</span>
+                        </div>
+                        <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
+                    </button>
+
+                    <!-- Menu con - ẩn mặc định -->
+                    <div class="submenu hidden pl-6 space-y-1 mt-1">
+                        <a href="${pageContext.request.contextPath}/ListProposalServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-list mr-2 w-4 text-center"></i>
+                            <span class="text-sm">My Submitted Proposals</span>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/ProposalServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-circle-plus mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Create New Proposal</span>
+                        </a>
+                    </div>
+                </div>
             </nav>
             <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">
                 <a href="${pageContext.request.contextPath}/forgetPassword/changePassword.jsp" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
                     <i class="fas fa-key mr-3"></i>
-                    <span class="text-lg">Đổi mật khẩu</span>
+                    <span class="text-lg">Change password</span>
                 </a>
                 <a href="${pageContext.request.contextPath}/logout" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
                     <i class="fas fa-sign-out-alt mr-3"></i>
-                    <span class="text-lg">Đăng xuất</span>
+                    <span class="text-lg">Logout</span>
                 </a>
             </div>
         </aside>
@@ -272,8 +294,8 @@
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Tổng quan Nhân viên</h1>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Quản lý yêu cầu vật tư</p>
+                        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">System Overview</h1>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Material Request Management</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-6">
@@ -284,7 +306,7 @@
                     <div class="flex items-center">
                         <img src="https://ui-avatars.com/api/?name=Nhân+viên&background=3b82f6&color=fff" 
                              alt="Nhân viên" class="w-10 h-10 rounded-full mr-3">
-                        <span class="font-medium text-gray-700 dark:text-white text-lg">Nhân viên</span>
+                        <span class="font-medium text-gray-700 dark:text-white text-lg"><%= username%></span>
                     </div>
                     <button id="toggleDarkMode" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
                         <i class="fas fa-moon text-gray-700 dark:text-yellow-300 text-xl"></i>
@@ -346,12 +368,12 @@
                 <button onclick="window.location.href = '${pageContext.request.contextPath}/ProposalServlet'" 
                         class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
                     <i class="fas fa-file-alt text-3xl mb-3"></i>
-                    <span class="text-lg">Tạo yêu cầu mới</span>
+                    <span class="text-lg">Create new proposal</span>
                 </button>
                 <button onclick="window.location.href = '${pageContext.request.contextPath}/ListProposalServlet'" 
                         class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
                     <i class="fas fa-history text-3xl mb-3"></i>
-                    <span class="text-lg">Xem lịch sử yêu cầu</span>
+                    <span class="text-lg">View My Submitted Proposals</span>
                 </button>
             </div>
 
@@ -376,6 +398,18 @@
 
             toggleSidebar.addEventListener('click', toggleSidebarVisibility);
             toggleSidebarMobile.addEventListener('click', toggleSidebarVisibility);
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const toggles = document.querySelectorAll('.toggle-submenu');
+                toggles.forEach(toggle => {
+                    toggle.addEventListener('click', () => {
+                        const submenu = toggle.parentElement.querySelector('.submenu');
+                        submenu.classList.toggle('hidden');
+                        const icon = toggle.querySelector('.fa-chevron-down');
+                        icon.classList.toggle('rotate-180');
+                    });
+                });
+            });
 
             // Initialize sidebar as hidden
             sidebar.classList.add('hidden');
