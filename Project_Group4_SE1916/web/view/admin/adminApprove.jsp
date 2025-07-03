@@ -17,7 +17,7 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-sky-100 via-cyan-100 to-blue-100 font-sans min-h-screen">
+<body class="bg-white font-sans min-h-screen">
     <div class="container mx-auto p-6">
         <!-- Title -->
         <h1 class="text-4xl font-extrabold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-blue-600 animate-pulse">
