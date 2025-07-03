@@ -334,6 +334,36 @@ $(document).ready(function () {
         window.location.href = url;
     });
 });
+
+$('#searchButton').on('click', function () {
+    var searchValue = $('#searchInput').val();
+    var selectedParentCategoryId = $('#filterParentCategory').val();
+    var selectedChildCategoryId = $('#filterCategory').val();
+    var itemsPerPage = $('#itemsPerPage').val();
+    
+    var url = '${pageContext.request.contextPath}/ListMaterialController?search=' + encodeURIComponent(searchValue);
+    
+    if (selectedParentCategoryId) {
+        url += '&filterParentCategory=' + selectedParentCategoryId;
+    }
+    
+    if (selectedChildCategoryId) {
+        url += '&filterCategory=' + selectedChildCategoryId;
+    }
+    
+    if (itemsPerPage) {
+        url += '&itemsPerPage=' + itemsPerPage;
+    }
+    
+    window.location.href = url;
+});
+
+// Thêm sự kiện khi nhấn Enter trong ô tìm kiếm
+$('#searchInput').on('keypress', function(e) {
+    if (e.which === 13) { // 13 là mã phím Enter
+        $('#searchButton').click();
+    }
+});
 </script>
     </body>
 </html>
