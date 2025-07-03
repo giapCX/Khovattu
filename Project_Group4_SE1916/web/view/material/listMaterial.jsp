@@ -1,338 +1,311 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Material Management - Material List</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f6f9;
-            padding-top: 20px;
-        }
-        .container {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            padding: 2rem;
-        }
-        .header-actions .btn {
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .header-actions .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        .filter-group .form-control, .filter-group .form-select {
-            border-radius: 8px;
-            border: 1px solid #d1d5db;
-            padding: 10px;
-            transition: border-color 0.3s ease;
-        }
-        .filter-group .form-control:focus, .filter-group .form-select:focus {
-            border-color: #60a5fa;
-            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
-        }
-        .filter-group .btn {
-            border-radius: 8px;
-            padding: 10px 20px;
-        }
-        .table th, .table td {
-            vertical-align: middle;
-            font-size: 0.95rem;
-        }
-        .table th {
-            background-color: #bfdbfe;
-            color: #1e3a8a;
-            font-weight: 600;
-        }
-        .table tbody tr {
-            background-color: #eff6ff;
-        }
-        .table tbody tr:hover {
-            background-color: #dbeafe;
-            transition: background-color 0.2s ease;
-        }
-        .thumbnail {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid #e5e7eb;
-        }
-        .action-btn {
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-        .action-btn:hover {
-            transform: translateY(-1px);
-        }
-        .modal-content {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-        .modal-header {
-            background-color: #bfdbfe;
-            border-bottom: 1px solid #e5e7eb;
-            color: #1e3a8a;
-        }
-        .modal-body img {
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-        }
-        .dataTables_paginate {
-            display: flex;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-        .dataTables_paginate .paginate_button {
-            margin: 0 5px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            background-color: transparent;
-            color: #1e3a8a;
-            transition: all 0.3s ease;
-        }
-        .dataTables_paginate .paginate_button:hover {
-            background-color: #60a5fa;
-            color: white;
-        }
-        .dataTables_paginate .paginate_button.current {
-            background-color: #60a5fa;
-            color: white;
-            font-weight: 600;
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-4">
-        <div class="header-actions flex justify-between items-center mb-6">
-            <a href="${pageContext.request.contextPath}/ListParentCategoryController" class="btn btn-secondary">PREVIOUS PAGE</a>
-            <div>
-                <a href="${pageContext.request.contextPath}/AddMaterialController" class="btn btn-primary mr-2">Add Material</a>
-                <a href="${pageContext.request.contextPath}/AddChildCategoryController" class="btn btn-primary">Add Child Category</a>
-                <a href="${pageContext.request.contextPath}/EditChildCategoryController" class="btn btn-primary">Edit Child Category</a>
-            </div>
-        </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Material Management - Material List</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+        <style>
+            .view-details-cell {
+                min-width: 120px;
+                word-break: break-word;
+            }
+            .view-details-cell a {
+                display: inline-block;
+                white-space: nowrap;
+            }
+            .error-message {
+                color: red;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+            }
+            .thumbnail {
+                width: 50px;
+                height: 50px;
+                object-fit: cover;
+                border-radius: 6px;
+                border: 1px solid #e5e7eb;
+            }
+            td, th {
+    line-height: 1.2; /* Giảm chiều cao dòng so với mặc định */
+}
+        </style>
+    </head>
+    <body class="bg-white font-sans min-h-screen">
+        <%
+            String role = (String) session.getAttribute("role");
+        %>
+        <!-- Sidebar -->
+        <c:choose>
+            <c:when test="${role == 'admin'}">
+                <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
+            </c:when>
+            <c:when test="${role == 'direction'}">
+                <jsp:include page="/view/sidebar/sidebarDirection.jsp" />
+            </c:when>
+            <c:when test="${role == 'warehouse'}">
+                <jsp:include page="/view/sidebar/sidebarWarehouse.jsp" />
+            </c:when>
+            <c:when test="${role == 'employee'}">
+                <jsp:include page="/view/sidebar/sidebarEmployee.jsp" />
+            </c:when>
+        </c:choose>
 
-        <div class="row filter-group mb-4">
-            <div class="col-md-4 mb-3">
-                <div class="input-group">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search by material code">
-                    <button id="searchButton" class="btn btn-primary">Search</button>
+        <!-- Main Content -->
+        <main class="flex-1 p-6 transition-all duration-300">
+            <div class="container mx-auto">
+                <!-- Title and Hamburger Button -->
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-4">
+                        <button id="toggleSidebarMobile" class="text-gray-700 hover:text-sky-600">
+                            <i class="fas fa-bars text-2xl"></i>
+                        </button>
+                        <h1 class="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-blue-600 animate-pulse">
+                            Material List
+                        </h1>
+                    </div>
+                    <div class="flex gap-4">
+                        <a href="${pageContext.request.contextPath}/ListParentCategoryController" 
+                           class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md inline-flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i>Back to Categories
+                        </a>
+                        <a href="${pageContext.request.contextPath}/AddMaterialController" 
+                           class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md inline-flex items-center">
+                            <i class="fas fa-plus mr-2"></i>Add Material
+                        </a>
+                        <a href="${pageContext.request.contextPath}/AddChildCategoryController" 
+                           class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md inline-flex items-center">
+                            <i class="fas fa-plus mr-2"></i>Add Child Category
+                        </a>
+                        <a href="${pageContext.request.contextPath}/EditChildCategoryController" 
+                           class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md inline-flex items-center">
+                            <i class="fas fa-plus mr-2"></i>Edit Child Category
+                        </a>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-2 mb-3">
-                <select id="filterParentCategory" class="form-select">
-                    <option value="">All parent categories</option>
-                    <c:forEach var="parentCat" items="${parentCategories}">
-                        <option value="${parentCat.categoryId}" <c:if test="${parentCat.categoryId == selectedParentCategory}">selected</c:if>>${parentCat.name}</option>
-                    </c:forEach>
-                </select>
-            </div>
-            <div class="col-md-2 mb-3">
-                <select id="filterCategory" class="form-select">
-                    <option value="">All child categories</option>
-                    <c:if test="${not empty selectedParentCategory}">
-                        <c:forEach var="childCat" items="${childCategoriesMap[selectedParentCategory]}">
-                            <option value="${childCat.categoryId}">${childCat.name}</option>
-                        </c:forEach>
-                    </c:if>
-                    <c:if test="${empty selectedParentCategory}">
-                        <c:forEach var="cat" items="${categories}">
-                            <option value="${cat.categoryId}">${cat.name}</option>
-                        </c:forEach>
-                    </c:if>
-                </select>
-            </div>
-        </div>
 
-        <div class="table-responsive">
-            <table id="materialTable" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Material Code</th>
-                        <th>Parent Category</th>
-                        <th>Child Category</th>
-                        <th>Material Name</th>
-                        <th>Unit</th>
-                        <th>Suppliers</th>
-                        <th>Image</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach var="mat" items="${materials}" varStatus="loop">
-                        <tr>
-                            <td>${loop.index + 1}</td>
-                            <td>${mat.code}</td>
-                            <td>${mat.category.parentCategoryName}</td>
-                            <td>${mat.category.name}</td>
-                            <td>${mat.name}</td>
-                            <td>${mat.unit}</td>
-                            <td>
-                                <c:choose>
-                                    <c:when test="${not empty mat.suppliers}">
-                                        <c:forEach var="supplier" items="${mat.suppliers}" varStatus="status">
-                                            ${fn:escapeXml(supplier.supplierName)}<c:if test="${!status.last}">,</c:if>
-                                        </c:forEach>
-                                    </c:when>
-                                    <c:otherwise>
-                                        Không có nhà cung cấp
-                                    </c:otherwise>
-                                </c:choose>
-                            </td>
-                            <td>
-                                <img src="${mat.imageUrl}" class="thumbnail" alt="Material image">
-                            </td>
-                            <td>
-                                <a href="${pageContext.request.contextPath}/EditMaterialController?id=${mat.materialId}&origin=listMaterial" class="btn btn-sm btn-warning action-btn">Edit</a>
-                                <form action="${pageContext.request.contextPath}/ListMaterialController" method="post" style="display:inline;">
-                                    <input type="hidden" name="action" value="delete"/>
-                                    <input type="hidden" name="id" value="${mat.materialId}"/>
-                                    <button type="submit" class="btn btn-sm btn-danger action-btn" onclick="return confirm('Are you sure you want to delete?')">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="detailModalLabel">Material Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <img id="detailImage" class="img-fluid" src="" alt="Material image">
+                <!-- Search and Filter Bar -->
+                <div class="flex flex-col md:flex-row justify-between mb-6 gap-4">
+                    <div class="flex w-full md:w-1/3 gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" id="searchInput" placeholder="Search by material code..." 
+                                   class="p-3 pl-10 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
                         </div>
-                        <div class="col-md-8">
-                            <p><strong>Material Code:</strong> <span id="detailCode"></span></p>
-                            <p><strong>Parent Category:</strong> <span id="detailParentCategory"></span></p>
-                            <p><strong>Child Category:</strong> <span id="detailCategory"></span></p>
-                            <p><strong>Material Name:</strong> <span id="detailName"></span></p>
-                            <p><strong>Unit:</strong> <span id="detailUnit"></span></p>
-                            <p><strong>Suppliers:</strong> <span id="detailSuppliers"></span></p>
-                            <p><strong>Description:</strong> <span id="detailDescription"></span></p>
-                            <p><strong>Inventory:</strong> <span id="detailInventory"></span></p>
+                        <button id="searchButton" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md">
+                            <i class="fas fa-search mr-2"></i>Search
+                        </button>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-4 w-full md:w-2/3">
+                        <div class="relative w-full md:w-1/2">
+                            <select id="filterParentCategory" class="p-3 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
+                                <option value="">All parent categories</option>
+                                <c:forEach var="parentCat" items="${parentCategories}">
+                                    <option value="${parentCat.categoryId}" <c:if test="${parentCat.categoryId == selectedParentCategory}">selected</c:if>>${parentCat.name}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        <div class="relative w-full md:w-1/2">
+                            <select id="filterCategory" class="p-3 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
+                                <option value="">All child categories</option>
+                                <c:if test="${not empty selectedParentCategory}">
+                                    <c:forEach var="childCat" items="${childCategoriesMap[selectedParentCategory]}">
+                                        <option value="${childCat.categoryId}">${childCat.name}</option>
+                                    </c:forEach>
+                                </c:if>
+                                <c:if test="${empty selectedParentCategory}">
+                                    <c:forEach var="cat" items="${categories}">
+                                        <option value="${cat.categoryId}">${cat.name}</option>
+                                    </c:forEach>
+                                </c:if>
+                            </select>
+                        </div>
+                        <div class="relative w-full md:w-1/2">
+                            <form action="${pageContext.request.contextPath}/ListMaterialController" method="get" class="relative w-full md:w-1/2">
+                                <select id="itemsPerPage" name="itemsPerPage" onchange="this.form.submit()" class="p-3 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
+                                    <option value="10" ${itemsPerPage == 10 ? 'selected' : ''}>10 items/page</option>
+                                    <option value="20" ${itemsPerPage == 20 ? 'selected' : ''}>20 items/page</option>
+                                    <option value="30" ${itemsPerPage == 30 ? 'selected' : ''}>30 items/page</option>
+                                </select>
+                                <!-- Giữ các tham số hiện tại -->
+                                <input type="hidden" name="page" value="${currentPage}">
+                                <input type="hidden" name="filterParentCategory" value="${selectedParentCategory}">
+                                <input type="hidden" name="search" value="${param.search}">
+                            </form>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <a id="editMaterialLink" href="" class="btn btn-primary">Edit</a>
+
+                <!-- Material Table -->
+                <div class="overflow-x-auto rounded-2xl shadow-xl">
+                    <table class="min-w-full bg-white">
+       <thead class="bg-gradient-to-r from-sky-600 to-blue-600 text-white">
+    <tr>
+        <th class="py-2 px-4 text-left rounded-tl-2xl"><i class="fas fa-list-ol mr-2"> No</i></th>
+        <th class="py-2 px-4 text-left"><i class="fas fa-barcode mr-2"></i>Material Code</th>
+        <th class="py-2 px-4 text-left"><i class="fas fa-layer-group mr-2"></i>Parent Category</th>
+        <th class="py-2 px-4 text-left"><i class="fas fa-tag mr-2"></i>Child Category</th>
+        <th class="py-2 px-4 text-left"><i class="fas fa-cube mr-2"></i>Material Name</th>
+        <th class="py-2 px-4 text-left"><i class="fas fa-balance-scale mr-2"></i>Unit</th>
+        <th class="py-2 px-4 text-left"><i class="fas fa-truck mr-2"></i>Suppliers</th>
+        <th class="py-2 px-4 text-left"><i class="fas fa-image mr-2"></i>Image</th>
+        <th class="py-2 px-4 text-left"><i class="fas fa-info-circle mr-2"></i>Child Category Status</th>
+        <th class="py-2 px-4 text-center view-details-cell rounded-tr-2xl"><i class="fas fa-cogs mr-2"></i>Actions</th>
+    </tr>
+</thead>
+<tbody class="divide-y divide-gray-200">
+    <c:forEach var="mat" items="${materials}" varStatus="loop">
+        <tr class="hover:bg-gradient-to-r hover:from-sky-50 hover:to-cyan-50 transition-all duration-300">
+            <td class="py-2 px-4 font-medium">${(currentPage - 1) * itemsPerPage + loop.index + 1}</td>
+            <td class="py-2 px-4">${mat.code}</td>
+            <td class="py-2 px-4">${mat.category.parentCategoryName}</td>
+            <td class="py-2 px-4">${mat.category.name}</td>
+            <td class="py-2 px-4">${mat.name}</td>
+            <td class="py-2 px-4">${mat.unit}</td>
+            <td class="py-2 px-4">
+                <c:choose>
+                    <c:when test="${not empty mat.suppliers}">
+                        <c:forEach var="supplier" items="${mat.suppliers}" varStatus="status">
+                            ${fn:escapeXml(supplier.supplierName)}<c:if test="${!status.last}">,</c:if>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        No suppliers
+                    </c:otherwise>
+                </c:choose>
+            </td>
+            <td class="py-2 px-4">
+                <img src="${mat.imageUrl}" class="thumbnail" alt="Material image">
+            </td>
+            <td class="py-2 px-4 text-center">
+                <span class="${mat.category.childCategoryStatus == 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} px-2 py-1 rounded-full">
+                    ${mat.category.childCategoryStatus}
+                </span>
+            </td>
+            <td class="py-2 px-4 text-center view-details-cell">
+                <a href="${pageContext.request.contextPath}/EditMaterialController?id=${mat.materialId}&origin=listMaterial" 
+                   class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all duration-300 shadow-md">
+                    <i class="fas fa-edit mr-2"></i>Edit
+                </a>
+                <form action="${pageContext.request.contextPath}/ListMaterialController" method="post" style="display:inline;">
+                    <input type="hidden" name="action" value="delete"/>
+                    <input type="hidden" name="id" value="${mat.materialId}"/>
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 transition-all duration-300 shadow-md" onclick="return confirm('Are you sure you want to delete?')">
+                        <i class="fas fa-trash-alt mr-2"></i>Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+    </c:forEach>
+</tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-center mt-6 gap-2">
+                    <a href="${pageContext.request.contextPath}/ListMaterialController?page=${currentPage - 1}&filterParentCategory=${selectedParentCategory}&search=${param.search}&itemsPerPage=${itemsPerPage}" 
+                       class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md ${currentPage == 1 ? 'opacity-50 pointer-events-none' : ''}">
+                        <i class="fas fa-chevron-left mr-2"></i>Previous Page
+                    </a>
+                    <div class="flex gap-2">
+                        <c:forEach begin="1" end="${totalPages}" var="i">
+                            <a href="${pageContext.request.contextPath}/ListMaterialController?page=${i}&filterParentCategory=${selectedParentCategory}&search=${param.search}&itemsPerPage=${itemsPerPage}" 
+                               class="px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${i == currentPage ? 'bg-blue-600 text-white' : 'bg-sky-200 text-sky-800 hover:bg-sky-300'}">${i}</a>
+                        </c:forEach>
+                    </div>
+                    <a href="${pageContext.request.contextPath}/ListMaterialController?page=${currentPage + 1}&filterParentCategory=${selectedParentCategory}&search=${param.search}&itemsPerPage=${itemsPerPage}" 
+                       class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md ${currentPage == totalPages ? 'opacity-50 pointer-events-none' : ''}">
+                        Next Page<i class="fas fa-chevron-right ml-2"></i>
+                    </a>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-$(document).ready(function () {
-    var table = $('#materialTable').DataTable({
-        dom: '<"top"lf>rt<"bottom"p><"clear">',
-        pagingType: 'full_numbers',
-        pageLength: 10,
-        lengthMenu: [5, 10, 25, 50, 100]
-    });
+        </main>
 
-    var childCategoriesMap = {
-        <c:forEach var="parentCat" items="${parentCategories}" varStatus="status">
-            "${parentCat.categoryId}": [
-                <c:forEach var="childCat" items="${childCategoriesMap[parentCat.categoryId]}" varStatus="childStatus">
-                    { categoryId: ${childCat.categoryId}, name: "${fn:escapeXml(childCat.name)}" }<c:if test="${!childStatus.last}">,</c:if>
+        <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+           <script>
+        $(document).ready(function () {
+            var childCategoriesMap = {
+                <c:forEach var="parentCat" items="${parentCategories}" varStatus="status">
+                    "${parentCat.categoryId}": [
+                        <c:forEach var="childCat" items="${childCategoriesMap[parentCat.categoryId]}" varStatus="childStatus">
+                            { categoryId: ${childCat.categoryId}, name: "${fn:escapeXml(childCat.name)}" }<c:if test="${!childStatus.last}">,</c:if>
+                        </c:forEach>
+                    ]<c:if test="${!status.last}">,</c:if>
                 </c:forEach>
-            ]<c:if test="${!status.last}">,</c:if>
-        </c:forEach>
-    };
+            };
 
-    var categories = [
-        <c:forEach var="cat" items="${categories}" varStatus="status">
-            { categoryId: ${cat.categoryId}, name: "${fn:escapeXml(cat.name)}" }<c:if test="${!status.last}">,</c:if>
-        </c:forEach>
-    ];
+            var categories = [
+                <c:forEach var="cat" items="${categories}" varStatus="status">
+                    { categoryId: ${cat.categoryId}, name: "${fn:escapeXml(cat.name)}" }<c:if test="${!status.last}">,</c:if>
+                </c:forEach>
+            ];
 
-    var parentCategories = [
-        <c:forEach var="parentCat" items="${parentCategories}" varStatus="status">
-            { categoryId: ${parentCat.categoryId}, name: "${fn:escapeXml(parentCat.name)}" }<c:if test="${!status.last}">,</c:if>
-        </c:forEach>
-    ];
+            var parentCategories = [
+                <c:forEach var="parentCat" items="${parentCategories}" varStatus="status">
+                    { categoryId: ${parentCat.categoryId}, name: "${fn:escapeXml(parentCat.name)}" }<c:if test="${!status.last}">,</c:if>
+                </c:forEach>
+            ];
 
-    function getCategoryName(categoryId) {
-        var cat = categories.find(c => c.categoryId == categoryId);
-        return cat ? cat.name : '';
-    }
+            function getCategoryName(categoryId) {
+                var cat = categories.find(c => c.categoryId == categoryId);
+                return cat ? cat.name : '';
+            }
 
-    function getParentCategoryName(categoryId) {
-        var parentCat = parentCategories.find(c => c.categoryId == categoryId);
-        return parentCat ? parentCat.name : '';
-    }
+            function updateChildCategorySelect(parentCategoryId) {
+                var $childCategorySelect = $('#filterCategory');
+                $childCategorySelect.empty();
+                $childCategorySelect.append('<option value="">All child categories</option>');
 
-    function updateChildCategorySelect(parentCategoryId) {
-        var $childCategorySelect = $('#filterCategory');
-        $childCategorySelect.empty();
-        $childCategorySelect.append('<option value="">All child categories</option>');
+                if (!parentCategoryId) {
+                    categories.forEach(function(cat) {
+                        $childCategorySelect.append('<option value="' + cat.categoryId + '">' + cat.name + '</option>');
+                    });
+                } else {
+                    var childCategories = childCategoriesMap[parentCategoryId] || [];
+                    childCategories.forEach(function(cat) {
+                        $childCategorySelect.append('<option value="' + cat.categoryId + '">' + cat.name + '</option>');
+                    });
+                }
+            }
 
-        if (!parentCategoryId) {
-            categories.forEach(function(cat) {
-                $childCategorySelect.append('<option value="' + cat.categoryId + '">' + cat.name + '</option>');
+            <c:if test="${not empty selectedParentCategory}">
+                updateChildCategorySelect('${selectedParentCategory}');
+            </c:if>
+
+            $('#filterParentCategory').on('change', function () {
+                var selectedParentCategoryId = $(this).val();
+                var url = '${pageContext.request.contextPath}/ListMaterialController';
+                if (selectedParentCategoryId) {
+                    url += '?filterParentCategory=' + selectedParentCategoryId;
+                }
+                window.location.href = url;
             });
-        } else {
-            var childCategories = childCategoriesMap[parentCategoryId] || [];
-            childCategories.forEach(function(cat) {
-                $childCategorySelect.append('<option value="' + cat.categoryId + '">' + cat.name + '</option>');
+
+            $('#searchButton').on('click', function () {
+                var searchValue = $('#searchInput').val().toLowerCase();
+                $('tbody tr').each(function() {
+                    var rowText = $(this).text().toLowerCase();
+                    $(this).toggle(rowText.indexOf(searchValue) > -1);
+                });
             });
-        }
-    }
 
-    <c:if test="${not empty selectedParentCategory}">
-        updateChildCategorySelect('${selectedParentCategory}');
-    </c:if>
-
-    $('#filterParentCategory').on('change', function () {
-        var selectedParentCategoryId = $(this).val();
-        var url = '${pageContext.request.contextPath}/ListMaterialController';
-        if (selectedParentCategoryId) {
-            url += '?filterParentCategory=' + selectedParentCategoryId;
-        }
-        window.location.href = url;
-    });
-
-    $('#filterCategory').on('change', function () {
-        var selectedCategoryId = $(this).val();
-        var categoryName = selectedCategoryId ? getCategoryName(selectedCategoryId) : '';
-        table.column(3).search(categoryName).draw();
-    });
-
-    $('#searchButton').on('click', function () {
-        var searchValue = $('#searchInput').val();
-        table.column(1).search(searchValue).draw();
-    });
-});
+            $('#filterCategory').on('change', function () {
+                var selectedCategoryId = $(this).val();
+                var categoryName = selectedCategoryId ? getCategoryName(selectedCategoryId) : '';
+                $('tbody tr').each(function() {
+                    var rowCategory = $(this).find('td:eq(3)').text().trim();
+                    $(this).toggle(categoryName === '' || rowCategory === categoryName);
+                });
+            });
+        });
     </script>
-</body>
+    </body>
 </html>

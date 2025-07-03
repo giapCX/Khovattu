@@ -51,41 +51,50 @@ public class ListMaterialController extends HttpServlet {
     }
 
     private void listMaterials(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        List<Material> materials;
-        String filterParentCategory = request.getParameter("filterParentCategory");
+    List<Material> materials;
+    String filterParentCategory = request.getParameter("filterParentCategory"); // Giả sử tên tham số là filterParentCategory
+    String pageParam = request.getParameter("page");
+    String itemsPerPageParam = request.getParameter("itemsPerPage");
 
-        // Lấy danh sách vật tư dựa trên bộ lọc
-        if (filterParentCategory != null && !filterParentCategory.isEmpty()) {
-            try {
-                int parentCategoryId = Integer.parseInt(filterParentCategory);
-                materials = materialDAO.getMaterialsByParentCategory(parentCategoryId);
-            } catch (NumberFormatException e) {
-                materials = materialDAO.getAllMaterials();
-                filterParentCategory = null; // Đặt lại nếu ID không hợp lệ
-            }
-        } else {
-            materials = materialDAO.getAllMaterials();
+    int page = (pageParam != null && !pageParam.isEmpty()) ? Integer.parseInt(pageParam) : 1;
+    int itemsPerPage = (itemsPerPageParam != null && !itemsPerPageParam.isEmpty()) ? Integer.parseInt(itemsPerPageParam) : 10;
+
+    if (filterParentCategory != null && !filterParentCategory.isEmpty()) {
+        try {
+            int parentCategoryId = Integer.parseInt(filterParentCategory);
+            materials = materialDAO.getMaterialsByParentCategory(parentCategoryId, page, itemsPerPage);
+        } catch (NumberFormatException e) {
+            materials = materialDAO.getAllMaterials(page, itemsPerPage);
+            filterParentCategory = null;
         }
-
-        // Lấy danh sách danh mục
-        List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
-        List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
-
-        // Tạo map chứa danh sách child categories theo parentId
-        Map<Integer, List<MaterialCategory>> childCategoriesMap = new HashMap<>();
-        for (MaterialCategory parent : parentCategories) {
-            List<MaterialCategory> childCategories = categoryDAO.getChildCategoriesByParentId(parent.getCategoryId());
-            childCategoriesMap.put(parent.getCategoryId(), childCategories);
-        }
-
-        // Lưu dữ liệu vào request
-        request.setAttribute("materials", materials);
-        request.setAttribute("categories", categories);
-        request.setAttribute("parentCategories", parentCategories);
-        request.setAttribute("childCategoriesMap", childCategoriesMap);
-        request.setAttribute("selectedParentCategory", filterParentCategory);
-        request.getRequestDispatcher("/view/material/listMaterial.jsp").forward(request, response);
+    } else {
+        materials = materialDAO.getAllMaterials(page, itemsPerPage);
     }
+
+    int totalRecords = filterParentCategory != null && !filterParentCategory.isEmpty()
+        ? materialDAO.getTotalMaterialsByParentCategory(Integer.parseInt(filterParentCategory))
+        : materialDAO.getTotalMaterials();
+    int totalPages = (int) Math.ceil((double) totalRecords / itemsPerPage);
+
+    List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
+    List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
+
+    Map<Integer, List<MaterialCategory>> childCategoriesMap = new HashMap<>();
+    for (MaterialCategory parent : parentCategories) {
+        List<MaterialCategory> childCategories = categoryDAO.getChildCategoriesByParentId(parent.getCategoryId());
+        childCategoriesMap.put(parent.getCategoryId(), childCategories);
+    }
+
+    request.setAttribute("materials", materials);
+    request.setAttribute("categories", categories);
+    request.setAttribute("parentCategories", parentCategories);
+    request.setAttribute("childCategoriesMap", childCategoriesMap);
+    request.setAttribute("selectedParentCategory", filterParentCategory);
+    request.setAttribute("currentPage", page);
+    request.setAttribute("itemsPerPage", itemsPerPage);
+    request.setAttribute("totalPages", totalPages);
+    request.getRequestDispatcher("/view/material/listMaterial.jsp").forward(request, response);
+}
 
     private void deleteMaterial(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
         int materialId = Integer.parseInt(request.getParameter("id"));
