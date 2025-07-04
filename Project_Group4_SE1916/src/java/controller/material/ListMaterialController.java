@@ -120,7 +120,7 @@ private void listMaterials(HttpServletRequest request, HttpServletResponse respo
     private void deleteMaterial(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
         int materialId = Integer.parseInt(request.getParameter("id"));
         materialDAO.deleteMaterial(materialId);
-        request.getSession().setAttribute("successMessage", "Xóa vật tư thành công!");
+        request.getSession().setAttribute("successMessage", "Disabled successfully!");
         response.sendRedirect(request.getContextPath() + "/ListMaterialController");
     }
 }

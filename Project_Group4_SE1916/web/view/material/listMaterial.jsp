@@ -369,6 +369,21 @@ $('#searchInput').on('keypress', function(e) {
         $('#searchButton').click();
     }
 });
+
+
+// Kiểm tra thông báo thành công từ session
+<c:if test="${not empty sessionScope.successMessage}">
+    Swal.fire({
+        icon: 'success',
+        title: 'Thành công',
+        text: '${sessionScope.successMessage}',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3B82F6' // Màu xanh Tailwind blue-500
+    }).then(function() {
+        // Xóa thông báo khỏi session sau khi hiển thị
+        <% session.removeAttribute("successMessage"); %>
+    });
+</c:if>
 </script>
     </body>
 </html>
