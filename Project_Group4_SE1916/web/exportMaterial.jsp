@@ -13,7 +13,16 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Export Materials</title>
+        <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+        <!-- Liên kết đến file CSS -->
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
         <style>
             body {
                 min-height: 100vh;
@@ -104,112 +113,138 @@
             }
         </style>
     </head>
-    <body>
-        <div class="container">
-            <h1 class="text-center mb-4">Export Materials</h1>
-
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    ${fn:escapeXml(error)}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <body class="bg-gray-50 min-h-screen font-sans antialiased">
+        <%
+            String role = (String) session.getAttribute("role");
+            String userFullName = (String) session.getAttribute("userFullName") != null ? (String) session.getAttribute("userFullName") : "Not Identified";
+        %>
+        <!-- Sidebar -->
+        <c:choose>
+            <c:when test="${role == 'admin'}">
+                <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
+            </c:when>
+            <c:when test="${role == 'direction'}">
+                <jsp:include page="/view/sidebar/sidebarDirection.jsp" />
+            </c:when>
+            <c:when test="${role == 'warehouse'}">
+                <jsp:include page="/view/sidebar/sidebarWarehouse.jsp" />
+            </c:when>
+            <c:when test="${role == 'employee'}">
+                <jsp:include page="/view/sidebar/sidebarEmployee.jsp" />
+            </c:when>
+        </c:choose>
+        <main class="flex-1 p-8 transition-all duration-300">
+            <div class="container max-w-6xl mx-auto">
+                <div class="flex items-center gap-4 mb-6">
+                    <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+<!--                    <h1 class="text-center mb-4" style="font-size: 30px; margin-left: 300px">Export Materials</h1>-->
                 </div>
-            </c:if>
+                <h1 class="text-center mb-4 " style="font-size: 30px">Export Materials</h1>
 
-            <c:if test="${not empty message}">
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    ${fn:escapeXml(message)} (Export ID: ${fn:escapeXml(exportId)})
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            </c:if>
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        ${fn:escapeXml(error)}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </c:if>
 
-            <form action="${pageContext.request.contextPath}/exportMaterial" method="post" class="needs-validation" novalidate>
-                <div class="mb-3">
-                    <label for="userFN" class="form-label">Exporter</label>
-                    <input type="text" name="userFN" class="form-control" value="${fn:escapeXml(sessionScope.userFullName != null ? sessionScope.userFullName : 'Not Identified')}" readonly>
-                    <c:if test="${empty sessionScope.userFullName}">
-                        <p class="error mt-2">Not logged in or user information is missing. Please log in again.</p>
-                    </c:if>
-                </div>
+                <c:if test="${not empty message}">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        ${fn:escapeXml(message)} (Export ID: ${fn:escapeXml(exportId)})
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </c:if>
 
-                <div class="mb-3">
-                    <label for="exportId" class="form-label">Export ID</label>
-                    <input type="text" class="form-control" id="exportId" name="exportId" value="${fn:escapeXml(exportId)}" readonly>
-                </div>
+                <form action="${pageContext.request.contextPath}/exportMaterial" method="post" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="userFN" class="form-label">Exporter</label>
+                        <input type="text" name="userFN" class="form-control" value="${fn:escapeXml(sessionScope.userFullName != null ? sessionScope.userFullName : 'Not Identified')}" readonly>
+                        <c:if test="${empty sessionScope.userFullName}">
+                            <p class="error mt-2">Not logged in or user information is missing. Please log in again.</p>
+                        </c:if>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="voucherId" class="form-label">Voucher ID</label>
-                    <input type="text" class="form-control" id="voucherId" name="voucherId" required maxlength="50" pattern="[A-Za-z0-9-_]+">
-                    <div class="invalid-feedback">Voucher ID is required, max 50 characters, alphanumeric, hyphens, or underscores only.</div>
-                </div>    
+                    <div class="mb-3">
+                        <label for="exportId" class="form-label">Export ID</label>
+                        <input type="text" class="form-control" id="exportId" name="exportId" value="${fn:escapeXml(exportId)}" readonly>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="purpose" class="form-label">Export Purpose</label>
-                    <textarea class="form-control" id="purpose" name="purpose" rows="3" required maxlength="500" pattern="[A-Za-z0-9\s,.()-]+"></textarea>
-                    <div class="invalid-feedback">Purpose is required, max 500 characters, alphanumeric, spaces, commas, periods, parentheses, or hyphens only.</div>
-                </div>
+                    <div class="mb-3">
+                        <label for="voucherId" class="form-label">Voucher ID</label>
+                        <input type="text" class="form-control" id="voucherId" name="voucherId" required maxlength="50" pattern="[A-Za-z0-9-_]+">
+                        <div class="invalid-feedback">Voucher ID is required, max 50 characters, alphanumeric, hyphens, or underscores only.</div>
+                    </div>    
 
-                <div class="mb-3">
-                    <label class="form-label">Material List</label>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>Material Name</th>
-                                <th>Material Code</th>
-                                <th>Quantity</th>
-                                <th>Unit</th>
-                                <th>Condition</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="materialTableBody">
-                            <tr>
-                                <td class="serial-number">1</td>
-                                <td style="position: relative;">
-                                    <input type="text" class="form-control material-name-input" name="materialName[]" required autocomplete="off">
-                                    <div class="autocomplete-suggestions" style="display: none;"></div>
-                                </td>
-                                <td><input type="text" class="form-control material-code-input" name="materialCode[]" readonly></td>
-                                <td><input type="number" class="form-control" name="quantity[]" min="1" required></td>
-                                <td><input type="text" class="form-control unit-display" name="unit[]" readonly></td>
-                                <td>
-                                    <select class="form-select" name="condition[]" required>
-                                        <option value="">Select condition</option>
-                                        <option value="new">New</option>
-                                        <option value="used">Used</option>
-                                        <option value="damaged">Damaged</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button>
-                                    <button type="button" class="btn btn-success btn-sm edit-row">Save</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <button type="button" class="btn btn-secondary" id="addMaterialBtn">Add Row</button>
-                </div>
+                    <div class="mb-3">
+                        <label for="purpose" class="form-label">Export Purpose</label>
+                        <textarea class="form-control" id="purpose" name="purpose" rows="3" required maxlength="500" pattern="[A-Za-z0-9\s,.()-]+"></textarea>
+                        <div class="invalid-feedback">Purpose is required, max 500 characters, alphanumeric, spaces, commas, periods, parentheses, or hyphens only.</div>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="requiredDate" class="form-label">Required Export Date</label>
-                    <input type="date" class="form-control" id="requiredDate" name="requiredDate" required>
-                    <div class="invalid-feedback">Please select the required export date.</div>
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label">Material List</label>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Material Name</th>
+                                    <th>Material Code</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Condition</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="materialTableBody">
+                                <tr>
+                                    <td class="serial-number">1</td>
+                                    <td style="position: relative;">
+                                        <input type="text" class="form-control material-name-input" name="materialName[]" required autocomplete="off">
+                                        <div class="autocomplete-suggestions" style="display: none;"></div>
+                                    </td>
+                                    <td><input type="text" class="form-control material-code-input" name="materialCode[]" readonly></td>
+                                    <td><input type="number" class="form-control" name="quantity[]" min="1" required></td>
+                                    <td><input type="text" class="form-control unit-display" name="unit[]" readonly></td>
+                                    <td>
+                                        <select class="form-select" name="condition[]" required>
+                                            <option value="">Select condition</option>
+                                            <option value="new">New</option>
+                                            <option value="used">Used</option>
+                                            <option value="damaged">Damaged</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button>
+                                        <button type="button" class="btn btn-success btn-sm edit-row">Save</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-secondary" id="addMaterialBtn">Add Row</button>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="additionalNote" class="form-label">Additional Notes</label>
-                    <textarea class="form-control" id="additionalNote" name="additionalNote" rows="3" maxlength="1000" pattern="[A-Za-z0-9\s,.()-]+"></textarea>
-                    <div class="invalid-feedback">Notes max 1000 characters, alphanumeric, spaces, commas, periods, parentheses, or hyphens only.</div>
-                </div>
+                    <div class="mb-3">
+                        <label for="requiredDate" class="form-label">Required Export Date</label>
+                        <input type="date" class="form-control" id="requiredDate" name="requiredDate" required>
+                        <div class="invalid-feedback">Please select the required export date.</div>
+                    </div>
 
-                <button type="submit" class="btn btn-primary">Save Export</button>
-                <button type="reset" class="btn btn-info">Reset</button>
-                <button type="button" class="btn btn-success" id="exportExcelBtn" disabled>Export to Excel</button>
-                <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn btn-secondary">Back to Home</a>
-            </form>
-        </div>
+                    <div class="mb-3">
+                        <label for="additionalNote" class="form-label">Additional Notes</label>
+                        <textarea class="form-control" id="additionalNote" name="additionalNote" rows="3" maxlength="1000" pattern="[A-Za-z0-9\s,.()-]+"></textarea>
+                        <div class="invalid-feedback">Notes max 1000 characters, alphanumeric, spaces, commas, periods, parentheses, or hyphens only.</div>
+                    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+                    <button type="submit" class="btn btn-primary">Save Export</button>
+                    <button type="reset" class="btn btn-info">Reset</button>
+                    <button type="button" class="btn btn-success" id="exportExcelBtn" disabled>Export to Excel</button>
+                    <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn btn-secondary">Back to Home</a>
+                </form>
+            </div>
+        </main>
+        
         <script>
             // Initialize materialData
             let materialData = [];
@@ -223,17 +258,15 @@
                     }
                     const data = await response.json();
                     materialData = data.map(item => ({
-                        name: item.name || '',
-                        code: item.code || '',
-                        unit: item.unit || ''
-                    }));
+                            name: item.name || '',
+                            code: item.code || '',
+                            unit: item.unit || ''
+                        }));
                     console.log("Material Data:", materialData);
-                    if (materialData.length === 0) {
-                        showAlert('warning', 'No material data available.');
-                    }
+                    
                 } catch (error) {
                     console.error("Error fetching materials:", error);
-                    showAlert('error', 'Failed to load material data. Please try again.');
+                    
                 }
             }
 
@@ -297,22 +330,19 @@
                 tableBody.appendChild(row);
                 attachAutocomplete(row.querySelector('.material-name-input'));
                 updateSerialNumbers();
-                updateRemoveButtons();
-                showAlert('success', 'Added new material row.');
+                updateRemoveButtons();                
                 checkFormValidity();
             }
 
             // Remove material row
             function removeRow(button) {
                 const rows = document.querySelectorAll('#materialTableBody tr');
-                if (rows.length <= 1) {
-                    showAlert('warning', 'Cannot delete: At least one material row is required.');
+                if (rows.length <= 1) {                    
                     return;
                 }
                 button.closest('tr').remove();
                 updateSerialNumbers();
                 updateRemoveButtons();
-                showAlert('success', 'Deleted material row.');
                 checkFormValidity();
             }
 
@@ -326,18 +356,15 @@
 
                 if (isEditing) {
                     // Validate
-                    if (!materialNameInput.value.trim()) {
-                        showAlert('error', 'Material name cannot be empty.');
+                    if (!materialNameInput.value.trim()) {                        
                         row.classList.add('error-row');
                         return;
                     }
-                    if (!quantityInput.value || quantityInput.value <= 0) {
-                        showAlert('error', 'Quantity must be greater than 0.');
+                    if (!quantityInput.value || quantityInput.value <= 0) {                        
                         row.classList.add('error-row');
                         return;
                     }
-                    if (!conditionSelect.value) {
-                        showAlert('error', 'Condition cannot be empty.');
+                    if (!conditionSelect.value) {                      
                         row.classList.add('error-row');
                         return;
                     }
@@ -353,7 +380,6 @@
                     button.classList.remove('btn-success');
                     button.classList.add('btn-warning');
                     row.classList.remove('error-row');
-                    showAlert('success', 'Row saved successfully.');
                 } else {
                     // Edit mode: unlock inputs
                     materialNameInput.readOnly = false;
@@ -376,7 +402,8 @@
             // Autocomplete functionality
             function attachAutocomplete(input) {
                 input.addEventListener('input', function () {
-                    if (this.readOnly) return;
+                    if (this.readOnly)
+                        return;
                     const value = this.value.toLowerCase();
                     const suggestionsDiv = this.nextElementSibling;
                     suggestionsDiv.innerHTML = '';
@@ -414,8 +441,7 @@
 
             // Export to Excel functionality
             function exportToExcel() {
-                const exporter = document.querySelector('input[name="userFN"]').value;
-                const exportId = document.getElementById('exportId').value;
+                const exporter = document.querySelector('input[name="userFN"]').value;               
                 const voucherId = document.getElementById('voucherId').value;
                 const purpose = document.getElementById('purpose').value;
                 const requiredDate = document.getElementById('requiredDate').value;
@@ -425,7 +451,6 @@
                 const data = [
                     ["Export Voucher"],
                     ["Exporter", exporter],
-                    ["Export ID", exportId || "N/A"],
                     ["Voucher ID", voucherId],
                     ["Purpose", purpose],
                     ["Required Export Date", requiredDate],
@@ -452,7 +477,7 @@
                 // Optional: Add basic styling
                 ws['A1'].s = {font: {bold: true}};
                 ws['A9'].s = {font: {bold: true}};
-                ws['A10'].s = {font: {bold: true}};
+                
                 ws['B10'].s = {font: {bold: true}};
                 ws['C10'].s = {font: {bold: true}};
                 ws['D10'].s = {font: {bold: true}};
@@ -464,7 +489,7 @@
                 XLSX.utils.book_append_sheet(wb, ws, "Export Voucher");
 
                 // Generate and download Excel file
-                XLSX.writeFile(wb, `ExportVoucher_${exportId || voucherId}.xlsx`);
+                XLSX.writeFile(wb, `ExportVoucher_${voucherId}.xlsx`);
             }
 
             // Check if all rows are saved
@@ -487,7 +512,7 @@
                 exportBtn.classList.toggle('btn-disabled', !isValid);
             }
 
-          
+
 
             // Client-side form validation
             function validateForm() {
@@ -509,83 +534,83 @@
                 const textRegex = /^[A-Za-z0-9\s,.()-]+$/;
 
                 // Check if all rows are saved
-                if (!areAllRowsSaved()) {
-                    showAlert('error', 'Please save all material rows before submitting.');
-                    return false;
-                }
+//                if (!areAllRowsSaved()) {
+//                    showAlert('error', 'Please save all material rows before submitting.');
+//                    return false;
+//                }
+//
+//                if (!voucherId) {
+//                    showAlert('error', 'Voucher ID cannot be empty.');
+//                    return false;
+//                }
+//                if (voucherId.length > 50) {
+//                    showAlert('error', 'Voucher ID cannot exceed 50 characters.');
+//                    return false;
+//                }
+//                if (!idRegex.test(voucherId)) {
+//                    showAlert('error', 'Voucher ID can only contain alphanumeric characters, hyphens, or underscores.');
+//                    return false;
+//                }
+//
+//                if (!purpose) {
+//                    showAlert('error', 'Export purpose cannot be empty.');
+//                    return false;
+//                }
+//                if (purpose.length > 500) {
+//                    showAlert('error', 'Export purpose cannot exceed 500 characters.');
+//                    return false;
+//                }
+//                if (!textRegex.test(purpose)) {
+//                    showAlert('error', 'Export purpose can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.');
+//                    return false;
+//                }
+//
+//                if (!requiredDate) {
+//                    showAlert('error', 'Required export date cannot be empty.');
+//                    return false;
+//                }
+//
+//                if (additionalNote && additionalNote.length > 1000) {
+//                    showAlert('error', 'Additional notes cannot exceed 1000 characters.');
+//                    return false;
+//                }
+//                if (additionalNote && !textRegex.test(additionalNote)) {
+//                    showAlert('error', 'Additional notes can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.');
+//                    return false;
+//                }
+//
+//                if (materialNames.length === 0) {
+//                    showAlert('error', 'At least one material is required.');
+//                    return false;
+//                }
 
-                if (!voucherId) {
-                    showAlert('error', 'Voucher ID cannot be empty.');
-                    return false;
-                }
-                if (voucherId.length > 50) {
-                    showAlert('error', 'Voucher ID cannot exceed 50 characters.');
-                    return false;
-                }
-                if (!idRegex.test(voucherId)) {
-                    showAlert('error', 'Voucher ID can only contain alphanumeric characters, hyphens, or underscores.');
-                    return false;
-                }
-
-                if (!purpose) {
-                    showAlert('error', 'Export purpose cannot be empty.');
-                    return false;
-                }
-                if (purpose.length > 500) {
-                    showAlert('error', 'Export purpose cannot exceed 500 characters.');
-                    return false;
-                }
-                if (!textRegex.test(purpose)) {
-                    showAlert('error', 'Export purpose can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.');
-                    return false;
-                }
-
-                if (!requiredDate) {
-                    showAlert('error', 'Required export date cannot be empty.');
-                    return false;
-                }
-
-                if (additionalNote && additionalNote.length > 1000) {
-                    showAlert('error', 'Additional notes cannot exceed 1000 characters.');
-                    return false;
-                }
-                if (additionalNote && !textRegex.test(additionalNote)) {
-                    showAlert('error', 'Additional notes can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.');
-                    return false;
-                }
-
-                if (materialNames.length === 0) {
-                    showAlert('error', 'At least one material is required.');
-                    return false;
-                }
-
-                for (let i = 0; i < materialNames.length; i++) {
-                    if (!materialNames[i].value.trim()) {
-                        showAlert('error', `Material name cannot be empty at row ${i + 1}`);
-                        rows[i].classList.add('error-row');
-                        return false;
-                    }
-                    if (!materialCodes[i].value.trim()) {
-                        showAlert('error', `Material code cannot be empty at row ${i + 1}`);
-                        rows[i].classList.add('error-row');
-                        return false;
-                    }
-                    if (!quantities[i].value || quantities[i].value <= 0) {
-                        showAlert('error', `Quantity must be greater than 0 at row ${i + 1}`);
-                        rows[i].classList.add('error-row');
-                        return false;
-                    }
-                    if (!units[i].value) {
-                        showAlert('error', `Unit cannot be empty at row ${i + 1}`);
-                        rows[i].classList.add('error-row');
-                        return false;
-                    }
-                    if (!conditions[i].value) {
-                        showAlert('error', `Condition cannot be empty at row ${i + 1}`);
-                        rows[i].classList.add('error-row');
-                        return false;
-                    }
-                }
+//                for (let i = 0; i < materialNames.length; i++) {
+//                    if (!materialNames[i].value.trim()) {
+//                        showAlert('error', `Material name cannot be empty at row ${i + 1}`);
+//                        rows[i].classList.add('error-row');
+//                        return false;
+//                    }
+//                    if (!materialCodes[i].value.trim()) {
+//                        showAlert('error', `Material code cannot be empty at row ${i + 1}`);
+//                        rows[i].classList.add('error-row');
+//                        return false;
+//                    }
+//                    if (!quantities[i].value || quantities[i].value <= 0) {
+//                        showAlert('error', `Quantity must be greater than 0 at row ${i + 1}`);
+//                        rows[i].classList.add('error-row');
+//                        return false;
+//                    }
+//                    if (!units[i].value) {
+//                        showAlert('error', `Unit cannot be empty at row ${i + 1}`);
+//                        rows[i].classList.add('error-row');
+//                        return false;
+//                    }
+//                    if (!conditions[i].value) {
+//                        showAlert('error', `Condition cannot be empty at row ${i + 1}`);
+//                        rows[i].classList.add('error-row');
+//                        return false;
+//                    }
+//                }
                 return true;
             }
 
@@ -615,8 +640,7 @@
                 const exportButton = document.getElementById('exportExcelBtn');
 
                 if (!tableBody || !addButton || !exportButton) {
-                    console.error('Required elements not found');
-                    showAlert('error', 'System error: Required elements not found.');
+                    console.error('Required elements not found');                    
                     return;
                 }
 
@@ -644,16 +668,18 @@
                 updateRemoveButtons();
                 checkFormValidity();
 
-                <c:if test="${not empty errorRow && errorRow >= 0}">
-                    const rows = document.querySelectorAll('#materialTableBody tr');
-                    if (rows[${fn:escapeXml(errorRow)}]) {
-                        rows[${fn:escapeXml(errorRow)}].classList.add('error-row');
-                    } else {
-                        console.warn('Error row index ${fn:escapeXml(errorRow)} is out of bounds.');
-                    }
-                </c:if>
+            <c:if test="${not empty errorRow && errorRow >= 0}">
+                const rows = document.querySelectorAll('#materialTableBody tr');
+                if (rows[${fn:escapeXml(errorRow)}]) {
+                    rows[${fn:escapeXml(errorRow)}].classList.add('error-row');
+                } else {
+                    console.warn('Error row index ${fn:escapeXml(errorRow)} is out of bounds.');
+                }
+            </c:if>
             });
         </script>
+        <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
