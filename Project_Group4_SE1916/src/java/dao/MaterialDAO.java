@@ -424,7 +424,7 @@ public List<Material> getMaterialsByParentCategory(int parentCategoryId, int pag
 }
 
 public int getTotalMaterials() throws SQLException {
-    String sql = "SELECT COUNT(*) FROM Materials";
+    String sql = "SELECT COUNT(*) FROM Materials WHERE status = 'active'";
     try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
         if (rs.next()) {
             return rs.getInt(1);
@@ -434,7 +434,7 @@ public int getTotalMaterials() throws SQLException {
 }
 
 public int getTotalMaterialsByParentCategory(int parentCategoryId) throws SQLException {
-    String sql = "SELECT COUNT(*) FROM Materials m JOIN MaterialCategories mc ON m.category_id = mc.category_id WHERE mc.parent_id = ?";
+    String sql = "SELECT COUNT(*) FROM Materials m JOIN MaterialCategories mc ON m.category_id = mc.category_id WHERE mc.parent_id = ? AND m.status = 'active'";
     try (PreparedStatement ps = conn.prepareStatement(sql)) {
         ps.setInt(1, parentCategoryId);
         try (ResultSet rs = ps.executeQuery()) {
@@ -502,7 +502,7 @@ public List<Material> getMaterialsByChildCategory(int childCategoryId, int page,
     return materials;
 }
 public int getTotalMaterialsByChildCategory(int childCategoryId) throws SQLException {
-    String sql = "SELECT COUNT(*) FROM Materials WHERE category_id = ?";
+    String sql = "SELECT COUNT(*) FROM Materials WHERE category_id = ? AND status = 'active'";
     try (PreparedStatement ps = conn.prepareStatement(sql)) {
         ps.setInt(1, childCategoryId);
         try (ResultSet rs = ps.executeQuery()) {
