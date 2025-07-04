@@ -127,7 +127,7 @@ public class MaterialDAO {
         String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name "
                 + "FROM Materials m "
                 + "JOIN MaterialCategories mc ON m.category_id = mc.category_id "
-                + "WHERE m.material_id = ?";
+                + "WHERE m.material_id = ? AND m.status = 'active'";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, materialId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -226,13 +226,7 @@ public class MaterialDAO {
         }
     }
 
-    public void deleteMaterial(int materialId) throws SQLException {
-        String sql = "DELETE FROM Materials WHERE material_id = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, materialId);
-            ps.executeUpdate();
-        }
-    }
+ 
 
     public double getInventoryQuantity(int materialId, String condition) throws SQLException {
         String sql = "SELECT quantity_in_stock FROM Inventory WHERE material_id = ? AND material_condition = ?";
@@ -312,7 +306,7 @@ public class MaterialDAO {
     }
     
     
-    public List<Material> getAllMaterials(int page, int itemsPerPage) throws SQLException {
+   public List<Material> getAllMaterials(int page, int itemsPerPage) throws SQLException {
     List<Material> materials = new ArrayList<>();
     String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name, " +
                  "mc.parent_id, mc2.name AS parent_category_name, mc.status AS child_category_status, mc2.status AS parent_category_status, " +
@@ -322,6 +316,7 @@ public class MaterialDAO {
                  "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id " +
                  "LEFT JOIN SupplierMaterials sm ON m.material_id = sm.material_id " +
                  "LEFT JOIN Suppliers s ON sm.supplier_id = s.supplier_id " +
+                 "WHERE m.status = 'active' " +  // THÊM ĐIỀU KIỆN NÀY
                  "GROUP BY m.material_id " +
                  "LIMIT ? OFFSET ?";
     
@@ -379,7 +374,7 @@ public List<Material> getMaterialsByParentCategory(int parentCategoryId, int pag
                  "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id " +
                  "LEFT JOIN SupplierMaterials sm ON m.material_id = sm.material_id " +
                  "LEFT JOIN Suppliers s ON sm.supplier_id = s.supplier_id " +
-                 "WHERE mc.parent_id = ? " +
+                 "WHERE mc.parent_id = ?  " +
                  "GROUP BY m.material_id " +
                  "LIMIT ? OFFSET ?";
     
@@ -461,7 +456,7 @@ public List<Material> getMaterialsByChildCategory(int childCategoryId, int page,
                  "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id " +
                  "LEFT JOIN SupplierMaterials sm ON m.material_id = sm.material_id " +
                  "LEFT JOIN Suppliers s ON sm.supplier_id = s.supplier_id " +
-                 "WHERE m.category_id = ? " +
+                 "WHERE m.category_id = ?   " +
                  "GROUP BY m.material_id " +
                  "LIMIT ? OFFSET ?";
     
@@ -528,7 +523,7 @@ public List<Material> searchMaterialsByCode(String code, int page, int itemsPerP
                  "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id " +
                  "LEFT JOIN SupplierMaterials sm ON m.material_id = sm.material_id " +
                  "LEFT JOIN Suppliers s ON sm.supplier_id = s.supplier_id " +
-                 "WHERE m.code LIKE ? " +
+                 "WHERE m.code LIKE ? AND m.status = 'active' " +
                  "GROUP BY m.material_id " +
                  "LIMIT ? OFFSET ?";
     
@@ -586,5 +581,14 @@ public int getTotalMaterialsByCode(String code) throws SQLException {
     }
     return 0;
 }
+public void deleteMaterial(int materialId) throws SQLException {
+    // Thay vì xóa, chúng ta cập nhật status thành 'inactive'
+    String sql = "UPDATE Materials SET status = 'inactive' WHERE material_id = ?";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, materialId);
+        ps.executeUpdate();
+    }
+}
+
     
 }

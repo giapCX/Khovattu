@@ -149,11 +149,13 @@
         <th class="py-2 px-4 text-left"><i class="fas fa-barcode mr-2"></i>Material Code</th>
         <th class="py-2 px-4 text-left"><i class="fas fa-layer-group mr-2"></i>Parent Category</th>
         <th class="py-2 px-4 text-left"><i class="fas fa-tag mr-2"></i>Child Category</th>
+        <th class="py-2 px-4 text-left"><i class="fas fa-info-circle mr-2"></i>Child Category Status</th>
         <th class="py-2 px-4 text-left"><i class="fas fa-cube mr-2"></i>Material Name</th>
         <th class="py-2 px-4 text-left"><i class="fas fa-balance-scale mr-2"></i>Unit</th>
         <th class="py-2 px-4 text-left"><i class="fas fa-truck mr-2"></i>Suppliers</th>
         <th class="py-2 px-4 text-left"><i class="fas fa-image mr-2"></i>Image</th>
-        <th class="py-2 px-4 text-left"><i class="fas fa-info-circle mr-2"></i>Child Category Status</th>
+       
+     
         <th class="py-2 px-4 text-center view-details-cell rounded-tr-2xl"><i class="fas fa-cogs mr-2"></i>Actions</th>
     </tr>
 </thead>
@@ -164,6 +166,11 @@
             <td class="py-2 px-4">${mat.code}</td>
             <td class="py-2 px-4">${mat.category.parentCategoryName}</td>
             <td class="py-2 px-4">${mat.category.name}</td>
+            <td class="py-2 px-4 text-center">
+                <span class="${mat.category.childCategoryStatus == 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} px-2 py-1 rounded-full">
+                    ${mat.category.childCategoryStatus}
+                </span>
+            </td>
             <td class="py-2 px-4">${mat.name}</td>
             <td class="py-2 px-4">${mat.unit}</td>
             <td class="py-2 px-4">
@@ -181,11 +188,8 @@
             <td class="py-2 px-4">
                 <img src="${mat.imageUrl}" class="thumbnail" alt="Material image">
             </td>
-            <td class="py-2 px-4 text-center">
-                <span class="${mat.category.childCategoryStatus == 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} px-2 py-1 rounded-full">
-                    ${mat.category.childCategoryStatus}
-                </span>
-            </td>
+            
+           
             <td class="py-2 px-4 text-center view-details-cell">
                 <a href="${pageContext.request.contextPath}/EditMaterialController?id=${mat.materialId}&origin=listMaterial" 
                    class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all duration-300 shadow-md">
@@ -194,8 +198,9 @@
                 <form action="${pageContext.request.contextPath}/ListMaterialController" method="post" style="display:inline;">
                     <input type="hidden" name="action" value="delete"/>
                     <input type="hidden" name="id" value="${mat.materialId}"/>
-                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 transition-all duration-300 shadow-md" onclick="return confirm('Are you sure you want to delete?')">
-                        <i class="fas fa-trash-alt mr-2"></i>Delete
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 transition-all duration-300 shadow-md" 
+                            onclick="return confirm('Are you sure you want to disable this item?')">
+                        <i class="fas fa-ban mr-2"></i>Disable
                     </button>
                 </form>
             </td>

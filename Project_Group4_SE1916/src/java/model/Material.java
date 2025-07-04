@@ -20,7 +20,7 @@ public class Material {
     private String imageUrl;
     private MaterialCategory category;
     private List<Supplier> suppliers;
-    
+    private String status;
 
     public Material() {
     }
@@ -34,6 +34,14 @@ public class Material {
         this.imageUrl = imageUrl;
         this.category = category;
         this.suppliers = suppliers;
+    }
+    
+     public String getStatus() {
+        return status;
+    }
+    
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public int getMaterialId() {
