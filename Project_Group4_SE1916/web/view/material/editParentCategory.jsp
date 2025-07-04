@@ -38,6 +38,10 @@
             transform: translateY(-2px);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -67,25 +71,63 @@
                     <option value="inactive" ${category.status == 'inactive' ? 'selected' : ''}>Inactive</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Update Category</button>
-            <button type="button" class="btn btn-secondary" onclick="document.getElementById('editCategoryForm').reset();">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="updateBtn">Update Category</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('editCategoryForm').reset(); checkChanges();">Cancel</button>
         </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        <c:if test="${not empty successMessage}">
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: '${successMessage}',
-                showConfirmButton: false,
-                timer: 2000,
-                customClass: { popup: 'animated fadeInDown' }
-            });
-            <% session.removeAttribute("successMessage"); %>
-        </c:if>
-    </script>
+   <script>
+    // Get initial values
+    let initialName = document.getElementById('name').value;
+    let initialStatus = document.getElementById('status').value;
+    const updateBtn = document.getElementById('updateBtn');
+
+    function checkChanges() {
+        const currentName = document.getElementById('name').value;
+        const currentStatus = document.getElementById('status').value;
+        
+        if (currentName === initialName && currentStatus === initialStatus) {
+            updateBtn.disabled = true;
+        } else {
+            updateBtn.disabled = false;
+        }
+    }
+
+    // Add event listeners to form fields
+    document.getElementById('name').addEventListener('input', checkChanges);
+    document.getElementById('status').addEventListener('change', checkChanges);
+
+    // Initialize button state
+    checkChanges();
+
+    <c:if test="${not empty successMessage}">
+        // Update initial values when success message is shown
+        initialName = document.getElementById('name').value;
+        initialStatus = document.getElementById('status').value;
+        updateBtn.disabled = true;
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '${successMessage}',
+            showConfirmButton: false,
+            timer: 2000,
+            customClass: { popup: 'animated fadeInDown' }
+        });
+    </c:if>
+
+    <c:if test="${not empty errorMessage}">
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '${errorMessage}',
+            showConfirmButton: false,
+            timer: 2000,
+            customClass: { popup: 'animated fadeInDown' }
+        });
+    </c:if>
+</script>
 </body>
 </html>

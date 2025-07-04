@@ -12,6 +12,7 @@ import java.sql.SQLException;
 
 @WebServlet(name = "EditParentCategoryController", urlPatterns = {"/EditParentCategoryController"})
 public class EditParentCategoryController extends HttpServlet {
+
     private MaterialCategoryDAO categoryDAO;
 
     @Override
@@ -47,8 +48,8 @@ public class EditParentCategoryController extends HttpServlet {
         }
     }
 
+   
     @Override
-
 protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     String categoryIdParam = request.getParameter("categoryId");
     String name = request.getParameter("name");
@@ -79,15 +80,32 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             return;
         }
 
-        if (!name.equals(existingCategory.getName()) && categoryDAO.categoryExistsByName(name, 0)) {
-            request.setAttribute("errorMessage", "Category name already exists!");
+        // Check if there are any changes
+        if (name.equals(existingCategory.getName()) && status.equals(existingCategory.getStatus())) {
+            request.setAttribute("errorMessage", "No changes detected!");
+            request.setAttribute("category", existingCategory);
             request.getRequestDispatcher("/view/material/editParentCategory.jsp").forward(request, response);
             return;
         }
 
+        // Check for duplicate name only if name is changed
+        if (!name.equals(existingCategory.getName())) {
+            if (categoryDAO.categoryExistsByName(name, 0)) {
+                request.setAttribute("errorMessage", "Category name already exists!");
+                request.setAttribute("category", existingCategory);
+                request.getRequestDispatcher("/view/material/editParentCategory.jsp").forward(request, response);
+                return;
+            }
+        }
+
         categoryDAO.updateParentCategory(categoryId, name, status);
-        request.getSession().setAttribute("successMessage", "Parent category updated successfully!");
-        response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
+        
+        // Get updated category to show new values
+        MaterialCategory updatedCategory = categoryDAO.getParentCategoryById(categoryId);
+        request.setAttribute("category", updatedCategory);
+        request.setAttribute("successMessage", "Parent category updated successfully!");
+        request.getRequestDispatcher("/view/material/editParentCategory.jsp").forward(request, response);
+        
     } catch (NumberFormatException e) {
         request.setAttribute("errorMessage", "Invalid category ID format!");
         request.getRequestDispatcher("/view/material/editParentCategory.jsp").forward(request, response);
@@ -96,7 +114,6 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
         request.getRequestDispatcher("/view/material/editParentCategory.jsp").forward(request, response);
     }
 }
-
     @Override
     public String getServletInfo() {
         return "Servlet to edit parent material category";
