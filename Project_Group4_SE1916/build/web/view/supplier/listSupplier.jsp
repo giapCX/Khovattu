@@ -16,7 +16,7 @@
 
         <!-- style CSS -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
-              <style>
+        <style>
             .badge {
                 padding: 0.25rem 0.75rem;
                 border-radius: 0.5rem;
@@ -92,6 +92,9 @@
                     <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg flex items-center">
                         <i class="fas fa-search mr-2"></i> Search
                     </button>
+                    <a href="${pageContext.request.contextPath}/ListSupplierServlet" onclick="Listevent.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" class="bg-yellow-500 text-white px-6 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-undo mr-2"></i> Reset form
+                    </a>
                 </form>
 
                 <!-- Table -->

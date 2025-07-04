@@ -61,11 +61,14 @@
                     <input type="hidden" name="supplierId" value="${supplierId}" />
                     <input type="hidden" name="searchCategory" />
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchName" placeholder="Search name of material" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="searchName" value="${param.searchName}" placeholder="Search name of material" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg flex items-center">
                         <i class="fas fa-search mr-2"></i> Search
                     </button>
+                    <a href="FilterSupplierServlet?supplierId=${param.supplierId}&supplierName=${param.supplierName}"" onclick="Listevent.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" class="bg-yellow-500 text-white px-6 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-undo mr-2"></i> Reset form
+                    </a>
                 </form>
                 <!-- Table -->
                 <div class="table-container bg-white dark:bg-gray-800">

@@ -102,7 +102,7 @@ public class ProposalServlet extends HttpServlet {
                 proposalDetail.setQuantity(Double.parseDouble(quantities[i]));
                 proposalDetail.setMaterialCondition(materialConditions[i]);
             } catch (NumberFormatException e) {
-                request.setAttribute("error", "Invalid material ID");
+                request.setAttribute("error", "Invalid material");
                 request.getRequestDispatcher("/view/proposal/proposalOfEmployee.jsp").forward(request, response);
                 return;
             }

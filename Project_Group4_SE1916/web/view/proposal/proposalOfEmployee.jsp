@@ -62,7 +62,7 @@
                     </div>
                     <div class="space-y-2">
                         <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Note</label>
-                        <textarea class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" name="note" rows="3"></textarea>
+                        <textarea class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" name="note" rows="3" required></textarea>
                     </div> 
 
                     <div class="space-y-2">
@@ -83,7 +83,7 @@
                                     <tbody id="itemsBody">
                                         <tr class="border-b border-gray-200 dark:border-gray-700">
                                             <td>
-                                                <input list="materialList" class="w-lg px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md nameMaterialInput" name="materialName[]" autocomplete="off">
+                                                <input list="materialList" required class="w-lg px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md nameMaterialInput" name="materialName[]" autocomplete="off">
                                                 <datalist id="materialList">
                                                     <c:forEach var="cat" items="${material}">
                                                         <option 
@@ -100,7 +100,7 @@
                                             <td>
                                                 <input type="text" name="unit[]" class="w-lg px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md unitMaterial" readonly>
                                             </td>
-                                            <td><input type="number" name="quantity[]" class="w-lg px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" value="0.00" step="0.01" min="0.01" required></td>
+                                            <td><input type="number" name="quantity[]" class="w-lg px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md"  step="1" min="1" required></td>
                                             <td>
                                                 <select name="materialCondition[]" class="w-3/4 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" required>
                                                     <option value="new">New</option>
