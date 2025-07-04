@@ -368,53 +368,53 @@ public class ProposalDAO {
             conn.setAutoCommit(true);
         }
     }
+public Proposal getProposalById(int proposalId) {
+    Proposal proposal = null;
+    String sql = "SELECT ep.*, u.full_name, "
+            + "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, m.name AS material_name, m.unit AS material_unit, " // Thêm unit vào đây
+            + "pa.approval_id, pa.admin_approver_id, pa.director_approver_id, "
+            + "pa.admin_status, pa.director_status, "
+            + "pa.admin_approval_date, pa.admin_reason, pa.admin_note, "
+            + "pa.director_approval_date, pa.director_reason, pa.director_note "
+            + "FROM EmployeeProposals ep "
+            + "JOIN Users u ON ep.proposer_id = u.user_id "
+            + "LEFT JOIN ProposalDetails pd ON ep.proposal_id = pd.proposal_id "
+            + "LEFT JOIN Materials m ON pd.material_id = m.material_id "
+            + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
+            + "WHERE ep.proposal_id = ?";
 
-    public Proposal getProposalById(int proposalId) {
-        Proposal proposal = null;
-        String sql = "SELECT ep.*, u.full_name, "
-                + "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, m.name AS material_name, "
-                + "pa.approval_id, pa.admin_approver_id, pa.director_approver_id, "
-                + "pa.admin_status, pa.director_status, "
-                + "pa.admin_approval_date, pa.admin_reason, pa.admin_note, "
-                + "pa.director_approval_date, pa.director_reason, pa.director_note "
-                + "FROM EmployeeProposals ep "
-                + "JOIN Users u ON ep.proposer_id = u.user_id "
-                + "LEFT JOIN ProposalDetails pd ON ep.proposal_id = pd.proposal_id "
-                + "LEFT JOIN Materials m ON pd.material_id = m.material_id "
-                + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
-                + "WHERE ep.proposal_id = ?";
+    try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, proposalId);
+        ResultSet rs = ps.executeQuery();
 
-        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, proposalId);
-            ResultSet rs = ps.executeQuery();
+        Map<Integer, ProposalDetails> detailsMap = new LinkedHashMap<>();
+        ProposalApprovals approval = null;
 
-            Map<Integer, ProposalDetails> detailsMap = new LinkedHashMap<>();
-            ProposalApprovals approval = null;
+        while (rs.next()) {
+            if (proposal == null) {
+                proposal = new Proposal();
+                proposal.setProposalId(rs.getInt("proposal_id"));
+                proposal.setProposalType(rs.getString("proposal_type"));
+                proposal.setProposerId(rs.getInt("proposer_id"));
+                proposal.setSenderName(rs.getString("full_name"));
+                proposal.setNote(rs.getString("note"));
+                proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
+                proposal.setFinalStatus(rs.getString("final_status"));
+            }
 
-            while (rs.next()) {
-                if (proposal == null) {
-                    proposal = new Proposal();
-                    proposal.setProposalId(rs.getInt("proposal_id"));
-                    proposal.setProposalType(rs.getString("proposal_type"));
-                    proposal.setProposerId(rs.getInt("proposer_id"));
-                    proposal.setSenderName(rs.getString("full_name"));
-                    proposal.setNote(rs.getString("note"));
-                    proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
-                    proposal.setFinalStatus(rs.getString("final_status"));
-                }
-
-                // Detail
-                int detailId = rs.getInt("proposal_detail_id");
-                if (detailId > 0 && !detailsMap.containsKey(detailId)) {
-                    ProposalDetails detail = new ProposalDetails();
-                    detail.setProposalDetailId(detailId);
-                    detail.setProposal(proposal);
-                    detail.setMaterialId(rs.getInt("material_id"));
-                    detail.setMaterialName(rs.getString("material_name"));
-                    detail.setQuantity(rs.getDouble("quantity"));
-                    detail.setMaterialCondition(rs.getString("material_condition"));
-                    detailsMap.put(detailId, detail);
-                }
+            // Detail
+            int detailId = rs.getInt("proposal_detail_id");
+            if (detailId > 0 && !detailsMap.containsKey(detailId)) {
+                ProposalDetails detail = new ProposalDetails();
+                detail.setProposalDetailId(detailId);
+                detail.setProposal(proposal);
+                detail.setMaterialId(rs.getInt("material_id"));
+                detail.setMaterialName(rs.getString("material_name"));
+                detail.setQuantity(rs.getDouble("quantity"));
+                detail.setMaterialCondition(rs.getString("material_condition"));
+                detail.setUnit(rs.getString("material_unit")); // Thêm dòng này
+                detailsMap.put(detailId, detail);
+            }
 
                 // Approval (nếu có)
                 if (approval == null && rs.getObject("approval_id") != null) {
