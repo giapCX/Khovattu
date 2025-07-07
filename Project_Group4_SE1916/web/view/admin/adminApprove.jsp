@@ -485,7 +485,7 @@
 
                     <!-- Back to Dashboard -->
                     <div class="mt-6">
-                        <a href="${pageContext.request.contextPath}/adminDashboard" 
+                        <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" 
                            class="btn-primary text-white px-4 py-2 rounded-lg">Back to Dashboard</a>
                     </div>
                 </main>
