@@ -63,7 +63,7 @@ public class ForgetPassword extends HttpServlet {
         String newPassword = generateRandomPassword(8);
 
         // Update the password in the database
-        updatePassword(username, newPassword);
+        //updatePassword(username, newPassword);
 
         // Send the new password via email
         if (!sendEmail(email, newPassword)) {
