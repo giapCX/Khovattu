@@ -17,13 +17,38 @@ public class AdminApproveServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Retrieve parameters
-        String search = request.getParameter("search") != null ? request.getParameter("search") : "";
-        String dateFrom = request.getParameter("dateFrom") != null ? request.getParameter("dateFrom") : "";
-        String dateTo = request.getParameter("dateTo") != null ? request.getParameter("dateTo") : "";
-        String status = request.getParameter("status") != null ? request.getParameter("status") : "";
-        int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
-        int itemsPerPage = request.getParameter("itemsPerPage") != null ? Integer.parseInt(request.getParameter("itemsPerPage")) : 10;
+        // Retrieve and validate parameters
+        String search = request.getParameter("search") != null ? request.getParameter("search").trim() : "";
+        String dateFrom = request.getParameter("dateFrom") != null ? request.getParameter("dateFrom").trim() : "";
+        String dateTo = request.getParameter("dateTo") != null ? request.getParameter("dateTo").trim() : "";
+        String status = request.getParameter("status") != null ? request.getParameter("status").trim() : "";
+        int page = 1;
+        int itemsPerPage = 10;
+
+        // Safely parse page and itemsPerPage
+        try {
+            String pageStr = request.getParameter("page");
+            String itemsPerPageStr = request.getParameter("itemsPerPage");
+            if (pageStr != null && !pageStr.isEmpty()) {
+                page = Integer.parseInt(pageStr);
+            }
+            if (itemsPerPageStr != null && !itemsPerPageStr.isEmpty()) {
+                itemsPerPage = Integer.parseInt(itemsPerPageStr);
+            }
+            // Ensure valid values
+            if (page < 1) {
+                page = 1;
+            }
+            if (itemsPerPage < 1) {
+                itemsPerPage = 10;
+            }
+        } catch (NumberFormatException e) {
+            // Log the error (optional, add logging framework like Log4j)
+            System.err.println("Invalid number format for page or itemsPerPage: " + e.getMessage());
+            page = 1;
+            itemsPerPage = 10;
+        }
+
         int offset = (page - 1) * itemsPerPage;
 
         try (Connection conn = DBContext.getConnection()) {
@@ -36,7 +61,7 @@ public class AdminApproveServlet extends HttpServlet {
 
             // Set attributes for JSP
             request.setAttribute("pendingProposals", pendingProposals);
-            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalPages", totalPages > 0 ? totalPages : 1);
             request.setAttribute("currentPage", page);
             request.setAttribute("search", search);
             request.setAttribute("dateFrom", dateFrom);
@@ -49,5 +74,10 @@ public class AdminApproveServlet extends HttpServlet {
         } catch (SQLException e) {
             throw new ServletException("Database error: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp); // Handle POST same as GET if needed
     }
 }

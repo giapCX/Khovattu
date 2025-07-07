@@ -264,8 +264,6 @@
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-
-
                 <a href="${pageContext.request.contextPath}/ListParentCategoryController" class="nav-item flex items-center p-3">
                     <i class="fas fa-box-open mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh mục vật tư</span>
@@ -310,6 +308,11 @@
                         <span class="text-base">Lịch sử nhập kho</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
+                </a>
+                <a href="${pageContext.request.contextPath}/view/admin/adminApprove.jsp" class="nav-item flex items-center p-3">
+                    <i class="fas fa-check-circle mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Approve Request</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
             </nav>
             <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">
@@ -397,7 +400,7 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/AdminApproveServlet" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Approve Orders</a>
+                        <a href="${pageContext.request.contextPath}/AdminApproveServlet" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Approve Request</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
