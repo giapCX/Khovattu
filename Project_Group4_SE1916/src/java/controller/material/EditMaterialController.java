@@ -1,20 +1,18 @@
+//editMaterial
 package controller.material;
 
 import Dal.DBContext;
 import dao.MaterialDAO;
 import dao.MaterialCategoryDAO;
-import dao.SupplierDAO;
 import jakarta.servlet.ServletException;
 import model.Material;
 import model.MaterialCategory;
-import model.Supplier;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -22,7 +20,6 @@ public class EditMaterialController extends HttpServlet {
 
     private MaterialDAO materialDAO;
     private MaterialCategoryDAO categoryDAO;
-    private SupplierDAO supplierDAO;
 
     // Khởi tạo các DAO để làm việc với database
     @Override
@@ -30,7 +27,6 @@ public class EditMaterialController extends HttpServlet {
         materialDAO = new MaterialDAO();
         categoryDAO = new MaterialCategoryDAO();
         Connection conn = DBContext.getConnection();
-        supplierDAO = new SupplierDAO(conn);
     }
 
     // Xử lý GET request: Hiển thị form chỉnh sửa vật tư
@@ -41,21 +37,15 @@ public class EditMaterialController extends HttpServlet {
             // 1. Lấy ID vật tư từ tham số URL
             int materialId = Integer.parseInt(request.getParameter("id"));
             String origin = request.getParameter("origin");
-            String supplierId = request.getParameter("supplierId");
-            String supplierName = request.getParameter("supplierName");
 
-            // 2. Lấy thông tin vật tư, danh mục và nhà cung cấp từ database
+            // 2. Lấy thông tin vật tư và danh mục từ database
             Material material = materialDAO.getMaterialById(materialId);
             List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
-            List<Supplier> suppliers = supplierDAO.getAllSuppliers();
 
             // 3. Gửi dữ liệu tới JSP để hiển thị form
             request.setAttribute("material", material);
             request.setAttribute("categories", categories);
-            request.setAttribute("suppliers", suppliers);
             request.setAttribute("origin", origin);
-            request.setAttribute("supplierId", supplierId);
-            request.setAttribute("supplierName", supplierName);
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
         } catch (SQLException e) {
             // Nếu có lỗi khi lấy dữ liệu, báo lỗi chi tiết
@@ -71,8 +61,6 @@ public class EditMaterialController extends HttpServlet {
             throws ServletException, IOException {
         Material material = new Material();
         String origin = request.getParameter("origin");
-        String supplierId = request.getParameter("supplierId");
-        String supplierName = request.getParameter("supplierName");
 
         try {
             // Lấy và validate các tham số từ form
@@ -83,7 +71,6 @@ public class EditMaterialController extends HttpServlet {
             String unit = request.getParameter("unit");
             String imageUrl = request.getParameter("imageUrl");
             String categoryIdStr = request.getParameter("category");
-            String[] supplierIds = request.getParameterValues("suppliers");
 
             // Validation rules
             StringBuilder errorMessage = new StringBuilder();
@@ -139,19 +126,12 @@ public class EditMaterialController extends HttpServlet {
                 errorMessage.append("Invalid category selection. ");
             }
 
-            // Validate suppliers: at least one must be selected
-            if (supplierIds == null || supplierIds.length == 0) {
-                errorMessage.append("At least one supplier must be selected. ");
-            }
-
             // If there are validation errors, reload form with error message
             if (errorMessage.length() > 0) {
                 request.setAttribute("message", errorMessage.toString());
                 request.setAttribute("messageType", "danger");
                 reloadFormData(request, materialIdStr, code, name, description, unit, imageUrl);
                 request.setAttribute("origin", origin);
-                request.setAttribute("supplierId", supplierId);
-                request.setAttribute("supplierName", supplierName);
                 request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
                 return;
             }
@@ -169,13 +149,8 @@ public class EditMaterialController extends HttpServlet {
             category.setCategoryId(categoryId);
             material.setCategory(category);
 
-            List<Integer> supplierIdList = new ArrayList<>();
-            for (String id : supplierIds) {
-                supplierIdList.add(Integer.parseInt(id));
-            }
-
             // Cập nhật vào DB
-            materialDAO.updateMaterial(material, supplierIdList);
+            materialDAO.updateMaterial(material);
 
             // Gán thông báo thành công
             request.setAttribute("message", "Update material success!");
@@ -188,8 +163,6 @@ public class EditMaterialController extends HttpServlet {
             Material updatedMaterial = materialDAO.getMaterialById(material.getMaterialId());
             request.setAttribute("material", updatedMaterial);
             request.setAttribute("origin", origin);
-            request.setAttribute("supplierId", supplierId);
-            request.setAttribute("supplierName", supplierName);
 
             // Hiển thị lại trang chỉnh sửa
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
@@ -201,8 +174,6 @@ public class EditMaterialController extends HttpServlet {
                     request.getParameter("name"), request.getParameter("description"),
                     request.getParameter("unit"), request.getParameter("imageUrl"));
             request.setAttribute("origin", origin);
-            request.setAttribute("supplierId", supplierId);
-            request.setAttribute("supplierName", supplierName);
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
         } catch (SQLException e) {
             request.setAttribute("message", "Error updating material: " + e.getMessage());
@@ -211,8 +182,6 @@ public class EditMaterialController extends HttpServlet {
                     request.getParameter("name"), request.getParameter("description"),
                     request.getParameter("unit"), request.getParameter("imageUrl"));
             request.setAttribute("origin", origin);
-            request.setAttribute("supplierId", supplierId);
-            request.setAttribute("supplierName", supplierName);
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
         }
     }
@@ -223,9 +192,7 @@ public class EditMaterialController extends HttpServlet {
             throws ServletException {
         try {
             List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
-            List<Supplier> suppliers = supplierDAO.getAllSuppliers();
             request.setAttribute("categories", categories);
-            request.setAttribute("suppliers", suppliers);
 
             // Giữ lại thông tin vật tư đã nhập
             Material material = new Material();

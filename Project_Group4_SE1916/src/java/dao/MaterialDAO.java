@@ -1,3 +1,4 @@
+//MaDAO
 package dao;
 
 import Dal.DBContext;
@@ -194,7 +195,7 @@ public class MaterialDAO {
         }
     }
 
-    public void updateMaterial(Material material, List<Integer> supplierIdList) throws SQLException {
+    public void updateMaterial(Material material) throws SQLException {
         String sqlMaterial = "UPDATE Materials SET code = ?, category_id = ?, name = ?, description = ?, unit = ?, image_url = ? WHERE material_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sqlMaterial)) {
             ps.setString(1, material.getCode());
@@ -206,23 +207,23 @@ public class MaterialDAO {
             ps.setInt(7, material.getMaterialId());
             ps.executeUpdate();
 
-            String deleteSql = "DELETE FROM SupplierMaterials WHERE material_id = ?";
-            try (PreparedStatement psDelete = conn.prepareStatement(deleteSql)) {
-                psDelete.setInt(1, material.getMaterialId());
-                psDelete.executeUpdate();
-            }
-
-            if (supplierIdList != null && !supplierIdList.isEmpty()) {
-                String sqlSupplier = "INSERT INTO SupplierMaterials (supplier_id, material_id) VALUES (?, ?)";
-                try (PreparedStatement psSupplier = conn.prepareStatement(sqlSupplier)) {
-                    for (Integer supplierId : supplierIdList) {
-                        psSupplier.setInt(1, supplierId);
-                        psSupplier.setInt(2, material.getMaterialId());
-                        psSupplier.addBatch();
-                    }
-                    psSupplier.executeBatch();
-                }
-            }
+//            String deleteSql = "DELETE FROM SupplierMaterials WHERE material_id = ?";
+//            try (PreparedStatement psDelete = conn.prepareStatement(deleteSql)) {
+//                psDelete.setInt(1, material.getMaterialId());
+//                psDelete.executeUpdate();
+//            }
+//
+//            if (supplierIdList != null && !supplierIdList.isEmpty()) {
+//                String sqlSupplier = "INSERT INTO SupplierMaterials (supplier_id, material_id) VALUES (?, ?)";
+//                try (PreparedStatement psSupplier = conn.prepareStatement(sqlSupplier)) {
+//                    for (Integer supplierId : supplierIdList) {
+//                        psSupplier.setInt(1, supplierId);
+//                        psSupplier.setInt(2, material.getMaterialId());
+//                        psSupplier.addBatch();
+//                    }
+//                    psSupplier.executeBatch();
+//                }
+//            }
         }
     }
 

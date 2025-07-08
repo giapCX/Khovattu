@@ -1,3 +1,4 @@
+edit.jsp
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -338,7 +339,12 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
-
+                        <div class="flex items-center gap-4 mb-6">
+                            <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
+                                <i class="fas fa-bars text-2xl"></i>
+                            </button>
+                            <!--                            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Material</h2>-->
+                        </div>
                         <div class="form-container">
                             <c:if test="${not empty message}">
                                 <div class="alert alert-${messageType} fade show" role="alert">
@@ -347,12 +353,6 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             </c:if>
-                            <div class="flex items-center gap-4 mb-6">
-                                <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
-                                    <i class="fas fa-bars text-2xl"></i>
-                                </button>
-                                <!--                            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Material</h2>-->
-                            </div>
                             <h2 class="form-header">
                                 <i class="fas fa-edit me-2"></i>Edit Material
                             </h2>
@@ -360,8 +360,8 @@
                             <form id="editMaterialForm" action="${pageContext.request.contextPath}/EditMaterialController" method="post">
                                 <input type="hidden" name="id" value="${material.materialId}" />
                                 <input type="hidden" name="origin" value="${origin}" />
-                                <input type="hidden" name="supplierId" value="${supplierId}" />
-                                <input type="hidden" name="supplierName" value="${supplierName}" />
+<!--                                <input type="hidden" name="supplierId" value="${supplierId}" />
+                                <input type="hidden" name="supplierName" value="${supplierName}" />-->
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="code" class="form-label">Material Code</label>
@@ -399,31 +399,7 @@
                                     <input type="url" class="form-control" id="imageUrl" name="imageUrl" value="${material.imageUrl}" placeholder="https://example.com/image.jpg">
                                 </div>
 
-                                <div class="mb-4">
-                                    <label class="form-label">Suppliers</label>
-                                    <div class="suppliers-container">
-                                        <div class="row">
-                                            <c:forEach var="sup" items="${suppliers}">
-                                                <div class="col-md-6">
-                                                    <div class="supplier-item">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input supplier-checkbox" type="checkbox" 
-                                                                   id="supplier_${sup.supplierId}" name="suppliers" 
-                                                                   value="${sup.supplierId}"
-                                                                   <c:forEach var="matSup" items="${material.suppliers}">
-                                                                       <c:if test="${matSup.supplierId == sup.supplierId}">checked</c:if>
-                                                                   </c:forEach>>
-                                                            <label class="form-check-label" for="supplier_${sup.supplierId}">
-                                                                <i class="fas fa-truck me-2"></i>${sup.supplierName}
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </c:forEach>
-                                        </div>
-                                    </div>
-                                    <div id="supplierError" class="error-message">Please select at least one supplier.</div>
-                                </div>
+
 
                                 <div class="d-flex justify-content-between">
                                     <div>
@@ -485,16 +461,16 @@
                     }
                 });
 
-                // Validate at least one supplier is selected
-                $('#editMaterialForm').on('submit', function (e) {
-                    const checkedSuppliers = $('.supplier-checkbox:checked').length;
-                    if (checkedSuppliers === 0) {
-                        e.preventDefault();
-                        $('#supplierError').show();
-                    } else {
-                        $('#supplierError').hide();
-                    }
-                });
+//                // Validate at least one supplier is selected
+//                $('#editMaterialForm').on('submit', function (e) {
+//                    const checkedSuppliers = $('.supplier-checkbox:checked').length;
+//                    if (checkedSuppliers === 0) {
+//                        e.preventDefault();
+//                        $('#supplierError').show();
+//                    } else {
+//                        $('#supplierError').hide();
+//                    }
+//                });
             });
         </script>
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
