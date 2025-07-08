@@ -440,8 +440,8 @@ public class UserDAO {
     public int countUsersByNameRoleStatus(String search, Integer roleId, String status) throws SQLException {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(*) FROM Users u "
-                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
-                + "WHERE 1=1 "
+                + "JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE r.role_name != 'admin' "
         );
 
         List<Object> params = new ArrayList<>();
@@ -477,9 +477,9 @@ public class UserDAO {
 
     public List<User> searchUsersByNameRoleStatusWithPaging(String search, Integer roleId, String status, int offset, int limit) throws SQLException {
         StringBuilder sql = new StringBuilder(
-                "SELECT u.*, r.role_id, r.role_name FROM Users u "
-                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
-                + "WHERE 1=1 "
+                "SELECT u.*, r.role_name FROM Users u "
+                + "JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE r.role_name != 'admin' "
         );
 
         List<Object> params = new ArrayList<>();
@@ -580,7 +580,7 @@ public class UserDAO {
         }
         return null;
     }
-    
+
     public boolean isUsernameOrEmailExists(String username, String email) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {

@@ -89,8 +89,8 @@
                     <div class="flex-1 min-w-[150px]">
                         <select name="roleId" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                             <option value="">All roles</option>
-                            <c:forEach var="role" items="${roles}">
-                                <option value="${role.roleId}" ${param.roleId == role.roleId ? "selected" : ""}>${role.roleName}</option>
+                            <c:forEach var="r" items="${roles}">
+                                <option value="${r.roleId}" ${param.roleId == r.roleId ? "selected" : ""}>${r.roleName}</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -107,7 +107,7 @@
                 </form>
 
                 <!-- Table -->
-                <div class="table-container bg-white dark:bg-gray-800">
+                <div class="table-container bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full table-auto">
                             <thead>

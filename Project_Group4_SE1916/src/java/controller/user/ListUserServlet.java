@@ -74,7 +74,7 @@ public class ListUserServlet extends HttpServlet {
             // Lấy danh sách user theo điều kiện + phân trang
             List<User> users = userDAO.searchUsersByNameRoleStatusWithPaging(search, roleId, status, offset, recordsPerPage);
             List<Role> roles = roleDAO.getAllRoles();
-
+            roles.removeIf(role -> role.getRoleId() == 1);
             int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
 
             request.setAttribute("data", users);
@@ -93,5 +93,4 @@ public class ListUserServlet extends HttpServlet {
     }
 }
 
-// nếu cần xử lý POST cho thêm/sửa user thì bạn có thể thêm method doPost ở đây
 
