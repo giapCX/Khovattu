@@ -146,20 +146,18 @@
                 </div>
 
                 <!-- Pagination -->
-                <c:if test="${totalPages > 1}">
-                    <div class="mt-6 flex justify-center pagination">
-                        <c:forEach begin="1" end="${totalPages}" var="i">
-                            <c:choose>
-                                <c:when test="${i == currentPage}">
-                                    <span>[${i}]</span>
-                                </c:when>
-                                <c:otherwise>
-                                    <a href="listuser?page=${i}&search=${param.search}&roleId=${param.roleId}&status=${param.status}">${i}</a>
-                                </c:otherwise>
-                            </c:choose>
-                        </c:forEach>
-                    </div>
-                </c:if>
+                <div class="mt-6 flex justify-center pagination">
+                    <c:forEach begin="1" end="${totalPages}" var="i">
+                        <c:choose>
+                            <c:when test="${i == currentPage}">
+                                <span>[${i}]</span>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="listuser?page=${i}&search=${param.search}&roleId=${param.roleId}&status=${param.status}">${i}</a>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:forEach>
+                </div>
 
                 <div class="mt-6 flex justify-center">
                     <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
