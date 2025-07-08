@@ -21,6 +21,7 @@ public class ChangePassword extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
+        String oldPass = request.getParameter("oldpassword");
         String newPass = request.getParameter("password");
         String newCfPass = request.getParameter("cfpassword");
 //        Account acc =  (Account) request.getSession().getAttribute("accountForgetPass");
@@ -35,7 +36,11 @@ public class ChangePassword extends HttpServlet {
 
         AccountDAO accdb = new AccountDAO();
         String oldHashedPassword = accdb.getPasswordByUsername(username); // Lấy mật khẩu hiện tại
-        if (!newPass.equals(newCfPass)) {
+        if(!BCrypt.checkpw(oldPass, oldHashedPassword)){
+             request.setAttribute("mess2", "Old password is wrong!");
+            request.getRequestDispatcher("./changePassword.jsp").forward(request, response);
+        }        
+        else if (!newPass.equals(newCfPass)) {
             request.setAttribute("mess2", "Password do not match.Please re-enter");
             request.getRequestDispatcher("./changePassword.jsp").forward(request, response);
         } //        else if (newPass.equals(oldPassword)) {

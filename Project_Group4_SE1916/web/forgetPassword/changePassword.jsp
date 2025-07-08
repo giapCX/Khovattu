@@ -13,6 +13,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link rel="icon" href="../Assets/icon/favicon.png"/>
         <title>Change Password</title>
         <style>
@@ -91,16 +92,16 @@
                 font-weight: 500;
                 text-decoration: none;
                 transition: color 0.2s ease;
-                }
+            }
             .signup-login-link:hover {
                 color: #2563EB;
                 text-decoration: underline;
             }
-            
+
             .signup-cancel:hover {
                 color: red;
                 text-decoration: underline;
-                
+
             }
         </style>
     </head>
@@ -108,15 +109,33 @@
         <div class="signup">
             <h1 class="signup-heading">Change Password</h1>
             <form action="change_password" method="POST" class="signup-form" autocomplete="off">
-                <label for="password" class="signup-label">new password</label>
-                <input type="password" name="password" class="signup-input" required>
+                <!-- Old Password -->
+                <label for="oldpassword" class="signup-label">Old password</label>
+                <div class="relative">
+                    <input type="password" name="oldpassword" id="oldpassword" class="signup-input pr-10" required>
+                    <i class="fa-solid fa-eye absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                       onclick="togglePassword('oldpassword', this)"></i>
+                </div>
 
+                <!-- New Password -->
+                <label for="password" class="signup-label">New password</label>
+                <div class="relative">
+                    <input type="password" name="password" id="password" class="signup-input pr-10" required>
+                    <i class="fa-solid fa-eye absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                       onclick="togglePassword('password', this)"></i>
+                </div>
+
+                <!-- Confirm Password -->
                 <label for="cfpassword" class="signup-label">Re-enter new password</label>
-                <input type="password" name="cfpassword" class="signup-input" required>
-               
+                <div class="relative">
+                    <input type="password" name="cfpassword" id="cfpassword" class="signup-input pr-10" required>
+                    <i class="fa-solid fa-eye absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                       onclick="togglePassword('cfpassword', this)"></i>
+                </div>
 
                 <input class="signup-submit" type="submit" value="OK">
             </form>
+
             <% if (request.getAttribute("mess1") != null) { %>
             <div class="alert alert-danger" role="alert">${mess1}</div>
             <% } %>
@@ -142,7 +161,16 @@
             %>
             <a href="<%= redirectUrl%>" class="signup-cancel">Cancel</a>
         </div>
-    </body>
+        <script>
+            function togglePassword(id, icon) {
+                const input = document.getElementById(id);
+                const isPassword = input.type === "password";
+                input.type = isPassword ? "text" : "password";
+                icon.classList.toggle("fa-eye");
+                icon.classList.toggle("fa-eye-slash");
+            }
+        </script>
+    </body>    
 </html>
 
 
