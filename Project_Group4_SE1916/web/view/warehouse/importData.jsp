@@ -6,7 +6,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Import Warehouse Data - Inventory Management System</title>
-        <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
             tailwind.config = {
@@ -31,12 +30,9 @@
                 }
             }
         </script>
-        <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <!-- Toastify -->
         <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-        <!-- jQuery UI for Autocomplete -->
         <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -195,7 +191,6 @@
         </style>
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
-        <!-- Session Check -->
         <%
             String username = (String) session.getAttribute("username");
             if (username == null) {
@@ -204,7 +199,6 @@
             }
         %>
 
-        <!-- Sidebar -->
         <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50">
             <div class="flex items-center mb-8">
                 <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
@@ -312,17 +306,15 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="flex-1 p-8 transition-all duration-300">
-            <!-- Header -->
             <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div class="flex items-center gap-4">
                     <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Add Import Voucher</h1>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Create a new import voucher for warehouse materials</p>
+                        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Add Import Receipt</h1>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Create a new import receipt for warehouse materials</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-6">
@@ -341,16 +333,15 @@
                 </div>
             </header>
 
-            <!-- Form Content -->
             <div class="table-container bg-white dark:bg-gray-800 mb-8">
                 <div class="p-6">
                     <div id="successAlert" class="bg-green-500 text-white rounded-lg p-4 mb-4" role="alert"></div>
                     <div id="errorAlert" class="bg-red-500 text-white rounded-lg p-4 mb-4" role="alert"></div>
                     <form id="importForm" method="post" action="${pageContext.request.contextPath}/ImportMaterialServlet">
                         <div class="mb-6">
-                            <label for="voucherId" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Import Voucher Code</label>
-                            <input type="text" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 search-input" id="voucherId" name="voucher_id" required pattern="[A-Za-z0-9-_]+">
-                            <div id="voucherError" class="error mt-2"></div>
+                            <label for="receiptId" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Import Receipt Code</label>
+                            <input type="text" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 search-input" id="receiptId" name="receipt_id" required pattern="[A-Za-z0-9-_]+">
+                            <div id="receiptError" class="error mt-2"></div>
                         </div>
                         <div class="mb-6">
                             <label for="importer" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Importer</label>
@@ -468,186 +459,169 @@
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="bg-gray-100 dark:bg-gray-800 text-center p-6 mt-8 border-t border-gray-200 dark:border-gray-700 transition-all duration-300">
             <p class="text-gray-600 dark:text-gray-300 text-sm">Inventory Management System - Version 2.0 © 2025 | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Contact Support</a></p>
         </footer>
 
-        <!-- JavaScript -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
         <script>
-                                    // Toggle Sidebar
-                                    const sidebar = document.getElementById('sidebar');
-                                    const toggleSidebar = document.getElementById('toggleSidebar');
-                                    const toggleSidebarMobile = document.getElementById('toggleSidebarMobile');
+            const sidebar = document.getElementById('sidebar');
+            const toggleSidebar = document.getElementById('toggleSidebar');
+            const toggleSidebarMobile = document.getElementById('toggleSidebarMobile');
 
-                                    function toggleSidebarVisibility() {
-                                        sidebar.classList.toggle('active');
-                                        sidebar.classList.toggle('hidden');
-                                    }
+            function toggleSidebarVisibility() {
+                sidebar.classList.toggle('active');
+                sidebar.classList.toggle('hidden');
+            }
 
-                                    // Prevent sidebar from closing when clicking inside it
-                                    sidebar.addEventListener('click', (event) => {
-                                        event.stopPropagation();
-                                    });
+            sidebar.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
 
-                                    // Toggle sidebar only with toggle buttons
-                                    toggleSidebar.addEventListener('click', toggleSidebarVisibility);
-                                    toggleSidebarMobile.addEventListener('click', toggleSidebarVisibility);
+            toggleSidebar.addEventListener('click', toggleSidebarVisibility);
+            toggleSidebarMobile.addEventListener('click', toggleSidebarVisibility);
 
-                                    // Remove automatic closing when clicking outside
-                                    // Sidebar will only close when toggle buttons are clicked
+            document.addEventListener('DOMContentLoaded', () => {
+                const toggles = document.querySelectorAll('.toggle-submenu');
+                toggles.forEach(toggle => {
+                    toggle.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        const submenu = toggle.parentElement.querySelector('.submenu');
+                        submenu.classList.toggle('hidden');
+                        const icon = toggle.querySelector('.fa-chevron-down');
+                        icon.classList.toggle('rotate-180');
+                    });
+                });
+            });
 
-                                    document.addEventListener('DOMContentLoaded', () => {
-                                        const toggles = document.querySelectorAll('.toggle-submenu');
-                                        toggles.forEach(toggle => {
-                                            toggle.addEventListener('click', (event) => {
-                                                event.stopPropagation(); // Prevent submenu toggle from affecting sidebar
-                                                const submenu = toggle.parentElement.querySelector('.submenu');
-                                                submenu.classList.toggle('hidden');
-                                                const icon = toggle.querySelector('.fa-chevron-down');
-                                                icon.classList.toggle('rotate-180');
-                                            });
-                                        });
-                                    });
+            sidebar.classList.add('hidden');
 
-                                    // Initialize sidebar as hidden
-                                    sidebar.classList.add('hidden');
+            const toggleDarkMode = document.getElementById('toggleDarkMode');
+            toggleDarkMode.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const icon = toggleDarkMode.querySelector('i');
+                icon.classList.toggle('fa-moon');
+                icon.classList.toggle('fa-sun');
+                localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            });
 
-                                    // Dark Mode Toggle
-                                    const toggleDarkMode = document.getElementById('toggleDarkMode');
-                                    toggleDarkMode.addEventListener('click', () => {
-                                        document.body.classList.toggle('dark-mode');
-                                        const icon = toggleDarkMode.querySelector('i');
-                                        icon.classList.toggle('fa-moon');
-                                        icon.classList.toggle('fa-sun');
-                                        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-                                    });
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                toggleDarkMode.querySelector('i').classList.replace('fa-moon', 'fa-sun');
+            }
 
-                                    // Load Dark Mode Preference
-                                    if (localStorage.getItem('darkMode') === 'true') {
-                                        document.body.classList.add('dark-mode');
-                                        toggleDarkMode.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-                                    }
+            function showToast(message) {
+                Toastify({
+                    text: message,
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#3b82f6",
+                    stopOnFocus: true,
+                    className: "rounded-lg shadow-lg",
+                    style: {borderRadius: "0.5rem"}
+                }).showToast();
+            }
 
-                                    // Toast Notification
-                                    function showToast(message) {
-                                        Toastify({
-                                            text: message,
-                                            duration: 3000,
-                                            gravity: "top",
-                                            position: "right",
-                                            backgroundColor: "#3b82f6",
-                                            stopOnFocus: true,
-                                            className: "rounded-lg shadow-lg",
-                                            style: {borderRadius: "0.5rem"}
-                                        }).showToast();
-                                    }
+            let materialData = [];
 
-                                    // Form JavaScript
-                                    let materialData = [];
+            function attachMaterialAutocomplete(materialInput) {
+                $(materialInput).autocomplete({
+                    source: function (request, response) {
+                        const term = request.term.toLowerCase();
+                        fetch('${pageContext.request.contextPath}/ImportMaterialServlet', {
+                            method: 'GET',
+                            headers: {'Accept': 'application/json'}
+                        })
+                            .then(res => {
+                                if (!res.ok) throw new Error(`Server error: ${res.status}`);
+                                return res.json();
+                            })
+                            .then(data => {
+                                materialData = data;
+                                const filtered = materialData.filter(mat => mat.name.toLowerCase().includes(term));
+                                response(filtered.map(mat => ({
+                                    label: mat.name,
+                                    value: mat.materialId,
+                                    code: mat.code || mat.materialCode || 'N/A',
+                                    unit: mat.unit || '',
+                                    suppliers: mat.suppliers || []
+                                })));
+                            })
+                            .catch(error => {
+                                console.error('Error loading materials:', error);
+                                showToast(`Unable to load material data: ${error.message}`);
+                            });
+                    },
+                    select: function (event, ui) {
+                        const row = $(this).closest("tr");
+                        row.find(".material-name-select").val(ui.item.label);
+                        row.find(".material-id-hidden").val(ui.item.value);
+                        row.find(".material-code-select").val(ui.item.code);
+                        row.find(".unit-display").val(ui.item.unit);
 
-                                    function attachMaterialAutocomplete(materialInput) {
-                                        $(materialInput).autocomplete({
-                                            source: function (request, response) {
-                                                const term = request.term.toLowerCase();
-                                                fetch('${pageContext.request.contextPath}/ImportMaterialServlet', {
-                                                    method: 'GET',
-                                                    headers: {'Accept': 'application/json'}
-                                                })
-                                                        .then(res => {
-                                                            if (!res.ok)
-                                                                throw new Error(`Server error: ${res.status}`);
-                                                            return res.json();
-                                                        })
-                                                        .then(data => {
-                                                            materialData = data;
-                                                            console.log('Material Data:', data); // Log data to inspect structure
-                                                            const filtered = materialData.filter(mat => mat.name.toLowerCase().includes(term));
-                                                            response(filtered.map(mat => ({
-                                                                    label: mat.name,
-                                                                    value: mat.materialId,
-                                                                    code: mat.code || mat.materialCode || 'N/A', // Fallback to materialCode or 'N/A'
-                                                                    unit: mat.unit || '',
-                                                                    suppliers: mat.suppliers || []
-                                                                })));
-                                                        })
-                                                        .catch(error => {
-                                                            console.error('Error loading materials:', error);
-                                                            showToast(`Unable to load material data: ${error.message}`);
-                                                        });
-                                            },
-                                            select: function (event, ui) {
-                                                const row = $(this).closest("tr");
-                                                row.find(".material-name-select").val(ui.item.label);
-                                                row.find(".material-id-hidden").val(ui.item.value);
-                                                const codeInput = row.find(".material-code-select");
-                                                codeInput.val(ui.item.code); // Set material code
-                                                console.log('Selected material code:', ui.item.code); // Log to verify
-                                                row.find(".unit-display").val(ui.item.unit);
+                        const supplierSelect = row.find(".supplier-select");
+                        supplierSelect.empty().append('<option value="">-- Select Supplier --</option>');
+                        if (ui.item.suppliers && ui.item.suppliers.length > 0) {
+                            ui.item.suppliers.forEach(supplier => {
+                                supplierSelect.append(new Option(supplier.supplierName, supplier.supplierId));
+                            });
+                            supplierSelect.prop('disabled', false);
+                        } else {
+                            supplierSelect.html('<option value="">No Suppliers Available</option>');
+                            supplierSelect.prop('disabled', true);
+                            showToast('No suppliers are associated with material "' + ui.item.label + '". Please contact the administrator.');
+                        }
 
-                                                const supplierSelect = row.find(".supplier-select");
-                                                supplierSelect.empty().append('<option value="">-- Select Supplier --</option>');
-                                                if (ui.item.suppliers && ui.item.suppliers.length > 0) {
-                                                    ui.item.suppliers.forEach(supplier => {
-                                                        supplierSelect.append(new Option(supplier.supplierName, supplier.supplierId));
-                                                    });
-                                                    supplierSelect.prop('disabled', false);
-                                                } else {
-                                                    supplierSelect.html('<option value="">No Suppliers Available</option>');
-                                                    supplierSelect.prop('disabled', true);
-                                                    showToast('No suppliers are associated with material "' + ui.item.label + '". Please contact the administrator.');
-                                                }
+                        updateTotalPrice(row[0]);
+                        validateSuppliers();
+                        return false;
+                    },
+                    minLength: 1
+                });
+            }
 
-                                                updateTotalPrice(row[0]);
-                                                validateSuppliers();
-                                                return false;
-                                            },
-                                            minLength: 1
-                                        });
-                                    }
+            function validateSuppliers() {
+                const supplierSelects = document.querySelectorAll('.supplier-select');
+                let firstSupplierId = null;
+                let isValid = true;
 
-                                    function validateSuppliers() {
-                                        const supplierSelects = document.querySelectorAll('.supplier-select');
-                                        let firstSupplierId = null;
-                                        let isValid = true;
+                supplierSelects.forEach((select, index) => {
+                    if (select.value && !firstSupplierId) {
+                        firstSupplierId = select.value;
+                    } else if (select.value && select.value !== firstSupplierId) {
+                        isValid = false;
+                        showToast(`All materials must be supplied by the same supplier. Please select supplier ${firstSupplierId} for row ${index + 1}.`);
+                        select.classList.add('border-red-500');
+                    } else {
+                        select.classList.remove('border-red-500');
+                    }
+                });
+                document.getElementById('saveImportBtn').disabled = !isValid || supplierSelects.length === 0 || [...supplierSelects].every(select => !select.value);
+            }
 
-                                        supplierSelects.forEach((select, index) => {
-                                            if (select.value && !firstSupplierId) {
-                                                firstSupplierId = select.value;
-                                            } else if (select.value && select.value !== firstSupplierId) {
-                                                isValid = false;
-                                                showToast(`All materials must be supplied by the same supplier. Please select supplier ${firstSupplierId} for row ${index + 1}.`);
-                                                select.classList.add('border-red-500');
-                                            } else {
-                                                select.classList.remove('border-red-500');
-                                            }
-                                        });
-                                        document.getElementById('saveImportBtn').disabled = !isValid || supplierSelects.length === 0 || [...supplierSelects].every(select => !select.value);
-                                    }
+            function updateSerialNumbers() {
+                const rows = document.querySelectorAll('#materialTableBody tr');
+                rows.forEach((row, index) => {
+                    row.querySelector('.serial-number').textContent = index + 1;
+                });
+            }
 
-                                    function updateSerialNumbers() {
-                                        const rows = document.querySelectorAll('#materialTableBody tr');
-                                        rows.forEach((row, index) => {
-                                            row.querySelector('.serial-number').textContent = index + 1;
-                                        });
-                                    }
+            function updateRemoveButtons() {
+                const rows = document.querySelectorAll('#materialTableBody tr');
+                const removeButtons = document.querySelectorAll('.remove-row');
+                const isSingleRow = rows.length === 1;
+                removeButtons.forEach(button => {
+                    button.disabled = isSingleRow;
+                    button.classList.toggle('btn-disabled', isSingleRow);
+                });
+            }
 
-                                    function updateRemoveButtons() {
-                                        const rows = document.querySelectorAll('#materialTableBody tr');
-                                        const removeButtons = document.querySelectorAll('.remove-row');
-                                        const isSingleRow = rows.length === 1;
-                                        removeButtons.forEach(button => {
-                                            button.disabled = isSingleRow;
-                                            button.classList.toggle('btn-disabled', isSingleRow);
-                                        });
-                                    }
-
-                                    function addMaterialRow() {
-                                        const tableBody = document.getElementById('materialTableBody');
-                                        const row = document.createElement('tr');
-                                        row.innerHTML = `
+            function addMaterialRow() {
+                const tableBody = document.getElementById('materialTableBody');
+                const row = document.createElement('tr');
+                row.innerHTML = `
                     <td class="p-4 serial-number"></td>
                     <td class="p-4">
                         <input type="text" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 material-name-select" required>
@@ -683,359 +657,355 @@
                         <button type="button" class="bg-red-500 text-white rounded-lg py-2 px-4 hover:bg-red-600 btn-sm remove-row">Delete</button>
                     </td>
                 `;
-                                        tableBody.appendChild(row);
-                                        attachMaterialAutocomplete(row.querySelector('.material-name-select'));
-                                        updateSerialNumbers();
-                                        updateRemoveButtons();
-                                        updateTotals();
-                                    }
+                tableBody.appendChild(row);
+                attachMaterialAutocomplete(row.querySelector('.material-name-select'));
+                updateSerialNumbers();
+                updateRemoveButtons();
+                updateTotals();
+            }
 
-                                    function removeRow(button) {
-                                        const rows = document.querySelectorAll('#materialTableBody tr');
-                                        if (rows.length <= 1)
-                                            return;
-                                        button.closest('tr').remove();
-                                        updateSerialNumbers();
-                                        updateRemoveButtons();
-                                        updateTotals();
-                                        validateSuppliers();
-                                    }
+            function removeRow(button) {
+                const rows = document.querySelectorAll('#materialTableBody tr');
+                if (rows.length <= 1) return;
+                button.closest('tr').remove();
+                updateSerialNumbers();
+                updateRemoveButtons();
+                updateTotals();
+                validateSuppliers();
+            }
 
-                                    function updateTotalPrice(row) {
-                                        const quantityInput = row.querySelector('.quantity');
-                                        const unitPriceInput = row.querySelector('.unit-price');
-                                        const totalPriceCell = row.querySelector('.total-price');
-                                        const quantity = parseFloat(quantityInput.value) || 0;
-                                        const unitPrice = parseFloat(unitPriceInput.value) || 0;
-                                        totalPriceCell.textContent = (quantity * unitPrice).toFixed(2);
-                                        updateTotals();
-                                    }
+            function updateTotalPrice(row) {
+                const quantityInput = row.querySelector('.quantity');
+                const unitPriceInput = row.querySelector('.unit-price');
+                const totalPriceCell = row.querySelector('.total-price');
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const unitPrice = parseFloat(unitPriceInput.value) || 0;
+                totalPriceCell.textContent = (quantity * unitPrice).toFixed(2);
+                updateTotals();
+            }
 
-                                    function updateTotals() {
-                                        let totalQuantity = 0;
-                                        let totalAmount = 0;
-                                        const rows = document.querySelectorAll('#materialTableBody tr');
-                                        rows.forEach(row => {
-                                            const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
-                                            const unitPrice = parseFloat(row.querySelector('.unit-price').value) || 0;
-                                            const total = quantity * unitPrice;
-                                            row.querySelector('.total-price').textContent = total.toFixed(2);
-                                            totalQuantity += quantity;
-                                            totalAmount += total;
-                                        });
-                                        document.getElementById('totalItems').textContent = rows.length;
-                                        document.getElementById('totalQuantity').textContent = totalQuantity.toFixed(2);
-                                        document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
-                                    }
+            function updateTotals() {
+                let totalQuantity = 0;
+                let totalAmount = 0;
+                const rows = document.querySelectorAll('#materialTableBody tr');
+                rows.forEach(row => {
+                    const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+                    const unitPrice = parseFloat(row.querySelector('.unit-price').value) || 0;
+                    const total = quantity * unitPrice;
+                    row.querySelector('.total-price').textContent = total.toFixed(2);
+                    totalQuantity += quantity;
+                    totalAmount += total;
+                });
+                document.getElementById('totalItems').textContent = rows.length;
+                document.getElementById('totalQuantity').textContent = totalQuantity.toFixed(2);
+                document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+            }
 
-                                    function validateForm() {
-                                        const voucherId = document.getElementById('voucherId').value.trim();
-                                        const voucherError = document.getElementById('voucherError');
-                                        const importDate = document.getElementById('importDate').value.trim();
-                                        const importer = document.getElementById('importer').value.trim();
-                                        const note = document.getElementById('note').value.trim();
-                                        const materialIds = document.getElementsByClassName('material-id-hidden');
-                                        const quantities = document.getElementsByName('quantity[]');
-                                        const unitPrices = document.getElementsByName('price_per_unit[]');
-                                        const conditions = document.getElementsByName('materialCondition[]');
-                                        const supplierIds = document.getElementsByName('supplierId[]');
-                                        const rows = document.querySelectorAll('#materialTableBody tr');
+            function validateForm() {
+                const receiptId = document.getElementById('receiptId').value.trim();
+                const receiptError = document.getElementById('receiptError');
+                const importDate = document.getElementById('importDate').value.trim();
+                const importer = document.getElementById('importer').value.trim();
+                const note = document.getElementById('note').value.trim();
+                const materialIds = document.getElementsByClassName('material-id-hidden');
+                const quantities = document.getElementsByName('quantity[]');
+                const unitPrices = document.getElementsByName('price_per_unit[]');
+                const conditions = document.getElementsByName('materialCondition[]');
+                const supplierIds = document.getElementsByName('supplierId[]');
+                const rows = document.querySelectorAll('#materialTableBody tr');
 
-                                        voucherError.textContent = '';
-                                        rows.forEach(row => row.classList.remove('error-row'));
+                receiptError.textContent = '';
+                rows.forEach(row => row.classList.remove('error-row'));
 
-                                        if (!voucherId) {
-                                            voucherError.textContent = 'The import voucher code must not be empty.';
-                                            return false;
-                                        }
-                                        if (!/^[A-Za-z0-9-_]+$/.test(voucherId)) {
-                                            voucherError.textContent = 'Voucher ID can only contain alphanumeric characters, hyphens, or underscores.';
-                                            return false;
-                                        }
-                                        if (voucherId.length > 50) {
-                                            voucherError.textContent = 'Voucher ID cannot exceed 50 characters.';
-                                            return false;
-                                        }
-                                        if (!importDate) {
-                                            showToast('The import date must not be empty.');
-                                            return false;
-                                        }
-                                        if (!importer || importer === 'Not Identified') {
-                                            showToast('The importer must not be empty or not identified.');
-                                            return false;
-                                        }
-                                        if (note && note.length > 1000) {
-                                            showToast('Note cannot exceed 1000 characters.');
-                                            return false;
-                                        }
-                                        if (note && !/^[A-Za-z0-9\s,.()-]+$/.test(note)) {
-                                            showToast('Note can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.');
-                                            return false;
-                                        }
-                                        if (materialIds.length === 0) {
-                                            showToast('At least one material is required.');
-                                            return false;
-                                        }
+                if (!receiptId) {
+                    receiptError.textContent = 'The import receipt code must not be empty.';
+                    return false;
+                }
+                if (!/^[A-Za-z0-9-_]+$/.test(receiptId)) {
+                    receiptError.textContent = 'Receipt ID can only contain alphanumeric characters, hyphens, or underscores.';
+                    return false;
+                }
+                if (receiptId.length > 50) {
+                    receiptError.textContent = 'Receipt ID cannot exceed 50 characters.';
+                    return false;
+                }
+                if (!importDate) {
+                    showToast('The import date must not be empty.');
+                    return false;
+                }
+                if (!importer || importer === 'Not Identified') {
+                    showToast('The importer must not be empty or not identified.');
+                    return false;
+                }
+                if (note && note.length > 1000) {
+                    showToast('Note cannot exceed 1000 characters.');
+                    return false;
+                }
+                if (note && !/^[A-Za-z0-9\s,.()-]+$/.test(note)) {
+                    showToast('Note can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.');
+                    return false;
+                }
+                if (materialIds.length === 0) {
+                    showToast('At least one material is required.');
+                    return false;
+                }
 
-                                        let firstSupplierId = supplierIds[0].value;
-                                        for (let i = 0; i < materialIds.length; i++) {
-                                            if (!materialIds[i].value.trim()) {
-                                                showToast(`Material ID must not be empty at row ${i + 1}`);
-                                                rows[i].classList.add('error-row');
-                                                return false;
-                                            }
-                                            if (!quantities[i].value || parseFloat(quantities[i].value) <= 0) {
-                                                showToast(`Quantity must be greater than 0 at row ${i + 1}`);
-                                                rows[i].classList.add('error-row');
-                                                return false;
-                                            }
-                                            if (!unitPrices[i].value || parseFloat(unitPrices[i].value) <= 0) {
-                                                showToast(`Unit price must be greater than 0 at row ${i + 1}`);
-                                                rows[i].classList.add('error-row');
-                                                return false;
-                                            }
-                                            if (!conditions[i].value) {
-                                                showToast(`Condition must not be empty at row ${i + 1}`);
-                                                rows[i].classList.add('error-row');
-                                                return false;
-                                            }
-                                            if (!supplierIds[i].value) {
-                                                showToast(`Supplier must not be empty at row ${i + 1}`);
-                                                rows[i].classList.add('error-row');
-                                                return false;
-                                            }
-                                            if (supplierIds[i].value !== firstSupplierId) {
-                                                showToast(`All materials must be supplied by the same supplier at row ${i + 1}`);
-                                                rows[i].classList.add('error-row');
-                                                return false;
-                                            }
-                                        }
-                                        return true;
-                                    }
+                let firstSupplierId = supplierIds[0].value;
+                for (let i = 0; i < materialIds.length; i++) {
+                    if (!materialIds[i].value.trim()) {
+                        showToast(`Material ID must not be empty at row ${i + 1}`);
+                        rows[i].classList.add('error-row');
+                        return false;
+                    }
+                    if (!quantities[i].value || parseFloat(quantities[i].value) <= 0) {
+                        showToast(`Quantity must be greater than 0 at row ${i + 1}`);
+                        rows[i].classList.add('error-row');
+                        return false;
+                    }
+                    if (!unitPrices[i].value || parseFloat(unitPrices[i].value) <= 0) {
+                        showToast(`Unit price must be greater than 0 at row ${i + 1}`);
+                        rows[i].classList.add('error-row');
+                        return false;
+                    }
+                    if (!conditions[i].value) {
+                        showToast(`Condition must not be empty at row ${i + 1}`);
+                        rows[i].classList.add('error-row');
+                        return false;
+                    }
+                    if (!supplierIds[i].value) {
+                        showToast(`Supplier must not be empty at row ${i + 1}`);
+                        rows[i].classList.add('error-row');
+                        return false;
+                    }
+                    if (supplierIds[i].value !== firstSupplierId) {
+                        showToast(`All materials must be supplied by the same supplier at row ${i + 1}`);
+                        rows[i].classList.add('error-row');
+                        return false;
+                    }
+                }
+                return true;
+            }
 
-                                    function showPrintPreview() {
-                                        const rows = document.querySelectorAll('#materialTableBody tr');
-                                        const receiptTableBody = document.getElementById('receiptTableBody');
-                                        const receiptTotalAmount = document.getElementById('receiptTotalAmount');
-                                        let totalAmount = 0;
+            function showPrintPreview() {
+                const rows = document.querySelectorAll('#materialTableBody tr');
+                const receiptTableBody = document.getElementById('receiptTableBody');
+                const receiptTotalAmount = document.getElementById('receiptTotalAmount');
+                let totalAmount = 0;
 
-                                        receiptTableBody.innerHTML = '';
-                                        rows.forEach(row => {
-                                            const materialName = row.querySelector('.material-name-select').value;
-                                            const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
-                                            const unitPrice = parseFloat(row.querySelector('.unit-price').value) || 0;
-                                            const total = quantity * unitPrice;
+                receiptTableBody.innerHTML = '';
+                rows.forEach(row => {
+                    const materialName = row.querySelector('.material-name-select').value;
+                    const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+                    const unitPrice = parseFloat(row.querySelector('.unit-price').value) || 0;
+                    const total = quantity * unitPrice;
 
-                                            if (materialName && quantity > 0 && unitPrice > 0) {
-                                                const newRow = document.createElement('tr');
-                                                newRow.innerHTML = `
+                    if (materialName && quantity > 0 && unitPrice > 0) {
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
                             <td class="p-4">${materialName}</td>
                             <td class="p-4">${quantity.toFixed(2)}</td>
                             <td class="p-4">${unitPrice.toFixed(2)}</td>
                             <td class="p-4">${total.toFixed(2)}</td>
                         `;
-                                                receiptTableBody.appendChild(newRow);
-                                                totalAmount += total;
-                                            }
-                                        });
-                                        receiptTotalAmount.textContent = totalAmount.toFixed(2);
-                                        document.getElementById('printReceiptPreview').style.display = 'block';
-                                    }
+                        receiptTableBody.appendChild(newRow);
+                        totalAmount += total;
+                    }
+                });
+                receiptTotalAmount.textContent = totalAmount.toFixed(2);
+                document.getElementById('printReceiptPreview').style.display = 'block';
+            }
 
-                                    function printReceipt() {
-                                        const printContents = document.getElementById('printReceiptPreview').innerHTML;
-                                        const originalContents = document.body.innerHTML;
-                                        document.body.innerHTML = printContents;
-                                        window.print();
-                                        document.body.innerHTML = originalContents;
-                                        hidePrintPreview();
-                                        window.location.reload();
-                                    }
+            function printReceipt() {
+                const printContents = document.getElementById('printReceiptPreview').innerHTML;
+                const originalContents = document.body.innerHTML;
+                document.body.innerHTML = printContents;
+                window.print();
+                document.body.innerHTML = originalContents;
+                hidePrintPreview();
+                window.location.reload();
+            }
 
-                                    function hidePrintPreview() {
-                                        document.getElementById('printReceiptPreview').style.display = 'none';
-                                    }
+            function hidePrintPreview() {
+                document.getElementById('printReceiptPreview').style.display = 'none';
+            }
 
-                                    function goBack() {
-                                        window.history.back();
-                                    }
+            function goBack() {
+                window.history.back();
+            }
 
-                                    document.addEventListener("DOMContentLoaded", () => {
-                                        const tableBody = document.getElementById('materialTableBody');
-                                        const addButton = document.getElementById('addMaterialBtn');
-                                        const saveButton = document.getElementById('saveImportBtn');
-                                        const voucherIdInput = document.getElementById('voucherId');
+            document.addEventListener("DOMContentLoaded", () => {
+                const tableBody = document.getElementById('materialTableBody');
+                const addButton = document.getElementById('addMaterialBtn');
+                const saveButton = document.getElementById('saveImportBtn');
+                const receiptIdInput = document.getElementById('receiptId');
 
-                                        fetch('${pageContext.request.contextPath}/ImportMaterialServlet', {
-                                            method: 'GET',
-                                            headers: {'Accept': 'application/json'}
-                                        })
-                                                .then(response => {
-                                                    if (!response.ok)
-                                                        throw new Error(`Server error: ${response.status}`);
-                                                    return response.json();
-                                                })
-                                                .then(data => {
-                                                    materialData = data;
-                                                    console.log('Initial Material Data:', data); // Log initial data
-                                                    document.querySelectorAll(".material-name-select").forEach(attachMaterialAutocomplete);
-                                                })
-                                                .catch(error => {
-                                                    console.error('Error loading materials:', error);
-                                                    showToast(`Unable to load material data: ${error.message}`);
-                                                });
+                fetch('${pageContext.request.contextPath}/ImportMaterialServlet', {
+                    method: 'GET',
+                    headers: {'Accept': 'application/json'}
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(data => {
+                        materialData = data;
+                        document.querySelectorAll(".material-name-select").forEach(attachMaterialAutocomplete);
+                    })
+                    .catch(error => {
+                        console.error('Error loading materials:', error);
+                        showToast(`Unable to load material data: ${error.message}`);
+                    });
 
-                                        addButton.addEventListener('click', (event) => {
-                                            event.stopPropagation();
-                                            addMaterialRow();
-                                        });
-                                        tableBody.addEventListener('click', (event) => {
-                                            if (event.target.classList.contains('remove-row')) {
-                                                event.stopPropagation();
-                                                removeRow(event.target);
-                                            }
-                                        });
-                                        tableBody.addEventListener('input', (e) => {
-                                            if (e.target.classList.contains('quantity') || e.target.classList.contains('unit-price')) {
-                                                updateTotalPrice(e.target.closest('tr'));
-                                            }
-                                        });
-                                        tableBody.addEventListener('change', (e) => {
-                                            if (e.target.classList.contains('supplier-select')) {
-                                                validateSuppliers();
-                                            }
-                                        });
+                addButton.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    addMaterialRow();
+                });
+                tableBody.addEventListener('click', (event) => {
+                    if (event.target.classList.contains('remove-row')) {
+                        event.stopPropagation();
+                        removeRow(event.target);
+                    }
+                });
+                tableBody.addEventListener('input', (e) => {
+                    if (e.target.classList.contains('quantity') || e.target.classList.contains('unit-price')) {
+                        updateTotalPrice(e.target.closest('tr'));
+                    }
+                });
+                tableBody.addEventListener('change', (e) => {
+                    if (e.target.classList.contains('supplier-select')) {
+                        validateSuppliers();
+                    }
+                });
 
-                                        voucherIdInput.addEventListener('blur', () => {
-                                            const voucherId = voucherIdInput.value.trim();
-                                            const voucherError = document.getElementById('voucherError');
-                                            voucherError.textContent = '';
-                                            if (!voucherId) {
-                                                voucherError.textContent = 'The import voucher code must not be empty.';
-                                                saveButton.disabled = true;
-                                                return;
-                                            }
-                                            if (!/^[A-Za-z0-9-_]+$/.test(voucherId)) {
-                                                voucherError.textContent = 'Voucher ID can only contain alphanumeric characters, hyphens, or underscores.';
-                                                saveButton.disabled = true;
-                                                return;
-                                            }
-                                            if (voucherId.length > 50) {
-                                                voucherError.textContent = 'Voucher ID cannot exceed 50 characters.';
-                                                saveButton.disabled = true;
-                                                return;
-                                            }
-                                            fetch('${pageContext.request.contextPath}/check_voucher_id', {
-                                                method: 'POST',
-                                                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                                                body: 'voucher_id=' + encodeURIComponent(voucherId) + '&type=import'
-                                            })
-                                                    .then(response => response.json())
-                                                    .then(data => {
-                                                        if (data.error) {
-                                                            voucherError.textContent = data.error;
-                                                            saveButton.disabled = true;
-                                                        } else if (data.exists) {
-                                                            voucherError.textContent = 'The import voucher code already exists. Please use a different code.';
-                                                            saveButton.disabled = true;
-                                                        } else {
-                                                            voucherError.textContent = '';
-                                                            saveButton.disabled = false;
-                                                        }
-                                                    })
-                                                    .catch(error => {
-                                                        voucherError.textContent = 'Error checking voucher ID: ' + error.message;
-                                                        saveButton.disabled = true;
-                                                    });
-                                        });
+                receiptIdInput.addEventListener('blur', () => {
+                    const receiptId = receiptIdInput.value.trim();
+                    const receiptError = document.getElementById('receiptError');
+                    receiptError.textContent = '';
+                    if (!receiptId) {
+                        receiptError.textContent = 'The import receipt code must not be empty.';
+                        saveButton.disabled = true;
+                        return;
+                    }
+                    if (!/^[A-Za-z0-9-_]+$/.test(receiptId)) {
+                        receiptError.textContent = 'Receipt ID can only contain alphanumeric characters, hyphens, or underscores.';
+                        saveButton.disabled = true;
+                        return;
+                    }
+                    if (receiptId.length > 50) {
+                        receiptError.textContent = 'Receipt ID cannot exceed 50 characters.';
+                        saveButton.disabled = true;
+                        return;
+                    }
+                    fetch('${pageContext.request.contextPath}/check_voucher_id', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: 'receipt_id=' + encodeURIComponent(receiptId) + '&type=import' // Changed from voucher_id
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.error) {
+                                receiptError.textContent = data.error;
+                                saveButton.disabled = true;
+                            } else if (data.exists) {
+                                receiptError.textContent = 'The import receipt code already exists. Please use a different code.';
+                                saveButton.disabled = true;
+                            } else {
+                                receiptError.textContent = '';
+                                saveButton.disabled = false;
+                            }
+                        })
+                        .catch(error => {
+                            receiptError.textContent = 'Error checking receipt ID: ' + error.message;
+                            saveButton.disabled = true;
+                        });
+                });
 
-                                        saveButton.addEventListener('click', (e) => {
-                                            e.preventDefault();
-                                            if (!validateForm())
-                                                return;
+                saveButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (!validateForm()) return;
 
-                                            const formData = new FormData(document.getElementById('importForm'));
-                                            fetch('${pageContext.request.contextPath}/ImportMaterialServlet', {
-                                                method: 'POST',
-                                                body: formData
-                                            })
-                                                    .then(response => {
-                                                        if (!response.ok) {
-                                                            return response.text().then(text => {
-                                                                throw new Error(`Server error: ${response.status} - ${text}`);
-                                                            });
-                                                        }
-                                                        return response.json();
-                                                    })
-                                                    .then(data => {
-                                                        const successAlert = document.getElementById('successAlert');
-                                                        const errorAlert = document.getElementById('errorAlert');
-                                                        if (data.status === 'success') {
-                                                            successAlert.textContent = data.message;
-                                                            successAlert.style.display = 'block';
-                                                            setTimeout(() => successAlert.style.display = 'none', 5000);
-                                                            document.getElementById('importForm').reset();
-                                                            const tableBody = document.getElementById('materialTableBody');
-                                                            tableBody.innerHTML = `
-                                        <tr>
-                                            <td class="p-4 serial-number">1</td>
-                                            <td class="p-4">
-                                                <input type="text" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 material-name-select" required>
-                                                <input type="hidden" class="material-id-hidden" name="materialId[]">
-                                            </td>
-                                            <td class="p-4">
-                                                <input type="text" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 material-code-select" readonly>
-                                            </td>
-                                            <td class="p-4">
-                                                <select class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 supplier-select" name="supplierId[]" required>
-                                                    <option value="">-- Select Supplier --</option>
-                                                </select>
-                                            </td>
-                                            <td class="p-4">
-                                                <input type="number" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 quantity" name="quantity[]" min="0.01" step="0.01" required>
-                                            </td>
-                                            <td class="p-4">
-                                                <input type="text" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 unit-display" readonly>
-                                            </td>
-                                            <td class="p-4">
-                                                <input type="number" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 unit-price" name="price_per_unit[]" min="0.01" step="0.01" required>
-                                            </td>
-                                            <td class="p-4 total-price">0.00</td>
-                                            <td class="p-4">
-                                                <select class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500" name="materialCondition[]" required>
-                                                    <option value="">Select Condition</option>
-                                                    <option value="new">New</option>
-                                                    <option value="used">Used</option>
-                                                    <option value="damaged">Damaged</option>
-                                                </select>
-                                            </td>
-                                            <td class="p-4">
-                                                <button type="button" class="bg-red-500 text-white rounded-lg py-2 px-4 hover:bg-red-600 btn-sm remove-row" disabled>Delete</button>
-                                            </td>
-                                        </tr>
-                                    `;
-                                                            updateSerialNumbers();
-                                                            updateRemoveButtons();
-                                                            updateTotals();
-                                                            document.querySelectorAll(".material-name-select").forEach(attachMaterialAutocomplete);
-                                                        } else {
-                                                            errorAlert.textContent = data.message;
-                                                            if (data.errorRow != null) {
-                                                                const rows = document.querySelectorAll('#materialTableBody tr');
-                                                                rows[data.errorRow].classList.add('error-row');
-                                                            }
-                                                            errorAlert.style.display = 'block';
-                                                            setTimeout(() => errorAlert.style.display = 'none', 5000);
-                                                        }
-                                                    })
-                                                    .catch(error => {
-                                                        const errorAlert = document.getElementById('errorAlert');
-                                                        errorAlert.textContent = `Error saving import voucher: ${error.message}`;
-                                                        errorAlert.style.display = 'block';
-                                                        setTimeout(() => errorAlert.style.display = 'none', 5000);
-                                                    });
-                                        });
-                                    });
+                    const formData = new FormData(document.getElementById('importForm'));
+                    fetch('${pageContext.request.contextPath}/ImportMaterialServlet', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    throw new Error(`Server error: ${response.status} - ${text}`);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            const successAlert = document.getElementById('successAlert');
+                            const errorAlert = document.getElementById('errorAlert');
+                            if (data.status === 'success') {
+                                successAlert.textContent = data.message;
+                                successAlert.style.display = 'block';
+                                setTimeout(() => successAlert.style.display = 'none', 5000);
+                                document.getElementById('importForm').reset();
+                                const tableBody = document.getElementById('materialTableBody');
+                                tableBody.innerHTML = `
+                                    <tr>
+                                        <td class="p-4 serial-number">1</td>
+                                        <td class="p-4">
+                                            <input type="text" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 material-name-select" required>
+                                            <input type="hidden" class="material-id-hidden" name="materialId[]">
+                                        </td>
+                                        <td class="p-4">
+                                            <input type="text" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 material-code-select" readonly>
+                                        </td>
+                                        <td class="p-4">
+                                            <select class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 supplier-select" name="supplierId[]" required>
+                                                <option value="">-- Select Supplier --</option>
+                                            </select>
+                                        </td>
+                                        <td class="p-4">
+                                            <input type="number" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 quantity" name="quantity[]" min="0.01" step="0.01" required>
+                                        </td>
+                                        <td class="p-4">
+                                            <input type="text" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 unit-display" readonly>
+                                        </td>
+                                        <td class="p-4">
+                                            <input type="number" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 unit-price" name="price_per_unit[]" min="0.01" step="0.01" required>
+                                        </td>
+                                        <td class="p-4 total-price">0.00</td>
+                                        <td class="p-4">
+                                            <select class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500" name="materialCondition[]" required>
+                                                <option value="">Select Condition</option>
+                                                <option value="new">New</option>
+                                                <option value="used">Used</option>
+                                                <option value="damaged">Damaged</option>
+                                            </select>
+                                        </td>
+                                        <td class="p-4">
+                                            <button type="button" class="bg-red-500 text-white rounded-lg py-2 px-4 hover:bg-red-600 btn-sm remove-row" disabled>Delete</button>
+                                        </td>
+                                    </tr>
+                                `;
+                                updateSerialNumbers();
+                                updateRemoveButtons();
+                                updateTotals();
+                                document.querySelectorAll(".material-name-select").forEach(attachMaterialAutocomplete);
+                            } else {
+                                errorAlert.textContent = data.message;
+                                if (data.errorRow != null) {
+                                    const rows = document.querySelectorAll('#materialTableBody tr');
+                                    rows[data.errorRow].classList.add('error-row');
+                                }
+                                errorAlert.style.display = 'block';
+                                setTimeout(() => errorAlert.style.display = 'none', 5000);
+                            }
+                        })
+                        .catch(error => {
+                            const errorAlert = document.getElementById('errorAlert');
+                            errorAlert.textContent = `Error saving import receipt: ${error.message}`;
+                            errorAlert.style.display = 'block';
+                            setTimeout(() => errorAlert.style.display = 'none', 5000);
+                        });
+                });
+            });
         </script>
     </body>
 </html>

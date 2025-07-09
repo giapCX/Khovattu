@@ -5,16 +5,19 @@ import java.sql.Date;
 public class ImportReceipt {
 
     private int importId;
-    private String voucherId;
+    private String receiptId;
     private int supplierId;
     private int userId;
     private Date importDate;
     private String note;
-    private String importerName; // Thêm trường này
-    private String supplierName; // Thêm trường này
-    private double total; // Đã có từ trước
+    private String importerName;
+    private String supplierName;
+    private double total;
 
-    // Getters and Setters
+    public ImportReceipt() {
+    }
+
+    // Constructor and Getters/Setters (update receiptId)
     public int getImportId() {
         return importId;
     }
@@ -23,12 +26,12 @@ public class ImportReceipt {
         this.importId = importId;
     }
 
-    public String getVoucherId() {
-        return voucherId;
+    public String getReceiptId() {
+        return receiptId;
     }
 
-    public void setVoucherId(String voucherId) {
-        this.voucherId = voucherId;
+    public void setReceiptId(String receiptId) {
+        this.receiptId = receiptId;
     }
 
     public int getSupplierId() {
@@ -65,19 +68,19 @@ public class ImportReceipt {
 
     public String getImporterName() {
         return importerName;
-    } // Thêm getter
+    }
 
     public void setImporterName(String importerName) {
         this.importerName = importerName;
-    } // Thêm setter
+    }
 
     public String getSupplierName() {
         return supplierName;
-    } // Thêm getter
+    }
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
-    } // Thêm setter
+    }
 
     public double getTotal() {
         return total;

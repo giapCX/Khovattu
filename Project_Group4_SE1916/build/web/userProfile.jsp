@@ -357,7 +357,10 @@
                     </div>
                     <div class="form-group">
                         <label for="profilePic">Profile Picture</label>
-                        <input type="file" class="form-control" id="profilePic" name="profilePic" accept="image/*">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="currentImage" name="currentImage" value="${not empty user.image ? user.image : 'Default'}" readonly>
+                            <input type="file" class="form-control" id="profilePic" name="profilePic" accept="image/*">
+                        </div>
                     </div>
                     <div class="button-group mt-3">
                         <button type="submit" class="btn btn-primary btn-update">Update Profile</button>
@@ -412,7 +415,7 @@
             // Toast Notifications
             <c:if test="${not empty message}">
             Toastify({
-            text: "${message}",
+                text: "${message}",
                 duration: 3000,
                 gravity: "top",
                 position: "right",
@@ -421,7 +424,7 @@
             </c:if>
             <c:if test="${not empty error}">
             Toastify({
-            text: "${error}",
+                text: "${error}",
                 duration: 3000,
                 gravity: "top",
                 position: "right",

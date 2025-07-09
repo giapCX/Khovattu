@@ -21,7 +21,7 @@ public class ImportReceiptDAO {
     public List<ImportReceipt> searchImportReceipts(Date fromDate, Date toDate, String importer, int page, int pageSize) {
     List<ImportReceipt> list = new ArrayList<>();
     StringBuilder sql = new StringBuilder(
-            "SELECT ir.import_id, ir.voucher_id, ir.import_date, ir.note, u.full_name AS importer_name, " +
+            "SELECT ir.import_id, ir.receipt_id, ir.import_date, ir.note, u.full_name AS importer_name, " +
                     "SUM(id.quantity * id.price_per_unit) AS total " +
                     "FROM ImportReceipts ir " +
                     "JOIN Users u ON ir.user_id = u.user_id " +
@@ -33,7 +33,7 @@ public class ImportReceiptDAO {
     if (toDate != null) sql.append("AND ir.import_date <= ? ");
     if (importer != null && !importer.isEmpty()) sql.append("AND u.full_name LIKE ? ");
 
-    sql.append("GROUP BY ir.import_id, ir.voucher_id, ir.import_date, ir.note, u.full_name ");
+    sql.append("GROUP BY ir.import_id, ir.receipt_id, ir.import_date, ir.note, u.full_name ");
     sql.append("ORDER BY ir.import_date DESC ");
     sql.append("LIMIT ? OFFSET ?");
 
@@ -49,7 +49,7 @@ public class ImportReceiptDAO {
         while (rs.next()) {
             ImportReceipt receipt = new ImportReceipt();
             receipt.setImportId(rs.getInt("import_id"));
-            receipt.setVoucherId(rs.getString("voucher_id"));
+            receipt.setReceiptId(rs.getString("receipt_id"));
             receipt.setImportDate(rs.getDate("import_date"));
             receipt.setNote(rs.getString("note"));
             receipt.setImporterName(rs.getString("importer_name"));
@@ -97,7 +97,7 @@ public ImportReceipt getReceiptById(int importId) {
     String sql = """
         SELECT 
             ir.import_id, 
-            ir.voucher_id, 
+            ir.receipt_id, 
             ir.import_date, 
             ir.note, 
             u.full_name AS importer_name, 
@@ -108,7 +108,7 @@ public ImportReceipt getReceiptById(int importId) {
         JOIN Suppliers s ON ir.supplier_id = s.supplier_id
         LEFT JOIN ImportDetails idt ON ir.import_id = idt.import_id
         WHERE ir.import_id = ?
-        GROUP BY ir.import_id, ir.voucher_id, ir.import_date, ir.note, u.full_name, s.name
+        GROUP BY ir.import_id, ir.receipt_id, ir.import_date, ir.note, u.full_name, s.name
     """;
 
     try (Connection conn = DBContext.getConnection();
@@ -118,7 +118,7 @@ public ImportReceipt getReceiptById(int importId) {
         if (rs.next()) {
             receipt = new ImportReceipt();
             receipt.setImportId(rs.getInt("import_id"));
-            receipt.setVoucherId(rs.getString("voucher_id"));
+            receipt.setReceiptId(rs.getString("receipt_id"));
             receipt.setImportDate(rs.getDate("import_date"));
             receipt.setNote(rs.getString("note"));
             receipt.setTotal(rs.getDouble("total"));

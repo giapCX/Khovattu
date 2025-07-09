@@ -3,8 +3,9 @@ package model;
 import java.time.LocalDate;
 
 public class Import {
+
     private int importId;
-    private String voucherId;
+    private String receiptId;
     private int userId;
     private LocalDate importDate;
     private String note;
@@ -12,14 +13,15 @@ public class Import {
     public Import() {
     }
 
-    public Import(int importId, String voucherId, int userId, LocalDate importDate, String note) {
+    public Import(int importId, String receiptId, int userId, LocalDate importDate, String note) {
         this.importId = importId;
-        this.voucherId = voucherId;
+        this.receiptId = receiptId;
         this.userId = userId;
         this.importDate = importDate;
         this.note = note;
     }
 
+    // Getters and Setters (update receiptId)
     public int getImportId() {
         return importId;
     }
@@ -28,12 +30,12 @@ public class Import {
         this.importId = importId;
     }
 
-    public String getVoucherId() {
-        return voucherId;
+    public String getReceiptId() {
+        return receiptId;
     }
 
-    public void setVoucherId(String voucherId) {
-        this.voucherId = voucherId;
+    public void setReceiptId(String receiptId) {
+        this.receiptId = receiptId;
     }
 
     public int getUserId() {

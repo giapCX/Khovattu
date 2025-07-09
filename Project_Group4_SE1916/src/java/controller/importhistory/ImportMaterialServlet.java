@@ -27,9 +27,10 @@ import model.User;
 import model.Supplier;
 
 public class ImportMaterialServlet extends HttpServlet {
+
     private static final Gson GSON = new Gson();
     private static final String ID_REGEX = "^[A-Za-z0-9-_]+$";
-    private static final int VOUCHER_ID_MAX_LENGTH = 50;
+    private static final int RECEIPT_ID_MAX_LENGTH = 50; // Changed from VOUCHER_ID_MAX_LENGTH
     private static final int NOTE_MAX_LENGTH = 1000;
 
     @Override
@@ -40,14 +41,12 @@ public class ImportMaterialServlet extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             MaterialDAO materialDAO = new MaterialDAO();
             List<Material> materials = materialDAO.getAllMaterials();
-            // Fetch suppliers for each material
             for (Material material : materials) {
                 List<Supplier> suppliers = new ArrayList<>();
-                String sql = "SELECT s.supplier_id, s.name AS supplier_name FROM Suppliers s " +
-                             "JOIN SupplierMaterials sm ON s.supplier_id = sm.supplier_id " +
-                             "WHERE sm.material_id = ?";
-                try (Connection conn = DBContext.getConnection();
-                     PreparedStatement ps = conn.prepareStatement(sql)) {
+                String sql = "SELECT s.supplier_id, s.name AS supplier_name FROM Suppliers s "
+                        + "JOIN SupplierMaterials sm ON s.supplier_id = sm.supplier_id "
+                        + "WHERE sm.material_id = ?";
+                try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, material.getMaterialId());
                     ResultSet rs = ps.executeQuery();
                     while (rs.next()) {
@@ -89,20 +88,20 @@ public class ImportMaterialServlet extends HttpServlet {
                 return;
             }
 
-            String voucherId = request.getParameter("voucher_id");
-            if (voucherId == null || voucherId.trim().isEmpty()) {
-                errorMessage = "The import voucher code was not submitted.";
+            String receiptId = request.getParameter("receipt_id"); // Changed from voucher_id
+            if (receiptId == null || receiptId.trim().isEmpty()) {
+                errorMessage = "The import receipt code was not submitted.";
                 sendErrorResponse(response, errorMessage, null);
                 return;
             }
-            String trimmedVoucherId = voucherId.trim();
-            if (trimmedVoucherId.length() > VOUCHER_ID_MAX_LENGTH) {
-                errorMessage = "Voucher ID cannot exceed " + VOUCHER_ID_MAX_LENGTH + " characters.";
+            String trimmedReceiptId = receiptId.trim();
+            if (trimmedReceiptId.length() > RECEIPT_ID_MAX_LENGTH) {
+                errorMessage = "Receipt ID cannot exceed " + RECEIPT_ID_MAX_LENGTH + " characters.";
                 sendErrorResponse(response, errorMessage, null);
                 return;
             }
-            if (!trimmedVoucherId.matches(ID_REGEX)) {
-                errorMessage = "Voucher ID can only contain alphanumeric characters, hyphens, or underscores.";
+            if (!trimmedReceiptId.matches(ID_REGEX)) {
+                errorMessage = "Receipt ID can only contain alphanumeric characters, hyphens, or underscores.";
                 sendErrorResponse(response, errorMessage, null);
                 return;
             }
@@ -113,7 +112,6 @@ public class ImportMaterialServlet extends HttpServlet {
             String[] conditions = request.getParameterValues("materialCondition[]");
             String[] supplierIds = request.getParameterValues("supplierId[]");
 
-            // Validate input arrays
             if (materialIds == null || materialIds.length == 0 || isArrayEmpty(materialIds)) {
                 errorMessage = "The list of material IDs must not be empty.";
                 sendErrorResponse(response, errorMessage, null);
@@ -139,8 +137,8 @@ public class ImportMaterialServlet extends HttpServlet {
                 sendErrorResponse(response, errorMessage, null);
                 return;
             }
-            if (materialIds.length != quantities.length || materialIds.length != unitPrices.length ||
-                materialIds.length != conditions.length || materialIds.length != supplierIds.length) {
+            if (materialIds.length != quantities.length || materialIds.length != unitPrices.length
+                    || materialIds.length != conditions.length || materialIds.length != supplierIds.length) {
                 errorMessage = "The lists of material IDs, quantities, unit prices, conditions, and suppliers are not synchronized.";
                 sendErrorResponse(response, errorMessage, null);
                 return;
@@ -165,21 +163,19 @@ public class ImportMaterialServlet extends HttpServlet {
             }
 
             try (Connection conn = DBContext.getConnection()) {
-                conn.setAutoCommit(false); // Start transaction
+                conn.setAutoCommit(false);
                 try {
                     ImportDAO dao = new ImportDAO(conn);
                     SupplierDAO supplierDAO = new SupplierDAO(conn);
                     UserDAO userDAO = new UserDAO();
                     MaterialDAO materialDAO = new MaterialDAO();
 
-                    // Check voucher ID uniqueness
-                    if (dao.voucherIdExists(trimmedVoucherId)) {
-                        errorMessage = "The import voucher code already exists. Please use a different code.";
+                    if (dao.receiptIdExists(trimmedReceiptId)) { // Changed from voucherIdExists
+                        errorMessage = "The import receipt code already exists. Please use a different code.";
                         sendErrorResponse(response, errorMessage, null);
                         return;
                     }
 
-                    // Validate user
                     User user = userDAO.getUserByUsername(username);
                     if (user == null || user.getUserId() == 0) {
                         errorMessage = "Invalid user information. Please log in again.";
@@ -187,7 +183,6 @@ public class ImportMaterialServlet extends HttpServlet {
                         return;
                     }
 
-                    // Validate supplier consistency
                     int supplierId = Integer.parseInt(supplierIds[0].trim());
                     for (int i = 1; i < supplierIds.length; i++) {
                         if (!supplierIds[i].trim().equals(String.valueOf(supplierId))) {
@@ -202,15 +197,13 @@ public class ImportMaterialServlet extends HttpServlet {
                         return;
                     }
 
-                    // Create ImportReceipt object
                     ImportReceipt importReceipt = new ImportReceipt();
-                    importReceipt.setVoucherId(trimmedVoucherId);
+                    importReceipt.setReceiptId(trimmedReceiptId); // Changed from setVoucherId
                     importReceipt.setUserId(user.getUserId());
                     importReceipt.setImportDate(java.sql.Date.valueOf(LocalDate.parse(importDateStr)));
                     importReceipt.setNote(note != null ? note.trim() : "");
                     importReceipt.setSupplierId(supplierId);
 
-                    // Validate materials and create ImportDetail list
                     List<ImportDetail> detailList = new ArrayList<>();
                     for (int i = 0; i < materialIds.length; i++) {
                         try {
@@ -244,32 +237,29 @@ public class ImportMaterialServlet extends HttpServlet {
                             double quantity = Double.parseDouble(quantities[i].trim());
                             double unitPrice = Double.parseDouble(unitPrices[i].trim());
 
-                            // Validate material existence
                             if (!materialDAO.materialExists(materialId)) {
                                 errorMessage = "Material ID " + materialId + " does not exist at row " + (i + 1);
                                 sendErrorResponse(response, errorMessage, i);
                                 return;
                             }
 
-                            // Validate supplier-material relationship
                             Material material = materialDAO.getMaterialById(materialId);
-                              boolean supplierValid = false;
-     List<Supplier> suppliers = material.getSuppliers();
-     if (suppliers != null) {
-         for (Supplier supplier : suppliers) {
-             if (supplier.getSupplierId() == supplierId) {
-                 supplierValid = true;
-                 break;
-             }
-         }
-     }
-     if (!supplierValid) {
-         errorMessage = "Material '" + material.getName() + "' at row " + (i + 1) + " is not associated with the selected supplier.";
-         sendErrorResponse(response, errorMessage, i);
-         return;
-     }
+                            boolean supplierValid = false;
+                            List<Supplier> suppliers = material.getSuppliers();
+                            if (suppliers != null) {
+                                for (Supplier supplier : suppliers) {
+                                    if (supplier.getSupplierId() == supplierId) {
+                                        supplierValid = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!supplierValid) {
+                                errorMessage = "Material '" + material.getName() + "' at row " + (i + 1) + " is not associated with the selected supplier.";
+                                sendErrorResponse(response, errorMessage, i);
+                                return;
+                            }
 
-                            // Validate quantity and unit price
                             if (quantity <= 0) {
                                 errorMessage = "Quantity must be greater than 0 at row " + (i + 1);
                                 sendErrorResponse(response, errorMessage, i);
@@ -281,7 +271,6 @@ public class ImportMaterialServlet extends HttpServlet {
                                 return;
                             }
 
-                            // Validate material condition
                             if (!conditions[i].matches("new|used|damaged")) {
                                 errorMessage = "Invalid material condition at row " + (i + 1);
                                 sendErrorResponse(response, errorMessage, i);
@@ -301,23 +290,21 @@ public class ImportMaterialServlet extends HttpServlet {
                         }
                     }
 
-                    // Save to database
                     int importId = dao.saveImport(importReceipt, detailList);
                     if (importId <= 0) {
-                        errorMessage = "Failed to save the import voucher. Please try again.";
+                        errorMessage = "Failed to save the import receipt. Please try again.";
                         sendErrorResponse(response, errorMessage, null);
                         return;
                     }
 
-                    // Update inventory
                     materialDAO.updateInventoryFromImport(detailList);
 
-                    conn.commit(); // Commit transaction
-                    String successMessage = "The import voucher has been saved successfully! Data has been updated to the database. (Import Voucher ID: " + importId + ")";
+                    conn.commit();
+                    String successMessage = "The import receipt has been saved successfully! Data has been updated to the database. (Import Receipt ID: " + importId + ")";
                     out.print(GSON.toJson(new ResponseMessage("success", successMessage, importId, null)));
                     out.flush();
                 } catch (SQLException e) {
-                    conn.rollback(); // Rollback on error
+                    conn.rollback();
                     throw e;
                 }
             } catch (SQLException e) {
@@ -326,7 +313,7 @@ public class ImportMaterialServlet extends HttpServlet {
                 sendErrorResponse(response, errorMessage, null);
             } catch (Exception e) {
                 e.printStackTrace();
-                errorMessage = "System error while processing the import voucher: " + e.getMessage();
+                errorMessage = "System error while processing the import receipt: " + e.getMessage();
                 sendErrorResponse(response, errorMessage, null);
             }
         }
@@ -351,6 +338,7 @@ public class ImportMaterialServlet extends HttpServlet {
     }
 
     private static class ResponseMessage {
+
         String status;
         String message;
         int importId;
