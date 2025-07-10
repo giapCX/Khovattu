@@ -17,11 +17,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
-
-        <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-        <!-- Liên kết đến file CSS -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
         <style>
             body {
@@ -118,7 +114,6 @@
             String role = (String) session.getAttribute("role");
             String userFullName = (String) session.getAttribute("userFullName") != null ? (String) session.getAttribute("userFullName") : "Not Identified";
         %>
-        <!-- Sidebar -->
         <c:choose>
             <c:when test="${role == 'admin'}">
                 <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
@@ -134,14 +129,14 @@
             </c:when>
         </c:choose>
         <main class="flex-1 p-8 transition-all duration-300">
+            <div class="flex items-center gap-4 mb-6">
+                <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
             <div class="container max-w-6xl mx-auto">
-                <div class="flex items-center gap-4 mb-6">
-                    <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
-                        <i class="fas fa-bars text-2xl"></i>
-                    </button>
-<!--                    <h1 class="text-center mb-4" style="font-size: 30px; margin-left: 300px">Export Materials</h1>-->
-                </div>
-                <h1 class="text-center mb-4 " style="font-size: 30px">Export Materials</h1>
+
+                <h1 class="text-center mb-4" style="font-size: 30px">Export Materials</h1>
 
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -167,15 +162,17 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="exportId" class="form-label">Export ID</label>
-                        <input type="text" class="form-control" id="exportId" name="exportId" value="${fn:escapeXml(exportId)}" readonly>
+                        <label for="voucherId" class="form-label">Receipt ID</label>
+                        <input type="text" class="form-control" id="voucherId" name="voucherId" required maxlength="50" pattern="[A-Za-z0-9-_]+">
+                        <div class="invalid-feedback">Voucher ID is required, max 50 characters, alphanumeric, hyphens, or underscores only.</div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="voucherId" class="form-label">Voucher ID</label>
-                        <input type="text" class="form-control" id="voucherId" name="voucherId" required maxlength="50" pattern="[A-Za-z0-9-_]+">
-                        <div class="invalid-feedback">Voucher ID is required, max 50 characters, alphanumeric, hyphens, or underscores only.</div>
-                    </div>    
+                        <label for="receiver" class="form-label">Receiver</label>
+                        <input type="text" class="form-control receiver-input" id="receiver" name="receiver" required autocomplete="off">
+                        <div class="autocomplete-suggestions" style="display: none;"></div>
+                        <div class="invalid-feedback">Please select a receiver.</div>
+                    </div>
 
                     <div class="mb-3">
                         <label for="purpose" class="form-label">Export Purpose</label>
@@ -217,7 +214,6 @@
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button>
-                                        <button type="button" class="btn btn-success btn-sm edit-row">Save</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -244,10 +240,10 @@
                 </form>
             </div>
         </main>
-        
+
         <script>
-            // Initialize materialData
             let materialData = [];
+            let employeeData = [];
 
             // Fetch materials from Servlet via AJAX
             async function fetchMaterials() {
@@ -256,32 +252,26 @@
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
-                    const data = await response.json();
-                    materialData = data.map(item => ({
-                            name: item.name || '',
-                            code: item.code || '',
-                            unit: item.unit || ''
-                        }));
+                    materialData = await response.json();
                     console.log("Material Data:", materialData);
-                    
                 } catch (error) {
                     console.error("Error fetching materials:", error);
-                    
                 }
             }
 
-            // Show alert
-//            function showAlert(type, message) {
-//                const alert = document.createElement('div');
-//                alert.className = `alert alert-${type} alert-dismissible fade show`;
-//                alert.role = 'alert';
-//                alert.innerHTML = `
-//                    ${message}
-//                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-//                `;
-//                document.querySelector('.container').prepend(alert);
-//                setTimeout(() => alert.remove(), 5000);
-//            }
+            // Fetch employees from Servlet via AJAX
+            async function fetchEmployees() {
+                try {
+                    const response = await fetch('${pageContext.request.contextPath}/exportMaterial?fetch=employees');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    employeeData = await response.json();
+                    console.log("Employee Data:", employeeData);
+                } catch (error) {
+                    console.error("Error fetching employees:", error);
+                }
+            }
 
             // Update serial numbers
             function updateSerialNumbers() {
@@ -324,20 +314,19 @@
                     </td>
                     <td>
                         <button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button>
-                        <button type="button" class="btn btn-success btn-sm edit-row">Save</button>
                     </td>
                 `;
                 tableBody.appendChild(row);
-                attachAutocomplete(row.querySelector('.material-name-input'));
+                attachMaterialAutocomplete(row.querySelector('.material-name-input'));
                 updateSerialNumbers();
-                updateRemoveButtons();                
+                updateRemoveButtons();
                 checkFormValidity();
             }
 
             // Remove material row
             function removeRow(button) {
                 const rows = document.querySelectorAll('#materialTableBody tr');
-                if (rows.length <= 1) {                    
+                if (rows.length <= 1) {
                     return;
                 }
                 button.closest('tr').remove();
@@ -346,61 +335,8 @@
                 checkFormValidity();
             }
 
-            // Toggle edit mode for a row
-            function toggleEditRow(button) {
-                const row = button.closest('tr');
-                const isEditing = button.textContent === 'Save';
-                const materialNameInput = row.querySelector('.material-name-input');
-                const quantityInput = row.querySelector('input[name="quantity[]"]');
-                const conditionSelect = row.querySelector('select[name="condition[]"]');
-
-                if (isEditing) {
-                    // Validate
-                    if (!materialNameInput.value.trim()) {                        
-                        row.classList.add('error-row');
-                        return;
-                    }
-                    if (!quantityInput.value || quantityInput.value <= 0) {                        
-                        row.classList.add('error-row');
-                        return;
-                    }
-                    if (!conditionSelect.value) {                      
-                        row.classList.add('error-row');
-                        return;
-                    }
-
-                    // Lock inputs
-                    materialNameInput.readOnly = true;
-                    quantityInput.readOnly = true;
-                    conditionSelect.classList.add('locked');
-                    conditionSelect.setAttribute('data-locked', 'true');
-                    conditionSelect.addEventListener('mousedown', preventSelectDropdown);
-
-                    button.textContent = 'Edit';
-                    button.classList.remove('btn-success');
-                    button.classList.add('btn-warning');
-                    row.classList.remove('error-row');
-                } else {
-                    // Edit mode: unlock inputs
-                    materialNameInput.readOnly = false;
-                    quantityInput.readOnly = false;
-                    conditionSelect.classList.remove('locked');
-                    conditionSelect.removeAttribute('data-locked');
-                    conditionSelect.removeEventListener('mousedown', preventSelectDropdown);
-
-                    button.textContent = 'Save';
-                    button.classList.remove('btn-warning');
-                    button.classList.add('btn-success');
-                }
-                checkFormValidity();
-            }
-
-            function preventSelectDropdown(e) {
-                e.preventDefault();
-            }
-
-            // Autocomplete functionality
-            function attachAutocomplete(input) {
+            // Autocomplete for materials
+            function attachMaterialAutocomplete(input) {
                 input.addEventListener('input', function () {
                     if (this.readOnly)
                         return;
@@ -439,19 +375,61 @@
                 });
             }
 
+            // Autocomplete for employees
+            function attachEmployeeAutocomplete(input) {
+                input.addEventListener('input', function () {
+                    if (this.readOnly)
+                        return;
+                    const value = this.value.toLowerCase();
+                    const suggestionsDiv = this.nextElementSibling;
+                    suggestionsDiv.innerHTML = '';
+                    suggestionsDiv.style.display = 'none';
+
+                    if (value) {
+                        const matches = employeeData.filter(emp =>
+                            emp.fullName.toLowerCase().includes(value)
+                        );
+                        if (matches.length > 0) {
+                            matches.forEach(emp => {
+                                const suggestion = document.createElement('div');
+                                suggestion.className = 'autocomplete-suggestion';
+                                suggestion.textContent = emp.fullName;
+                                suggestion.addEventListener('click', () => {
+                                    this.value = emp.fullName;
+                                    suggestionsDiv.style.display = 'none';
+                                    checkFormValidity();
+                                });
+                                suggestionsDiv.appendChild(suggestion);
+                            });
+                            suggestionsDiv.style.display = 'block';
+                        }
+                    }
+                });
+
+                input.addEventListener('blur', function () {
+                    setTimeout(() => {
+                        this.nextElementSibling.style.display = 'none';
+                    }, 200);
+                });
+            }
+
             // Export to Excel functionality
             function exportToExcel() {
-                const exporter = document.querySelector('input[name="userFN"]').value;               
+                if (!checkFormValidity())
+                    return;
+
+                const exporter = document.querySelector('input[name="userFN"]').value;
                 const voucherId = document.getElementById('voucherId').value;
+                const receiver = document.getElementById('receiver').value;
                 const purpose = document.getElementById('purpose').value;
                 const requiredDate = document.getElementById('requiredDate').value;
                 const additionalNote = document.getElementById('additionalNote').value;
 
-                // Create data for Excel
                 const data = [
                     ["Export Voucher"],
                     ["Exporter", exporter],
-                    ["Voucher ID", voucherId],
+                    ["Receipt ID", voucherId],
+                    ["Receiver", receiver],
                     ["Purpose", purpose],
                     ["Required Export Date", requiredDate],
                     ["Additional Notes", additionalNote || "None"],
@@ -460,7 +438,6 @@
                     ["No.", "Material Name", "Material Code", "Quantity", "Unit", "Condition"]
                 ];
 
-                // Add material rows
                 const materialRows = document.querySelectorAll('#materialTableBody tr');
                 materialRows.forEach((row, index) => {
                     const materialName = row.querySelector('.material-name-input').value;
@@ -471,37 +448,19 @@
                     data.push([index + 1, materialName, materialCode, parseInt(quantity), unit, condition]);
                 });
 
-                // Create worksheet
                 const ws = XLSX.utils.aoa_to_sheet(data);
-
-                // Optional: Add basic styling
                 ws['A1'].s = {font: {bold: true}};
                 ws['A9'].s = {font: {bold: true}};
-                
+                ws['A10'].s = {font: {bold: true}};
                 ws['B10'].s = {font: {bold: true}};
                 ws['C10'].s = {font: {bold: true}};
                 ws['D10'].s = {font: {bold: true}};
                 ws['E10'].s = {font: {bold: true}};
                 ws['F10'].s = {font: {bold: true}};
 
-                // Create workbook
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Export Voucher");
-
-                // Generate and download Excel file
                 XLSX.writeFile(wb, `ExportVoucher_${voucherId}.xlsx`);
-            }
-
-            // Check if all rows are saved
-            function areAllRowsSaved() {
-                const rows = document.querySelectorAll('#materialTableBody tr');
-                for (let row of rows) {
-                    const saveButton = row.querySelector('.edit-row');
-                    if (saveButton.textContent === 'Save') {
-                        return false;
-                    }
-                }
-                return true;
             }
 
             // Check form validity to enable/disable export button
@@ -510,13 +469,13 @@
                 const exportBtn = document.getElementById('exportExcelBtn');
                 exportBtn.disabled = !isValid;
                 exportBtn.classList.toggle('btn-disabled', !isValid);
+                return isValid;
             }
-
-
 
             // Client-side form validation
             function validateForm() {
                 const voucherId = document.getElementById('voucherId').value.trim();
+                const receiver = document.getElementById('receiver').value.trim();
                 const purpose = document.getElementById('purpose').value.trim();
                 const requiredDate = document.getElementById('requiredDate').value;
                 const additionalNote = document.getElementById('additionalNote').value.trim();
@@ -529,88 +488,47 @@
 
                 rows.forEach(row => row.classList.remove('error-row'));
 
-                // Regex for allowed characters
                 const idRegex = /^[A-Za-z0-9-_]+$/;
                 const textRegex = /^[A-Za-z0-9\s,.()-]+$/;
 
-                // Check if all rows are saved
-//                if (!areAllRowsSaved()) {
-//                    showAlert('error', 'Please save all material rows before submitting.');
-//                    return false;
-//                }
-//
-//                if (!voucherId) {
-//                    showAlert('error', 'Voucher ID cannot be empty.');
-//                    return false;
-//                }
-//                if (voucherId.length > 50) {
-//                    showAlert('error', 'Voucher ID cannot exceed 50 characters.');
-//                    return false;
-//                }
-//                if (!idRegex.test(voucherId)) {
-//                    showAlert('error', 'Voucher ID can only contain alphanumeric characters, hyphens, or underscores.');
-//                    return false;
-//                }
-//
-//                if (!purpose) {
-//                    showAlert('error', 'Export purpose cannot be empty.');
-//                    return false;
-//                }
-//                if (purpose.length > 500) {
-//                    showAlert('error', 'Export purpose cannot exceed 500 characters.');
-//                    return false;
-//                }
-//                if (!textRegex.test(purpose)) {
-//                    showAlert('error', 'Export purpose can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.');
-//                    return false;
-//                }
-//
-//                if (!requiredDate) {
-//                    showAlert('error', 'Required export date cannot be empty.');
-//                    return false;
-//                }
-//
-//                if (additionalNote && additionalNote.length > 1000) {
-//                    showAlert('error', 'Additional notes cannot exceed 1000 characters.');
-//                    return false;
-//                }
-//                if (additionalNote && !textRegex.test(additionalNote)) {
-//                    showAlert('error', 'Additional notes can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.');
-//                    return false;
-//                }
-//
-//                if (materialNames.length === 0) {
-//                    showAlert('error', 'At least one material is required.');
-//                    return false;
-//                }
+                if (!voucherId || voucherId.length > 50 || !idRegex.test(voucherId)) {
+                    rows[0].classList.add('error-row');
+                    return false;
+                }
 
-//                for (let i = 0; i < materialNames.length; i++) {
-//                    if (!materialNames[i].value.trim()) {
-//                        showAlert('error', `Material name cannot be empty at row ${i + 1}`);
-//                        rows[i].classList.add('error-row');
-//                        return false;
-//                    }
-//                    if (!materialCodes[i].value.trim()) {
-//                        showAlert('error', `Material code cannot be empty at row ${i + 1}`);
-//                        rows[i].classList.add('error-row');
-//                        return false;
-//                    }
-//                    if (!quantities[i].value || quantities[i].value <= 0) {
-//                        showAlert('error', `Quantity must be greater than 0 at row ${i + 1}`);
-//                        rows[i].classList.add('error-row');
-//                        return false;
-//                    }
-//                    if (!units[i].value) {
-//                        showAlert('error', `Unit cannot be empty at row ${i + 1}`);
-//                        rows[i].classList.add('error-row');
-//                        return false;
-//                    }
-//                    if (!conditions[i].value) {
-//                        showAlert('error', `Condition cannot be empty at row ${i + 1}`);
-//                        rows[i].classList.add('error-row');
-//                        return false;
-//                    }
-//                }
+                if (!receiver || !employeeData.some(emp => emp.fullName === receiver)) {
+                    rows[0].classList.add('error-row');
+                    return false;
+                }
+
+                if (!purpose || purpose.length > 500 || !textRegex.test(purpose)) {
+                    rows[0].classList.add('error-row');
+                    return false;
+                }
+
+                if (!requiredDate) {
+                    rows[0].classList.add('error-row');
+                    return false;
+                }
+
+                if (additionalNote && (additionalNote.length > 1000 || !textRegex.test(additionalNote))) {
+                    rows[0].classList.add('error-row');
+                    return false;
+                }
+
+                if (materialNames.length === 0) {
+                    return false;
+                }
+
+                for (let i = 0; i < materialNames.length; i++) {
+                    if (!materialNames[i].value.trim() || !materialCodes[i].value.trim() ||
+                            !quantities[i].value || quantities[i].value <= 0 ||
+                            !units[i].value || !conditions[i].value) {
+                        rows[i].classList.add('error-row');
+                        return false;
+                    }
+                }
+
                 return true;
             }
 
@@ -638,15 +556,17 @@
                 const tableBody = document.getElementById('materialTableBody');
                 const addButton = document.getElementById('addMaterialBtn');
                 const exportButton = document.getElementById('exportExcelBtn');
+                const receiverInput = document.getElementById('receiver');
 
-                if (!tableBody || !addButton || !exportButton) {
-                    console.error('Required elements not found');                    
+                if (!tableBody || !addButton || !exportButton || !receiverInput) {
+                    console.error('Required elements not found');
                     return;
                 }
 
-                // Fetch materials and attach autocomplete
-                fetchMaterials().then(() => {
-                    document.querySelectorAll(".material-name-input").forEach(attachAutocomplete);
+                // Fetch data and attach autocompletes
+                Promise.all([fetchMaterials(), fetchEmployees()]).then(() => {
+                    document.querySelectorAll(".material-name-input").forEach(attachMaterialAutocomplete);
+                    attachEmployeeAutocomplete(receiverInput);
                 });
 
                 // Add row event
@@ -655,12 +575,10 @@
                 // Export to Excel event
                 exportButton.addEventListener('click', exportToExcel);
 
-                // Remove row and edit row events
+                // Remove row event
                 tableBody.addEventListener('click', (event) => {
                     if (event.target.classList.contains('remove-row')) {
                         removeRow(event.target);
-                    } else if (event.target.classList.contains('edit-row')) {
-                        toggleEditRow(event.target);
                     }
                 });
 
@@ -670,10 +588,10 @@
 
             <c:if test="${not empty errorRow && errorRow >= 0}">
                 const rows = document.querySelectorAll('#materialTableBody tr');
-                if (rows[${fn:escapeXml(errorRow)}]) {
-                    rows[${fn:escapeXml(errorRow)}].classList.add('error-row');
+            if (rows[${fn:escapeXml(errorRow)}]) {
+                rows[${fn:escapeXml(errorRow)}].classList.add('error-row');
                 } else {
-                    console.warn('Error row index ${fn:escapeXml(errorRow)} is out of bounds.');
+                console.warn('Error row index ${fn:escapeXml(errorRow)} is out of bounds.');
                 }
             </c:if>
             });

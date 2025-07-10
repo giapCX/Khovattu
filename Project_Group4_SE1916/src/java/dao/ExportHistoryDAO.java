@@ -1,5 +1,4 @@
-
-//HistoryDAO
+//exHisDAO
 /**
  * ExportHistoryDAO.java
  * Data Access Object for handling export history operations
@@ -29,10 +28,13 @@ public class ExportHistoryDAO {
     public List<Export> searchExportReceipts(Date fromDate, Date toDate, String exporter, int page, int pageSize) {
         List<Export> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT DISTINCT er.export_id, er.voucher_id, er.export_date, er.note, u.full_name AS exporter_name "
+                "SELECT DISTINCT er.export_id, er.receipt_id, er.export_date, er.note, "
+                + "u1.full_name AS exporter_name, u2.full_name AS receiver_name, "
+                + "er.exporter_id, er.receiver_id "
                 + "FROM ExportReceipts er "
-                + "JOIN Users u ON er.user_id = u.user_id "
-                + "LEFT JOIN ExportDetails ed ON er.export_id = ed.export_id " // Use LEFT JOIN to include receipts without details
+                + "JOIN Users u1 ON er.exporter_id = u1.user_id "
+                + "JOIN Users u2 ON er.receiver_id = u2.user_id "
+                + "LEFT JOIN ExportDetails ed ON er.export_id = ed.export_id "
                 + "WHERE 1=1 "
         );
 
@@ -43,7 +45,7 @@ public class ExportHistoryDAO {
             sql.append("AND er.export_date <= ? ");
         }
         if (exporter != null && !exporter.trim().isEmpty()) {
-            sql.append("AND u.full_name LIKE ? ");
+            sql.append("AND u1.full_name LIKE ? ");
         }
 
         sql.append("ORDER BY er.export_date DESC ");
@@ -77,10 +79,13 @@ public class ExportHistoryDAO {
             while (rs.next()) {
                 Export receipt = new Export();
                 receipt.setExportId(rs.getInt("export_id"));
-                receipt.setVoucherId(rs.getString("voucher_id"));
+                receipt.setReceiptId(rs.getString("receipt_id"));
                 receipt.setExportDate(rs.getDate("export_date").toLocalDate());
                 receipt.setNote(rs.getString("note"));
+                receipt.setExporterId(rs.getInt("exporter_id"));
+                receipt.setReceiverId(rs.getInt("receiver_id"));
                 receipt.setExporterName(rs.getString("exporter_name"));
+                receipt.setReceiverName(rs.getString("receiver_name"));
                 list.add(receipt);
             }
         } catch (SQLException e) {
@@ -94,7 +99,7 @@ public class ExportHistoryDAO {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(DISTINCT er.export_id) "
                 + "FROM ExportReceipts er "
-                + "JOIN Users u ON er.user_id = u.user_id "
+                + "JOIN Users u1 ON er.exporter_id = u1.user_id "
                 + "WHERE 1=1"
         );
 
@@ -105,7 +110,7 @@ public class ExportHistoryDAO {
             sql.append(" AND er.export_date <= ? ");
         }
         if (exporter != null && !exporter.trim().isEmpty()) {
-            sql.append(" AND u.full_name LIKE ? ");
+            sql.append(" AND u1.full_name LIKE ? ");
         }
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -133,12 +138,15 @@ public class ExportHistoryDAO {
 
     public List<Export> searchByExporterName(String exporter) {
         List<Export> list = new ArrayList<>();
-        String sql = "SELECT er.export_id, er.voucher_id, er.export_date, er.note, u.full_name AS exporter_name "
+        String sql = "SELECT er.export_id, er.receipt_id, er.export_date, er.note, "
+                + "u1.full_name AS exporter_name, u2.full_name AS receiver_name, "
+                + "er.exporter_id, er.receiver_id "
                 + "FROM ExportReceipts er "
-                + "JOIN Users u ON er.user_id = u.user_id "
+                + "JOIN Users u1 ON er.exporter_id = u1.user_id "
+                + "JOIN Users u2 ON er.receiver_id = u2.user_id "
                 + "JOIN ExportDetails ed ON er.export_id = ed.export_id "
-                + "WHERE u.full_name LIKE ? "
-                + "GROUP BY er.export_id, er.voucher_id, er.export_date, er.note, u.full_name "
+                + "WHERE u1.full_name LIKE ? "
+                + "GROUP BY er.export_id, er.receipt_id, er.export_date, er.note, u1.full_name, u2.full_name, er.exporter_id, er.receiver_id "
                 + "ORDER BY er.export_date DESC";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -147,10 +155,13 @@ public class ExportHistoryDAO {
             while (rs.next()) {
                 Export receipt = new Export();
                 receipt.setExportId(rs.getInt("export_id"));
-                receipt.setVoucherId(rs.getString("voucher_id"));
+                receipt.setReceiptId(rs.getString("receipt_id"));
                 receipt.setExportDate(rs.getDate("export_date").toLocalDate());
                 receipt.setNote(rs.getString("note"));
+                receipt.setExporterId(rs.getInt("exporter_id"));
+                receipt.setReceiverId(rs.getInt("receiver_id"));
                 receipt.setExporterName(rs.getString("exporter_name"));
+                receipt.setReceiverName(rs.getString("receiver_name"));
                 list.add(receipt);
             }
         } catch (SQLException e) {
@@ -158,18 +169,22 @@ public class ExportHistoryDAO {
         }
         return list;
     }
-    
-     public Export getReceiptById(int exportId) {
+
+    public Export getReceiptById(int exportId) {
         Export receipt = null;
         String sql = """
             SELECT 
                 er.export_id, 
-                er.voucher_id, 
+                er.receipt_id, 
                 er.export_date, 
                 er.note, 
-                u.full_name AS exporter_name
+                u1.full_name AS exporter_name,
+                u2.full_name AS receiver_name,
+                er.exporter_id,
+                er.receiver_id
             FROM ExportReceipts er
-            JOIN Users u ON er.user_id = u.user_id
+            JOIN Users u1 ON er.exporter_id = u1.user_id
+            JOIN Users u2 ON er.receiver_id = u2.user_id
             WHERE er.export_id = ?
         """;
 
@@ -179,10 +194,13 @@ public class ExportHistoryDAO {
             if (rs.next()) {
                 receipt = new Export();
                 receipt.setExportId(rs.getInt("export_id"));
-                receipt.setVoucherId(rs.getString("voucher_id"));
+                receipt.setReceiptId(rs.getString("receipt_id"));
                 receipt.setExportDate(rs.getDate("export_date").toLocalDate());
                 receipt.setNote(rs.getString("note"));
+                receipt.setExporterId(rs.getInt("exporter_id"));
+                receipt.setReceiverId(rs.getInt("receiver_id"));
                 receipt.setExporterName(rs.getString("exporter_name"));
+                receipt.setReceiverName(rs.getString("receiver_name"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

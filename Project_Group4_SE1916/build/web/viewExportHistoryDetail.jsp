@@ -1,4 +1,5 @@
 
+
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -104,7 +105,7 @@
             <!-- General Information -->
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <strong>Receipt Code:</strong> ${receipt.voucherId}
+                    <strong>Receipt Code:</strong> ${receipt.receiptId}
                 </div>
                 <div class="col-md-6">
                     <strong>Export Date:</strong> ${receipt.exportDate}

@@ -1,39 +1,40 @@
-//Export.java
+//export
 package model;
 
 import java.time.LocalDate;
 
 public class Export {
     private int exportId;
-    private String voucherId; 
-    private int userId;       
+    private String receiptId;
+    private int exporterId;
+    private int receiverId;
     private LocalDate exportDate;
     private String note;
     private String exporterName;
+    private String receiverName;
 
-    public String getExporterName() {
-        return exporterName;
-    }
- 
-    public void setExporterName(String exporterName) {
-        this.exporterName = exporterName;
-    }
-
-    public Export(String exporterName) {
-        this.exporterName = exporterName;
-    }
-    
     public Export() {
     }
-
-    public Export(int exportId, String voucherId, int userId, LocalDate exportDate, String note) {
+    
+    public Export(int exportId, String receiptId, int exporterId, int receiverId, LocalDate exportDate, String note, String exporterName, String receiverName) {
         this.exportId = exportId;
-        this.voucherId = voucherId;
-        this.userId = userId;
+        this.receiptId = receiptId;
+        this.exporterId = exporterId;
+        this.receiverId = receiverId;
         this.exportDate = exportDate;
         this.note = note;
+        this.exporterName = exporterName;
+        this.receiverName = receiverName;
+    }  
+
+    public String getReceiverName() {
+        return receiverName;
     }
 
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
+    }
+        
     public int getExportId() {
         return exportId;
     }
@@ -42,20 +43,28 @@ public class Export {
         this.exportId = exportId;
     }
 
-    public String getVoucherId() {
-        return voucherId;
+    public String getReceiptId() {
+        return receiptId;
     }
 
-    public void setVoucherId(String voucherId) {
-        this.voucherId = voucherId;
+    public void setReceiptId(String receiptId) {
+        this.receiptId = receiptId;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getExporterId() {
+        return exporterId;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setExporterId(int exporterId) {
+        this.exporterId = exporterId;
+    }
+
+    public int getReceiverId() {
+        return receiverId;
+    }
+
+    public void setReceiverId(int receiverId) {
+        this.receiverId = receiverId;
     }
 
     public LocalDate getExportDate() {
@@ -72,5 +81,13 @@ public class Export {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getExporterName() {
+        return exporterName;
+    }
+
+    public void setExporterName(String exporterName) {
+        this.exporterName = exporterName;
     }
 }

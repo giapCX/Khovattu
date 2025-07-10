@@ -224,6 +224,7 @@
                         <th>Code</th>
                         <th>Date</th>
                         <th>Exporter</th>
+                        <th>Receiver</th>
                         <th>Note</th>
                         <th>Action</th>
                     </tr>
@@ -232,9 +233,10 @@
                             <c:forEach items="${historyData}" var="item" varStatus="loop">
                                 <tr>
                                     <td>${(currentPage - 1) * 10 + loop.index + 1}</td>
-                                    <td>${item.voucherId}</td>
+                                    <td>${item.receiptId}</td>
                                     <td>${item.exportDate}</td>
                                     <td>${item.exporterName}</td>
+                                    <td>${item.receiverName}</td>
                                     <td>${item.note}</td>
 <!--                                    <td><a href="viewExportHistoryDetail.jsp">View</a></td>-->
                                     <td><a href="exportHistoryDetail?exportId=${item.exportId}&keyword=${param.keyword}&sort=${param.sort}&page=1">View</a></td>

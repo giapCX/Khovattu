@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import model.Export;
@@ -26,6 +25,7 @@ public class ExportMaterial extends HttpServlet {
     private static final String ID_REGEX = "^[A-Za-z0-9-_]+$";
     private static final String TEXT_REGEX = "^[A-Za-z0-9\\s,.()-]+$";
     private static final int VOUCHER_ID_MAX_LENGTH = 50;
+    private static final int RECEIVER_MAX_LENGTH = 100;
     private static final int PURPOSE_MAX_LENGTH = 500;
     private static final int NOTE_MAX_LENGTH = 1000;
 
@@ -39,6 +39,19 @@ public class ExportMaterial extends HttpServlet {
                 List<Material> materials = materialDAO.getAllMaterials();
                 Gson gson = new Gson();
                 String json = gson.toJson(materials);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(json);
+            } catch (SQLException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("{\"error\": \"Database error: " + e.getMessage() + "\"}");
+            }
+        } else if ("employees".equals(fetch)) {
+            try {
+                UserDAO userDAO = new UserDAO();
+                List<User> employees = userDAO.getAllEmployees();
+                Gson gson = new Gson();
+                String json = gson.toJson(employees);
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
                 response.getWriter().write(json);
@@ -67,6 +80,7 @@ public class ExportMaterial extends HttpServlet {
         HttpSession session = request.getSession();
         String username = (String) session.getAttribute("username");
         String voucherIdStr = request.getParameter("voucherId");
+        String receiver = request.getParameter("receiver");
         String[] materialCodes = request.getParameterValues("materialCode[]");
         String[] quantities = request.getParameterValues("quantity[]");
         String[] conditions = request.getParameterValues("condition[]");
@@ -75,24 +89,63 @@ public class ExportMaterial extends HttpServlet {
         UserDAO userDAO = new UserDAO();
         User user = userDAO.getUserByUsername(username);
 
-        // Generate exportId automatically
-        //String exportIdStr = "EXP-" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "-" + System.currentTimeMillis();
-
         // Server-side validation
         if (voucherIdStr == null || voucherIdStr.trim().isEmpty()) {
-            errorMessage = "Voucher ID cannot be empty.";
+            errorMessage = "Receipt ID cannot be empty.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
         }
         if (voucherIdStr.length() > VOUCHER_ID_MAX_LENGTH) {
-            errorMessage = "Voucher ID cannot exceed " + VOUCHER_ID_MAX_LENGTH + " characters.";
+            errorMessage = "Receipt ID cannot exceed " + VOUCHER_ID_MAX_LENGTH + " characters.";
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
         }
         if (!voucherIdStr.matches(ID_REGEX)) {
-            errorMessage = "Voucher ID can only contain alphanumeric characters, hyphens, or underscores.";
+            errorMessage = "Receipt ID can only contain alphanumeric characters, hyphens, or underscores.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+
+        if (receiver == null || receiver.trim().isEmpty()) {
+            errorMessage = "Receiver cannot be empty.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+        if (receiver.length() > RECEIVER_MAX_LENGTH) {
+            errorMessage = "Receiver cannot exceed " + RECEIVER_MAX_LENGTH + " characters.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+        if (!receiver.matches(TEXT_REGEX)) {
+            errorMessage = "Receiver can only contain alphanumeric characters, spaces, commas, periods, parentheses, or hyphens.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+
+        int receiverId = -1; // Default value to indicate invalid receiver
+        try (Connection conn = DBContext.getConnection()) {
+            UserDAO dao = new UserDAO(conn);
+            List<User> employees = dao.getAllEmployees();
+            User receiverUser = employees.stream()
+                    .filter(emp -> emp.getFullName().equals(receiver))
+                    .findFirst()
+                    .orElse(null);
+
+            if (receiverUser == null) {
+                errorMessage = "Invalid receiver selected.";
+                request.setAttribute("error", errorMessage);
+                request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+                return;
+            }
+            receiverId = receiverUser.getUserId();
+        } catch (SQLException e) {
+            errorMessage = "Database error while validating receiver: " + e.getMessage();
             request.setAttribute("error", errorMessage);
             request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             return;
@@ -101,8 +154,8 @@ public class ExportMaterial extends HttpServlet {
         // Check for duplicate voucherId
         try (Connection conn = DBContext.getConnection()) {
             ExportDAO dao = new ExportDAO(conn);
-            if (dao.checkVoucherIdExists(voucherIdStr)) {
-                errorMessage = "Voucher ID already exists. Please use a unique Voucher ID.";
+            if (dao.checkReceiptIdExists(voucherIdStr)) {
+                errorMessage = "Receipt ID already exists. Please use a unique Receipt ID.";
                 request.setAttribute("error", errorMessage);
                 request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                 return;
@@ -171,12 +224,13 @@ public class ExportMaterial extends HttpServlet {
         }
 
         int userId = user.getUserId();
-
+        int recId = 1;
         try (Connection conn = DBContext.getConnection()) {
             ExportDAO dao = new ExportDAO(conn);
             Export export = new Export();
-            export.setUserId(userId);
-            export.setVoucherId(voucherIdStr);
+            export.setExporterId(userId);
+            export.setReceiptId(voucherIdStr);
+            export.setReceiverId(recId);
             export.setExportDate(LocalDate.now());
             export.setNote(note);
             int exportId = dao.saveExport(export);
