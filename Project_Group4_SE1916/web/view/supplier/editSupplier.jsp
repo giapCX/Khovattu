@@ -36,7 +36,7 @@
 
         <!-- Main Content -->
         <main class="flex-1 p-8">
-            <div class="max-w-md mx-auto card bg-white dark:bg-gray-800 p-6">
+            <div class="max-w-6xl mx-auto card bg-white dark:bg-gray-800 p-6">
                  <div class="flex items-center gap-4 mb-6">
                     <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>

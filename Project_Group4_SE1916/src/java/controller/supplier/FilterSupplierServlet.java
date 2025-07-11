@@ -68,7 +68,15 @@ public class FilterSupplierServlet extends HttpServlet {
         int supplierId = Integer.parseInt(request.getParameter("supplierId"));
         String pageParam = request.getParameter("page");
         int currentPage = 1;
-        int recordsPerPage = 6;
+        int recordsPerPage = 5;
+        String rppParam = request.getParameter("recordsPerPage");
+        if (rppParam != null && !rppParam.isEmpty()) {
+            try {
+                recordsPerPage = Integer.parseInt(rppParam);
+            } catch (NumberFormatException e) {
+
+            }
+        }
 
         if (pageParam != null) {
             try {
@@ -105,12 +113,15 @@ public class FilterSupplierServlet extends HttpServlet {
             if (materials == null) {
                 materials = new ArrayList<>();
             }
-
+            
+            SupplierDAO s = new SupplierDAO(conn);
+            Supplier supplier = s.getSupplierById(supplierId);
+            request.setAttribute("supplier", supplier);
             request.setAttribute("materials", materials);
             request.setAttribute("searchName", searchName);
             request.setAttribute("searchCategory", searchCategory);
             request.setAttribute("supplierId", supplierId);
-            request.setAttribute("supplierName",supplierName);
+            request.setAttribute("supplierName", supplierName);
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("recordsPerPage", recordsPerPage);

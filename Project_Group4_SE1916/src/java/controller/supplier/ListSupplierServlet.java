@@ -68,7 +68,15 @@ public class ListSupplierServlet extends HttpServlet {
         String searchStatus = request.getParameter("searchStatus");
         String pageParam = request.getParameter("page");
         int currentPage = 1;
-        int recordsPerPage = 6;
+        int recordsPerPage = 10; 
+        String rppParam = request.getParameter("recordsPerPage");
+        if (rppParam != null && !rppParam.isEmpty()) {
+            try {
+                recordsPerPage = Integer.parseInt(rppParam);
+            } catch (NumberFormatException e) {
+                
+            }
+        }
 
         if (pageParam != null) {
             try {

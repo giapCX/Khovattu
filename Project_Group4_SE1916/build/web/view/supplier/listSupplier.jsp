@@ -94,7 +94,14 @@
                     </button>
                     <a href="${pageContext.request.contextPath}/ListSupplierServlet" onclick="Listevent.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" class="bg-yellow-500 text-white px-6 py-2 rounded-lg flex items-center">
                         <i class="fas fa-undo mr-2"></i> Reset form
-                    </a>
+                    </a><br/>
+                    <span class="text-gray-700 dark:text-gray-300">Items per page:</span>
+                    <select name="recordsPerPage" onchange="this.form.submit()" 
+                            class="border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 search-input">
+                        <option value="10" ${recordsPerPage == '10' ? 'selected' : ''}>10 suppliers/page</option>
+                        <option value="20" ${recordsPerPage == '20' ? 'selected' : ''}>20 suppliers/page</option>
+                        <option value="30" ${recordsPerPage == '30' ? 'selected' : ''}>30 suppliers/page</option>
+                    </select>
                 </form>
 
                 <!-- Table -->
@@ -107,9 +114,8 @@
                                     <th class="p-4 text-left">Name</th>
                                     <th class="p-4 text-left">Phone</th>
                                     <th class="p-4 text-left">Address</th>
-                                    <th class="p-4 text-left">Email</th>
                                     <th class="p-4 text-left">Status</th>
-                                    <th class="p-4 text-left">Supplied materials</th>
+                                    <th class="p-4 text-left">Details</th>
                                     <th class="p-4 text-left">Action</th>
                                 </tr>
                             </thead>
@@ -122,7 +128,6 @@
                                                 <td class="p-4 font-medium">${item.supplierName}</td>
                                                 <td class="p-4 font-medium">${item.supplierPhone}</td>
                                                 <td class="p-4 font-medium">${item.supplierAddress}</td>
-                                                <td class="p-4 font-medium">${item.supplierEmail}</td>
                                                 <td class="p-4 font-medium">
                                                     <c:choose>
                                                         <c:when test="${item.supplierStatus == 'inactive'}">
@@ -134,7 +139,7 @@
                                                     </c:choose>
                                                 </td>
                                                 <td class="p-4 font-medium">
-                                                    <a href="FilterSupplierServlet?supplierId=${item.supplierId}&supplierName=${item.supplierName}" class="text-primary-600 dark:text-primary-400 hover:underline">View details</a>
+                                                    <a href="FilterSupplierServlet?supplierId=${item.supplierId}&supplierName=${item.supplierName}" class="text-primary-600 dark:text-primary-400 hover:underline">View </a>
                                                 </td>
                                                 <td class="p-4 font-medium">
                                                     <a href="EditSupplierServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
@@ -160,7 +165,7 @@
                     <!-- Nút trang trước -->
                     <c:choose>
                         <c:when test="${currentPage > 1}">
-                            <a href="ListSupplierServlet?page=${currentPage - 1}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&lt;</a>
+                            <a href="ListSupplierServlet?page=${currentPage - 1}&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&lt;</a>
                         </c:when>
                         <c:otherwise>
                             <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">&lt;</span>
@@ -172,7 +177,7 @@
                             <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">1</span>
                         </c:when>
                         <c:otherwise>
-                            <a href="ListSupplierServlet?page=1&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">1</a>
+                            <a href="ListSupplierServlet?page=1&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">1</a>
                         </c:otherwise>
                     </c:choose>
                     <!-- Dấu ... nếu khoảng cách trang hiện tại > 3 với trang 1 -->
@@ -186,7 +191,7 @@
                                 <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${i}</span>
                             </c:when>
                             <c:otherwise>
-                                <a href="ListSupplierServlet?page=${i}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${i}</a>
+                                <a href="ListSupplierServlet?page=${i}&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${i}</a>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
@@ -201,14 +206,14 @@
                                 <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${totalPages}</span>
                             </c:when>
                             <c:otherwise>
-                                <a href="ListSupplierServlet?page=${totalPages}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${totalPages}</a>
+                                <a href="ListSupplierServlet?page=${totalPages}&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${totalPages}</a>
                             </c:otherwise>
                         </c:choose>
                     </c:if>
                     <!-- Nút trang sau -->
                     <c:choose>
                         <c:when test="${currentPage < totalPages}">
-                            <a href="ListSupplierServlet?page=${currentPage + 1}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&gt;</a>
+                            <a href="ListSupplierServlet?page=${currentPage + 1}&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&gt;</a>
                         </c:when>
                         <c:otherwise>
                             <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">&gt;</span>
