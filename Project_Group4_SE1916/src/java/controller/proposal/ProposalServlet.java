@@ -5,9 +5,11 @@
 package controller.proposal;
 
 import Dal.DBContext;
+import dao.ConstructionSiteDAO;
 import dao.MaterialCategoryDAO;
 import dao.MaterialDAO;
 import dao.ProposalDAO;
+import dao.SupplierDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -20,10 +22,12 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import model.ConstructionSite;
 import model.Material;
 import model.MaterialCategory;
 import model.Proposal;
 import model.ProposalDetails;
+import model.Supplier;
 
 /**
  *
@@ -56,6 +60,13 @@ public class ProposalServlet extends HttpServlet {
             List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
             List<MaterialCategory> childCategories = categoryDAO.getAllChildCategories();
             List<Material> material = materialDAO.getAllMaterials();
+            Connection conn = DBContext.getConnection();
+            SupplierDAO supplierDAO = new SupplierDAO(conn);
+            List<Supplier> suppliers = supplierDAO.getAllSuppliers();
+            ConstructionSiteDAO constructionSiteDAO = new ConstructionSiteDAO(conn);
+            List<ConstructionSite> constructionSites = constructionSiteDAO.getAllConstructionSites();
+            request.setAttribute("constructionSites", constructionSites);
+            request.setAttribute("suppliers", suppliers);
             request.setAttribute("material", material);
             request.setAttribute("parentCategories", parentCategories);
             request.setAttribute("childCategories", childCategories);
@@ -77,14 +88,12 @@ public class ProposalServlet extends HttpServlet {
         }
         String note = request.getParameter("note");
         String[] materialIds = request.getParameterValues("materialId[]");
+        String[] units = request.getParameterValues("unit[]");
         String[] quantities = request.getParameterValues("quantity[]");
-        String[] materialConditions = request.getParameterValues("materialCondition[]");
-
-        if (materialIds == null || quantities == null || materialConditions == null || materialIds.length == 0) {
-            request.setAttribute("error", "Missing proposal details");
-            request.getRequestDispatcher("/view/proposal/proposalOfEmployee.jsp").forward(request, response);
-            return;
-        }
+        String[] conditions = request.getParameterValues("materialCondition[]");
+        String[] supplierIds = request.getParameterValues("supplierId[]");
+        String[] prices = request.getParameterValues("pricePerUnit[]");
+        String[] siteIds = request.getParameterValues("siteId[]");
 
         Proposal proposal = new Proposal();
         proposal.setProposalType(proposalType);
@@ -93,23 +102,34 @@ public class ProposalServlet extends HttpServlet {
         proposal.setProposalSentDate(new Timestamp(System.currentTimeMillis()));
         proposal.setFinalStatus("pending");
 
-        List<ProposalDetails> proposalDetailsList = new ArrayList<>();
-        for (int i = 0; i < materialIds.length; i++) {
-            ProposalDetails proposalDetail = new ProposalDetails();
-            proposalDetail.setProposal(proposal);
-            try {
-                proposalDetail.setMaterialId(Integer.parseInt(materialIds[i]));
-                proposalDetail.setQuantity(Double.parseDouble(quantities[i]));
-                proposalDetail.setMaterialCondition(materialConditions[i]);
-            } catch (NumberFormatException e) {
-                request.setAttribute("error", "Invalid material");
-                request.getRequestDispatcher("/view/proposal/proposalOfEmployee.jsp").forward(request, response);
-                return;
-            }
-            proposalDetailsList.add(proposalDetail);
-        }
+        List<ProposalDetails> details = new ArrayList<>();
 
-        proposal.setProposalDetails(proposalDetailsList);
+        for (int i = 0; i < materialIds.length; i++) {
+            ProposalDetails detail = new ProposalDetails();
+            detail.setMaterialId(Integer.parseInt(materialIds[i]));
+            detail.setQuantity(Integer.parseInt(quantities[i]));
+            detail.setUnit(units[i]);
+            detail.setMaterialCondition(conditions[i]);
+
+            if ("import_from_supplier".equals(proposalType)) {
+                if (supplierIds != null && i < supplierIds.length && supplierIds[i] != null && !supplierIds[i].isEmpty()) {
+                    detail.setSupplierId(Integer.parseInt(supplierIds[i]));
+                }
+
+                if (prices != null && i < prices.length && prices[i] != null && !prices[i].isEmpty()) {
+                    detail.setPrice(Double.parseDouble(prices[i]));
+                }
+
+            } else if ("export".equals(proposalType) || "import_returned".equals(proposalType)) {
+                if (siteIds != null && i < siteIds.length && siteIds[i] != null && !siteIds[i].isEmpty()) {
+                    detail.setSiteId(Integer.parseInt(siteIds[i]));
+                }
+            }
+
+            details.add(detail);
+            
+        }
+        proposal.setProposalDetails(details);
 
         try (Connection conn = DBContext.getConnection()) {
             ProposalDAO proposalDAO = new ProposalDAO(conn);

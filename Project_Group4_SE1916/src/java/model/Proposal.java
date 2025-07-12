@@ -8,7 +8,10 @@ public class Proposal {
     private int proposalId;
     private String proposalType;
     private int proposerId;
+    private int executorId;
+    private int receiverId;
     private String senderName;
+    private String executorName;
     private String note;
     private Timestamp proposalSentDate;
     private String finalStatus;
@@ -134,5 +137,31 @@ public class Proposal {
     public void setExecuteDate(Timestamp executeDate) {
         this.executeDate = executeDate;
     }
+
+    public int getExecutorId() {
+        return executorId;
+    }
+
+    public void setExecutorId(int executorId) {
+        this.executorId = executorId;
+    }
+
+    public String getExecutorName() {
+        return executorName;
+    }
+
+    public void setExecutorName(String executorName) {
+        this.executorName = executorName;
+    }
+
+    public int getReceiverId() {
+        return receiverId;
+    }
+
+    public void setReceiverId(int receiverId) {
+        this.receiverId = receiverId;
+    }
+    
+    
 
 }

@@ -64,15 +64,39 @@ public class ProposalDAO {
     }
 
     private boolean addProposalDetails(int proposalId, List<ProposalDetails> proposalDetailsList) throws SQLException {
-        String insertProposalDetailSQL = "INSERT INTO ProposalDetails (proposal_id, material_id, quantity, material_condition) VALUES (?, ?, ?, ?)";
+        String insertProposalDetailSQL = "INSERT INTO ProposalDetails (proposal_id, material_id, quantity, material_condition, price_per_unit, supplier_id, site_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
         try (PreparedStatement ps = conn.prepareStatement(insertProposalDetailSQL)) {
             for (ProposalDetails detail : proposalDetailsList) {
                 ps.setInt(1, proposalId);
                 ps.setInt(2, detail.getMaterialId());
                 ps.setDouble(3, detail.getQuantity());
                 ps.setString(4, detail.getMaterialCondition());
+
+                // Giá - nếu null thì setNull
+                if (detail.getPrice() != null) {
+                    ps.setDouble(5, detail.getPrice());
+                } else {
+                    ps.setNull(5, java.sql.Types.DOUBLE);
+                }
+
+                // Supplier - nếu null thì setNull
+                if (detail.getSupplierId() != null) {
+                    ps.setInt(6, detail.getSupplierId());
+                } else {
+                    ps.setNull(6, java.sql.Types.INTEGER);
+                }
+
+                // Site - nếu null thì setNull
+                if (detail.getSiteId() != null) {
+                    ps.setInt(7, detail.getSiteId());
+                } else {
+                    ps.setNull(7, java.sql.Types.INTEGER);
+                }
+
                 ps.addBatch();
             }
+
             int[] result = ps.executeBatch();
             for (int i : result) {
                 if (i == PreparedStatement.EXECUTE_FAILED) {
@@ -368,53 +392,54 @@ public class ProposalDAO {
             conn.setAutoCommit(true);
         }
     }
-public Proposal getProposalById(int proposalId) {
-    Proposal proposal = null;
-    String sql = "SELECT ep.*, u.full_name, "
-            + "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, m.name AS material_name, m.unit AS material_unit, " // Thêm unit vào đây
-            + "pa.approval_id, pa.admin_approver_id, pa.director_approver_id, "
-            + "pa.admin_status, pa.director_status, "
-            + "pa.admin_approval_date, pa.admin_reason, pa.admin_note, "
-            + "pa.director_approval_date, pa.director_reason, pa.director_note "
-            + "FROM EmployeeProposals ep "
-            + "JOIN Users u ON ep.proposer_id = u.user_id "
-            + "LEFT JOIN ProposalDetails pd ON ep.proposal_id = pd.proposal_id "
-            + "LEFT JOIN Materials m ON pd.material_id = m.material_id "
-            + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
-            + "WHERE ep.proposal_id = ?";
 
-    try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, proposalId);
-        ResultSet rs = ps.executeQuery();
+    public Proposal getProposalById(int proposalId) {
+        Proposal proposal = null;
+        String sql = "SELECT ep.*, u.full_name, "
+                + "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, m.name AS material_name, m.unit AS material_unit, " // Thêm unit vào đây
+                + "pa.approval_id, pa.admin_approver_id, pa.director_approver_id, "
+                + "pa.admin_status, pa.director_status, "
+                + "pa.admin_approval_date, pa.admin_reason, pa.admin_note, "
+                + "pa.director_approval_date, pa.director_reason, pa.director_note "
+                + "FROM EmployeeProposals ep "
+                + "JOIN Users u ON ep.proposer_id = u.user_id "
+                + "LEFT JOIN ProposalDetails pd ON ep.proposal_id = pd.proposal_id "
+                + "LEFT JOIN Materials m ON pd.material_id = m.material_id "
+                + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
+                + "WHERE ep.proposal_id = ?";
 
-        Map<Integer, ProposalDetails> detailsMap = new LinkedHashMap<>();
-        ProposalApprovals approval = null;
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, proposalId);
+            ResultSet rs = ps.executeQuery();
 
-        while (rs.next()) {
-            if (proposal == null) {
-                proposal = new Proposal();
-                proposal.setProposalId(rs.getInt("proposal_id"));
-                proposal.setProposalType(rs.getString("proposal_type"));
-                proposal.setProposerId(rs.getInt("proposer_id"));
-                proposal.setSenderName(rs.getString("full_name"));
-                proposal.setNote(rs.getString("note"));
-                proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
-                proposal.setFinalStatus(rs.getString("final_status"));
-            }
+            Map<Integer, ProposalDetails> detailsMap = new LinkedHashMap<>();
+            ProposalApprovals approval = null;
 
-            // Detail
-            int detailId = rs.getInt("proposal_detail_id");
-            if (detailId > 0 && !detailsMap.containsKey(detailId)) {
-                ProposalDetails detail = new ProposalDetails();
-                detail.setProposalDetailId(detailId);
-                detail.setProposal(proposal);
-                detail.setMaterialId(rs.getInt("material_id"));
-                detail.setMaterialName(rs.getString("material_name"));
-                detail.setQuantity(rs.getDouble("quantity"));
-                detail.setMaterialCondition(rs.getString("material_condition"));
-                detail.setUnit(rs.getString("material_unit")); // Thêm dòng này
-                detailsMap.put(detailId, detail);
-            }
+            while (rs.next()) {
+                if (proposal == null) {
+                    proposal = new Proposal();
+                    proposal.setProposalId(rs.getInt("proposal_id"));
+                    proposal.setProposalType(rs.getString("proposal_type"));
+                    proposal.setProposerId(rs.getInt("proposer_id"));
+                    proposal.setSenderName(rs.getString("full_name"));
+                    proposal.setNote(rs.getString("note"));
+                    proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
+                    proposal.setFinalStatus(rs.getString("final_status"));
+                }
+
+                // Detail
+                int detailId = rs.getInt("proposal_detail_id");
+                if (detailId > 0 && !detailsMap.containsKey(detailId)) {
+                    ProposalDetails detail = new ProposalDetails();
+                    detail.setProposalDetailId(detailId);
+                    detail.setProposal(proposal);
+                    detail.setMaterialId(rs.getInt("material_id"));
+                    detail.setMaterialName(rs.getString("material_name"));
+                    detail.setQuantity(rs.getDouble("quantity"));
+                    detail.setMaterialCondition(rs.getString("material_condition"));
+                    detail.setUnit(rs.getString("material_unit")); // Thêm dòng này
+                    detailsMap.put(detailId, detail);
+                }
 
                 // Approval (nếu có)
                 if (approval == null && rs.getObject("approval_id") != null) {
@@ -685,14 +710,21 @@ public Proposal getProposalById(int proposalId) {
 
     public Proposal getProposalWithDetailsById(int proposalId) throws SQLException {
         Proposal proposal = null;
+
         String sql = "SELECT ep.proposal_id, ep.proposal_type, ep.proposer_id, u.full_name AS sender_name, "
-                + "ep.note, ep.proposal_sent_date, ep.final_status, "
+                + "ep.receiver_id, ep.executor_id, executor.full_name AS executor_name, ep.note, "
+                + "ep.proposal_sent_date, ep.final_status, ep.executed_date, "
                 + "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, "
-                + "m.name AS material_name, m.unit AS material_unit "
+                + "pd.site_id, pd.supplier_id, pd.price_per_unit, "
+                + "m.name AS material_name, m.unit AS material_unit, "
+                + "cs.site_name, s.name AS supplier_name "
                 + "FROM EmployeeProposals ep "
                 + "JOIN Users u ON ep.proposer_id = u.user_id "
+                + "LEFT JOIN Users executor ON ep.executor_id = executor.user_id "
                 + "LEFT JOIN ProposalDetails pd ON ep.proposal_id = pd.proposal_id "
                 + "LEFT JOIN Materials m ON pd.material_id = m.material_id "
+                + "LEFT JOIN ConstructionSites cs ON pd.site_id = cs.site_id "
+                + "LEFT JOIN Suppliers s ON pd.supplier_id = s.supplier_id "
                 + "WHERE ep.proposal_id = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -700,31 +732,40 @@ public Proposal getProposalById(int proposalId) {
             try (ResultSet rs = ps.executeQuery()) {
                 List<ProposalDetails> detailsList = new ArrayList<>();
                 while (rs.next()) {
-
                     if (proposal == null) {
                         proposal = new Proposal();
                         proposal.setProposalId(rs.getInt("proposal_id"));
                         proposal.setProposalType(rs.getString("proposal_type"));
                         proposal.setProposerId(rs.getInt("proposer_id"));
                         proposal.setSenderName(rs.getString("sender_name"));
+                        proposal.setExecutorId(rs.getInt("executor_id"));
+                        proposal.setExecutorName(rs.getString("executor_name"));
+                        proposal.setReceiverId(rs.getInt("receiver_id"));
                         proposal.setNote(rs.getString("note"));
                         proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
                         proposal.setFinalStatus(rs.getString("final_status"));
+                        proposal.setExecuteDate(rs.getTimestamp("executed_date"));
                     }
 
                     int detailId = rs.getInt("proposal_detail_id");
                     if (detailId > 0) {
                         ProposalDetails detail = new ProposalDetails();
                         detail.setProposalDetailId(detailId);
-                        detail.setProposal(proposal); // liên kết lại
+                        detail.setProposal(proposal);
                         detail.setMaterialId(rs.getInt("material_id"));
                         detail.setMaterialName(rs.getString("material_name"));
                         detail.setQuantity(rs.getDouble("quantity"));
-                        detail.setUnit(rs.getString("material_unit"));
                         detail.setMaterialCondition(rs.getString("material_condition"));
+                        detail.setUnit(rs.getString("material_unit"));
+                        detail.setPrice(rs.getDouble("price_per_unit"));
+                        detail.setSiteId(rs.getInt("site_id"));
+                        detail.setSiteName(rs.getString("site_name"));
+                        detail.setSupplierId(rs.getInt("supplier_id"));
+                        detail.setSupplierName(rs.getString("supplier_name"));
                         detailsList.add(detail);
                     }
                 }
+
                 if (proposal != null) {
                     proposal.setProposalDetails(detailsList);
                 }
@@ -734,10 +775,10 @@ public Proposal getProposalById(int proposalId) {
         return proposal;
     }
 
-    public boolean updateProposalById(int proposalId, Proposal proposal) throws SQLException {
+    public boolean updateProposalById(Integer proposalId, Proposal proposal) throws SQLException {
         String updateProposalSQL = "UPDATE EmployeeProposals SET proposal_type = ?, proposer_id = ?, note = ?, proposal_sent_date = ?, final_status = ? WHERE proposal_id = ?";
         String deleteProposalDetailsSQL = "DELETE FROM ProposalDetails WHERE proposal_id = ?";
-        String insertProposalDetailSQL = "INSERT INTO ProposalDetails (proposal_id, material_id, quantity, material_condition) VALUES (?, ?, ?, ?)";
+        String insertProposalDetailSQL = "INSERT INTO ProposalDetails (proposal_id, material_id, quantity, material_condition, price_per_unit, supplier_id, site_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         conn.setAutoCommit(false);
         try (
@@ -767,6 +808,27 @@ public Proposal getProposalById(int proposalId) {
                     insertStmt.setInt(2, detail.getMaterialId());
                     insertStmt.setDouble(3, detail.getQuantity());
                     insertStmt.setString(4, detail.getMaterialCondition());
+                    // Giá - nếu null thì setNull
+                    if (detail.getPrice() != null) {
+                        insertStmt.setDouble(5, detail.getPrice());
+                    } else {
+                        insertStmt.setNull(5, java.sql.Types.DOUBLE);
+                    }
+
+                    // Supplier - nếu null thì setNull
+                    if (detail.getSupplierId() != null) {
+                        insertStmt.setInt(6, detail.getSupplierId());
+                    } else {
+                        insertStmt.setNull(6, java.sql.Types.INTEGER);
+                    }
+
+                    // Site - nếu null thì setNull
+                    if (detail.getSiteId() != null) {
+                        insertStmt.setInt(7, detail.getSiteId());
+                    } else {
+                        insertStmt.setNull(7, java.sql.Types.INTEGER);
+                    }
+
                     insertStmt.addBatch();
                 }
                 int[] result = insertStmt.executeBatch();
@@ -777,7 +839,6 @@ public Proposal getProposalById(int proposalId) {
                     }
                 }
             }
-
             conn.commit();
             return true;
 

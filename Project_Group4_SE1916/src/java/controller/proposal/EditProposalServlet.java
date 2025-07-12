@@ -5,9 +5,11 @@
 package controller.proposal;
 
 import Dal.DBContext;
+import dao.ConstructionSiteDAO;
 import dao.MaterialCategoryDAO;
 import dao.MaterialDAO;
 import dao.ProposalDAO;
+import dao.SupplierDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -16,14 +18,17 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import model.ConstructionSite;
 import model.Material;
 import model.MaterialCategory;
 import model.Proposal;
 import model.ProposalDetails;
+import model.Supplier;
 
 /**
  *
@@ -80,6 +85,12 @@ public class EditProposalServlet extends HttpServlet {
             List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
             List<MaterialCategory> childCategories = categoryDAO.getAllChildCategories();
             List<Material> material = materialDAO.getAllMaterials();
+            SupplierDAO supplierDAO = new SupplierDAO(conn);
+            List<Supplier> suppliers = supplierDAO.getAllSuppliers();
+            ConstructionSiteDAO constructionSiteDAO = new ConstructionSiteDAO(conn);
+            List<ConstructionSite> constructionSites = constructionSiteDAO.getAllConstructionSites();
+            request.setAttribute("constructionSites", constructionSites);
+            request.setAttribute("suppliers", suppliers);
             request.setAttribute("proposalId", proposalId);
             request.setAttribute("material", material);
             request.setAttribute("parentCategories", parentCategories);
@@ -102,7 +113,7 @@ public class EditProposalServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Integer proposalId = Integer.parseInt(request.getParameter("proposalId"));
-         String proposalType = request.getParameter("proposalType");
+        String proposalType = request.getParameter("proposalType");
         HttpSession session = request.getSession();
         Integer proposerId = (Integer) session.getAttribute("userId");
         if (proposerId == null) {
@@ -111,13 +122,25 @@ public class EditProposalServlet extends HttpServlet {
         }
         String note = request.getParameter("note");
         String[] materialIds = request.getParameterValues("materialId[]");
+        String[] units = request.getParameterValues("unit[]");
         String[] quantities = request.getParameterValues("quantity[]");
-        String[] materialConditions = request.getParameterValues("materialCondition[]");
+        String[] conditions = request.getParameterValues("materialCondition[]");
+        String[] supplierIds = request.getParameterValues("supplierId[]");
+        String[] priceStrings = request.getParameterValues("pricePerUnit[]");
+        String[] siteIds = request.getParameterValues("siteId[]");
 
-        if (materialIds == null || quantities == null || materialConditions == null || materialIds.length == 0) {
-            request.setAttribute("error", "Missing proposal details");
-            request.getRequestDispatcher("/view/proposal/editProposalOfEmployee.jsp").forward(request, response);
-            return;
+        List<Double> prices = new ArrayList<>();
+
+        if (priceStrings != null) {
+            for (String priceStr : priceStrings) {
+                try {
+                    priceStr = priceStr.trim();
+                    BigDecimal priceDecimal = new BigDecimal(priceStr);
+                    prices.add(priceDecimal.doubleValue());
+                } catch (NumberFormatException e) {
+                    prices.add(0.0);
+                }
+            }
         }
 
         Proposal proposal = new Proposal();
@@ -127,33 +150,43 @@ public class EditProposalServlet extends HttpServlet {
         proposal.setProposalSentDate(new Timestamp(System.currentTimeMillis()));
         proposal.setFinalStatus("pending");
 
-        List<ProposalDetails> proposalDetailsList = new ArrayList<>();
+        List<ProposalDetails> details = new ArrayList<>();
         for (int i = 0; i < materialIds.length; i++) {
-            ProposalDetails proposalDetail = new ProposalDetails();
-            proposalDetail.setProposal(proposal);
-            try {
-                proposalDetail.setMaterialId(Integer.parseInt(materialIds[i]));
-                proposalDetail.setQuantity(Double.parseDouble(quantities[i]));
-                proposalDetail.setMaterialCondition(materialConditions[i]);
-            } catch (NumberFormatException e) {
-                request.setAttribute("error", "Invalid material ID");
-                request.getRequestDispatcher("/view/proposal/proposalOfEmployee.jsp").forward(request, response);
-                return;
-            }
-            proposalDetailsList.add(proposalDetail);
-        }
+            ProposalDetails detail = new ProposalDetails();
+            detail.setMaterialId(Integer.parseInt(materialIds[i]));
+            detail.setQuantity(Integer.parseInt(quantities[i]));
+            detail.setUnit(units[i]);
+            detail.setMaterialCondition(conditions[i]);
 
-        proposal.setProposalDetails(proposalDetailsList);
+            if ("import_from_supplier".equals(proposalType)) {
+                if (supplierIds != null && i < supplierIds.length && supplierIds[i] != null && !supplierIds[i].isEmpty()) {
+                    detail.setSupplierId(Integer.parseInt(supplierIds[i]));
+                }
+
+                if (prices != null && i < prices.size() && prices.get(i) != null) {
+                    detail.setPrice(prices.get(i));
+                }
+
+            } else if ("export".equals(proposalType) || "import_returned".equals(proposalType)) {
+                if (siteIds != null && i < siteIds.length && siteIds[i] != null && !siteIds[i].isEmpty()) {
+                    detail.setSiteId(Integer.parseInt(siteIds[i]));
+                }
+            }
+
+            details.add(detail);
+
+        }
+        proposal.setProposalDetails(details);
 
         try (Connection conn = DBContext.getConnection()) {
             ProposalDAO proposalDAO = new ProposalDAO(conn);
-            boolean isInserted = proposalDAO.updateProposalById(proposalId,proposal);
+            boolean isInserted = proposalDAO.updateProposalById(proposalId, proposal);
             proposalDAO.updateApprovedByProposalId(proposalId);
             if (isInserted) {
                 response.sendRedirect("ListProposalServlet");
             } else {
                 request.setAttribute("error", "Failed to submit proposal");
-                request.getRequestDispatcher("/view/proposal/editProposalOfEmployee.jsp").forward(request, response);
+                request.getRequestDispatcher("/view/proposal/proposalOfEmployee.jsp").forward(request, response);
             }
         } catch (SQLException e) {
             throw new ServletException("Database error: " + e.getMessage(), e);

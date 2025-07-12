@@ -5,13 +5,19 @@
 package model;
 
 public class ProposalDetails {
+
     private int proposalDetailId;
     private String materialName;
-    private Proposal proposal;    
-    private int materialId;  
+    private Proposal proposal;
+    private int materialId;
     private double quantity;
     private String materialCondition;
     private String unit;
+    private Double  price;
+    private Integer supplierId;
+    private String supplierName;
+    private Integer  siteId;
+    private String siteName;
 
     public ProposalDetails() {
     }
@@ -24,7 +30,7 @@ public class ProposalDetails {
         this.materialCondition = materialCondition;
     }
 
-    public ProposalDetails(int proposalDetailId, String materialName, Proposal proposal, int materialId, double quantity, String materialCondition,String unit) {
+    public ProposalDetails(int proposalDetailId, String materialName, Proposal proposal, int materialId, double quantity, String materialCondition, String unit) {
         this.proposalDetailId = proposalDetailId;
         this.materialName = materialName;
         this.proposal = proposal;
@@ -34,28 +40,20 @@ public class ProposalDetails {
         this.unit = unit;
     }
 
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-   
-    public String getMaterialName() {
-        return materialName;
-    }
-
-    public void setMaterialName(String materialName) {
-        this.materialName = materialName;
-    }
-
     public int getProposalDetailId() {
         return proposalDetailId;
     }
 
     public void setProposalDetailId(int proposalDetailId) {
         this.proposalDetailId = proposalDetailId;
+    }
+
+    public String getMaterialName() {
+        return materialName;
+    }
+
+    public void setMaterialName(String materialName) {
+        this.materialName = materialName;
     }
 
     public Proposal getProposal() {
@@ -90,6 +88,54 @@ public class ProposalDetails {
         this.materialCondition = materialCondition;
     }
 
-  
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public Integer getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(Integer siteId) {
+        this.siteId = siteId;
+    }
+
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
+    }
+
     
+
 }

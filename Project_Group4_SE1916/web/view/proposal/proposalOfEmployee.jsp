@@ -36,7 +36,7 @@
         </c:choose>
         <!-- Main Content -->
         <main class="flex-1 p-8 transition-all duration-300 min-h-screen">
-            <div class="max-w-5xl mx-auto card bg-white dark:bg-gray-800 p-6">
+            <div class="max-w-6xl mx-auto card bg-white dark:bg-gray-800 p-6">
                 <div class="flex items-center gap-4 mb-6">
                     <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>
@@ -53,11 +53,9 @@
                     <div class="space-y-2">
                         <label for="proposalType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Type of proposal</label>
                         <select id="proposalType" name="proposalType" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                            <option value="import_from_supplier">Purchase</option>
+                            <option value="import_returned">Retrieve</option>
                             <option value="export">Export</option>
-                            <option value="import">Import</option>
-                            <c:if test="${role == 'warehouse'}">
-                                <option value="repair">Repair</option>               
-                            </c:if>
                         </select>
                     </div>
                     <div class="space-y-2">
@@ -70,20 +68,23 @@
                         <br/>
                         <div class="table-container bg-white dark:bg-gray-800">
                             <div class="overflow-x-auto">
-                                <table class="w-full table-auto" id="importDetailsTable">
+                                <table class="w-full table-fixed text-sm" id="importDetailsTable">
                                     <thead>
-                                        <tr class="bg-primary-600 text-white">
-                                            <th class="p-4 text-left">Name of Material</th>
-                                            <th class="p-4 text-left">Unit</th>
-                                            <th class="p-4 text-left">Quantity</th>
-                                            <th class="p-4 text-left">Material Condition </th>
-                                            <th class="p-4 text-left">Action</th>
+                                        <tr class="bg-primary-600 text-white text-sm">
+                                            <th class="p-2 text-left w-[20%]">Name of Material</th>
+                                            <th class="p-2 text-left w-[7%]">Unit</th> 
+                                            <th class="p-2 text-left w-[10%]">Quantity</th>
+                                            <th class="p-2 text-left w-[9%]">Condition</th> 
+                                            <th class="p-2 text-left w-[23%] supplier-column">Supplier</th>
+                                            <th class="p-2 text-left w-[12%] price-column">Price (VNĐ)</th>
+                                            <th class="p-2 text-left w-[13%] constructionSite-column">Construction Site</th>
+                                            <th class="p-2 text-left w-[5%]">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="itemsBody">
                                         <tr class="border-b border-gray-200 dark:border-gray-700">
-                                            <td>
-                                                <input list="materialList" required class="w-lg px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md nameMaterialInput" name="materialName[]" autocomplete="off">
+                                            <td class="pr-2">
+                                                <input list="materialList" required class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md nameMaterialInput" name="materialName[]" autocomplete="off" placeholder="Enter material name">
                                                 <datalist id="materialList">
                                                     <c:forEach var="cat" items="${material}">
                                                         <option 
@@ -97,31 +98,57 @@
                                                 </datalist>
                                                 <input type="hidden" name="materialId[]" class="materialIdHidden">
                                             </td>
-                                            <td>
-                                                <input type="text" name="unit[]" class="w-lg px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md unitMaterial" readonly>
+                                            <td class="pr-2">
+                                                <input type="text" name="unit[]" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md unitMaterial" readonly>
                                             </td>
-                                            <td><input type="number" name="quantity[]" class="w-lg px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md"  step="1" min="1" required></td>
-                                            <td>
-                                                <select name="materialCondition[]" class="w-3/4 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" required>
+                                            <td class="pr-2">
+                                                <input type="number" name="quantity[]" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" step="1" min="1" required>
+                                            </td>
+                                            <td class="pr-2">
+                                                <select name="materialCondition[]" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md conditionSelect" required>
                                                     <option value="new">New</option>
                                                     <option value="used">Used</option>
-                                                    <option value="damaged">Damaged</option>
+                                                    <option value="damaged" class="damaged-option">Damaged</option>
                                                 </select>
                                             </td>
+                                            <td class="supplier-column hidden">
+                                                <input list="supplierList" name="supplierName[]" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" placeholder="Enter supplier name">
+                                                <datalist id="supplierList">
+                                                    <c:forEach var="supplier" items="${suppliers}">
+                                                        <option value="${supplier.supplierName}" data-id="${supplier.supplierId}">${supplier.supplierName}</option>
+                                                    </c:forEach>
+                                                </datalist>
+                                                <input type="hidden" name="supplierId[]" class="supplierIdHidden">
+                                            </td>
+                                            <td class="price-column hidden">
+                                                <input type="number" name="pricePerUnit[]" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" step="1000" min="0">
+                                            </td>
+                                            <td class="constructionSite-column hidden">
+                                                <input list="siteList" name="siteName[]" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" placeholder="Enter site name">
+                                                <datalist id="siteList">
+                                                    <c:forEach var="site" items="${constructionSites}">
+                                                        <option value="${site.siteName}" data-id="${site.siteId}">${site.siteName}</option>
+                                                    </c:forEach>
+                                                </datalist>
+                                                <input type="hidden" name="siteId[]" class="siteIdHidden">
+                                            </td>
                                             <td>
-                                                <button type="button" class="p-4 px-12 font-medium " onclick="removeRow(this)">
+                                                <button type="button" class="p-2 text-red-600 hover:text-red-800 pr-2" onclick="removeRow(this)">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
+
                             </div>
                             <button type="button" class="p-2 font-medium bg-green-500 hover:bg-green-600 text-white rounded-md border border-green-500 hover:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-all duration-200 flex items-center" onclick="addRow()">
                                 <i class="fas fa-plus me-2"></i>Add
                             </button>
                         </div>
                     </div>
+                    <input type="hidden" id="itemCount" name="itemCount" value="1">
+
                     <div class="flex gap-4 justify-center">
                         <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg flex items-center justify-center">
                             <i class="fas fa-plus-circle mr-2"></i> Submit 
@@ -163,7 +190,10 @@
                 newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
                 tbody.appendChild(newRow);
                 document.getElementById('itemCount').value = tbody.rows.length;
+                toggleMaterialConditionOptions(document.getElementById('proposalType').value);
             }
+            toggleMaterialConditionOptions(document.getElementById('proposalType').value);
+
             function removeRow(btn) {
                 const tbody = document.getElementById('itemsBody');
                 if (tbody.rows.length > 1) {
@@ -195,7 +225,99 @@
                     hiddenInput.value = foundId;
                     unitInput.value = foundUnit;
                 }
+                if (e.target.name === 'siteName[]') {
+                    const input = e.target;
+                    const value = input.value.trim();
+                    const row = input.closest('tr');
+                    const hiddenInput = row.querySelector('.siteIdHidden');
+                    const datalist = document.getElementById('siteList');
+                    const options = datalist.options;
+
+                    let foundId = '';
+
+                    for (let i = 0; i < options.length; i++) {
+                        if (options[i].value === value) {
+                            foundId = options[i].getAttribute('data-id');
+                            break;
+                        }
+                    }
+
+                    if (hiddenInput)
+                        hiddenInput.value = foundId;
+                }
+
+                if (e.target.name === 'supplierName[]') {
+                    const input = e.target;
+                    const value = input.value.trim();
+                    const row = input.closest('tr');
+                    const hiddenInput = row.querySelector('.supplierIdHidden');
+                    const datalist = document.getElementById('supplierList');
+
+                    const options = datalist.options;
+                    let foundId = '';
+
+                    for (let i = 0; i < options.length; i++) {
+                        if (options[i].value === value) {
+                            foundId = options[i].getAttribute('data-id');
+                            break;
+                        }
+                    }
+
+                    hiddenInput.value = foundId;
+                }
+
             });
+
+
+            function toggleTableColumns(proposalType) {
+                const supplierCols = document.querySelectorAll('.supplier-column');
+                const priceCols = document.querySelectorAll('.price-column');
+                const constructionSiteCols = document.querySelectorAll('.constructionSite-column');
+
+                // Ẩn hết các cột trước
+                [...supplierCols, ...priceCols, ...constructionSiteCols].forEach(col => col.classList.add('hidden'));
+
+                // Hiển thị theo loại phiếu
+                if (proposalType === 'import_from_supplier') {
+                    supplierCols.forEach(col => col.classList.remove('hidden'));
+                    priceCols.forEach(col => col.classList.remove('hidden'));
+                } else if (proposalType === 'import_returned') {
+                    constructionSiteCols.forEach(col => col.classList.remove('hidden')); // công trình thu hồi
+                } else if (proposalType === 'export') {
+                    constructionSiteCols.forEach(col => col.classList.remove('hidden')); // công trình nhận
+                }
+            }
+
+// Kích hoạt khi thay đổi loại đề xuất
+            document.getElementById('proposalType').addEventListener('change', function () {
+                toggleTableColumns(this.value);
+                toggleMaterialConditionOptions(this.value); // THÊM
+            });
+
+
+// Gọi một lần ban đầu nếu cần
+            toggleTableColumns(document.getElementById('proposalType').value);
+
+            function toggleMaterialConditionOptions(proposalType) {
+                const allSelects = document.querySelectorAll('.conditionSelect');
+
+                allSelects.forEach(select => {
+                    const damagedOption = select.querySelector('option[value="damaged"]');
+                    if (!damagedOption)
+                        return;
+
+                    if (proposalType === 'import_from_supplier' || proposalType === 'export') {
+                        damagedOption.disabled = true;
+                        // Nếu đang chọn "damaged" thì reset về "new"
+                        if (select.value === 'damaged') {
+                            select.value = 'new';
+                        }
+                    } else {
+                        damagedOption.disabled = false;
+                    }
+                });
+            }
+
 
         </script>
         <!--JavaScript -->
