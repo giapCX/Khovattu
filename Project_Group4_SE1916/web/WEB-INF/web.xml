@@ -172,6 +172,14 @@
         <servlet-name>ListProposalExecute</servlet-name>
         <servlet-class>controller.proposal.ListProposalExecute</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ListConsructionSite</servlet-name>
+        <servlet-class>controller.constructionSites.ListConsructionSite</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ListConstructionSites</servlet-name>
+        <servlet-class>controller.constructionSites.ListConstructionSites</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -343,6 +351,14 @@
     <servlet-mapping>
         <servlet-name>ListProposalExecute</servlet-name>
         <url-pattern>/ListProposalExecute</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ListConsructionSite</servlet-name>
+        <url-pattern>/ListConsructionSite</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ListConstructionSites</servlet-name>
+        <url-pattern>/ListConstructionSites</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>
