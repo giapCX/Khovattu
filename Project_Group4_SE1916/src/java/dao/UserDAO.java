@@ -1,4 +1,4 @@
-
+//userDAO
 package dao;
 
 import Dal.DBContext;
@@ -72,12 +72,26 @@ public class UserDAO {
         try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 User user = new User();
-                
+
                 user.setFullName(rs.getString("full_name"));
                 employees.add(user);
             }
         }
         return employees;
+    }
+
+    public int getUserIdByFullName(String fullName) throws SQLException {
+        String sql = "SELECT user_id FROM Users WHERE full_name = ?";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, fullName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("user_id");
+                } else {
+                    return -1; // Không tìm thấy
+                }
+            }
+        }
     }
 
     public User getUserByEmail(String email) {

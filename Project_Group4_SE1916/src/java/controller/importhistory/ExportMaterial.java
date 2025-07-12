@@ -1,4 +1,4 @@
-
+//exMa.servlet
 package controller.importhistory;
 
 import Dal.DBContext;
@@ -128,22 +128,16 @@ public class ExportMaterial extends HttpServlet {
             return;
         }
 
-        int receiverId = -1; // Default value to indicate invalid receiver
-        try (Connection conn = DBContext.getConnection()) {
-            UserDAO dao = new UserDAO(conn);
-            List<User> employees = dao.getAllEmployees();
-            User receiverUser = employees.stream()
-                    .filter(emp -> emp.getFullName().equals(receiver))
-                    .findFirst()
-                    .orElse(null);
-
-            if (receiverUser == null) {
+        
+        int receiverId = -1;
+        try {
+            receiverId = userDAO.getUserIdByFullName(receiver);
+            if (receiverId == -1) {
                 errorMessage = "Invalid receiver selected.";
                 request.setAttribute("error", errorMessage);
                 request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                 return;
             }
-            receiverId = receiverUser.getUserId();
         } catch (SQLException e) {
             errorMessage = "Database error while validating receiver: " + e.getMessage();
             request.setAttribute("error", errorMessage);
@@ -224,13 +218,13 @@ public class ExportMaterial extends HttpServlet {
         }
 
         int userId = user.getUserId();
-        int recId = 1;
+       
         try (Connection conn = DBContext.getConnection()) {
             ExportDAO dao = new ExportDAO(conn);
             Export export = new Export();
             export.setExporterId(userId);
             export.setReceiptId(voucherIdStr);
-            export.setReceiverId(recId);
+            export.setReceiverId(receiverId);
             export.setExportDate(LocalDate.now());
             export.setNote(note);
             int exportId = dao.saveExport(export);
