@@ -39,7 +39,12 @@
 
         <%
             String role = (String) session.getAttribute("role");
+            if (role == null) {
+                response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
+                return;
+            }
         %>
+
         <!-- Sidebar -->
         <c:choose>
             <c:when test="${role == 'admin'}">
@@ -66,9 +71,13 @@
                         </button>
                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">List Supplier</h2>
                     </div>
-                    <a href="${pageContext.request.contextPath}/AddSupplierServlet" class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
-                        <i class="fas fa-plus-circle mr-2"></i> Create new supplier
-                    </a>
+                    <c:if test="${role == 'admin' || role == 'direction'}">
+                        <a href="${pageContext.request.contextPath}/AddSupplierServlet" 
+                           class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
+                            <i class="fas fa-plus-circle mr-2"></i> Create new supplier
+                        </a>
+                    </c:if>
+
                 </div>
 
                 <!-- Search and Filter Form -->
@@ -116,7 +125,9 @@
                                     <th class="p-4 text-left">Address</th>
                                     <th class="p-4 text-left">Status</th>
                                     <th class="p-4 text-left">Details</th>
-                                    <th class="p-4 text-left">Action</th>
+                                        <c:if test="${role == 'admin' || role == 'direction'}">
+                                        <th class="p-4 text-left">Action</th>
+                                        </c:if>
                                 </tr>
                             </thead>
                             <tbody>
@@ -141,9 +152,12 @@
                                                 <td class="p-4 font-medium">
                                                     <a href="FilterSupplierServlet?supplierId=${item.supplierId}&supplierName=${item.supplierName}" class="text-primary-600 dark:text-primary-400 hover:underline">View </a>
                                                 </td>
-                                                <td class="p-4 font-medium">
-                                                    <a href="EditSupplierServlet?supplierId=${item.supplierId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
-                                                </td>
+                                                <c:if test="${role == 'admin' || role == 'direction'}">
+                                                    <td class="p-4 font-medium">
+                                                        <a href="EditSupplierServlet?supplierId=${item.supplierId}"
+                                                           class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
+                                                    </td>
+                                                </c:if>
                                             </tr>
                                         </c:forEach>
                                     </c:when>
@@ -221,20 +235,7 @@
                     </c:choose>
                 </div>
                 <div class="mt-6 flex justify-center">
-                    <c:choose>
-                        <c:when test="${role == 'admin'}">
-                            <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                        </c:when>
-                        <c:when test="${role == 'direction'}">
-                            <a href="${pageContext.request.contextPath}/view/direction/directionDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                        </c:when>
-                        <c:when test="${role == 'warehouse'}">
-                            <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                        </c:when>
-                        <c:when test="${role == 'employee'}">
-                            <a href="${pageContext.request.contextPath}/view/employee/employeeDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                        </c:when>
-                    </c:choose>
+                    <jsp:include page="/view/backToDashboardButton.jsp" />
                 </div>
             </div>
         </main>

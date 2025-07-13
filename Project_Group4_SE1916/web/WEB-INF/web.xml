@@ -188,6 +188,14 @@
         <servlet-name>WarehouseDashboard</servlet-name>
         <servlet-class>controller.user.WarehouseDashboard</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminDashboard</servlet-name>
+        <servlet-class>controller.user.AdminDashboard</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DirectionDashboard</servlet-name>
+        <servlet-class>controller.user.DirectionDashboard</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -375,6 +383,14 @@
     <servlet-mapping>
         <servlet-name>WarehouseDashboard</servlet-name>
         <url-pattern>/WarehouseDashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminDashboard</servlet-name>
+        <url-pattern>/AdminDashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DirectionDashboard</servlet-name>
+        <url-pattern>/DirectionDashboard</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

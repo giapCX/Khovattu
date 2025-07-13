@@ -277,25 +277,7 @@
                     </c:choose>
                 </div>
                 <div class="mt-6 flex justify-center">
-                    <c:choose>
-                        <c:when test="${role == 'admin'}">
-                            <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                        </c:when>
-                        <c:when test="${role == 'direction'}">
-                            <a href="${pageContext.request.contextPath}/view/direction/directionDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                        </c:when>
-                        <c:when test="${role == 'warehouse'}">
-                            <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                        </c:when>
-                        <c:when test="${role == 'employee'}">
-                            <form action="${pageContext.request.contextPath}/EmployeeDashboard" method="post">
-                                <button type="submit" class="btn-secondary text-white px-6 py-3 rounded-lg">
-                                    Back to home
-                                </button>
-                            </form>
-                        </c:when>
-
-                    </c:choose>
+                    <jsp:include page="/view/backToDashboardButton.jsp" />
                 </div>
             </div>
         </main>

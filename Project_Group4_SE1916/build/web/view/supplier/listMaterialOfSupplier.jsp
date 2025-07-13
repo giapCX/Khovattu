@@ -23,6 +23,10 @@
 
         <%
             String role = (String) session.getAttribute("role");
+            if (role == null) {
+                response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
+                return;
+            }
         %>
         <!-- Sidebar -->
         <c:choose>
@@ -50,7 +54,6 @@
                         </button>
                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Detail Of Supplier : ${supplier.supplierName}</h2>
                     </div>
-
                 </div>
 
                 <!-- Supplier Info Section -->
@@ -85,6 +88,14 @@
                                 </c:choose>
                             </div>
                         </div>
+                        <c:if test="${role == 'admin' || role == 'direction'}">
+                            <div class="mt-4">
+                                <a href="EditSupplierServlet?supplierId=${supplierId}" 
+                                   class="btn-secondary text-white px-5 py-2 rounded w-fit inline-block flex items-center">
+                                    <i class="fas fa-pen mr-2"></i> Edit
+                                </a>
+                            </div>
+                        </c:if>
                     </div>
                 </div>
             </div>
@@ -160,7 +171,7 @@
                                         <c:otherwise>
                                             <tr>
                                                 <td colspan="7" class="p-4 text-center text-gray-500 dark:text-gray-400">
-                                                    No suppliers found
+                                                    No materials found
                                                 </td>
                                             </tr>
                                         </c:otherwise>

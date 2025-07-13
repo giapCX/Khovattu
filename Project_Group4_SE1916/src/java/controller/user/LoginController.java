@@ -72,10 +72,10 @@ public class LoginController extends HttpServlet {
                         // Chuyển hướng đến dashboard tương ứng với vai trò
                         switch (roleName) {
                             case "admin":
-                                response.sendRedirect("view/admin/adminDashboard.jsp");
+                                response.sendRedirect("AdminDashboard");
                                 break;
                             case "direction":
-                                response.sendRedirect("view/direction/directionDashboard.jsp");
+                                response.sendRedirect("DirectionDashboard");
                                 break;
                             case "warehouse":
                                 response.sendRedirect("WarehouseDashboard");

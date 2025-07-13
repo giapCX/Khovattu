@@ -286,10 +286,7 @@
                             <i class="fas fa-list mr-2 w-4 text-center"></i>
                             <span class="text-sm">Suppliers List</span>
                         </a>
-                        <a href="${pageContext.request.contextPath}/AddSupplierServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                            <i class="fas fa-circle-plus mr-2 w-4 text-center"></i>
-                            <span class="text-sm">Create New Supplier </span>
-                        </a>
+                        
                     </div>
                 </div>
                 <a href="${pageContext.request.contextPath}/ListConstructionSites" class="nav-item flex items-center p-2 justify-between">
