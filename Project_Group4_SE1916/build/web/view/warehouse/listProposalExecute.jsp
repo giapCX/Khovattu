@@ -75,7 +75,8 @@
                     <div class="flex-1 min-w-[200px]">
                         <select name="searchType" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">                         
                             <option value="">All Type</option>
-                            <option value="import" ${param.searchType == 'import' ? 'selected' : ''}>Import</option>
+                            <option value="import_from_supplier" ${param.searchType == 'import_from_supplier' ? 'selected' : ''}>Purchase</option>
+                            <option value="import_returned" ${param.searchType == 'import_returned' ? 'selected' : ''}>Retrieve</option>
                             <option value="export" ${param.searchType == 'export' ? 'selected' : ''}>Export</option>
                         </select>                   
                     </div>
@@ -133,8 +134,9 @@
                                                 <td class="p-4 font-medium">${item.proposalId}</td>
                                                 <td class="p-4 font-medium">
                                                     <c:choose>
+                                                        <c:when test="${item.proposalType == 'import_from_supplier'}">Purchase</c:when>
+                                                        <c:when test="${item.proposalType == 'import_returned'}">Retrieve</c:when>
                                                         <c:when test="${item.proposalType == 'export'}">Export</c:when>
-                                                        <c:when test="${item.proposalType == 'import'}">Import</c:when>
                                                     </c:choose>
                                                 </td>
                                                 <td class="p-4 font-medium">${item.senderName}</td>
