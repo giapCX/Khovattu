@@ -92,17 +92,17 @@
                     </div>
                 </c:if>
 
-                <div class="mt-6 flex justify-center gap-4 max-w-2xl mx-auto w-full">
-                    <div class="w-1/3">
-                        <a href="${pageContext.request.contextPath}/ListSupplierServlet" 
-                           class="btn-secondary text-white px-6 py-3 rounded-lg w-full block text-center">
-                            Back to list supplier
-                        </a>
-                    </div>
-                    <div class="w-1/2">
-                        <div class="w-full">
-                            <jsp:include page="/view/backToDashboardButton.jsp" />
-                        </div>
+            </div>
+            <div class="mt-6 flex justify-center gap-4 max-w-2xl mx-auto w-full">
+                <div class="w-1/3">
+                    <a href="${pageContext.request.contextPath}/ListSupplierServlet" 
+                       class="btn-secondary text-white px-6 py-3 rounded-lg">
+                        Back to list supplier
+                    </a>
+                </div>
+                <div class="w-1/2">
+                    <div class="w-full">
+                        <jsp:include page="/view/backToDashboardButton.jsp" />
                     </div>
                 </div>
             </div>

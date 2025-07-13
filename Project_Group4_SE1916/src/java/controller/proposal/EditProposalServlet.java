@@ -92,6 +92,7 @@ public class EditProposalServlet extends HttpServlet {
             request.setAttribute("constructionSites", constructionSites);
             request.setAttribute("suppliers", suppliers);
             request.setAttribute("proposalId", proposalId);
+            request.setAttribute("proposerId", proposal.getProposerId());
             request.setAttribute("material", material);
             request.setAttribute("parentCategories", parentCategories);
             request.setAttribute("childCategories", childCategories);

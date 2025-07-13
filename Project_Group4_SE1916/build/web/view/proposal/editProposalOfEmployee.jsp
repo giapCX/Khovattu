@@ -7,7 +7,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Proposal</title>
+        <title>Edit Request</title>
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
@@ -20,6 +20,13 @@
             String role = (String) session.getAttribute("role");
             Integer userId = (Integer) session.getAttribute("userId");
             String userFullName = (String) session.getAttribute("userFullName");
+
+            Integer proposerId = (Integer) request.getAttribute("proposerId");
+
+            if (role == null || !role.equals("employee") || proposerId == null || !proposerId.equals(userId)) {
+                response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
+                return;
+            }
         %>
         <!-- Sidebar -->
         <c:choose>
@@ -43,30 +50,37 @@
                     <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Proposal Material</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Request</h2>
                 </div>
 
                 <form action="EditProposalServlet" method="post" class="space-y-4">
                     <input type="hidden" name="proposalId" value="${proposalId}">
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Proposer</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sender name</label>
                         <input type="text" value="${sessionScope.userFullName}" readonly class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"  >
                     </div>
                     <div class="space-y-2">
-                        <label for="proposalType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Type of proposal</label>
+                        <label for="proposalType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Type of request</label>
                         <select id="proposalType" name="proposalType" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                            <option value="import_from_supplier">Purchase</option>
-                            <option value="import_returned">Retrieve</option>
-                            <option value="export">Export</option>
-                        </select>
-                    </div>
-                    <div class="space-y-2">
-                        <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Note</label>
-                        <textarea class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" name="note" rows="3" required>${proposal.note}</textarea>
+                            <option value="import_from_supplier"
+                                    <c:if test="${proposal.proposalType == 'import_from_supplier'}">selected</c:if>>Purchase
+                                    </option>
+                                    <option value="import_returned"
+                                    <c:if test="${proposal.proposalType == 'import_returned'}">selected</c:if>>Retrieve
+                                    </option>
+                                    <option value="export"
+                                    <c:if test="${proposal.proposalType == 'export'}">selected</c:if>>Export
+                                    </option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Note</label>
+                            <textarea class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" name="note" rows="3" required>${proposal.note}</textarea>
                     </div> 
 
                     <div class="space-y-2">
-                        <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">List of Proposed Materials</label>
+                        <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">List of Materials</label>
                         <br/>
                         <div class="table-container bg-white dark:bg-gray-800">
                             <div class="overflow-x-auto">
@@ -100,13 +114,13 @@
                                                             </option>
                                                         </c:forEach>
                                                     </datalist>
-                                                    <input type="hidden" name="materialId[]" class="materialIdHidden">
+                                                    <input type="hidden" name="materialId[]" class="materialIdHidden" value="${detail.materialId}">
                                                 </td>
                                                 <td class="pr-2">
                                                     <input type="text" name="unit[]" value="${detail.unit}" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md unitMaterial" readonly>
                                                 </td>
                                                 <td class="pr-2">
-                                                    <input type="number" name="quantity[]" value="${detail.quantity}" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" step="1" min="1" required>
+                                                    <input type="number" name="quantity[]" value="<fmt:formatNumber value='${detail.quantity}' type='number' groupingUsed='false' maxFractionDigits='0' />" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" step="1" min="1" required>
                                                 </td>
                                                 <td class="pr-2">
                                                     <select name="materialCondition[]" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md conditionSelect" required>
@@ -116,13 +130,13 @@
                                                     </select>
                                                 </td>
                                                 <td class="supplier-column hidden">
-                                                    <input list="supplierList" name="supplierName[]" value="${detail.supplierName}" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" placeholder="Enter supplier name">
+                                                    <input list="supplierList" name="supplierName[]"  value="${detail.supplierName}" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" placeholder="Enter supplier name">
                                                     <datalist id="supplierList">
                                                         <c:forEach var="supplier" items="${suppliers}">
                                                             <option value="${supplier.supplierName}" data-id="${supplier.supplierId}">${supplier.supplierName}</option>
                                                         </c:forEach>
                                                     </datalist>
-                                                    <input type="hidden" name="supplierId[]" class="supplierIdHidden">
+                                                    <input type="hidden" name="supplierId[]" class="supplierIdHidden" value="${detail.supplierId}">
                                                 </td>
                                                 <td class="price-column hidden">
                                                     <input 
@@ -130,16 +144,16 @@
                                                         name="pricePerUnit[]" 
                                                         value="<fmt:formatNumber value='${detail.price}' type='number' groupingUsed='false' maxFractionDigits='0' />" 
                                                         class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" 
-                                                        step="1000" min="0" />
+                                                        step="1000" min="1000" />
                                                 </td>
                                                 <td class="constructionSite-column hidden">
-                                                    <input list="siteList" name="siteName[]" value="${detail.siteName}" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" placeholder="Enter site name">
+                                                    <input  list="siteList" name="siteName[]" value="${detail.siteName}" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" placeholder="Enter site name">
                                                     <datalist id="siteList">
                                                         <c:forEach var="site" items="${constructionSites}">
                                                             <option value="${site.siteName}" data-id="${site.siteId}">${site.siteName}</option>
                                                         </c:forEach>
                                                     </datalist>
-                                                    <input type="hidden" name="siteId[]" class="siteIdHidden">
+                                                    <input type="hidden" name="siteId[]" class="siteIdHidden" value="${detail.siteId}">
                                                 </td>
                                                 <td>
                                                     <button type="button" class="p-2 text-red-600 hover:text-red-800 pr-2" onclick="removeRow(this)">
@@ -178,21 +192,22 @@
                         ${error}
                     </div>
                 </c:if>
-                <c:choose>
-                    <c:when test="${role == 'warehouse'}">
-                        <div class="mt-4 flex justify-center">
-                            <a href="${pageContext.request.contextPath}/ListProposalServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to list proposal</a>
-                        </div>
-                    </c:when>
-                    <c:when test="${role == 'employee'}">
-                        <div class="mt-4 flex justify-center">
-                            <a href="${pageContext.request.contextPath}/ListProposalServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to list proposal</a>
-                        </div>
-                    </c:when>
-                </c:choose>
+
+            </div>
+            <div class="mt-6 flex justify-center gap-4 max-w-2xl mx-auto w-full">
+                <div class="w-1/3">
+                    <a href="${pageContext.request.contextPath}/ListProposalServlet" 
+                       class="btn-secondary text-white px-6 py-3 rounded-lg">
+                        Back to list proposal
+                    </a>
+                </div>
+                <div class="w-1/2">
+                    <div class="w-full">
+                        <jsp:include page="/view/backToDashboardButton.jsp" />
+                    </div>
+                </div>
             </div>
         </main>
-
         <script>
             function addRow() {
                 const tbody = document.getElementById('itemsBody');
@@ -204,6 +219,7 @@
                 toggleMaterialConditionOptions(document.getElementById('proposalType').value);
             }
             toggleMaterialConditionOptions(document.getElementById('proposalType').value);
+            toggleFieldRequiredByType(document.getElementById('proposalType').value);
 
             function removeRow(btn) {
                 const tbody = document.getElementById('itemsBody');
@@ -299,14 +315,15 @@
                 }
             }
 
-// Kích hoạt khi thay đổi loại đề xuất
+            // Kích hoạt khi thay đổi loại đề xuất
             document.getElementById('proposalType').addEventListener('change', function () {
                 toggleTableColumns(this.value);
                 toggleMaterialConditionOptions(this.value); // THÊM
+                toggleFieldRequiredByType(this.value);
             });
 
 
-// Gọi một lần ban đầu nếu cần
+            // Gọi một lần ban đầu nếu cần
             toggleTableColumns(document.getElementById('proposalType').value);
 
             function toggleMaterialConditionOptions(proposalType) {
@@ -328,7 +345,33 @@
                     }
                 });
             }
+            function toggleFieldRequiredByType(proposalType) {
+                const rows = document.querySelectorAll('#itemsBody tr');
 
+                rows.forEach(row => {
+                    const supplierInput = row.querySelector('input[name="supplierName[]"]');
+                    const priceInput = row.querySelector('input[name="pricePerUnit[]"]');
+                    const siteInput = row.querySelector('input[name="siteName[]"]');
+
+                    // Reset all
+                    if (supplierInput)
+                        supplierInput.required = false;
+                    if (priceInput)
+                        priceInput.required = false;
+                    if (siteInput)
+                        siteInput.required = false;
+
+                    if (proposalType === 'import_from_supplier') {
+                        if (supplierInput)
+                            supplierInput.required = true;
+                        if (priceInput)
+                            priceInput.required = true;
+                    } else if (proposalType === 'import_returned' || proposalType === 'export') {
+                        if (siteInput)
+                            siteInput.required = true;
+                    }
+                });
+            }
 
         </script>
         <!--JavaScript -->

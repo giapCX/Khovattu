@@ -7,7 +7,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Proposal</title>
+        <title>Detail Request</title>
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
@@ -20,6 +20,13 @@
             String role = (String) session.getAttribute("role");
             Integer userId = (Integer) session.getAttribute("userId");
             String userFullName = (String) session.getAttribute("userFullName");
+
+            Integer proposerId = (Integer) request.getAttribute("proposerId");
+
+            if (role == null || !role.equals("employee") || !proposerId.equals(userId)) {
+                response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
+                return;
+            }
         %>
         <!-- Sidebar -->
         <c:choose>
@@ -45,56 +52,56 @@
                         <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                             <i class="fas fa-bars text-2xl"></i>
                         </button>
-                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Detail Proposal Material ID:${proposalId}</h2>
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Detail Request ID:${proposalId}</h2>
                     </div>
 
                 </div>
 
                 <div class="w-full flex justify-center">
                     <div class="w-full max-w-6xl bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-6">
-                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Proposal Information</h3>
+                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Request Information</h3>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-gray-700 dark:text-gray-300 text-sm">
                             <div>
-                                <span class="font-semibold">Proposer name:</span> ${proposal.senderName}
+                                <span class="font-semibold">Sender name:</span> ${proposal.senderName}
                             </div>
                             <div>
-                                <span class="font-semibold">My note:</span> ${proposal.note}
+                                <span class="font-semibold">Sender note:</span> ${proposal.note}
                             </div>
                             <div>
-                                <span class="font-semibold">Type of proposal:</span> 
+                                <span class="font-semibold">Type of request:</span> 
                                 <c:choose>
                                     <c:when test="${proposal.proposalType == 'import_from_supplier'}">
-                                        <span class="underline font-semibold text-red-600">Purchase</span> 
+                                        <span class="underline">Purchase</span> 
                                     </c:when>
                                     <c:when test="${proposal.proposalType == 'import_returned'}">
-                                        <span class="underline font-semibold text-yellow-600">Retrieve</span> 
+                                        <span class="underline">Retrieve</span> 
                                     </c:when>
                                     <c:when test="${proposal.proposalType == 'export'}">
-                                        <span class="underline font-semibold text-blue-600">Export</span> 
+                                        <span class="underline">Export</span> 
                                     </c:when>
                                 </c:choose>
                             </div>
                             <div>
-                                <span class="font-semibold">Note of admin:</span> ${proApp.adminNote}
+                                <span class="font-semibold">Admin note:</span> ${proApp.adminNote}
                             </div>
                             <div>
                                 <span class="font-semibold">Status:</span> 
                                 <c:choose>
                                     <c:when test="${proposal.finalStatus == 'rejected'}">
-                                        <span class="text-red-600 font-semibold underline">Rejected</span> 
+                                        <span class="underline">Rejected</span> 
                                     </c:when>
                                     <c:when test="${proposal.finalStatus == 'pending'}">
-                                        <span class="text-yellow-600 font-semibold underline">Pending</span> 
+                                        <span class="underline">Pending</span> 
                                     </c:when>
                                     <c:when test="${proposal.finalStatus == 'approved_by_admin'}">
-                                        <span class="text-blue-600 font-semibold underline">Approved by admin</span> 
+                                        <span class="underline">Approved by admin</span> 
                                     </c:when>
                                     <c:when test="${proposal.finalStatus == 'approved_but_not_executed'}">
-                                        <span class="text-green-600 font-semibold underline">To Be Execute</span> 
+                                        <span class="underline">To Be Execute</span> 
                                     </c:when>
                                     <c:when test="${proposal.finalStatus == 'executed'}">
-                                        <span class="text-green-800 font-semibold underline">Executed</span> 
+                                        <span class="underline">Executed</span> 
                                     </c:when>
                                     <c:otherwise>
                                         <span class="text-gray-500 font-semibold underline">Unknown</span>
@@ -102,7 +109,7 @@
                                 </c:choose>
                             </div>
                             <div>
-                                <span class="font-semibold">Note of direction:</span> ${proApp.directorNote}
+                                <span class="font-semibold">Direction note:</span> ${proApp.directorNote}
                             </div>
                             <div>
                                 <span class="font-semibold">Executor proposal:</span> ${proposal.executorName}
@@ -146,7 +153,9 @@
                                                 <td class="p-2">${status.index + 1}</td> 
                                                 <td class="p-2">${detail.materialName}</td>
                                                 <td class="p-2">${detail.unit}</td>
-                                                <td class="p-2">${detail.quantity}</td>
+                                                <td class="p-2">
+                                                    <fmt:formatNumber value="${detail.quantity}" type="number" minFractionDigits="0" maxFractionDigits="2" />
+                                                </td>
                                                 <td class="p-2">${detail.materialCondition}</td>
                                                 <c:if test="${proposal.proposalType == 'import_from_supplier'}">
                                                     <td class="p-2">${detail.supplierName}</td>
@@ -170,26 +179,24 @@
                 </div>
                 <c:choose>
                     <c:when test="${proposal.finalStatus == 'rejected'}">
-                        <a href="EditProposalServlet?proposalId=${proposal.proposalId}" class="btn-secondary text-white px-6 py-3 rounded-lg">
-                            Edit
+                        <a href="EditProposalServlet?proposalId=${proposal.proposalId}" class="bg-blue-500 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
+                            <i class="fas fa-pen mr-2"></i>Edit
                         </a>
                     </c:when>
-                    <c:otherwise>
-                        <span class="btn-secondary text-white px-6 py-3 rounded-lg">Cannot edit</span>
-                    </c:otherwise>
                 </c:choose>
-                <c:choose>
-                    <c:when test="${role == 'warehouse'}">
-                        <div class="mt-4 flex justify-center">
-                            <a href="${pageContext.request.contextPath}/ListProposalServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to list proposal</a>
-                        </div>
-                    </c:when>
-                    <c:when test="${role == 'employee'}">
-                        <div class="mt-4 flex justify-center">
-                            <a href="${pageContext.request.contextPath}/ListProposalServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to list proposal</a>
-                        </div>
-                    </c:when>
-                </c:choose>
+            </div>
+            <div class="mt-6 flex justify-center gap-4 max-w-2xl mx-auto w-full">
+                <div class="w-1/3">
+                    <a href="${pageContext.request.contextPath}/ListProposalServlet" 
+                       class="btn-secondary text-white px-6 py-3 rounded-lg">
+                        Back to list request
+                    </a>
+                </div>
+                <div class="w-1/2">
+                    <div class="w-full">
+                        <jsp:include page="/view/backToDashboardButton.jsp" />
+                    </div>
+                </div>
             </div>
         </main>
         <!--JavaScript -->

@@ -71,6 +71,7 @@ public class DetailProposalServlet extends HttpServlet {
             request.setAttribute("proposal", proposal);      
             request.setAttribute("proApp", proApp);
             request.setAttribute("proposalId", proposalId);
+            request.setAttribute("proposerId", proposal.getProposerId());
             request.getRequestDispatcher("/view/proposal/detailProposalOfEmployee.jsp").forward(request, response);
         } catch (Exception e) {
             throw new ServletException(e);

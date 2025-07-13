@@ -69,8 +69,7 @@ public class ListProposalServlet extends HttpServlet {
         String searchStartDateStr = request.getParameter("searchStartDate");
         String searchEndDateStr = request.getParameter("searchEndDate");
         HttpSession session = request.getSession(false);
-        Integer proposerId =(Integer) session.getAttribute("userId");
-      
+        Integer proposerId = (Integer) session.getAttribute("userId");
 
         Timestamp searchStartDate = null;
         Timestamp searchEndDate = null;
@@ -84,7 +83,15 @@ public class ListProposalServlet extends HttpServlet {
 
         String pageParam = request.getParameter("page");
         int currentPage = 1;
-        int recordsPerPage = 6;
+        int recordsPerPage = 5;
+        String rppParam = request.getParameter("recordsPerPage");
+        if (rppParam != null && !rppParam.isEmpty()) {
+            try {
+                recordsPerPage = Integer.parseInt(rppParam);
+            } catch (NumberFormatException e) {
+
+            }
+        }
 
         if (pageParam != null) {
             try {
@@ -100,7 +107,7 @@ public class ListProposalServlet extends HttpServlet {
         try (Connection conn = DBContext.getConnection()) {
             ProposalDAO proposalDAO = new ProposalDAO(conn);
 
-            int totalRecords = proposalDAO.countProposalsByProposerTypeStatusFromStartDateToEndDate(proposerId,searchType, searchStatus, searchStartDate, searchEndDate);
+            int totalRecords = proposalDAO.countProposalsByProposerTypeStatusFromStartDateToEndDate(proposerId, searchType, searchStatus, searchStartDate, searchEndDate);
 
             // Nếu không có bản ghi nào, set totalPages tối thiểu là 1
             int totalPages = 1;
@@ -115,7 +122,7 @@ public class ListProposalServlet extends HttpServlet {
 
             int offset = (currentPage - 1) * recordsPerPage;
 
-            List<Proposal> proposals = proposalDAO.searchProposalsByProposerTypeStatusFromStartDateToEndDateWithPaging(proposerId,searchType, searchStatus, searchStartDate, searchEndDate, offset, recordsPerPage);
+            List<Proposal> proposals = proposalDAO.searchProposalsByProposerTypeStatusFromStartDateToEndDateWithPaging(proposerId, searchType, searchStatus, searchStartDate, searchEndDate, offset, recordsPerPage);
 
             // Đảm bảo suppliers không null, nếu null thì khởi tạo list rỗng
             if (proposals == null) {
