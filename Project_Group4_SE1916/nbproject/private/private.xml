@@ -3,15 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/WEB-INF/web.xml</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/login.jsp</file>
             <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/user/EmployeeDashboard.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/sidebar/sidebarEmployee.jsp</file>
             <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/employee/employeeDashboard.jsp</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/ProposalDAO.java</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/user/LoginController.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/proposal/proposalOfEmployee.jsp</file>
             <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/admin/adminDashboard.jsp</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/proposal/listProposalOfEmployee.jsp</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/ListProposalServlet.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/user/WarehouseDashboard.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/ListProposalExecute.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/warehouse/warehouseDashboard.jsp</file>
         </group>
     </open-files>
 </project-private>

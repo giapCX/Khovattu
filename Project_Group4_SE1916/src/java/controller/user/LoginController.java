@@ -78,7 +78,7 @@ public class LoginController extends HttpServlet {
                                 response.sendRedirect("view/direction/directionDashboard.jsp");
                                 break;
                             case "warehouse":
-                                response.sendRedirect("view/warehouse/warehouseDashboard.jsp");
+                                response.sendRedirect("WarehouseDashboard");
                                 break;
                             case "employee":
                                 response.sendRedirect("EmployeeDashboard");

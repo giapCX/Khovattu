@@ -224,6 +224,11 @@
                 return;
             }
         %>
+        <%
+            String role = (String) session.getAttribute("role");
+            Integer userId = (Integer) session.getAttribute("userId");
+            String userFullName = (String) session.getAttribute("userFullName");
+        %>
         <!-- Sidebar -->
         <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50 hidden">
             <div class="flex items-center mb-8">
@@ -307,14 +312,14 @@
                     </div>
                 </div>
             </nav>
-            <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">
-                <a href="${pageContext.request.contextPath}/forgetPassword/changePassword.jsp" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
-                    <i class="fas fa-key mr-3"></i>
-                    <span class="text-lg">Change password</span>
+            <div class="absolute bottom-0 left-0 right-0 p-4 bg-white bg-opacity-10">
+                <a href="${pageContext.request.contextPath}/forgetPassword/changePassword.jsp" class="flex items-center p-2 rounded-lg hover:bg-white hover:bg-opacity-20">
+                    <i class="fas fa-key mr-2 w-5 text-center"></i>
+                    <span class="text-base">Change password</span>
                 </a>
-                <a href="${pageContext.request.contextPath}/logout" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
-                    <i class="fas fa-sign-out-alt mr-3"></i>
-                    <span class="text-lg">Logout</span>
+                <a href="${pageContext.request.contextPath}/logout" class="flex items-center p-2 rounded-lg hover:bg-white hover:bg-opacity-20">
+                    <i class="fas fa-sign-out-alt mr-2 w-5 text-center"></i>
+                    <span class="text-base">Logout</span>
                 </a>
             </div>
         </aside>

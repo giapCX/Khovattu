@@ -184,6 +184,10 @@
         <servlet-name>EmployeeDashboard</servlet-name>
         <servlet-class>controller.user.EmployeeDashboard</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>WarehouseDashboard</servlet-name>
+        <servlet-class>controller.user.WarehouseDashboard</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -367,6 +371,10 @@
     <servlet-mapping>
         <servlet-name>EmployeeDashboard</servlet-name>
         <url-pattern>/EmployeeDashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>WarehouseDashboard</servlet-name>
+        <url-pattern>/WarehouseDashboard</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

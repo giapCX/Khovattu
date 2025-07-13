@@ -228,7 +228,7 @@
         </style>
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
-              <!-- Session Check -->
+        <!-- Session Check -->
         <%
             String username = (String) session.getAttribute("username");
             if (username == null) {
@@ -246,6 +246,13 @@
                 <button id="toggleSidebar" class="ml-auto text-white opacity-75 hover:opacity-100">
                     <i class="fas fa-times"></i>
                 </button>
+            </div>
+            <div class="flex items-center space-x-3 bg-white bg-opacity-10 rounded-lg p-3 mb-6">
+                <img src="https://ui-avatars.com/api/?name=<%= java.net.URLEncoder.encode(username, "UTF-8")%>&background=0ea5e9&color=fff"
+                     alt="Avatar" class="w-10 h-10 rounded-full border border-white shadow" />
+                <div class="text-white">
+                    <p class="font-semibold text-base"><%= username%></p>
+                </div>
             </div>
             <nav class="space-y-1">
                 <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-2 justify-between">
@@ -285,30 +292,29 @@
                         </a>
                     </div>
                 </div>
+                <a href="${pageContext.request.contextPath}/ListConstructionSites" class="nav-item flex items-center p-2 justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-building mr-2 w-5 text-center"></i>
+                        <span class="text-base">List Construction Site</span>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
+                </a>
 
                 <!-- Proposal - Menu cha -->
                 <div class="nav-item flex flex-col">
                     <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
                         <div class="flex items-center">
                             <i class="fas fas fa-file-alt mr-2 w-5 text-center"></i>
-                            <span class="text-base">Proposals</span>
+                            <span class="text-base">Requests</span>
                         </div>
                         <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
                     </button>
 
                     <!-- Menu con - ẩn mặc định -->
-                    <div class="submenu hidden pl-6 space-y-1 mt-1">
-                        <a href="${pageContext.request.contextPath}/ListProposalServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                            <i class="fas fa-list mr-2 w-4 text-center"></i>
-                            <span class="text-sm">My Submitted Proposals</span>
-                        </a>
+                    <div class="submenu hidden pl-6 space-y-1 mt-1">        
                         <a href="${pageContext.request.contextPath}/ListProposalExecute" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
                             <i class="fas fa-list mr-2 w-4 text-center"></i>
-                            <span class="text-sm">Proposal Execute</span>
-                        </a>
-                        <a href="${pageContext.request.contextPath}/ProposalServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                            <i class="fas fa-circle-plus mr-2 w-4 text-center"></i>
-                            <span class="text-sm">Create New Proposal</span>
+                            <span class="text-sm">List Requests Execute</span>
                         </a>
                     </div>
                 </div>
@@ -418,16 +424,16 @@
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-200">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Yêu cầu chờ duyệt</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">5</h3>
-                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Đang chờ xử lý</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Request awaiting execution</p>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${totalToBeExecute}</h3>
+                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Awaiting</p>
                         </div>
                         <div class="p-4 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300">
                             <i class="fas fa-clipboard-list text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="#" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem yêu cầu</a>
+                        <a href="${pageContext.request.contextPath}/ListProposalExecute?searchType=&searchStatus=approved_but_not_executed&searchStartDate=&searchEndDate=" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
