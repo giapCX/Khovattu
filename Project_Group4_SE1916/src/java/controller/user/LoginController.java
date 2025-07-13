@@ -1,6 +1,7 @@
 package controller.user;
 
 import Dal.DBContext;
+import dao.ProposalDAO;
 import dao.UserDAO;
 import jakarta.servlet.RequestDispatcher;
 import model.User;
@@ -35,10 +36,10 @@ public class LoginController extends HttpServlet {
 
             // Tạo instance UserDAO với kết nối cơ sở dữ liệu
             UserDAO userDAO = new UserDAO(conn);
-            
+
             // Lấy thông tin người dùng từ cơ sở dữ liệu dựa trên username
             User foundAccount = userDAO.getUserByUsername(username);
-            
+
             // Kiểm tra nếu tài khoản tồn tại
             if (foundAccount != null) {
                 // Kiểm tra trạng thái tài khoản (active hoặc inactive)
@@ -67,7 +68,7 @@ public class LoginController extends HttpServlet {
 
                         // Lấy tên vai trò của người dùng
                         String roleName = userDAO.getRoleNameByUsername(username);
-                        
+
                         // Chuyển hướng đến dashboard tương ứng với vai trò
                         switch (roleName) {
                             case "admin":
@@ -80,8 +81,9 @@ public class LoginController extends HttpServlet {
                                 response.sendRedirect("view/warehouse/warehouseDashboard.jsp");
                                 break;
                             case "employee":
-                                response.sendRedirect("view/employee/employeeDashboard.jsp");
+                                response.sendRedirect("EmployeeDashboard");
                                 break;
+
                             default:
                                 response.sendRedirect("login.jsp");
                                 break;

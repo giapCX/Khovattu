@@ -288,8 +288,13 @@
                             <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
                         </c:when>
                         <c:when test="${role == 'employee'}">
-                            <a href="${pageContext.request.contextPath}/view/employee/employeeDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
+                            <form action="${pageContext.request.contextPath}/EmployeeDashboard" method="post">
+                                <button type="submit" class="btn-secondary text-white px-6 py-3 rounded-lg">
+                                    Back to home
+                                </button>
+                            </form>
                         </c:when>
+
                     </c:choose>
                 </div>
             </div>

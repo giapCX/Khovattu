@@ -236,6 +236,13 @@
                 </button>
             </div>
             <nav class="space-y-2">
+                <div class="flex items-center space-x-3 bg-white bg-opacity-10 rounded-lg p-3 mb-6">
+                    <img src="https://ui-avatars.com/api/?name=<%= java.net.URLEncoder.encode(username, "UTF-8")%>&background=0ea5e9&color=fff"
+                         alt="Avatar" class="w-10 h-10 rounded-full border border-white shadow" />
+                    <div class="text-white">
+                        <p class="font-semibold text-base"><%= username%></p>
+                    </div>
+                </div>
                 <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-2 justify-between">
                     <div class="flex items-center">
                         <i class="fas fa-user mr-2 w-5 text-center"></i>
@@ -247,6 +254,33 @@
                     <div class="flex items-center">
                         <i class="fas fa-box-open mr-2 w-5 text-center"></i>
                         <span class="text-base">Materials List</span>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
+                </a>
+                <div class="nav-item flex flex-col">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                        <div class="flex items-center">
+                            <i class="fas fa-truck mr-2 w-5 text-center"></i>
+                            <span class="text-base">Suppliers</span>
+                        </div>
+                        <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
+                    </button>
+                    <!-- Menu con - ẩn mặc định -->
+                    <div class="submenu hidden pl-6 space-y-1 mt-1">
+                        <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-list mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Suppliers List</span>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/AddSupplierServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-circle-plus mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Create New Supplier </span>
+                        </a>
+                    </div>
+                </div>
+                <a href="${pageContext.request.contextPath}/ListConstructionSites" class="nav-item flex items-center p-2 justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-building mr-2 w-5 text-center"></i>
+                        <span class="text-base">List Construction Site</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
@@ -304,9 +338,9 @@
                         <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">2</span>
                     </div>
                     <div class="flex items-center">
-                        <img src="https://ui-avatars.com/api/?name=Nhân+viên&background=3b82f6&color=fff" 
-                             alt="Nhân viên" class="w-10 h-10 rounded-full mr-3">
-                        <span class="font-medium text-gray-700 dark:text-white text-lg"><%= username%></span>
+                        <img src="https://ui-avatars.com/api/?name=<%= java.net.URLEncoder.encode(username, "UTF-8")%>&background=0ea5e9&color=fff"
+                             alt="Avatar" class="w-10 h-10 rounded-full border border-white shadow" />
+                        <span class="font-medium text-gray-700 dark:text-white text-lg ml-3"><%= username%></span>
                     </div>
                     <button id="toggleDarkMode" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
                         <i class="fas fa-moon text-gray-700 dark:text-yellow-300 text-xl"></i>
@@ -319,46 +353,46 @@
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Yêu cầu đã gửi</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">10</h3>
-                            <p class="text-sm text-green-500 mt-3"><i class="fas fa-arrow-up mr-1"></i>2 yêu cầu mới</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Request was rejected.</p>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${totalRejected}</h3>
+                            <p class="text-sm text-red-500 mt-3"><i class="fas fa-exclamation-circle mr-1"></i>Rejected</p>
                         </div>
-                        <div class="p-4 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300">
-                            <i class="fas fa-file-alt text-2xl"></i>
+                        <div class="p-4 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300">
+                            <i class="fas fa-exclamation text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/requestHistory.jsp" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem lịch sử</a>
+                        <a href="${pageContext.request.contextPath}/ListProposalServlet?searchType=&searchStatus=rejected&searchStartDate=&searchEndDate=" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View all</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-100">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Yêu cầu chờ duyệt</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">3</h3>
-                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Đang chờ xử lý</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Request pending approval</p>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${totalPending}</h3>
+                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Pending</p>
                         </div>
                         <div class="p-4 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300">
                             <i class="fas fa-clipboard-list text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/requestHistory.jsp" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
+                        <a href="${pageContext.request.contextPath}/ListProposalServlet?searchType=&searchStatus=pending&searchStartDate=&searchEndDate=" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View all</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-200">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Yêu cầu được duyệt</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">7</h3>
-                            <p class="text-sm text-blue-500 mt-3"><i class="fas fa-check-circle mr-1"></i>Đã hoàn thành</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Request has been executed.</p>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${totalExecuted}</h3>
+                            <p class="text-sm text-green-500 mt-3"><i class="fas fa-check-circle mr-1"></i>Completed</p>
                         </div>
                         <div class="p-4 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
                             <i class="fas fa-check text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/ListProposalServlet.jsp" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                        <a href="${pageContext.request.contextPath}/ListProposalServlet?searchType=&searchStatus=executed&searchStartDate=&searchEndDate=" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View all</a>
                     </div>
                 </div>
             </div>
@@ -368,12 +402,12 @@
                 <button onclick="window.location.href = '${pageContext.request.contextPath}/ProposalServlet'" 
                         class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
                     <i class="fas fa-file-alt text-3xl mb-3"></i>
-                    <span class="text-lg">Create new proposal</span>
+                    <span class="text-lg">Create new request</span>
                 </button>
                 <button onclick="window.location.href = '${pageContext.request.contextPath}/ListProposalServlet'" 
                         class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
                     <i class="fas fa-history text-3xl mb-3"></i>
-                    <span class="text-lg">View My Submitted Proposals</span>
+                    <span class="text-lg">View my submitted requested</span>
                 </button>
             </div>
 
@@ -381,7 +415,7 @@
 
         <!-- Footer -->
         <footer class="bg-gray-100 dark:bg-gray-800 text-center p-6 mt-8 border-t border-gray-200 dark:border-gray-700 transition-all duration-300">
-            <p class="text-gray-600 dark:text-gray-300 text-sm">Hệ thống Quản lý Vật tư | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Liên hệ hỗ trợ</a></p>
+            <p class="text-gray-600 dark:text-gray-300 text-sm">Material Management | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Please contact support for assistance: support@company.com </a></p>
         </footer>
 
         <!-- JavaScript -->
