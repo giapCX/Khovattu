@@ -17,6 +17,8 @@ public class Material {
     private String name;
     private String description;
     private String unit;
+    private Double quantity;
+    private String condition;
     private String imageUrl;
     private MaterialCategory category;
     private List<Supplier> suppliers;
@@ -25,22 +27,17 @@ public class Material {
     public Material() {
     }
 
-    public Material(int materialId, String code, String name, String description, String unit, String imageUrl, MaterialCategory category, List<Supplier> suppliers) {
+    public Material(int materialId, String code, String name, String description, String unit, Double quantity, String condition, String imageUrl, MaterialCategory category, List<Supplier> suppliers, String status) {
         this.materialId = materialId;
         this.code = code;
         this.name = name;
         this.description = description;
         this.unit = unit;
+        this.quantity = quantity;
+        this.condition = condition;
         this.imageUrl = imageUrl;
         this.category = category;
         this.suppliers = suppliers;
-    }
-    
-     public String getStatus() {
-        return status;
-    }
-    
-    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -84,6 +81,22 @@ public class Material {
         this.unit = unit;
     }
 
+    public Double getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Double quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -108,6 +121,12 @@ public class Material {
         this.suppliers = suppliers;
     }
 
-   
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
 }

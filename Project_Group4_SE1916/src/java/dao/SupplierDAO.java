@@ -548,4 +548,31 @@ public class SupplierDAO {
         return false;
     }
 
+    public List<Supplier> getSuppliersByMaterialId(int materialId) throws SQLException {
+        String sql = "SELECT s.supplier_id, s.supplier_name, s.supplier_phone, s.supplier_address, s.supplier_email, s.supplier_status "
+                + "FROM Suppliers s "
+                + "JOIN SupplierMaterials sm ON s.supplier_id = sm.supplier_id "
+                + "WHERE sm.material_id = ?";
+
+        List<Supplier> suppliers = new ArrayList<>();
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, materialId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Supplier supplier = new Supplier();
+                    supplier.setSupplierId(rs.getInt("supplier_id"));
+                    supplier.setSupplierName(rs.getString("supplier_name"));
+                    supplier.setSupplierPhone(rs.getString("supplier_phone"));
+                    supplier.setSupplierAddress(rs.getString("supplier_address"));
+                    supplier.setSupplierEmail(rs.getString("supplier_email"));
+                    supplier.setSupplierStatus(rs.getString("supplier_status"));
+                    // Nếu muốn lấy cả danh sách materials thì cần query thêm
+                    suppliers.add(supplier);
+                }
+            }
+        }
+        return suppliers;
+    }
+
 }
