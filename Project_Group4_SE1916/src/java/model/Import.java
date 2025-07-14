@@ -14,6 +14,9 @@ public class Import {
     private String note;
     private Timestamp importDate;
     private List<ImportDetail> importDetail;
+    private User executor;
+    private Proposal proposal;
+    
 
     public Import() {
     }
@@ -28,6 +31,22 @@ public class Import {
         this.note = note;
         this.importDate = importDate;
         this.importDetail = importDetail;
+    }
+
+    public User getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(User executor) {
+        this.executor = executor;
+    }
+
+    public Proposal getProposal() {
+        return proposal;
+    }
+
+    public void setProposal(Proposal proposal) {
+        this.proposal = proposal;
     }
 
     public int getImportId() {

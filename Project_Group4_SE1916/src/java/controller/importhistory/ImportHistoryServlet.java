@@ -4,7 +4,8 @@ package controller.importhistory;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
+import Dal.DBContext;
+import dao.ImportDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,9 +14,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
-import model.ImportReceipt;
-import dao.ImportReceiptDAO;
+import java.sql.Connection;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import model.Import;
 
 /**
  *
@@ -61,50 +65,48 @@ public class ImportHistoryServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String fromDateStr = request.getParameter("fromDate");
-        String toDateStr = request.getParameter("toDate");
-        String importer = request.getParameter("importer");
-        String pageParam = request.getParameter("page");
-
         int page = 1;
-        int pageSize = 10;
+        int recordsPerPage = 10;
 
+        String pageParam = request.getParameter("page");
         if (pageParam != null) {
             try {
                 page = Integer.parseInt(pageParam);
-            } catch (NumberFormatException ignored) {
+            } catch (NumberFormatException e) {
+                page = 1;
             }
         }
-
-        Date fromDate = null;
-        Date toDate = null;
-
-        try {
-            if (fromDateStr != null && !fromDateStr.isEmpty()) {
-                fromDate = java.sql.Date.valueOf(fromDateStr);
-            }
-            if (toDateStr != null && !toDateStr.isEmpty()) {
-                toDate = java.sql.Date.valueOf(toDateStr);
-            }
-        } catch (IllegalArgumentException e) {
-            // ignore invalid date format
+        if (page < 1) {
+            page = 1;
         }
 
-        ImportReceiptDAO dao = new ImportReceiptDAO();
-        List<ImportReceipt> receipts = dao.searchImportReceipts(fromDate, toDate, importer, page, pageSize);
-        int totalRecords = dao.countImportReceipts(fromDate, toDate, importer);
+        int offset = (page - 1) * recordsPerPage;
 
-        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+        String type = request.getParameter("type");
+        String executor = request.getParameter("executor");
+        String fromDate = request.getParameter("fromDate");
+        String toDate = request.getParameter("toDate");
 
-        request.setAttribute("historyData", receipts);
-request.setAttribute("totalPages", totalPages);
-request.setAttribute("currentPage", page);
+        try (Connection conn = DBContext.getConnection()) {
+            ImportDAO dao = new ImportDAO(conn);
+            List<Import> importList = dao.searchImportsWithPagination(type, executor, fromDate, toDate, offset, recordsPerPage);
+            int totalRecords = dao.countSearchImports(type, executor, fromDate, toDate);
+            int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
 
-request.setAttribute("fromDate", fromDateStr);
-request.setAttribute("toDate", toDateStr);
-request.setAttribute("importer", importer);
+            request.setAttribute("importList", importList);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("type", type);
+            request.setAttribute("executor", executor);
+            request.setAttribute("fromDate", fromDate);
+            request.setAttribute("toDate", toDate);
 
-request.getRequestDispatcher("importHistory.jsp").forward(request, response);
+            request.getRequestDispatcher("importHistory.jsp").forward(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(ImportHistoryServlet.class.getName()).log(Level.SEVERE, null, ex);
+            throw new ServletException("Database error while loading import history", ex);
+        }
+
     }
 
     /**
