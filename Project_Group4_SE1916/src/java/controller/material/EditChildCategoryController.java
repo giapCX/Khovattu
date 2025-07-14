@@ -66,14 +66,29 @@ public class EditChildCategoryController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         try {
-            List<MaterialCategory> childCategories = categoryDAO.getAllChildCategories();
-            List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
-            request.setAttribute("childCategories", childCategories);
-            request.setAttribute("parentCategories", parentCategories);
-            request.getRequestDispatcher("/view/material/editChildCategory.jsp").forward(request, response);
-        } catch (SQLException e) {
-            throw new ServletException("Error " + e.getMessage());
+        String idParam = request.getParameter("id");
+        if (idParam == null || idParam.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
+            return;
         }
+
+        int categoryId = Integer.parseInt(idParam);
+        MaterialCategory categoryToEdit = categoryDAO.getChildCategoryById(categoryId);
+
+        if (categoryToEdit == null) {
+            request.setAttribute("errorMessage", "Child category not found!");
+            request.getRequestDispatcher("/view/material/editChildCategory.jsp").forward(request, response);
+            return;
+        }
+
+        List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
+
+        request.setAttribute("categoryToEdit", categoryToEdit);
+        request.setAttribute("parentCategories", parentCategories);
+        request.getRequestDispatcher("/view/material/editChildCategory.jsp").forward(request, response);
+    } catch (Exception e) {
+        throw new ServletException("Error: " + e.getMessage());
+    }
     } 
 
     /** 
