@@ -1,8 +1,4 @@
 //exHisDAO
-/**
- * ExportHistoryDAO.java
- * Data Access Object for handling export history operations
- */
 package dao;
 
 import Dal.DBContext;
@@ -11,7 +7,6 @@ import model.Export;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDate;
 
 public class ExportHistoryDAO {
 
@@ -30,9 +25,9 @@ public class ExportHistoryDAO {
         StringBuilder sql = new StringBuilder(
                 "SELECT DISTINCT er.export_id, er.receipt_id, er.export_date, er.note, "
                 + "u1.full_name AS exporter_name, u2.full_name AS receiver_name, "
-                + "er.exporter_id, er.receiver_id "
+                + "er.executor_id, er.receiver_id, er.proposal_id "
                 + "FROM ExportReceipts er "
-                + "JOIN Users u1 ON er.exporter_id = u1.user_id "
+                + "JOIN Users u1 ON er.executor_id = u1.user_id "
                 + "JOIN Users u2 ON er.receiver_id = u2.user_id "
                 + "LEFT JOIN ExportDetails ed ON er.export_id = ed.export_id "
                 + "WHERE 1=1 "
@@ -50,14 +45,9 @@ public class ExportHistoryDAO {
 
         sql.append("ORDER BY er.export_date DESC ");
 
-        // Only apply LIMIT and OFFSET if pageSize > 0
         if (pageSize > 0) {
             sql.append("LIMIT ? OFFSET ?");
         }
-
-        // Debug SQL
-        System.out.println("SQL Query: " + sql);
-        System.out.println("Parameters: fromDate=" + fromDate + ", toDate=" + toDate + ", exporter=" + exporter + ", page=" + page + ", pageSize=" + pageSize);
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int index = 1;
@@ -82,8 +72,9 @@ public class ExportHistoryDAO {
                 receipt.setReceiptId(rs.getString("receipt_id"));
                 receipt.setExportDate(rs.getDate("export_date").toLocalDate());
                 receipt.setNote(rs.getString("note"));
-                receipt.setExporterId(rs.getInt("exporter_id"));
+                receipt.setExporterId(rs.getInt("executor_id"));
                 receipt.setReceiverId(rs.getInt("receiver_id"));
+                receipt.setProposalId(rs.getInt("proposal_id"));
                 receipt.setExporterName(rs.getString("exporter_name"));
                 receipt.setReceiverName(rs.getString("receiver_name"));
                 list.add(receipt);
@@ -99,8 +90,8 @@ public class ExportHistoryDAO {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(DISTINCT er.export_id) "
                 + "FROM ExportReceipts er "
-                + "JOIN Users u1 ON er.exporter_id = u1.user_id "
-                + "WHERE 1=1"
+                + "JOIN Users u1 ON er.executor_id = u1.user_id "
+                + "WHERE 1=1 "
         );
 
         if (fromDate != null) {
@@ -140,13 +131,14 @@ public class ExportHistoryDAO {
         List<Export> list = new ArrayList<>();
         String sql = "SELECT er.export_id, er.receipt_id, er.export_date, er.note, "
                 + "u1.full_name AS exporter_name, u2.full_name AS receiver_name, "
-                + "er.exporter_id, er.receiver_id "
+                + "er.executor_id, er.receiver_id, er.proposal_id "
                 + "FROM ExportReceipts er "
-                + "JOIN Users u1 ON er.exporter_id = u1.user_id "
+                + "JOIN Users u1 ON er.executor_id = u1.user_id "
                 + "JOIN Users u2 ON er.receiver_id = u2.user_id "
                 + "JOIN ExportDetails ed ON er.export_id = ed.export_id "
                 + "WHERE u1.full_name LIKE ? "
-                + "GROUP BY er.export_id, er.receipt_id, er.export_date, er.note, u1.full_name, u2.full_name, er.exporter_id, er.receiver_id "
+                + "GROUP BY er.export_id, er.receipt_id, er.export_date, er.note, "
+                + "u1.full_name, u2.full_name, er.executor_id, er.receiver_id, er.proposal_id "
                 + "ORDER BY er.export_date DESC";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -158,8 +150,9 @@ public class ExportHistoryDAO {
                 receipt.setReceiptId(rs.getString("receipt_id"));
                 receipt.setExportDate(rs.getDate("export_date").toLocalDate());
                 receipt.setNote(rs.getString("note"));
-                receipt.setExporterId(rs.getInt("exporter_id"));
+                receipt.setExporterId(rs.getInt("executor_id"));
                 receipt.setReceiverId(rs.getInt("receiver_id"));
+                receipt.setProposalId(rs.getInt("proposal_id"));
                 receipt.setExporterName(rs.getString("exporter_name"));
                 receipt.setReceiverName(rs.getString("receiver_name"));
                 list.add(receipt);
@@ -180,10 +173,11 @@ public class ExportHistoryDAO {
                 er.note, 
                 u1.full_name AS exporter_name,
                 u2.full_name AS receiver_name,
-                er.exporter_id,
-                er.receiver_id
+                er.executor_id,
+                er.receiver_id,
+                er.proposal_id
             FROM ExportReceipts er
-            JOIN Users u1 ON er.exporter_id = u1.user_id
+            JOIN Users u1 ON er.executor_id = u1.user_id
             JOIN Users u2 ON er.receiver_id = u2.user_id
             WHERE er.export_id = ?
         """;
@@ -197,8 +191,9 @@ public class ExportHistoryDAO {
                 receipt.setReceiptId(rs.getString("receipt_id"));
                 receipt.setExportDate(rs.getDate("export_date").toLocalDate());
                 receipt.setNote(rs.getString("note"));
-                receipt.setExporterId(rs.getInt("exporter_id"));
+                receipt.setExporterId(rs.getInt("executor_id"));
                 receipt.setReceiverId(rs.getInt("receiver_id"));
+                receipt.setProposalId(rs.getInt("proposal_id"));
                 receipt.setExporterName(rs.getString("exporter_name"));
                 receipt.setReceiverName(rs.getString("receiver_name"));
             }

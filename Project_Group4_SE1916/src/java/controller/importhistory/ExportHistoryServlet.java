@@ -1,9 +1,8 @@
-
+//exHisServlet
 package controller.importhistory;
 
 import Dal.DBContext;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,7 +40,7 @@ public class ExportHistoryServlet extends HttpServlet {
                 throw new IllegalArgumentException("Invalid date format.");
             }
         } catch (IllegalArgumentException e) {
-            request.setAttribute("errorMessage", "Invalid date format.");
+            request.setAttribute("errorMessage", e.getMessage());
         }
 
         Connection conn = DBContext.getConnection();
