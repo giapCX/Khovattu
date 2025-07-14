@@ -651,4 +651,16 @@ public class MaterialDAO {
         }
         return materials;
     }
+    public void addMaterial(Material material) throws SQLException {
+    String sqlMaterial = "INSERT INTO Materials (code, category_id, name, description, unit, image_url) VALUES (?, ?, ?, ?, ?, ?)";
+    try (PreparedStatement ps = conn.prepareStatement(sqlMaterial, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        ps.setString(1, material.getCode());
+        ps.setInt(2, material.getCategory().getCategoryId());
+        ps.setString(3, material.getName());
+        ps.setString(4, material.getDescription());
+        ps.setString(5, material.getUnit());
+        ps.setString(6, material.getImageUrl());
+        ps.executeUpdate();
+    }
+}
 }

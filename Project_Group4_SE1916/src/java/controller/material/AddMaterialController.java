@@ -1,121 +1,135 @@
 package controller.material;
 
-import Dal.DBContext;
 import dao.MaterialDAO;
 import dao.MaterialCategoryDAO;
-import dao.SupplierDAO;
 import model.Material;
 import model.MaterialCategory;
-import model.Supplier;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+
+import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
-// em note các bước ra để sau đọc lại hiểu luôn nên thầy đừng bắt bẻ em nhá =(( 
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10, // 10MB
+        maxRequestSize = 1024 * 1024 * 50 // 50MB
+)
 public class AddMaterialController extends HttpServlet {
 
     private MaterialDAO materialDAO;
     private MaterialCategoryDAO categoryDAO;
-    private SupplierDAO supplierDAO;
 
-    // Khởi tạo các DAO khi servlet được tạo
     @Override
     public void init() throws ServletException {
         materialDAO = new MaterialDAO();
         categoryDAO = new MaterialCategoryDAO();
-        Connection conn = DBContext.getConnection();
-        supplierDAO = new SupplierDAO(conn);
     }
 
-    // Xử lý GET request: Hiển thị form thêm vật tư
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Lấy danh sách danh mục và nhà cung cấp từ database
             List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
-            List<Supplier> suppliers = supplierDAO.getAllSuppliers();
-
-            // Gửi dữ liệu tới JSP để hiển thị form
             request.setAttribute("categories", categories);
-            request.setAttribute("suppliers", suppliers);
             request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
         } catch (SQLException e) {
-            // Nếu có lỗi khi lấy dữ liệu, ném ngoại lệ để server báo lỗi chi tiết
             throw new ServletException("Không thể lấy dữ liệu cho form", e);
         }
     }
 
-    // Xử lý POST request: Lưu thông tin vật tư từ form
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Tạo đối tượng Material để lưu thông tin từ form
         Material material = new Material();
 
         try {
-            // 1. Lấy dữ liệu từ form
+            // Lấy dữ liệu từ form
             material.setCode(request.getParameter("code"));
             material.setName(request.getParameter("name"));
             material.setDescription(request.getParameter("description"));
             material.setUnit(request.getParameter("unit"));
-            material.setImageUrl(request.getParameter("imageUrl"));
 
-            // 2. Lấy và gán category
-            String categoryIdStr = request.getParameter("category");
-            int categoryId = Integer.parseInt(categoryIdStr); // Chuyển chuỗi thành số
+            // Xử lý upload ảnh
+            Part filePart = request.getPart("imageFile");
+            String imageUrl = "";
+            if (filePart == null || filePart.getSize() == 0) {
+                request.setAttribute("message", "Vui lòng chọn ảnh cho vật tư.");
+                request.setAttribute("messageType", "danger");
+                List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
+                request.setAttribute("categories", categories);
+                request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
+                return;
+            }
+
+            if (filePart != null && filePart.getSize() > 0) {
+                String fileName = System.currentTimeMillis() + "_" + Path.of(filePart.getSubmittedFileName()).getFileName();
+
+                // ✅ 1. Ghi vào thư mục build để có thể hiển thị khi chạy
+                String buildPath = request.getServletContext().getRealPath("/uploads");
+                File buildDir = new File(buildPath);
+                if (!buildDir.exists()) {
+                    buildDir.mkdirs();
+                }
+                filePart.write(buildPath + File.separator + fileName);
+
+                // ✅ 2. Copy về thư mục dự án để không bị mất khi Clean & Build
+                File buildDirFile = new File(buildPath);
+                File projectRoot = buildDirFile.getParentFile().getParentFile().getParentFile(); // build/web/uploads → build/web → build → root
+                File sourceUploadDir = new File(projectRoot, "web/uploads");
+                if (!sourceUploadDir.exists()) {
+                    sourceUploadDir.mkdirs();
+                }
+
+                Path source = Path.of(buildPath, fileName);
+                Path target = Path.of(sourceUploadDir.getAbsolutePath(), fileName);
+                Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+
+                imageUrl = "uploads/" + fileName;
+            }
+
+            material.setImageUrl(imageUrl);
+
+            // Lấy và gán category
+            int categoryId = Integer.parseInt(request.getParameter("category"));
             MaterialCategory category = new MaterialCategory();
             category.setCategoryId(categoryId);
             material.setCategory(category);
 
-            // 3. Lấy danh sách supplier
-            String[] supplierIds = request.getParameterValues("suppliers");
-            List<Integer> supplierIdList = new ArrayList<>();
-            if (supplierIds != null) {
-                for (String id : supplierIds) {
-                    supplierIdList.add(Integer.parseInt(id)); // Chuyển mỗi ID thành số
-                }
-            }
-
-            // 4. Lưu vật tư vào database
-            materialDAO.addMaterial(material, supplierIdList);
-
-            // 5. Hiển thị thông báo thành công
+            // Lưu vào CSDL
+            materialDAO.addMaterial(material);
             request.setAttribute("message", "Thêm vật tư thành công!");
             request.setAttribute("messageType", "success");
+
         } catch (NumberFormatException e) {
-            // Nếu dữ liệu nhập vào không đúng định dạng (ví dụ: category không phải số)
             request.setAttribute("message", "Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.");
             request.setAttribute("messageType", "danger");
         } catch (SQLException e) {
-            // Xử lý lỗi database
-            if (e.getSQLState().equals("23000") && e.getErrorCode() == 1062) {
-                // Lỗi trùng mã vật tư
+            if ("23000".equals(e.getSQLState()) && e.getErrorCode() == 1062) {
                 request.setAttribute("message", "Mã vật tư đã tồn tại!");
             } else {
-                // Các lỗi database khác
                 request.setAttribute("message", "Lỗi khi lưu vật tư: " + e.getMessage());
             }
             request.setAttribute("messageType", "danger");
         }
 
-        // 6. Tải lại dữ liệu cho form (để người dùng tiếp tục nhập nếu có lỗi)
+        // Tải lại danh sách category
         try {
             List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
-            List<Supplier> suppliers = supplierDAO.getAllSuppliers();
             request.setAttribute("categories", categories);
-            request.setAttribute("suppliers", suppliers);
         } catch (SQLException e) {
             throw new ServletException("Không thể lấy dữ liệu cho form", e);
         }
 
-        // 7. Chuyển lại về trang JSP để hiển thị kết quả
         request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
     }
 }

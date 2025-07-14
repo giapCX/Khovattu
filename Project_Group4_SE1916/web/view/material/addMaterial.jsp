@@ -57,26 +57,6 @@
             box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
         }
         
-        .suppliers-container {
-            border: 1px solid #dee2e6;
-            border-radius: var(--border-radius);
-            padding: 1rem;
-            max-height: 200px;
-            overflow-y: auto;
-            background-color: var(--light-color);
-        }
-        
-        .supplier-item {
-            margin-bottom: 0.5rem;
-            padding: 0.5rem;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-        
-        .supplier-item:hover {
-            background-color: #e9ecef;
-        }
-        
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
@@ -100,6 +80,13 @@
         
         .alert {
             border-radius: var(--border-radius);
+        }
+        
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+            display: none;
         }
         
         @media (max-width: 768px) {
@@ -126,7 +113,7 @@
                         <i class="fas fa-plus-circle me-2"></i>Add New Material
                     </h2>
                     
-                    <form action="${pageContext.request.contextPath}/AddMaterialController" method="post">
+                    <form action="${pageContext.request.contextPath}/AddMaterialController" method="post" enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="code" class="form-label">Material Code</label>
@@ -160,30 +147,9 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="imageUrl" class="form-label">Image URL</label>
-                            <input type="url" class="form-control" id="imageUrl" name="imageUrl" placeholder="https://example.com/image.jpg">
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="form-label">Suppliers</label>
-                            <div class="suppliers-container">
-                                <div class="row">
-                                    <c:forEach var="sup" items="${suppliers}">
-                                        <div class="col-md-6">
-                                            <div class="supplier-item">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" 
-                                                           id="supplier_${sup.supplierId}" name="suppliers" 
-                                                           value="${sup.supplierId}">
-                                                    <label class="form-check-label" for="supplier_${sup.supplierId}">
-                                                        <i class="fas fa-truck me-2"></i>${sup.supplierName}
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </c:forEach>
-                                </div>
-                            </div>
+                            <label for="imageFile" class="form-label">Material Image</label>
+                            <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+                            <img id="imagePreview" class="image-preview" src="#" alt="Preview">
                         </div>
                         
                         <div class="d-flex justify-content-between">
@@ -217,12 +183,15 @@
                 $('.alert').alert('close');
             }, 5000);
             
-            // Preview image when URL changes
-            $('#imageUrl').on('change', function() {
-                const url = $(this).val();
-                if(url) {
-                    // You could add image preview functionality here
-                    console.log('Image URL changed:', url);
+            // Image preview functionality
+            $('#imageFile').change(function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#imagePreview').attr('src', e.target.result).show();
+                    }
+                    reader.readAsDataURL(file);
                 }
             });
         });
