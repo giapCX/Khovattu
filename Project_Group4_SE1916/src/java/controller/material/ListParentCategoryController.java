@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @WebServlet("/listParentCategory")
 public class ListParentCategoryController extends HttpServlet {
@@ -55,8 +57,26 @@ public class ListParentCategoryController extends HttpServlet {
 
             // Lấy danh sách danh mục cha với tìm kiếm, lọc trạng thái và phân trang
             List<MaterialCategory> parentCategories = categoryDAO.getParentCategoriesWithFilters(search, status, page, itemsPerPage);
+            for (MaterialCategory cat : parentCategories) {
+    int childCount = categoryDAO.getChildCategoryCount(cat.getCategoryId());
+    cat.setChildCount(childCount); // Thêm thuộc tính childCount vào model MaterialCategory
+}
+            Map<Integer, List<MaterialCategory>> childCategoriesMap = new HashMap<>();
+for (MaterialCategory parent : parentCategories) {
+    int childCount = categoryDAO.getChildCategoryCount(parent.getCategoryId());
+    parent.setChildCount(childCount);
+    
+    // Lấy danh sách child categories
+    List<MaterialCategory> childCategories = categoryDAO.getChildCategoriesByParentId(parent.getCategoryId());
+    childCategoriesMap.put(parent.getCategoryId(), childCategories);
+}
+
+request.setAttribute("parentCategories", parentCategories);
+request.setAttribute("childCategoriesMap", childCategoriesMap);
             int totalRecords = categoryDAO.getTotalParentCategories(search, status);
             int totalPages = (int) Math.ceil((double) totalRecords / itemsPerPage);
+            // Trong doGet method, sau khi lấy danh sách parentCategories
+
 
             // Đặt các thuộc tính cho JSP
             request.setAttribute("parentCategories", parentCategories);
