@@ -2,35 +2,35 @@ package model;
 
 public class ImportDetail {
     private int importDetailId;
-    private int importId;
+    private Import importOb;
     private int materialId;
-    private double quantity;
-    private double pricePerUnit;
-    private String materialCondition;
-    private int supplierId;
-
-    private String materialCode;
     private String materialName;
+    private Double quantity;
     private String unit;
-    private String materialCategory;
+    private Double price;
+    private String materialCondition;
+    private Integer supplierId;
+    private String supplierName;
+    private Integer  siteId;
+    private String siteName;
+   
 
     public ImportDetail() {
     }
 
-    public ImportDetail(int importDetailId, int importId, int materialId, double quantity,
-                       double pricePerUnit, String materialCondition, int supplierId,
-                       String materialCode, String materialName, String unit, String materialCategory) {
+    public ImportDetail(int importDetailId, Import importOb, int materialId, String materialName, double quantity, String unit, double price, String materialCondition, Integer supplierId, String supplierName, Integer siteId, String siteName) {
         this.importDetailId = importDetailId;
-        this.importId = importId;
+        this.importOb = importOb;
         this.materialId = materialId;
+        this.materialName = materialName;
         this.quantity = quantity;
-        this.pricePerUnit = pricePerUnit;
+        this.unit = unit;
+        this.price = price;
         this.materialCondition = materialCondition;
         this.supplierId = supplierId;
-        this.materialCode = materialCode;
-        this.materialName = materialName;
-        this.unit = unit;
-        this.materialCategory = materialCategory;
+        this.supplierName = supplierName;
+        this.siteId = siteId;
+        this.siteName = siteName;
     }
 
     public int getImportDetailId() {
@@ -41,12 +41,12 @@ public class ImportDetail {
         this.importDetailId = importDetailId;
     }
 
-    public int getImportId() {
-        return importId;
+    public Import getImportOb() {
+        return importOb;
     }
 
-    public void setImportId(int importId) {
-        this.importId = importId;
+    public void setImportOb(Import importOb) {
+        this.importOb = importOb;
     }
 
     public int getMaterialId() {
@@ -57,52 +57,20 @@ public class ImportDetail {
         this.materialId = materialId;
     }
 
-    public double getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(double quantity) {
-        this.quantity = quantity;
-    }
-
-    public double getPricePerUnit() {
-        return pricePerUnit;
-    }
-
-    public void setPricePerUnit(double pricePerUnit) {
-        this.pricePerUnit = pricePerUnit;
-    }
-
-    public String getMaterialCondition() {
-        return materialCondition;
-    }
-
-    public void setMaterialCondition(String materialCondition) {
-        this.materialCondition = materialCondition;
-    }
-
-    public int getSupplierId() {
-        return supplierId;
-    }
-
-    public void setSupplierId(int supplierId) {
-        this.supplierId = supplierId;
-    }
-
-    public String getMaterialCode() {
-        return materialCode;
-    }
-
-    public void setMaterialCode(String materialCode) {
-        this.materialCode = materialCode;
-    }
-
     public String getMaterialName() {
         return materialName;
     }
 
     public void setMaterialName(String materialName) {
         this.materialName = materialName;
+    }
+
+    public double getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
     }
 
     public String getUnit() {
@@ -113,11 +81,55 @@ public class ImportDetail {
         this.unit = unit;
     }
 
-    public String getMaterialCategory() {
-        return materialCategory;
+    public double getPrice() {
+        return price;
     }
 
-    public void setMaterialCategory(String materialCategory) {
-        this.materialCategory = materialCategory;
+    public void setPrice(double price) {
+        this.price = price;
     }
+
+    public String getMaterialCondition() {
+        return materialCondition;
+    }
+
+    public void setMaterialCondition(String materialCondition) {
+        this.materialCondition = materialCondition;
+    }
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public Integer getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(Integer siteId) {
+        this.siteId = siteId;
+    }
+
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
+    }
+    
+    
+
+    
 }

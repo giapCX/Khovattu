@@ -1,27 +1,35 @@
 package model;
 
-import java.time.LocalDate;
+import java.sql.Timestamp;
+import java.util.List;
 
 public class Import {
 
     private int importId;
     private String receiptId;
-    private int userId;
-    private LocalDate importDate;
+    private int proposalId;
+    private String importType;
+    private Integer responsibleId;
+    private Integer executorId;
     private String note;
+    private Timestamp importDate;
+    private List<ImportDetail> importDetail;
 
     public Import() {
     }
 
-    public Import(int importId, String receiptId, int userId, LocalDate importDate, String note) {
+    public Import(int importId, String receiptId, int proposalId, String importType, int responsible_id, int executor_id, String note, Timestamp importDate, List<ImportDetail> importDetail) {
         this.importId = importId;
         this.receiptId = receiptId;
-        this.userId = userId;
-        this.importDate = importDate;
+        this.proposalId = proposalId;
+        this.importType = importType;
+        this.responsibleId = responsible_id;
+        this.executorId = executor_id;
         this.note = note;
+        this.importDate = importDate;
+        this.importDetail = importDetail;
     }
 
-    // Getters and Setters (update receiptId)
     public int getImportId() {
         return importId;
     }
@@ -38,20 +46,36 @@ public class Import {
         this.receiptId = receiptId;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getProposalId() {
+        return proposalId;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setProposalId(int proposalId) {
+        this.proposalId = proposalId;
     }
 
-    public LocalDate getImportDate() {
-        return importDate;
+    public String getImportType() {
+        return importType;
     }
 
-    public void setImportDate(LocalDate importDate) {
-        this.importDate = importDate;
+    public void setImportType(String importType) {
+        this.importType = importType;
+    }
+
+    public Integer getResponsibleId() {
+        return responsibleId;
+    }
+
+    public void setResponsibleId(Integer responsibleId) {
+        this.responsibleId = responsibleId;
+    }
+
+    public Integer getExecutorId() {
+        return executorId;
+    }
+
+    public void setExecutorId(Integer executorId) {
+        this.executorId = executorId;
     }
 
     public String getNote() {
@@ -61,4 +85,24 @@ public class Import {
     public void setNote(String note) {
         this.note = note;
     }
+
+    public Timestamp getImportDate() {
+        return importDate;
+    }
+
+    public void setImportDate(Timestamp importDate) {
+        this.importDate = importDate;
+    }
+
+    public List<ImportDetail> getImportDetail() {
+        return importDetail;
+    }
+
+    public void setImportDetail(List<ImportDetail> importDetail) {
+        this.importDetail = importDetail;
+    }
+
+    
+
+    
 }

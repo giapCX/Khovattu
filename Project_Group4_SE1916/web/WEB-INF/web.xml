@@ -57,6 +57,10 @@
         <servlet-class>controller.auth.ChangePasswordByForget</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ImportServlet</servlet-name>
+        <servlet-class>controller.importhistory.ImportServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>AddMaterialController</servlet-name>
         <servlet-class>controller.material.AddMaterialController</servlet-class>
     </servlet>
@@ -259,6 +263,10 @@
     <servlet-mapping>
         <servlet-name>ChangePasswordByForget</servlet-name>
         <url-pattern>/forgetPassword/changePasswordByForget</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImportServlet</servlet-name>
+        <url-pattern>/ImportServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AddMaterialController</servlet-name>

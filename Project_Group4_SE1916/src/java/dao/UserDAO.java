@@ -628,4 +628,41 @@ public class UserDAO {
         }
         return false;
     }
+
+    public List<User> getAllActiveUsers() throws SQLException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT u.*, r.role_id, r.role_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "WHERE u.status = 'active'";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setCode(rs.getString("code"));
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setAddress(rs.getString("address"));
+                user.setEmail(rs.getString("email"));
+                user.setPhone(rs.getString("phone_number"));
+                user.setImage(rs.getString("imageUrl"));
+                user.setDateOfBirth(rs.getString("date_of_birth"));
+                user.setStatus(rs.getString("status"));
+
+                Role role = new Role();
+                role.setRoleId(rs.getInt("role_id"));
+                role.setRoleName(rs.getString("role_name"));
+                user.setRole(role);
+
+                users.add(user);
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Error fetching active users", ex);
+            throw ex;
+        }
+
+        return users;
+    }
+
 }
