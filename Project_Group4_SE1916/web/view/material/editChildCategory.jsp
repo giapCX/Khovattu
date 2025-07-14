@@ -134,7 +134,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <a href="${pageContext.request.contextPath}/ListMaterialController" class="btn btn-secondary back-btn">
+                <a href="${pageContext.request.contextPath}/ListParentCategoryController" class="btn btn-secondary back-btn">
                     <i class="fas fa-arrow-left me-2"></i>Back to Material List
                 </a>
                 

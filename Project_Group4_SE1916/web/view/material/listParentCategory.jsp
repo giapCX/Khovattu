@@ -11,75 +11,188 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
         <style>
-            .view-details-cell {
-                min-width: 120px;
-                word-break: break-word;
-            }
-            .view-details-cell a {
-                display: inline-block;
-                white-space: nowrap;
-            }
+
             .error-message {
                 color: red;
                 font-size: 0.875rem;
                 margin-top: 0.25rem;
             }
-            
+
             .dropdown-container {
-        position: relative;
-        display: inline-block;
-    }
-    .dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: white;
-        min-width: 250px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
-        border-radius: 8px;
-        padding: 8px 0;
-        max-height: 300px;
-        overflow-y: auto;
-    }
-    .dropdown-item {
-        padding: 8px 16px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .dropdown-item:hover {
-        background-color: #f1f5f9;
-    }
-    .dropdown-btn {
-        cursor: pointer;
-        padding: 4px 12px;
-        border-radius: 20px;
-        background-color: #e0f2fe;
-        color: #0369a1;
-        border: none;
-        transition: all 0.2s;
-    }
-    .dropdown-btn:hover {
-        background-color: #bae6fd;
-    }
-    .action-btns {
-        display: flex;
-        gap: 4px;
-    }
-    .action-btn {
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        cursor: pointer;
-    }
-    .view-btn {
-        background-color: #3b82f6;
-        color: white;
-    }
-    .edit-btn {
-        background-color: #f59e0b;
-        color: white;
-    }
+                position: relative;
+                display: inline-block;
+            }
+            .dropdown-content {
+                display: none;
+                position: absolute;
+                background-color: white;
+                min-width: 250px;
+                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                z-index: 1;
+                border-radius: 8px;
+                padding: 8px 0;
+                max-height: 300px;
+                overflow-y: auto;
+            }
+            .dropdown-item {
+                padding: 8px 16px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .dropdown-item:hover {
+                background-color: #f1f5f9;
+            }
+            .dropdown-btn {
+                cursor: pointer;
+                padding: 4px 12px;
+                border-radius: 20px;
+                background-color: #e0f2fe;
+                color: #0369a1;
+                border: none;
+                transition: all 0.2s;
+            }
+            .dropdown-btn:hover {
+                background-color: #bae6fd;
+            }
+            .action-btns {
+                display: flex;
+                gap: 4px;
+            }
+            .action-btn {
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                cursor: pointer;
+            }
+            .view-btn {
+                background-color: #3b82f6;
+                color: white;
+            }
+            .edit-btn {
+                background-color: #f59e0b;
+                color: white;
+            }
+            dropdown-container {
+                position: relative;
+                display: inline-block;
+            }
+
+            .dropdown-btn {
+                cursor: pointer;
+                padding: 8px 16px;
+                border-radius: 8px;
+                background-color: #e0f2fe;
+                color: #0369a1;
+                border: none;
+                transition: all 0.2s;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+
+            .dropdown-btn:hover {
+                background-color: #bae6fd;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            }
+
+            .dropdown-btn i {
+                transition: transform 0.2s;
+            }
+
+            .dropdown-btn.active i {
+                transform: rotate(180deg);
+            }
+
+            .dropdown-content {
+                display: none;
+                position: absolute;
+                background-color: white;
+                min-width: 300px; /* Rộng hơn */
+                box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+                z-index: 100;
+                border-radius: 12px;
+                padding: 12px 0;
+                max-height: 400px;
+                overflow-y: auto;
+                border: 1px solid #e2e8f0;
+                margin-top: 8px;
+            }
+
+            .dropdown-item {
+                padding: 12px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                transition: background-color 0.2s;
+                border-bottom: 1px solid #f1f5f9;
+            }
+
+            .dropdown-item:last-child {
+                border-bottom: none;
+            }
+
+            .dropdown-item:hover {
+                background-color: #f8fafc;
+            }
+
+            .dropdown-item span {
+                flex-grow: 1;
+                font-weight: 500;
+                color: #334155;
+            }
+
+            .view-all-materials {
+                background-color: #f8fafc;
+                padding: 12px 20px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #3b82f6;
+                font-weight: 500;
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+
+            .view-all-materials:hover {
+                color: #2563eb;
+            }
+
+            .action-btns {
+                display: flex;
+                gap: 8px;
+            }
+
+            .action-btn {
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .view-btn {
+                background-color: #3b82f6;
+                color: white;
+            }
+
+            .view-btn:hover {
+                background-color: #2563eb;
+            }
+
+            .edit-btn {
+                background-color: #f59e0b;
+                color: white;
+            }
+
+            .edit-btn:hover {
+                background-color: #d97706;
+            }
         </style>
     </head>
     <body class="bg-white font-sans min-h-screen">
@@ -123,6 +236,10 @@
                         <a href="${pageContext.request.contextPath}/AddParentCategoryController" 
                            class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md inline-flex items-center">
                             <i class="fas fa-plus mr-2"></i>Add Parent Category
+                        </a>
+                        <a href="${pageContext.request.contextPath}/AddChildCategoryController" 
+                           class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md inline-flex items-center">
+                            <i class="fas fa-plus mr-2"></i>Add Child Category
                         </a>
                     </div>
                 </div>
@@ -170,66 +287,67 @@
                                 <th class="py-4 px-6 text-left rounded-tl-2xl"><i class="fas fa-list-ol mr-2"></i>Id</th>
                                 <th class="py-4 px-6 text-left"><i class="fas fa-box mr-2"></i>Category Name</th>
                                 <th class="py-4 px-6 text-left"><i class="fas fa-layer-group mr-2"></i>Child Categories</th>
-                                <th class="py-4 px-6 text-left"><i class="fas fa-check-circle mr-2"></i>Status</th>
+                                <th class="py-4 px-6 text-left"><i class="fas fa-check-circle mr-2"></i>ParentCategory Status</th>
                                 <th class="py-4 px-6 text-center view-details-cell rounded-tr-2xl"><i class="fas fa-eye mr-2"></i>Actions</th>
                             </tr>
                         </thead>
-                       <tbody id="categoryTableBody" class="divide-y divide-gray-200">
-    <c:forEach var="cat" items="${parentCategories}" varStatus="loop">
-        <tr class="hover:bg-gradient-to-r hover:from-sky-50 hover:to-cyan-50 transition-all duration-300">
-            <td class="py-4 px-6 font-medium">${cat.categoryId}</td>
-            <td class="py-4 px-6">${cat.name}</td>
-            <td class="py-4 px-6">
-                <div class="dropdown-container">
-                    <button onclick="toggleDropdown('dropdown-${cat.categoryId}')" 
-                            class="dropdown-btn flex items-center">
-                        <span>${cat.childCount} child categories</span>
-                        <i class="fas fa-chevron-down ml-1 text-xs"></i>
-                    </button>
-                    <div id="dropdown-${cat.categoryId}" class="dropdown-content">
-                        <c:forEach var="childCat" items="${childCategoriesMap[cat.categoryId]}">
-                            <div class="dropdown-item">
-                                <span>${childCat.name}</span>
-                                <div class="action-btns">
-                                    <a href="${pageContext.request.contextPath}/ListMaterialController?filterParentCategory=${cat.categoryId}&filterCategory=${childCat.categoryId}"
-                                       class="action-btn view-btn">
-                                        <i class="fas fa-eye mr-1"></i>View
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/EditChildCategoryController?id=${childCat.categoryId}"
-                                       class="action-btn edit-btn">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </c:forEach>
-                        <div class="dropdown-item border-t border-gray-100 bg-gray-50">
-                            <a href="${pageContext.request.contextPath}/ListMaterialController?filterParentCategory=${cat.categoryId}"
-                               class="text-blue-600 hover:text-blue-800 text-sm font-medium inline-flex items-center">
-                                <i class="fas fa-boxes mr-1"></i> View All Materials
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </td>
-            <td class="py-4 px-6">
-                <span class="px-3 py-1 rounded-full font-semibold
-                      <c:choose>
-                          <c:when test="${cat.status == 'active'}">bg-green-300 text-green-900</c:when>
-                          <c:when test="${cat.status == 'inactive'}">bg-red-300 text-red-900</c:when>
-                          <c:otherwise>bg-gray-300 text-gray-900</c:otherwise>
-                      </c:choose>">
-                    ${cat.status}
-                </span>
-            </td>
-            <td class="py-4 px-6 text-center view-details-cell">
-                <a href="${pageContext.request.contextPath}/EditParentCategoryController?categoryId=${cat.categoryId}" 
-                   class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all duration-300 shadow-md">
-                    <i class="fas fa-edit mr-2"></i>Edit
-                </a>
-            </td>
-        </tr>
-    </c:forEach>
-</tbody>
+                        <tbody id="categoryTableBody" class="divide-y divide-gray-200">
+                            <c:forEach var="cat" items="${parentCategories}" varStatus="loop">
+                                <tr class="hover:bg-gradient-to-r hover:from-sky-50 hover:to-cyan-50 transition-all duration-300">
+                                    <td class="py-4 px-6 font-medium">${cat.categoryId}</td>
+                                    <td class="py-4 px-6">${cat.name}</td>
+                                    <td class="py-4 px-6">
+                                        <div class="dropdown-container">
+                                            <button onclick="toggleDropdown('dropdown-${cat.categoryId}', this)" 
+                                                    class="dropdown-btn">
+                                                <span>${cat.childCount} child categories</span>
+                                                <i class="fas fa-chevron-down text-xs"></i>
+                                            </button>
+                                            <div id="dropdown-${cat.categoryId}" class="dropdown-content">
+                                                <c:forEach var="childCat" items="${childCategoriesMap[cat.categoryId]}">
+                                                    <div class="dropdown-item">
+                                                        <span>${childCat.name}</span>
+                                                        <div class="action-btns">
+                                                            <a href="${pageContext.request.contextPath}/ListMaterialController?filterParentCategory=${cat.categoryId}&filterCategory=${childCat.categoryId}"
+                                                               class="action-btn view-btn">
+                                                                <i class="fas fa-eye"></i>
+                                                                <span>View</span>
+                                                            </a>
+                                                            <a href="${pageContext.request.contextPath}/EditChildCategoryController?id=${childCat.categoryId}"
+                                                               class="action-btn edit-btn">
+                                                                <i class="fas fa-edit"></i>
+                                                                <span>Edit</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </c:forEach>
+                                                <a href="${pageContext.request.contextPath}/ListMaterialController?filterParentCategory=${cat.categoryId}"
+                                                   class="view-all-materials">
+                                                    <i class="fas fa-boxes"></i>
+                                                    <span>View All Materials</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <span class="px-3 py-1 rounded-full font-semibold
+                                              <c:choose>
+                                                  <c:when test="${cat.status == 'active'}">bg-green-300 text-green-900</c:when>
+                                                  <c:when test="${cat.status == 'inactive'}">bg-red-300 text-red-900</c:when>
+                                                  <c:otherwise>bg-gray-300 text-gray-900</c:otherwise>
+                                              </c:choose>">
+                                            ${cat.status}
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-6 text-center view-details-cell">
+                                        <a href="${pageContext.request.contextPath}/EditParentCategoryController?categoryId=${cat.categoryId}" 
+                                           class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all duration-300 shadow-md">
+                                            <i class="fas fa-edit mr-2"></i>Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
                     </table>
                 </div>
 
@@ -259,39 +377,48 @@
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
 
         <script>
-                                    function validateForm() {
-                                        const searchInput = document.getElementById('searchInput').value;
-                                        const searchError = document.getElementById('searchError');
-                                        const itemsPerPage = document.getElementById('itemsPerPage').value;
-                                        searchError.textContent = '';
-                                        if (searchInput.length > 100) {
-                                            searchError.textContent = 'Search term must be less than 100 characters.';
-                                            return false;
-                                        }
-                                        if (!itemsPerPage) {
-                                            searchError.textContent = 'Please select items per page.';
-                                            return false;
-                                        }
-                                        return true;
-                                    }
-                                     function toggleDropdown(dropdownId) {
+     function validateForm() {
+    const searchInput = document.getElementById('searchInput').value;
+    const searchError = document.getElementById('searchError');
+    const itemsPerPage = document.getElementById('itemsPerPage').value;
+    searchError.textContent = '';
+    if (searchInput.length > 100) {
+        searchError.textContent = 'Search term must be less than 100 characters.';
+            return false;
+    }
+    if (!itemsPerPage) {
+    searchError.textContent = 'Please select items per page.';
+    return false;
+        }
+    return true;
+    }
+   function toggleDropdown(dropdownId, button) {
         var dropdown = document.getElementById(dropdownId);
         if (dropdown.style.display === 'block') {
             dropdown.style.display = 'none';
+            button.classList.remove('active');
         } else {
             // Đóng tất cả dropdown khác trước khi mở dropdown hiện tại
-            document.querySelectorAll('.dropdown-content').forEach(function(dropdown) {
-                dropdown.style.display = 'none';
+            document.querySelectorAll('.dropdown-content').forEach(function (content) {
+                content.style.display = 'none';
             });
+            document.querySelectorAll('.dropdown-btn').forEach(function (btn) {
+                btn.classList.remove('active');
+            });
+            
             dropdown.style.display = 'block';
+            button.classList.add('active');
         }
     }
 
     // Đóng dropdown khi click ra ngoài
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         if (!event.target.matches('.dropdown-btn') && !event.target.closest('.dropdown-content')) {
-            document.querySelectorAll('.dropdown-content').forEach(function(dropdown) {
+            document.querySelectorAll('.dropdown-content').forEach(function (dropdown) {
                 dropdown.style.display = 'none';
+            });
+            document.querySelectorAll('.dropdown-btn').forEach(function (btn) {
+                btn.classList.remove('active');
             });
         }
     });

@@ -77,14 +77,8 @@
                            class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md inline-flex items-center">
                             <i class="fas fa-plus mr-2"></i>Add Material
                         </a>
-                        <a href="${pageContext.request.contextPath}/AddChildCategoryController" 
-                           class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md inline-flex items-center">
-                            <i class="fas fa-plus mr-2"></i>Add Child Category
-                        </a>
-                        <a href="${pageContext.request.contextPath}/EditChildCategoryController" 
-                           class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md inline-flex items-center">
-                            <i class="fas fa-plus mr-2"></i>Edit Child Category
-                        </a>
+                       
+                        
                     </div>
                 </div>
 
@@ -152,7 +146,7 @@
         <th class="py-2 px-4 text-left"><i class="fas fa-info-circle mr-2"></i>Child Category Status</th>
         <th class="py-2 px-4 text-left"><i class="fas fa-cube mr-2"></i>Material Name</th>
         <th class="py-2 px-4 text-left"><i class="fas fa-balance-scale mr-2"></i>Unit</th>
-        <th class="py-2 px-4 text-left"><i class="fas fa-truck mr-2"></i>Suppliers</th>
+        
         <th class="py-2 px-4 text-left"><i class="fas fa-image mr-2"></i>Image</th>
        
      
@@ -173,18 +167,7 @@
             </td>
             <td class="py-2 px-4">${mat.name}</td>
             <td class="py-2 px-4">${mat.unit}</td>
-            <td class="py-2 px-4">
-                <c:choose>
-                    <c:when test="${not empty mat.suppliers}">
-                        <c:forEach var="supplier" items="${mat.suppliers}" varStatus="status">
-                            ${fn:escapeXml(supplier.supplierName)}<c:if test="${!status.last}">,</c:if>
-                        </c:forEach>
-                    </c:when>
-                    <c:otherwise>
-                        No suppliers
-                    </c:otherwise>
-                </c:choose>
-            </td>
+          
             <td class="py-2 px-4">
                 <img src="${mat.imageUrl}" class="thumbnail" alt="Material image">
             </td>
