@@ -92,7 +92,7 @@ public class ImportDAO {
                 ps.setDouble(3, detail.getQuantity());
 
                 // 5. price (nullable)
-                if (detail.getPrice() != 0) {
+                if (detail.getPrice() != null) {
                     ps.setDouble(4, detail.getPrice());
                 } else {
                     ps.setNull(4, Types.DOUBLE);

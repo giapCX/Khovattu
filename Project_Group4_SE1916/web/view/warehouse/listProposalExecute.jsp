@@ -6,7 +6,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>List proposal</title>
+        <title>List request awaiting execute</title>
 
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
@@ -81,13 +81,6 @@
                         </select>                   
                     </div>
                     <div class="flex-1 min-w-[200px]">
-                        <select name="searchStatus" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">                         
-                            <option value="">All Status</option>                           
-                            <option value="approved_but_not_executed" ${param.searchStatus == 'approved_but_not_executed' ? 'selected' : ''}>To Be Execute</option>
-                            <option value="executed" ${param.searchStatus == 'executed' ? 'selected' : ''}>Executed</option>                            
-                        </select>                 
-                    </div>
-                    <div class="flex-1 min-w-[200px]">
                         <input type="date" name="searchStartDate" id="searchStartDate"
                                value="${param.searchStartDate}"
                                max="<%= java.time.LocalDate.now()%>"
@@ -121,7 +114,6 @@
                                     <th class="p-4 text-left">Type</th>
                                     <th class="p-4 text-left">Proposer Sent</th>
                                     <th class="p-4 text-left">Time Sent</th>
-                                    <th class="p-4 text-left">Time Execute</th>
                                     <th class="p-4 text-left">Status</th>
                                     <th class="p-4 text-left">Execute</th>
                                 </tr>
@@ -142,9 +134,6 @@
                                                 <td class="p-4 font-medium">${item.senderName}</td>
                                                 <td class="p-4 font-medium">
                                                     <fmt:formatDate value="${item.proposalSentDate}" pattern="HH:mm, dd MMM yyyy"/>
-                                                </td>
-                                                <td class="p-4 font-medium">
-                                                    <fmt:formatDate value="${item.executeDate}" pattern="HH:mm, dd MMM yyyy"/>
                                                 </td>
                                                 <td class="p-4 font-medium">
                                                     <c:choose>

@@ -100,7 +100,7 @@ public class ImportServlet extends HttpServlet {
             throws ServletException, IOException {
         String proposalId = request.getParameter("proposalId");
         String proposalType = request.getParameter("proposalType");
-      
+
         HttpSession session = request.getSession();
         Integer executorId = (Integer) session.getAttribute("userId");
         if (executorId == null) {
@@ -112,14 +112,14 @@ public class ImportServlet extends HttpServlet {
         String[] units = request.getParameterValues("unit[]");
         String[] quantities = request.getParameterValues("quantity[]");
         String[] conditions = request.getParameterValues("materialCondition[]");
-        String[] supplierIds = request.getParameterValues("supplierId[]");
-        String[] prices = request.getParameterValues("pricePerUnit[]");
-        String[] siteIds = request.getParameterValues("siteId[]");
+        
+        
+        
 
         Import importOb = new Import();
         importOb.setProposalId(Integer.parseInt(proposalId));
         importOb.setImportType(proposalType);
-       
+
         importOb.setNote(note);
         importOb.setImportDate(new Timestamp(System.currentTimeMillis()));
 
@@ -133,24 +133,26 @@ public class ImportServlet extends HttpServlet {
             detail.setMaterialCondition(conditions[i]);
 
             if ("import_from_supplier".equals(proposalType)) {
+                String[] supplierIds = request.getParameterValues("supplierIds[]");
                 if (supplierIds != null && i < supplierIds.length && supplierIds[i] != null && !supplierIds[i].isEmpty()) {
                     detail.setSupplierId(Integer.parseInt(supplierIds[i]));
                 }
-
+                String[] prices = request.getParameterValues("pricePerUnit[]");
                 if (prices != null && i < prices.length && prices[i] != null && !prices[i].isEmpty()) {
                     detail.setPrice(Double.parseDouble(prices[i]));
                 }
 
-            } else if ( "import_returned".equals(proposalType)) {
+            } else if ("import_returned".equals(proposalType)) {
+                String[] siteIds = request.getParameterValues("siteId[]");
                 if (siteIds != null && i < siteIds.length && siteIds[i] != null && !siteIds[i].isEmpty()) {
                     detail.setSiteId(Integer.parseInt(siteIds[i]));
                 }
-                  String responsibleId = request.getParameter("responsibleId");
-                   importOb.setResponsibleId(Integer.parseInt(responsibleId));
+                String responsibleId = request.getParameter("responsibleId");
+                importOb.setResponsibleId(Integer.parseInt(responsibleId));
             }
 
             details.add(detail);
-            
+
         }
         importOb.setImportDetail(details);
 

@@ -149,6 +149,7 @@
                                                         <td class="p-2">
                                                             <fmt:formatNumber value="${detail.price}" type="number" minFractionDigits="0" maxFractionDigits="2" />
                                                             <input type="hidden" name="pricePerUnit[]" value="${detail.price}" />
+                                                            
                                                         </td>
                                                     </c:if>
                                                     <c:if test="${proposal.proposalType == 'export' || proposal.proposalType == 'import_returned'}">

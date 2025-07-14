@@ -430,7 +430,7 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/ListProposalExecute?searchType=&searchStatus=approved_but_not_executed&searchStartDate=&searchEndDate=" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View</a>
+                        <a href="${pageContext.request.contextPath}/ListProposalExecute" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">

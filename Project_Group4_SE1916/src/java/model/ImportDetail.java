@@ -65,11 +65,11 @@ public class ImportDetail {
         this.materialName = materialName;
     }
 
-    public double getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(double quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 
@@ -81,11 +81,11 @@ public class ImportDetail {
         this.unit = unit;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -128,7 +128,7 @@ public class ImportDetail {
     public void setSiteName(String siteName) {
         this.siteName = siteName;
     }
-    
+
     
 
     

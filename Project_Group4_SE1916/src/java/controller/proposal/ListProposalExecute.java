@@ -62,7 +62,7 @@ public class ListProposalExecute extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String searchType = request.getParameter("searchType");
-        String searchStatus = request.getParameter("searchStatus");
+        String searchStatus = "approved_but_not_executed";
         String searchStartDateStr = request.getParameter("searchStartDate");
         String searchEndDateStr = request.getParameter("searchEndDate");
 
