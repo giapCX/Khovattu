@@ -94,6 +94,7 @@ public class ImportServlet extends HttpServlet {
 
         Import importOb = new Import();
         importOb.setProposalId(Integer.parseInt(proposalId));
+        importOb.setExecutorId(executorId);
         importOb.setImportType(proposalType);
         importOb.setNote(note);
 
