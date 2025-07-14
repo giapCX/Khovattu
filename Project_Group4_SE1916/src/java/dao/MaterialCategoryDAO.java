@@ -245,4 +245,17 @@ public class MaterialCategoryDAO {
             return false;
         }
     }
+    
+    public int getChildCategoryCount(int parentId) throws SQLException {
+    String sql = "SELECT COUNT(*) FROM MaterialCategories WHERE parent_id = ?";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, parentId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+    }
+    return 0;
+}
 }

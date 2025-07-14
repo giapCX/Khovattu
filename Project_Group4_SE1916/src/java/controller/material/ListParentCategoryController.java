@@ -55,8 +55,14 @@ public class ListParentCategoryController extends HttpServlet {
 
             // Lấy danh sách danh mục cha với tìm kiếm, lọc trạng thái và phân trang
             List<MaterialCategory> parentCategories = categoryDAO.getParentCategoriesWithFilters(search, status, page, itemsPerPage);
+            for (MaterialCategory cat : parentCategories) {
+    int childCount = categoryDAO.getChildCategoryCount(cat.getCategoryId());
+    cat.setChildCount(childCount); // Thêm thuộc tính childCount vào model MaterialCategory
+}
             int totalRecords = categoryDAO.getTotalParentCategories(search, status);
             int totalPages = (int) Math.ceil((double) totalRecords / itemsPerPage);
+            // Trong doGet method, sau khi lấy danh sách parentCategories
+
 
             // Đặt các thuộc tính cho JSP
             request.setAttribute("parentCategories", parentCategories);

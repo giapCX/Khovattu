@@ -10,11 +10,12 @@ public class MaterialCategory {
     private String status; 
     private List<Material> materials;
     private String ChildCategoryStatus;
+    private int childCount;
 
     public MaterialCategory() {
     }
 
-    public MaterialCategory(int categoryId, String name, String parentCategoryName, int parentId, String status, List<Material> materials, String ChildCategoryStatus) {
+    public MaterialCategory(int categoryId, String name, String parentCategoryName, int parentId, String status, List<Material> materials, String ChildCategoryStatus, int childCount) {
         this.categoryId = categoryId;
         this.name = name;
         this.parentCategoryName = parentCategoryName;
@@ -22,8 +23,17 @@ public class MaterialCategory {
         this.status = status;
         this.materials = materials;
         this.ChildCategoryStatus = ChildCategoryStatus;
+        this.childCount  = childCount;
     }
 
+    public int getChildCount() {
+        return childCount;
+    }
+
+    public void setChildCount(int childCount) {
+        this.childCount = childCount;
+    }
+    
     public String getChildCategoryStatus() {
         return ChildCategoryStatus;
     }
