@@ -2,11 +2,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh sách đề xuất chờ duyệt - Hệ thống Quản lý Vật tư</title>
+    <title>List of Pending Proposals - Material Management System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
@@ -90,6 +90,42 @@
             content: ' ↓';
             font-size: 0.75rem;
         }
+        .sidebar {
+            width: 18rem;
+            background: linear-gradient(to bottom, #1e40af, #3b82f6);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+            transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transform: translateX(-100%);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 50;
+        }
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        .nav-item {
+            transition: all 0.2s ease;
+            border-radius: 0.5rem;
+        }
+        .nav-item:hover {
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            transform: translateX(5px) scale(1.02);
+        }
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                max-width: 280px;
+            }
+            .sidebar.active ~ main {
+                margin-left: 0;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans antialiased">
@@ -103,20 +139,7 @@
     %>
     <div class="flex">
         <!-- Sidebar -->
-        <c:choose>
-            <c:when test="${role == 'admin'}">
-                <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
-            </c:when>
-            <c:when test="${role == 'direction'}">
-                <jsp:include page="/view/sidebar/sidebarDirection.jsp" />
-            </c:when>
-            <c:when test="${role == 'warehouse'}">
-                <jsp:include page="/view/sidebar/sidebarWarehouse.jsp" />
-            </c:when>
-            <c:when test="${role == 'employee'}">
-                <jsp:include page="/view/sidebar/sidebarEmployee.jsp" />
-            </c:when>
-        </c:choose>
+        <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
 
         <!-- Main Content -->
         <main class="flex-1 p-8 transition-all duration-300">
@@ -126,7 +149,7 @@
                     <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Approve Request</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">List of Pending Proposals</h2>
                 </div>
 
                 <!-- Error Message Display -->
@@ -151,7 +174,7 @@
                     </div>
                     <div class="flex-1 min-w-[200px]">
                         <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white search-input">
-                            <option value="" ${empty param.status ? 'selected' : ''}>All Status</option>
+                            <option value="" ${empty param.status ? 'selected' : ''}>All Statuses</option>
                             <option value="pending" ${param.status == 'pending' ? 'selected' : ''}>Pending</option>
                             <option value="approved_by_admin" ${param.status == 'approved_by_admin' ? 'selected' : ''}>Approved by Admin</option>
                             <option value="approved_but_not_executed" ${param.status == 'approved_but_not_executed' ? 'selected' : ''}>Approved by Director</option>
@@ -164,7 +187,7 @@
                     <a href="${pageContext.request.contextPath}/AdminApproveServlet" 
                        onclick="event.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" 
                        class="bg-yellow-500 text-white px-6 py-2 rounded-lg flex items-center">
-                        <i class="fas fa-undo mr-2"></i> Reset form
+                        <i class="fas fa-undo mr-2"></i> Reset
                     </a>
                 </form>
 
@@ -222,8 +245,8 @@
                                                     proposal.approval.adminStatus == 'approved' ? 'badge-success' : 
                                                     proposal.approval.adminStatus == 'rejected' ? 'badge-danger' : 
                                                     'bg-gray-300 text-gray-900'}">
-                                                      ${not empty proposal.approval.adminStatus ? proposal.approval.adminStatus : 'N/A'}
-                                                  </span>
+                                                ${not empty proposal.approval.adminStatus ? proposal.approval.adminStatus : 'N/A'}
+                                            </span>
                                         </td>
                                         <td class="p-4">
                                             <span class="badge
@@ -231,8 +254,8 @@
                                                     proposal.approval.directorStatus == 'approved' ? 'badge-success' : 
                                                     proposal.approval.directorStatus == 'rejected' ? 'badge-danger' : 
                                                     'bg-gray-300 text-gray-900'}">
-                                                      ${not empty proposal.approval.directorStatus ? proposal.approval.directorStatus : 'N/A'}
-                                                  </span>
+                                                ${not empty proposal.approval.directorStatus ? proposal.approval.directorStatus : 'N/A'}
+                                            </span>
                                         </td>
                                         <td class="p-4">
                                             <a href="${pageContext.request.contextPath}/AdminProposalDetailServlet?proposalId=${proposal.proposalId}" 
@@ -309,7 +332,7 @@
                 <!-- Back to Dashboard -->
                 <div class="mt-6 flex justify-center">
                     <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" 
-                       class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
+                       class="btn-secondary text-white px-6 py-3 rounded-lg">Back to Dashboard</a>
                 </div>
             </div>
         </main>
@@ -319,12 +342,32 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const toggleButton = document.getElementById('toggleSidebarMobile');
+            const closeButton = document.getElementById('toggleSidebar');
             const sidebar = document.querySelector('.sidebar');
+
+            // Toggle sidebar visibility
             if (toggleButton && sidebar) {
                 toggleButton.addEventListener('click', () => {
                     sidebar.classList.toggle('active');
                 });
+            } else {
+                console.error('Toggle button or sidebar not found');
             }
+            if (closeButton && sidebar) {
+                closeButton.addEventListener('click', () => {
+                    sidebar.classList.toggle('active');
+                });
+            } else {
+                console.error('Close button or sidebar not found');
+            }
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (event) => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active') && 
+                    !sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
 
             // Table Sorting
             document.querySelectorAll('.table th[data-sort]').forEach(th => {

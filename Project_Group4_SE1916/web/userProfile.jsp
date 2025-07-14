@@ -1,239 +1,209 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>User Profile</title>
-        <!-- Font Awesome for Icons -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-        <!-- Toastify CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-        <!-- Tailwind CSS for Sidebar -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            primary: {
-                                50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
-                                400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
-                                800: '#075985', 900: '#0c4a6e'
-                            },
-                            secondary: {
-                                50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe', 300: '#c4b5fd',
-                                400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9',
-                                800: '#5b21b6', 900: '#4c1d95'
-                            }
-                        },
-                        fontFamily: {
-                            sans: ['Inter', 'sans-serif']
-                        }
-                    }
-                }
-            }
-        </script>
-        <style>
-            /* Bootstrap-based styles for profile content */
-            body {
-                background-color: #f8f9fa;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                color: #333;
-            }
-            .container {
-                max-width: 750px;
-                margin: 40px auto;
-                padding: 25px;
-                background: #ffffff;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                transition: all 0.3s ease;
-            }
-            .profile-header {
-                text-align: center;
-                margin-bottom: 25px;
-            }
-            .profile-pic {
-                width: 150px;
-                height: 150px;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 4px solid #007bff;
-                margin-bottom: 15px;
-                transition: transform 0.3s ease;
-            }
-            .profile-pic:hover {
-                transform: scale(1.05);
-            }
-            .info-group {
-                margin-bottom: 20px;
-            }
-            .info-group label {
-                font-weight: 600;
-                color: #495057;
-                margin-right: 15px;
-                min-width: 120px;
-                display: inline-block;
-            }
-            .info-value {
-                color: #212529;
-                font-size: 1.1em;
-            }
-            .form-group {
-                margin-bottom: 20px;
-                display: none;
-            }
-            .form-group label {
-                font-weight: 600;
-                color: #495057;
-            }
-            .form-control {
-                border-radius: 6px;
-                border: 1px solid #ced4da;
-            }
-            .form-control:focus {
-                border-color: #007bff;
-                box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-            }
-            .form-control[readonly] {
-                background-color: #e9ecef;
-                cursor: not-allowed;
-            }
-            .btn-primary {
-                background-color: #007bff;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 6px;
-                transition: background-color 0.3s ease;
-            }
-            .btn-primary:hover {
-                background-color: #0056b3;
-            }
-            .btn-secondary {
-                background-color: #6c757d;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 6px;
-                transition: background-color 0.3s ease;
-            }
-            .btn-secondary:hover {
-                background-color: #5a6268;
-            }
-            .edit-mode .info-group {
-                display: none;
-            }
-            .edit-mode .form-group {
-                display: block;
-            }
-            .edit-mode .btn-edit, .edit-mode .btn-back {
-                display: none;
-            }
-            .edit-mode .btn-update, .edit-mode .btn-cancel {
-                display: inline-block;
-            }
-            .btn-edit, .btn-back {
-                margin-right: 10px;
-            }
-            .btn-update, .btn-cancel {
-                display: none;
-                margin-right: 10px;
-            }
-            /* Tailwind-based styles for sidebar */
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin cá nhân - Hệ thống Quản lý Vật tư</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- Style CSS -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
+    <style>
+        /* Profile content styles */
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Inter', sans-serif;
+            color: #333;
+        }
+        .container {
+            max-width: 750px;
+            margin: 40px auto;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #3b82f6;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+        .profile-pic:hover {
+            transform: scale(1.05);
+        }
+        .info-group {
+            margin-bottom: 20px;
+        }
+        .info-group label {
+            font-weight: 600;
+            color: #495057;
+            margin-right: 15px;
+            min-width: 120px;
+            display: inline-block;
+        }
+        .info-value {
+            color: #212529;
+            font-size: 1.1em;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            display: none;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-control {
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            padding: 8px 12px;
+        }
+        .form-control:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+        }
+        .form-control[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .edit-mode .info-group {
+            display: none;
+        }
+        .edit-mode .form-group {
+            display: block;
+        }
+        .edit-mode .btn-edit, .edit-mode .btn-back {
+            display: none;
+        }
+        .edit-mode .btn-update, .edit-mode .btn-cancel {
+            display: inline-block;
+        }
+        .btn-edit, .btn-back {
+            margin-right: 10px;
+        }
+        .btn-update, .btn-cancel {
+            display: none;
+            margin-right: 10px;
+        }
+        /* Sidebar styles */
+        .sidebar {
+            width: 18rem;
+            background: linear-gradient(to bottom, #1e40af, #3b82f6);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+            transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transform: translateX(-100%);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 50;
+        }
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        .nav-item {
+            transition: all 0.2s ease;
+            border-radius: 0.5rem;
+        }
+        .nav-item:hover {
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            transform: translateX(5px) scale(1.02);
+        }
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
             .sidebar {
-                background: linear-gradient(195deg, #1e3a8a, #3b82f6);
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(59, 130, 246, 0.4);
-                transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-                transform: translateX(-100%);
-            }
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            main {
-                transition: all 0.3s ease;
+                width: 100%;
+                max-width: 280px;
+                z-index: 50;
             }
             .sidebar.active ~ main {
-                margin-left: 18rem;
+                margin-left: 0;
             }
-            .nav-item {
-                transition: all 0.2s ease;
-                border-radius: 0.5rem;
+        }
+        @media (max-width: 576px) {
+            .container {
+                margin: 20px;
+                padding: 15px;
             }
-            .nav-item:hover {
-                background: linear-gradient(to right, #3b82f6, #8b5cf6);
-                transform: translateX(5px) scale(1.02);
+            .profile-pic {
+                width: 120px;
+                height: 120px;
             }
-            .nav-item.active {
-                background-color: rgba(255, 255, 255, 0.2);
-                font-weight: 600;
+            .info-group label {
+                min-width: 100px;
             }
-            /* Responsive Adjustments */
-            @media (max-width: 768px) {
-                .sidebar {
-                    width: 100%;
-                    max-width: 280px;
-                    z-index: 50;
-                }
-                .sidebar.active ~ main {
-                    margin-left: 0;
-                }
-            }
-            @media (max-width: 576px) {
-                .container {
-                    margin: 20px;
-                    padding: 15px;
-                }
-                .profile-pic {
-                    width: 120px;
-                    height: 120px;
-                }
-                .info-group label {
-                    min-width: 100px;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <!-- Session Validation -->
-        <%
-            String username = (String) session.getAttribute("username");
-            String role = (String) session.getAttribute("role");
-            if (username == null || role == null) {
-                response.sendRedirect(request.getContextPath() + "/Login.jsp");
-                return;
-            }
-            // Determine sidebar file based on role
-            String sidebarFile;
-            switch (role != null ? role.toLowerCase() : "") {
-                case "admin":
-                    sidebarFile = "/view/sidebar/sidebarAdmin.jsp";
-                    break;
-                case "direction":
-                    sidebarFile = "/view/sidebar/sidebarDirection.jsp";
-                    break;
-                case "warehouse":
-                    sidebarFile = "/view/sidebar/sidebarWarehouse.jsp";
-                    break;
-                case "employee":
-                    sidebarFile = "/view/sidebar/sidebarEmployee.jsp";
-                    break;
-                default:
-                    sidebarFile = "/view/sidebar/sidebarEmployee.jsp"; // Default to employee sidebar
-            }
-        %>
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
+    <!-- Session Validation -->
+    <%
+        String username = (String) session.getAttribute("username");
+        String role = (String) session.getAttribute("role");
+        if (username == null || role == null) {
+            response.sendRedirect(request.getContextPath() + "/view/login.jsp");
+            return;
+        }
+    %>
 
-        <!-- Dynamic Sidebar Inclusion with Error Handling -->
-        <c:catch var="includeError">
-            <jsp:include page="<%= sidebarFile%>" />
-        </c:catch>
-        <c:if test="${not empty includeError}">
-            <div class="alert alert-danger m-4">
-                Error loading sidebar: ${includeError.message}. Please contact the administrator.
-            </div>
-        </c:if>
+    <div class="flex">
+        <!-- Sidebar -->
+        <c:choose>
+            <c:when test="${role == 'admin'}">
+                <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
+            </c:when>
+            <c:when test="${role == 'direction'}">
+                <jsp:include page="/view/sidebar/sidebarDirection.jsp" />
+            </c:when>
+            <c:when test="${role == 'warehouse'}">
+                <jsp:include page="/view/sidebar/sidebarWarehouse.jsp" />
+            </c:when>
+            <c:when test="${role == 'employee'}">
+                <jsp:include page="/view/sidebar/sidebarEmployee.jsp" />
+            </c:when>
+        </c:choose>
 
         <!-- Main Content -->
         <main class="flex-1 p-8 transition-all duration-300">
@@ -242,28 +212,28 @@
                 <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600 mr-4">
                     <i class="fas fa-bars text-2xl"></i>
                 </button>
-                <h1 class="text-3xl font-bold text-gray-800">User Profile</h1>
+                <h1 class="text-3xl font-bold text-gray-800 dark:text-white">My Information</h1>
             </header>
 
             <!-- Profile Content -->
             <div class="container ${param.edit == 'true' ? 'edit-mode' : ''}">
                 <div class="profile-header">
                     <c:if test="${not empty user.image}">
-                        <img src="${pageContext.request.contextPath}/${user.image}" alt="Profile Picture" class="profile-pic">
+                        <img src="${pageContext.request.contextPath}/${user.image}" alt="Ảnh đại diện" class="profile-pic">
                     </c:if>
                     <c:if test="${empty user.image}">
-                        <img src="${pageContext.request.contextPath}/images/default-profile.png" alt="Default Profile Picture" class="profile-pic">
+                        <img src="${pageContext.request.contextPath}/images/default-profile.png" alt="Ảnh đại diện mặc định" class="profile-pic">
                     </c:if>
                 </div>
 
                 <!-- Read-only View -->
                 <div class="info-section">
                     <div class="info-group">
-                        <label>Username:</label>
+                        <label>Tên đăng nhập:</label>
                         <span class="info-value">${user.username}</span>
                     </div>
                     <div class="info-group">
-                        <label>Full Name:</label>
+                        <label>Họ và tên:</label>
                         <span class="info-value">${user.fullName}</span>
                     </div>
                     <div class="info-group">
@@ -271,33 +241,33 @@
                         <span class="info-value">${user.email}</span>
                     </div>
                     <div class="info-group">
-                        <label>Phone Number:</label>
+                        <label>Số điện thoại:</label>
                         <span class="info-value">${user.phone}</span>
                     </div>
                     <div class="info-group">
-                        <label>Address:</label>
+                        <label>Địa chỉ:</label>
                         <span class="info-value">${user.address}</span>
                     </div>
                     <div class="info-group">
-                        <label>Date of Birth:</label>
+                        <label>Ngày sinh:</label>
                         <span class="info-value">${user.dateOfBirth}</span>
                     </div>
                     <div class="info-group">
-                        <label>Status:</label>
+                        <label>Trạng thái:</label>
                         <span class="info-value">${user.status}</span>
                     </div>
                     <div class="info-group">
-                        <label>Role:</label>
+                        <label>Vai trò:</label>
                         <span class="info-value">${role}</span>
                     </div>
                     <div class="info-group">
-                        <label>Profile Picture:</label>
-                        <span class="info-value">${not empty user.image ? user.image : 'Default'}</span>
+                        <label>Ảnh đại diện:</label>
+                        <span class="info-value">${not empty user.image ? user.image : 'Mặc định'}</span>
                     </div>
                     <div class="button-group mt-3">
-                        <a href="${pageContext.request.contextPath}/userprofile?edit=true" class="btn btn-primary btn-edit">Edit</a>
+                        <a href="${pageContext.request.contextPath}/userprofile?edit=true" class="btn btn-primary btn-edit">Chỉnh sửa</a>
                         <%
-                            String backUrl = request.getContextPath() + "/Login.jsp"; // Default to Login.jsp
+                            String backUrl = request.getContextPath() + "/view/login.jsp";
                             if (role != null) {
                                 switch (role.toLowerCase()) {
                                     case "admin":
@@ -316,7 +286,7 @@
                             }
                         %>
                         <a href="<%= backUrl%>" class="btn btn-secondary btn-back">
-                            <i class="fas fa-arrow-left me-2"></i>Back
+                            <i class="fas fa-arrow-left me-2"></i>Quay lại
                         </a>
                     </div>
                 </div>
@@ -324,7 +294,7 @@
                 <!-- Editable Form -->
                 <form action="${pageContext.request.contextPath}/userprofile" method="post" enctype="multipart/form-data" class="form-section">
                     <div class="form-group">
-                        <label for="username">Username</label>
+                        <label for="username">User Name</label>
                         <input type="text" class="form-control" id="username" name="username" value="${user.username}" readonly>
                     </div>
                     <div class="form-group">
@@ -344,7 +314,7 @@
                         <input type="text" class="form-control" id="address" name="address" value="${user.address}">
                     </div>
                     <div class="form-group">
-                        <label for="dateOfBirth">Date of Birth</label>
+                        <label for="dateOfBirth">Birth of Date</label>
                         <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" value="${user.dateOfBirth}">
                     </div>
                     <div class="form-group">
@@ -358,59 +328,62 @@
                     <div class="form-group">
                         <label for="profilePic">Profile Picture</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="currentImage" name="currentImage" value="${not empty user.image ? user.image : 'Default'}" readonly>
+                            <input type="text" class="form-control" id="currentImage" name="currentImage" value="${not empty user.image ? user.image : 'Mặc định'}" readonly>
                             <input type="file" class="form-control" id="profilePic" name="profilePic" accept="image/*">
                         </div>
                     </div>
                     <div class="button-group mt-3">
-                        <button type="submit" class="btn btn-primary btn-update">Update Profile</button>
-                        <a href="${pageContext.request.contextPath}/userprofile" class="btn btn-secondary btn-cancel">Cancel</a>
+                        <button type="submit" class="btn btn-primary btn-update">Cập nhật hồ sơ</button>
+                        <a href="${pageContext.request.contextPath}/userprofile" class="btn btn-secondary btn-cancel">Hủy</a>
                     </div>
                 </form>
             </div>
         </main>
+    </div>
 
-        <!-- Toastify JS -->
-        <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-        <script>
-            // Sidebar Toggle
-            const sidebar = document.getElementById('sidebar');
-            const toggleSidebar = document.getElementById('toggleSidebar');
-            const toggleSidebarMobile = document.getElementById('toggleSidebarMobile');
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleButton = document.getElementById('toggleSidebarMobile');
+            const closeButton = document.getElementById('toggleSidebar');
+            const sidebar = document.querySelector('.sidebar');
 
-            function toggleSidebarVisibility() {
-                if (sidebar) {
+            // Toggle sidebar visibility
+            if (toggleButton && sidebar) {
+                toggleButton.addEventListener('click', () => {
                     sidebar.classList.toggle('active');
-                    sidebar.classList.toggle('hidden');
-                }
-            }
-
-            if (toggleSidebar && toggleSidebarMobile) {
-                toggleSidebar.addEventListener('click', toggleSidebarVisibility);
-                toggleSidebarMobile.addEventListener('click', toggleSidebarVisibility);
-            }
-
-            // Submenu Toggle
-            document.addEventListener('DOMContentLoaded', () => {
-                const toggles = document.querySelectorAll('.toggle-submenu');
-                toggles.forEach(toggle => {
-                    toggle.addEventListener('click', () => {
-                        const submenu = toggle.parentElement.querySelector('.submenu');
-                        if (submenu) {
-                            submenu.classList.toggle('hidden');
-                            const icon = toggle.querySelector('.fa-chevron-down');
-                            if (icon) {
-                                icon.classList.toggle('rotate-180');
-                            }
-                        }
-                    });
                 });
+            }
+            if (closeButton && sidebar) {
+                closeButton.addEventListener('click', () => {
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (event) => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active') && 
+                    !sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
             });
 
-            // Initialize sidebar as hidden
-            if (sidebar) {
-                sidebar.classList.add('hidden');
-            }
+            // Submenu Toggle
+            const toggles = document.querySelectorAll('.toggle-submenu');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const submenu = toggle.parentElement.querySelector('.submenu');
+                    if (submenu) {
+                        submenu.classList.toggle('hidden');
+                        const icon = toggle.querySelector('.fa-chevron-down');
+                        if (icon) {
+                            icon.classList.toggle('rotate-180');
+                        }
+                    }
+                });
+            });
 
             // Toast Notifications
             <c:if test="${not empty message}">
@@ -419,7 +392,10 @@
                 duration: 3000,
                 gravity: "top",
                 position: "right",
-                backgroundColor: "#28a745"
+                backgroundColor: "#28a745",
+                stopOnFocus: true,
+                className: "rounded-lg shadow-lg",
+                style: { borderRadius: "0.5rem" }
             }).showToast();
             </c:if>
             <c:if test="${not empty error}">
@@ -428,9 +404,14 @@
                 duration: 3000,
                 gravity: "top",
                 position: "right",
-                backgroundColor: "#dc3545"
+                backgroundColor: "#dc3545",
+                stopOnFocus: true,
+                className: "rounded-lg shadow-lg",
+                style: { borderRadius: "0.5rem" }
             }).showToast();
             </c:if>
-        </script>
-    </body>
+        });
+    </script>
+    <script src="${pageContext.request.contextPath}/assets/js/sidebar_darkmode.js"></script>
+</body>
 </html>

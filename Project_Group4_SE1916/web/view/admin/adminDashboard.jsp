@@ -316,7 +316,7 @@
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/view/admin/adminApprove.jsp" class="nav-item flex items-center p-3">
+                <a href="${pageContext.request.contextPath}/AdminApproveServlet" class="nav-item flex items-center p-3">
                     <i class="fas fa-check-circle mr-3 w-6 text-center"></i>
                     <span class="text-lg">Approve Request</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
