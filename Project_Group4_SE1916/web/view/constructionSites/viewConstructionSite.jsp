@@ -41,7 +41,6 @@
 <body class="bg-gray-50 min-h-screen font-sans antialiased">
     <%
         String role = (String) session.getAttribute("role");
-        pageContext.setAttribute("role", role);
         if (role == null) {
             response.sendRedirect(request.getContextPath() + "/view/login.jsp");
             return;
@@ -62,16 +61,13 @@
             <c:when test="${role == 'employee'}">
                 <jsp:include page="/view/sidebar/sidebarEmployee.jsp" />
             </c:when>
-            <c:otherwise>
-                <div class="text-red-400 p-4">Error: Invalid or missing role. Please log in again.</div>
-            </c:otherwise>
         </c:choose>
 
         <!-- Main Content -->
-        <main class="main-content flex-1 p-8 transition-all duration-300 ml-64 md:ml-0">
+        <main class="flex-1 p-8 transition-all duration-300">
             <div class="max-w-6xl mx-auto">
                 <div class="flex items-center gap-4 mb-6">
-                    <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600 md:hidden">
+                    <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
                     <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Construction Site Details</h2>
