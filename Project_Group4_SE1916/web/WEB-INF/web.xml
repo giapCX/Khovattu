@@ -196,6 +196,14 @@
         <servlet-name>DirectionDashboard</servlet-name>
         <servlet-class>controller.user.DirectionDashboard</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>EditConstructionSiteServlet</servlet-name>
+        <servlet-class>controller.constructionSites.EditConstructionSiteServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ViewConstructionSiteServlet</servlet-name>
+        <servlet-class>controller.constructionSites.ViewConstructionSiteServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -391,6 +399,14 @@
     <servlet-mapping>
         <servlet-name>DirectionDashboard</servlet-name>
         <url-pattern>/DirectionDashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditConstructionSiteServlet</servlet-name>
+        <url-pattern>/EditConstructionSiteServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewConstructionSiteServlet</servlet-name>
+        <url-pattern>/ViewConstructionSiteServlet</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

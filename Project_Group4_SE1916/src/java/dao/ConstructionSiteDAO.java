@@ -1,4 +1,3 @@
-
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -26,8 +25,6 @@ public class ConstructionSiteDAO {
 
     public ConstructionSiteDAO() {
     }
-    
-    
 
     public List<ConstructionSite> getAllConstructionSites() {
         List<ConstructionSite> sites = new ArrayList<>();
@@ -55,7 +52,7 @@ public class ConstructionSiteDAO {
 
     public int countConstructionSiteByNameAddressStatus(String name, String address, String status) {
         int count = 0;
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM ConstructionSites  WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM ConstructionSites WHERE 1=1");
 
         if (name != null && !name.trim().isEmpty()) {
             sql.append(" AND site_name LIKE ?");
@@ -92,7 +89,7 @@ public class ConstructionSiteDAO {
 
     public List<ConstructionSite> searchConstructionSiteByNameAddressStatusWithPaging(String name, String address, String status, int offset, int limit) {
         List<ConstructionSite> sites = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM ConstructionSites  WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT * FROM ConstructionSites WHERE 1=1");
 
         if (name != null && !name.trim().isEmpty()) {
             sql.append(" AND site_name LIKE ?");
@@ -151,9 +148,73 @@ public class ConstructionSiteDAO {
                 return rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
         }
-        return false; 
+        return false;
     }
 
+    public boolean addConstructionSite(ConstructionSite site) {
+        String sql = "INSERT INTO ConstructionSites (site_name, address, manager_id, start_date, end_date, status, note) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, site.getSiteName());
+            ps.setString(2, site.getAddress());
+            ps.setInt(3, site.getManagerId());
+            ps.setDate(4, site.getStartDate());
+            ps.setDate(5, site.getEndDate());
+            ps.setString(6, site.getStatus());
+            ps.setString(7, site.getNote());
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateConstructionSite(ConstructionSite site) {
+        String sql = "UPDATE ConstructionSites SET site_name = ?, address = ?, manager_id = ?, start_date = ?, " +
+                     "end_date = ?, status = ?, note = ? WHERE site_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, site.getSiteName());
+            ps.setString(2, site.getAddress());
+            ps.setInt(3, site.getManagerId());
+            ps.setDate(4, site.getStartDate());
+            ps.setDate(5, site.getEndDate());
+            ps.setString(6, site.getStatus());
+            ps.setString(7, site.getNote());
+            ps.setInt(8, site.getSiteId());
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public ConstructionSite getConstructionSiteById(int siteId) {
+        String sql = "SELECT * FROM ConstructionSites WHERE site_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, siteId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    ConstructionSite site = new ConstructionSite();
+                    site.setSiteId(rs.getInt("site_id"));
+                    site.setSiteName(rs.getString("site_name"));
+                    site.setAddress(rs.getString("address"));
+                    site.setManagerId(rs.getInt("manager_id"));
+                    site.setStartDate(rs.getDate("start_date"));
+                    site.setEndDate(rs.getDate("end_date"));
+                    site.setStatus(rs.getString("status"));
+                    site.setNote(rs.getString("note"));
+                    return site;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
