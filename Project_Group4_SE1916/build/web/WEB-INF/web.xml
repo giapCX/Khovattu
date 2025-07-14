@@ -208,6 +208,10 @@
         <servlet-name>ViewConstructionSiteServlet</servlet-name>
         <servlet-class>controller.constructionSites.ViewConstructionSiteServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>InventoryServlet</servlet-name>
+        <servlet-class>controller.auth.inventory.InventoryServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -415,6 +419,10 @@
     <servlet-mapping>
         <servlet-name>ViewConstructionSiteServlet</servlet-name>
         <url-pattern>/ViewConstructionSiteServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>InventoryServlet</servlet-name>
+        <url-pattern>/inventory</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

@@ -1,4 +1,4 @@
-//exMa servlet
+//exMaServlet
 package controller.importhistory;
 
 import Dal.DBContext;
@@ -62,7 +62,7 @@ public class ExportMaterial extends HttpServlet {
                 response.getWriter().write("{\"error\": \"Database error: " + e.getMessage() + "\"}");
             }
         } else if ("sites".equals(fetch)) {
-            try(Connection conn = DBContext.getConnection()) {
+            try (Connection conn = DBContext.getConnection()) {
                 ConstructionSiteDAO siteDAO = new ConstructionSiteDAO(conn);
                 List<ConstructionSite> sites = siteDAO.getAllConstructionSites();
                 Gson gson = new Gson();
@@ -70,6 +70,25 @@ public class ExportMaterial extends HttpServlet {
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
                 response.getWriter().write(json);
+            } catch (SQLException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("{\"error\": \"Database error: " + e.getMessage() + "\"}");
+            }
+        } else if ("checkReceiptId".equals(fetch)) {
+            String receiptId = request.getParameter("receiptId");
+            if (receiptId == null || receiptId.trim().isEmpty() || receiptId.length() > VOUCHER_ID_MAX_LENGTH || !receiptId.matches(ID_REGEX)) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"error\": \"Invalid Receipt ID format\"}");
+                return;
+            }
+            try (Connection conn = DBContext.getConnection()) {
+                ExportDAO dao = new ExportDAO(conn);
+                boolean exists = dao.checkReceiptIdExists(receiptId);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"exists\": " + exists + "}");
             } catch (SQLException e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\": \"Database error: " + e.getMessage() + "\"}");
@@ -99,7 +118,7 @@ public class ExportMaterial extends HttpServlet {
         String username = (String) session.getAttribute("username");
         String voucherIdStr = request.getParameter("voucherId");
         String receiver = request.getParameter("receiver");
-        String siteIdStr = request.getParameter("siteId");
+        String siteIdStr = request.getParameter("siteId[]");
         String[] materialCodes = request.getParameterValues("materialCode[]");
         String[] quantities = request.getParameterValues("quantity[]");
         String[] conditions = request.getParameterValues("condition[]");
@@ -154,7 +173,7 @@ public class ExportMaterial extends HttpServlet {
             return;
         }
         int siteId;
-        try(Connection conn = DBContext.getConnection()) {
+        try (Connection conn = DBContext.getConnection()) {
             siteId = Integer.parseInt(siteIdStr);
             ConstructionSiteDAO siteDAO = new ConstructionSiteDAO(conn);
             if (!siteDAO.siteExists(siteId)) {
@@ -268,22 +287,12 @@ public class ExportMaterial extends HttpServlet {
         try (Connection conn = DBContext.getConnection()) {
             conn.setAutoCommit(false); // Start transaction
             try {
-                // Create a proposal
-                ExportDAO dao = new ExportDAO(conn);
-                int proposalId = dao.createExportProposal(userId, receiverId, note);
-                if (proposalId <= 0) {
-                    errorMessage = "Unable to create export proposal. Please try again.";
-                    request.setAttribute("error", errorMessage);
-                    request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
-                    return;
-                }
-
                 // Save export receipt
+                ExportDAO dao = new ExportDAO(conn);
                 Export export = new Export();
                 export.setExporterId(userId);
                 export.setReceiptId(voucherIdStr);
-                export.setReceiverId(receiverId);               
-                export.setProposalId(proposalId);
+                export.setReceiverId(receiverId);
                 export.setExportDate(LocalDate.now());
                 export.setNote(note);
                 int exportId = dao.saveExport(export);

@@ -1,4 +1,4 @@
-
+//exportHisDetailServlet
 package controller.importhistory;
 
 import dao.ExportDetailDAO;
@@ -39,8 +39,9 @@ public class ExportHistoryDetailServlet extends HttpServlet {
                 return;
             }
 
-            String search = request.getParameter("search");
-            String sort = request.getParameter("sort");
+            String materialName = request.getParameter("materialName");
+            String constructionSite = request.getParameter("constructionSite");
+            String reason = request.getParameter("reason");
             String pageRaw = request.getParameter("page");
 
             int page = 1;
@@ -62,26 +63,25 @@ public class ExportHistoryDetailServlet extends HttpServlet {
 
             // Get details based on parameters
             List<ExportDetail> details;
-            if (search != null && !search.isEmpty() && sort != null && !sort.isEmpty()) {
-                details = exportDetailDAO.searchAndSortByQuantity(exportId, search, sort, page, PAGE_SIZE);
-            } else if (search != null && !search.isEmpty()) {
-                details = exportDetailDAO.searchByName(exportId, search, page, PAGE_SIZE);
-            } else if (sort != null && !sort.isEmpty()) {
-                details = exportDetailDAO.sortByQuantity(exportId, sort, page, PAGE_SIZE);
+            if ((materialName != null && !materialName.isEmpty()) || 
+                (constructionSite != null && !constructionSite.isEmpty()) || 
+                (reason != null && !reason.isEmpty())) {
+                details = exportDetailDAO.searchByCriteria(exportId, materialName, constructionSite, reason, page, PAGE_SIZE);
             } else {
                 details = exportDetailDAO.getByExportId(exportId, page, PAGE_SIZE);
             }
 
             // Calculate total pages
-            int totalItems = exportDetailDAO.countSearch(exportId, search);
+            int totalItems = exportDetailDAO.countSearchByCriteria(exportId, materialName, constructionSite, reason);
             int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
 
             // Set attributes
             request.setAttribute("receipt", receipt);
             request.setAttribute("details", details);
             request.setAttribute("exportId", exportId);
-            request.setAttribute("search", search);
-            request.setAttribute("sort", sort);
+            request.setAttribute("materialName", materialName);
+            request.setAttribute("constructionSite", constructionSite);
+            request.setAttribute("reason", reason);
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
 

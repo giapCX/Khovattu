@@ -1,4 +1,5 @@
 
+
 <%-- 
     Document   : exportMaterial
     Created on : Jun 9, 2025, 7:27:11 PM
@@ -162,8 +163,8 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="voucherId" class="form-label">Receipt ID</label>
-                        <input type="text" class="form-control" id="voucherId" name="voucherId" required maxlength="50" pattern="[A-Za-z0-9-_]+">
+                        <label>Receipt ID</label>
+                        <input type="text" id="voucherId" name="voucherId" class="form-control" maxlength="50" pattern="[A-Za-z0-9-_]+" required readonly>
                         <div class="invalid-feedback">Voucher ID is required, max 50 characters, alphanumeric, hyphens, or underscores only.</div>
                     </div>
 
@@ -249,6 +250,29 @@
         </main>
 
         <script>
+
+            // Function to generate a unique receipt ID
+            function generateReceiptId() {
+                const prefix = "EXP-";
+                const now = new Date();
+                const yyyy = now.getFullYear();
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                const datePart = yyyy + mm + dd;
+                const randomInt = Math.floor(Math.random() * 90) + 10;
+                const randomStr = Math.random().toString(36).substring(2, 4).toUpperCase();
+                return prefix + datePart + "-" + randomStr + randomInt;
+            }
+
+            // Set receipt ID when the page loads
+            window.onload = function () {
+                const voucherIdInput = document.getElementById("voucherId");
+                if (voucherIdInput && !voucherIdInput.value) {
+                    voucherIdInput.value = generateReceiptId();
+                }
+            };
+
+
             let materialData = [];
             let employeeData = [];
             let siteData = [];
@@ -613,17 +637,21 @@
                 Array.from(forms).forEach(form => {
                     form.addEventListener('submit', event => {
                         if (!form.checkValidity() || !validateForm()) {
-                            event.preventDefault();
-                            event.stopPropagation();
+                            // event.preventDefault(); // ❌ Bỏ chặn!
+                            // event.stopPropagation(); // ❌ Bỏ chặn!
+                            // Có thể log hoặc alert nếu muốn:
+                            console.warn('Form không hợp lệ nhưng vẫn submit!');
                         }
                         form.classList.add('was-validated');
                     }, false);
+
                     form.querySelectorAll('input, textarea, select').forEach(input => {
                         input.addEventListener('input', checkFormValidity);
                         input.addEventListener('change', checkFormValidity);
                     });
                 });
             })();
+
 
             // Initialize
             document.addEventListener("DOMContentLoaded", () => {

@@ -1,5 +1,4 @@
 
-
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -8,63 +7,86 @@
         <meta charset="UTF-8">
         <title>Export Receipt Details</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
         <style>
             body {
                 font-family: 'Inter', sans-serif;
-                background-color: #f8f9fa;
+                background-color: #f0f2f5; /* Matches bg-gray-50 from exportHistory */
+                color: #1a1a1a;
             }
             .container {
                 max-width: 1200px;
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 0 0 0.5rem 0.5rem; /* Rounded corners at the bottom */
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Matches exportHistory shadow */
             }
             /* Form styles */
             .form-control, .form-select {
-                border-radius: 0.375rem;
-                border: 1px solid #ced4da;
+                border-radius: 0.5rem; /* Matches exportHistory input border-radius */
+                border: 1px solid #d1d5db; /* Matches border-gray-300 */
                 font-size: 0.9rem;
                 padding: 0.5rem;
+                background-color: #fff;
+                transition: border-color 0.2s, box-shadow 0.2s;
             }
             .form-control:focus, .form-select:focus {
-                border-color: #0d6efd;
-                box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+                border-color: #2563eb; /* Matches focus:ring-primary-500 */
+                box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.2);
+                outline: none;
             }
             .btn-primary {
-                background-color: #0d6efd;
+                background-color: #2563eb; /* Matches bg-primary-600 */
                 border: none;
                 font-size: 0.9rem;
                 padding: 0.5rem 1rem;
-                border-radius: 0.375rem;
+                border-radius: 0.5rem;
+                color: #fff;
+                transition: background-color 0.3s;
             }
             .btn-primary:hover {
-                background-color: #0b5ed7;
+                background-color: #1d4ed8; /* Darker shade of primary-600 */
             }
-            .btn-back {
-                background-color: #6c757d;
+            .btn-secondary {
+                background-color: #6F7684; /* Matches bg-yellow-500 from exportHistory */
                 border: none;
                 font-size: 0.9rem;
                 padding: 0.5rem 1rem;
-                border-radius: 0.375rem;
-                color: white;
+                border-radius: 0.5rem;
+                color: #fff;
+                transition: background-color 0.3s;
             }
-            .btn-back:hover {
-                background-color: #5c636a;
+            .btn-secondary:hover {
+                background-color: #ca8a04; /* Darker shade of yellow-500 */
             }
             /* Table styles */
-            .table {
+            .table-container {
                 background-color: #fff;
-                border-radius: 0.375rem;
-                overflow: hidden;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                border-radius: 0 0 0.5rem 0.5rem; /* Rounded corners at the bottom */
+                overflow: hidden; /* Ensure no content spills out */
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Matches exportHistory shadow */
+            }
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 0; /* Remove default margin to avoid gap */
             }
             .table th, .table td {
                 vertical-align: middle;
                 padding: 0.75rem;
+                border-bottom: 1px solid #e5e7eb; /* Matches border-gray-200, ensure bottom border */
+                text-align: left;
             }
-            .table-primary {
-                background-color: #0d6efd;
-                color: white;
+            .table th {
+                background-color: #0284C7; /* Matches bg-primary-600 */
+                color: #fff;
+                font-weight: bold;
             }
-            .table-hover tbody tr:hover {
-                background-color: #f1f3f5;
+            .table tbody tr:nth-child(even) {
+                background-color: #f9fafb; /* Matches bg-gray-50 */
+            }
+            .table tbody tr:hover {
+                background-color: #f3f4f6; /* Matches hover:bg-gray-100 */
             }
             /* General info styles */
             .row.mb-3 > div {
@@ -72,21 +94,25 @@
                 font-size: 0.95rem;
             }
             .row.mb-3 strong {
-                color: #1f2937;
+                color: #1f2937; /* Matches text-gray-800 */
             }
             /* Pagination styles */
             .pagination .page-link {
-                border-radius: 0.375rem;
+                border-radius: 0.5rem;
                 margin: 0 0.2rem;
                 font-size: 0.9rem;
-                color: #0d6efd;
+                color: #2563eb; /* Matches text-primary-600 */
+                border: 1px solid #d1d5db; /* Matches border-gray-300 */
+                transition: background-color 0.3s, border-color 0.3s;
             }
             .pagination .page-item.active .page-link {
-                background-color: #0d6efd;
-                border-color: #0d6efd;
+                background-color: #2563eb; /* Matches bg-primary-600 */
+                border-color: #2563eb;
+                color: #fff;
             }
             .pagination .page-link:hover {
-                background-color: #e9ecef;
+                background-color: #e5e7eb; /* Matches hover:bg-gray-200 */
+                border-color: #2563eb;
             }
             /* Back button container */
             .back-button-container {
@@ -121,50 +147,53 @@
             <!-- Filters -->
             <form method="get" action="exportHistoryDetail" class="row g-2 mb-4">
                 <input type="hidden" name="exportId" value="${receipt.exportId}" />
-                <div class="col-md-5">
-                    <input type="text" name="keyword" value="${param.keyword}" class="form-control" placeholder="Search material name..." />
+                <div class="col-md-4">
+                    <input type="text" name="materialName" value="${param.materialName}" class="form-control" placeholder="Search material name..." />
                 </div>
                 <div class="col-md-4">
-                    <select name="sort" class="form-select">
-                        <option value="">Sort by quantity</option>
-                        <option value="asc" ${param.sort == 'asc' ? 'selected' : ''}>Ascending</option>
-                        <option value="desc" ${param.sort == 'desc' ? 'selected' : ''}>Descending</option>
-                    </select>
+                    <input type="text" name="constructionSite" value="${param.constructionSite}" class="form-control" placeholder="Search construction site..." />
                 </div>
                 <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    <input type="text" name="reason" value="${param.reason}" class="form-control" placeholder="Search reason..." />
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
                 </div>
             </form>
 
             <!-- Material Details Table -->
             <h5 class="fw-bold mb-3">Exported Materials List</h5>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>Material ID</th>
-                            <th>Material Code</th>
-                            <th>Material Name</th>
-                            <th>Quantity</th>
-                            <th>Unit</th>
-                            <th>Condition</th>
-                            <th>Reason</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach var="detail" items="${details}">
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead>
                             <tr>
-                                <td>${detail.materialId}</td>
-                                <td>${detail.materialCode}</td>
-                                <td>${detail.materialName}</td>
-                                <td>${detail.quantity}</td>
-                                <td>${detail.unit}</td>
-                                <td>${detail.materialCondition}</td>
-                                <td>${detail.reason}</td>
+                                <th>Material ID</th>
+                                <th>Material Code</th>
+                                <th>Material Name</th>
+                                <th>Quantity</th>
+                                <th>Unit</th>
+                                <th>Condition</th>
+                                <th>Construction Site</th>
+                                <th>Reason</th>
                             </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="detail" items="${details}">
+                                <tr>
+                                    <td>${detail.materialId}</td>
+                                    <td>${detail.materialCode}</td>
+                                    <td>${detail.materialName}</td>
+                                    <td>${detail.quantity}</td>
+                                    <td>${detail.unit}</td>
+                                    <td>${detail.materialCondition}</td>
+                                    <td>${detail.siteName}</td>
+                                    <td>${detail.reason}</td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Pagination -->
@@ -173,7 +202,7 @@
                     <c:forEach var="i" begin="1" end="${totalPages}">
                         <li class="page-item ${i == currentPage ? 'active' : ''}">
                             <a class="page-link text-white"
-                               href="exportHistoryDetail?exportId=${receipt.exportId}&page=${i}&keyword=${param.keyword}&sort=${param.sort}">
+                               href="exportHistoryDetail?exportId=${receipt.exportId}&page=${i}&materialName=${param.materialName}&constructionSite=${param.constructionSite}&reason=${param.reason}">
                                 ${i}
                             </a>
                         </li>
@@ -183,8 +212,8 @@
 
             <!-- Back Button -->
             <div class="back-button-container">
-                <button onclick="history.back()" class="btn btn-back">Back</button>
+                <button onclick="window.location.href = './exportHistory'" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to List</button>
             </div>
         </div>
     </body>
-</html> 
+</html>

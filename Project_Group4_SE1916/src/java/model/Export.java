@@ -11,8 +11,7 @@ public class Export {
     private LocalDate exportDate;
     private String note;
     private String exporterName;
-    private String receiverName;
-    
+    private String receiverName;    
     private int proposalId;
 
     public Export() {
