@@ -396,7 +396,7 @@ public class ProposalDAO {
     public Proposal getProposalById(int proposalId) {
         Proposal proposal = null;
         String sql = "SELECT ep.*, u.full_name, "
-                + "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, m.name AS material_name, m.unit AS material_unit, " // Thêm unit vào đây
+                + "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, m.name AS material_name, m.unit AS material_unit, "
                 + "pa.approval_id, pa.admin_approver_id, pa.director_approver_id, "
                 + "pa.admin_status, pa.director_status, "
                 + "pa.admin_approval_date, pa.admin_reason, pa.admin_note, "
@@ -437,7 +437,7 @@ public class ProposalDAO {
                     detail.setMaterialName(rs.getString("material_name"));
                     detail.setQuantity(rs.getDouble("quantity"));
                     detail.setMaterialCondition(rs.getString("material_condition"));
-                    detail.setUnit(rs.getString("material_unit")); // Thêm dòng này
+                    detail.setUnit(rs.getString("material_unit"));
                     detailsMap.put(detailId, detail);
                 }
 
@@ -873,47 +873,52 @@ public class ProposalDAO {
         }
     }
 
-    public int countProposalsByTypeExecuteStatusFromStartDateToEndDate(String searchType, String searchStatus, Timestamp searchStartDate, Timestamp searchEndDate) {
+    public int countProposalsByTypeExecuteStatusFromStartDateToEndDate(String[] proposalTypes, String searchStatus, Timestamp searchStartDate, Timestamp searchEndDate) {
         int total = 0;
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM EmployeeProposals WHERE final_status IN ('approved_but_not_executed', 'executed')");
 
         List<Object> parameters = new ArrayList<>();
 
-        // Kiểm tra nếu searchType không null hoặc rỗng, thêm điều kiện vào truy vấn
-        if (searchType != null && !searchType.isEmpty()) {
-            sql.append(" AND proposal_type = ?");
-            parameters.add(searchType);
+        // Filter by proposal types
+        if (proposalTypes != null && proposalTypes.length > 0) {
+            sql.append(" AND proposal_type IN (");
+            for (int i = 0; i < proposalTypes.length; i++) {
+                sql.append("?");
+                if (i < proposalTypes.length - 1) {
+                    sql.append(",");
+                }
+                parameters.add(proposalTypes[i]);
+            }
+            sql.append(")");
         }
 
-        // Kiểm tra nếu searchStatus không null hoặc rỗng, thêm điều kiện vào truy vấn
+        // Filter by status
         if (searchStatus != null && !searchStatus.isEmpty()) {
             sql.append(" AND final_status = ?");
             parameters.add(searchStatus);
         }
 
-        // Kiểm tra nếu searchStartDate không null, thêm điều kiện vào truy vấn
+        // Filter by start date
         if (searchStartDate != null) {
             sql.append(" AND proposal_sent_date >= ?");
             parameters.add(searchStartDate);
         }
 
-        // Kiểm tra nếu searchEndDate không null, thêm điều kiện vào truy vấn
+        // Filter by end date
         if (searchEndDate != null) {
             sql.append(" AND proposal_sent_date <= ?");
             parameters.add(searchEndDate);
         }
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            // Thiết lập các tham số cho câu lệnh SQL
             for (int i = 0; i < parameters.size(); i++) {
                 ps.setObject(i + 1, parameters.get(i));
             }
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                total = rs.getInt(1);  // Lấy số lượng kết quả từ cột đầu tiên (COUNT)
+                total = rs.getInt(1);
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -922,7 +927,7 @@ public class ProposalDAO {
     }
 
     public List<Proposal> searchProposalsByTypeExecuteStatusFromStartDateToEndDateWithPaging(
-            String searchType, String searchStatus, Timestamp searchStartDate, Timestamp searchEndDate,
+            String[] proposalTypes, String searchStatus, Timestamp searchStartDate, Timestamp searchEndDate,
             int offset, int recordsPerPage) {
 
         List<Proposal> list = new ArrayList<>();
@@ -934,36 +939,42 @@ public class ProposalDAO {
 
         List<Object> params = new ArrayList<>();
 
-        // Lọc theo proposal_type nếu có
-        if (searchType != null && !searchType.isEmpty()) {
-            sql.append(" AND ep.proposal_type = ?");
-            params.add(searchType);
+        // Filter by proposal types
+        if (proposalTypes != null && proposalTypes.length > 0) {
+            sql.append(" AND ep.proposal_type IN (");
+            for (int i = 0; i < proposalTypes.length; i++) {
+                sql.append("?");
+                if (i < proposalTypes.length - 1) {
+                    sql.append(",");
+                }
+                params.add(proposalTypes[i]);
+            }
+            sql.append(")");
         }
 
-        // Lọc sâu hơn theo final_status nếu truyền đúng giá trị
+        // Filter by status
         if (searchStatus != null && !searchStatus.isEmpty()) {
             if (searchStatus.equals("approved_but_not_executed") || searchStatus.equals("executed")) {
                 sql.append(" AND ep.final_status = ?");
                 params.add(searchStatus);
             } else {
-                // Nếu giá trị searchStatus không nằm trong 2 giá trị hợp lệ, trả list rỗng
-                return list;
+                return list; // Return empty list if invalid status
             }
         }
 
-        // Lọc theo ngày bắt đầu
+        // Filter by start date
         if (searchStartDate != null) {
             sql.append(" AND ep.proposal_sent_date >= ?");
             params.add(searchStartDate);
         }
 
-        // Lọc theo ngày kết thúc
+        // Filter by end date
         if (searchEndDate != null) {
             sql.append(" AND ep.proposal_sent_date <= ?");
             params.add(searchEndDate);
         }
 
-        // Phân trang
+        // Pagination
         sql.append(" ORDER BY ep.proposal_sent_date DESC LIMIT ? OFFSET ?");
         params.add(recordsPerPage);
         params.add(offset);
@@ -990,5 +1001,4 @@ public class ProposalDAO {
         }
         return list;
     }
-
 }

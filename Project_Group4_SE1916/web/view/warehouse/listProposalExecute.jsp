@@ -99,7 +99,7 @@
                     <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg flex items-center">
                         <i class="fas fa-search mr-2"></i> Search
                     </button>
-                    <a href="${pageContext.request.contextPath}/ListProposalExecute" onclick="Listevent.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" class="bg-yellow-500 text-white px-6 py-2 rounded-lg flex items-center">
+                    <a href="${pageContext.request.contextPath}/ListProposalExecute" onclick="event.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" class="bg-yellow-500 text-white px-6 py-2 rounded-lg flex items-center">
                         <i class="fas fa-undo mr-2"></i> Reset form
                     </a>
                 </form>
@@ -178,7 +178,7 @@
                     <!-- Nút trang trước -->
                     <c:choose>
                         <c:when test="${currentPage > 1}">
-                            <a href="ListProposalExecute?page=${currentPage - 1}&searchType=${param.searchType}&searchStatus=${param.searchStatus}&searchStartDate=${param.searchStartDate}&searchEndDate=${param.searchEndDate}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&lt;</a>
+                            <a href="ListProposalExecute?page=${currentPage - 1}&searchType=${param.searchType}&searchStatus=${param.searchStatus}&searchStartDate=${param.searchStartDate}&searchEndDate=${param.searchEndDate}&filter=${param.filter}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&lt;</a>
                         </c:when>
                         <c:otherwise>
                             <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">&lt;</span>
@@ -190,7 +190,7 @@
                             <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">1</span>
                         </c:when>
                         <c:otherwise>
-                            <a href="ListProposalExecute?page=1&searchType=${param.searchType}&searchStatus=${param.searchStatus}&searchStartDate=${param.searchStartDate}&searchEndDate=${param.searchEndDate}" class="px-3 py-1 rounded border hover:border-blue-500">1</a>
+                            <a href="ListProposalExecute?page=1&searchType=${param.searchType}&searchStatus=${param.searchStatus}&searchStartDate=${param.searchStartDate}&searchEndDate=${param.searchEndDate}&filter=${param.filter}" class="px-3 py-1 rounded border hover:border-blue-500">1</a>
                         </c:otherwise>
                     </c:choose>
                     <!-- Dấu ... nếu khoảng cách trang hiện tại > 3 với trang 1 -->
@@ -204,7 +204,7 @@
                                 <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${i}</span>
                             </c:when>
                             <c:otherwise>
-                                <a href="ListProposalExecute?page=${i}&searchType=${param.searchType}&searchStatus=${param.searchStatus}&searchStartDate=${param.searchStartDate}&searchEndDate=${param.searchEndDate}" class="px-3 py-1 rounded border hover:border-blue-500">${i}</a>
+                                <a href="ListProposalExecute?page=${i}&searchType=${param.searchType}&searchStatus=${param.searchStatus}&searchStartDate=${param.searchStartDate}&searchEndDate=${param.searchEndDate}&filter=${param.filter}" class="px-3 py-1 rounded border hover:border-blue-500">${i}</a>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
@@ -219,14 +219,14 @@
                                 <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${totalPages}</span>
                             </c:when>
                             <c:otherwise>
-                                <a href="ListProposalExecute?page=${totalPages}&searchType=${param.searchType}&searchStatus=${param.searchStatus}&searchStartDate=${param.searchStartDate}&searchEndDate=${param.searchEndDate}" class="px-3 py-1 rounded border hover:border-blue-500">${totalPages}</a>
+                                <a href="ListProposalExecute?page=${totalPages}&searchType=${param.searchType}&searchStatus=${param.searchStatus}&searchStartDate=${param.searchStartDate}&searchEndDate=${param.searchEndDate}&filter=${param.filter}" class="px-3 py-1 rounded border hover:border-blue-500">${totalPages}</a>
                             </c:otherwise>
                         </c:choose>
                     </c:if>
                     <!-- Nút trang sau -->
                     <c:choose>
                         <c:when test="${currentPage < totalPages}">
-                            <a href="ListProposalExecute?page=${currentPage + 1}&searchType=${param.searchType}&searchStatus=${param.searchStatus}&searchStartDate=${param.searchStartDate}&searchEndDate=${param.searchEndDate}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&gt;</a>
+                            <a href="ListProposalExecute?page=${currentPage + 1}&searchType=${param.searchType}&searchStatus=${param.searchStatus}&searchStartDate=${param.searchStartDate}&searchEndDate=${param.searchEndDate}&filter=${param.filter}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&gt;</a>
                         </c:when>
                         <c:otherwise>
                             <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">&gt;</span>
@@ -252,12 +252,22 @@
             </div>
         </main>
 
-        <!--JavaScript -->
+        <!-- JavaScript -->
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const form = document.querySelector('form');
                 const startDateInput = document.getElementById('searchStartDate');
                 const endDateInput = document.getElementById('searchEndDate');
+                const searchTypeSelect = document.querySelector('select[name="searchType"]');
+                const filter = new URLSearchParams(window.location.search).get('filter');
+
+                // Disable "Export" option if filter=import_only
+                if (filter === 'import_only') {
+                    const exportOption = searchTypeSelect.querySelector('option[value="export"]');
+                    if (exportOption) {
+                        exportOption.disabled = true;
+                    }
+                }
 
                 form.addEventListener('submit', function (e) {
                     const today = new Date().toISOString().split('T')[0];
@@ -276,7 +286,6 @@
                         e.preventDefault();
                         return;
                     }
-
 
                     if (startDate && endDate && endDate < startDate) {
                         alert("End date cannot be earlier than start date.");

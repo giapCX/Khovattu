@@ -62,6 +62,7 @@ public class ListProposalExecute extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String searchType = request.getParameter("searchType");
+        String filter = request.getParameter("filter"); // Get the filter parameter
         String searchStatus = "approved_but_not_executed";
         String searchStartDateStr = request.getParameter("searchStartDate");
         String searchEndDateStr = request.getParameter("searchEndDate");
@@ -84,7 +85,7 @@ public class ListProposalExecute extends HttpServlet {
             try {
                 currentPage = Integer.parseInt(pageParam);
                 if (currentPage < 1) {
-                    currentPage = 1; // đảm bảo currentPage không âm hoặc 0
+                    currentPage = 1;
                 }
             } catch (NumberFormatException e) {
                 currentPage = 1;
@@ -94,22 +95,34 @@ public class ListProposalExecute extends HttpServlet {
         try (Connection conn = DBContext.getConnection()) {
             ProposalDAO proposalDAO = new ProposalDAO(conn);
 
-            int totalRecords = proposalDAO.countProposalsByTypeExecuteStatusFromStartDateToEndDate(searchType, searchStatus, searchStartDate, searchEndDate);
+            // If filter=import_only, restrict to import_from_supplier and import_returned
+            String[] proposalTypes = null;
+            if ("import_only".equals(filter)) {
+                proposalTypes = new String[]{"import_from_supplier", "import_returned"};
+            } else if (searchType != null && !searchType.isEmpty()) {
+                proposalTypes = new String[]{searchType};
+            } else {
+                proposalTypes = new String[]{"import_from_supplier", "import_returned", "export"};
+            }
 
-            // Nếu không có bản ghi nào, set totalPages tối thiểu là 1
+            // Count total records with the filtered proposal types
+            int totalRecords = proposalDAO.countProposalsByTypeExecuteStatusFromStartDateToEndDate(proposalTypes, searchStatus, searchStartDate, searchEndDate);
+
+            // Calculate total pages
             int totalPages = 1;
             if (totalRecords > 0) {
                 totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
             }
 
-            // Nếu currentPage lớn hơn tổng số trang, gán lại cho đúng
+            // Ensure currentPage is within valid bounds
             if (currentPage > totalPages) {
                 currentPage = totalPages;
             }
 
             int offset = (currentPage - 1) * recordsPerPage;
 
-            List<Proposal> proposals = proposalDAO.searchProposalsByTypeExecuteStatusFromStartDateToEndDateWithPaging(searchType, searchStatus, searchStartDate, searchEndDate, offset, recordsPerPage);
+            // Fetch proposals with the filtered proposal types
+            List<Proposal> proposals = proposalDAO.searchProposalsByTypeExecuteStatusFromStartDateToEndDateWithPaging(proposalTypes, searchStatus, searchStartDate, searchEndDate, offset, recordsPerPage);
 
             if (proposals == null) {
                 proposals = new ArrayList<>();
@@ -117,6 +130,7 @@ public class ListProposalExecute extends HttpServlet {
 
             request.setAttribute("proposals", proposals);
             request.setAttribute("searchType", searchType);
+            request.setAttribute("filter", filter); // Pass filter to JSP if needed
             request.setAttribute("searchStatus", searchStatus);
             request.setAttribute("searchStartDate", searchStartDate);
             request.setAttribute("searchEndDate", searchEndDate);
@@ -127,7 +141,6 @@ public class ListProposalExecute extends HttpServlet {
         } catch (Exception e) {
             throw new ServletException(e);
         }
-
     }
 
     /**
@@ -153,5 +166,4 @@ public class ListProposalExecute extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

@@ -68,14 +68,15 @@ public class WarehouseDashboard extends HttpServlet {
             }        
 
             ProposalDAO proposalDAO = new ProposalDAO(conn);
-            int totalToBeExecute = proposalDAO.countProposalsByTypeExecuteStatusFromStartDateToEndDate("", "approved_but_not_executed", null, null);
+            // Filter proposals by import_from_supplier and import_returned types
+            String[] proposalTypes = new String[]{"import_from_supplier", "import_returned"};
+            int totalToBeExecute = proposalDAO.countProposalsByTypeExecuteStatusFromStartDateToEndDate(proposalTypes, "approved_but_not_executed", null, null);
           
             request.setAttribute("totalToBeExecute", totalToBeExecute);   
             request.getRequestDispatcher("/view/warehouse/warehouseDashboard.jsp").forward(request, response);
         } catch (Exception e) {
             throw new ServletException("Lỗi khi tải dashboard nhân viên: " + e.getMessage(), e);
         }
-
     }
 
     /**
@@ -101,5 +102,4 @@ public class WarehouseDashboard extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }
