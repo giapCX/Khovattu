@@ -191,6 +191,7 @@
                                     <th>Quantity</th>
                                     <th>Unit</th>
                                     <th>Condition</th>
+                                    <th>Construction Site</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -211,6 +212,12 @@
                                             <option value="used">Used</option>
                                             <option value="damaged">Damaged</option>
                                         </select>
+                                    </td>
+                                    <td style="position: relative;">
+                                        <input type="text" class="form-control site-name-input" name="siteName[]" required autocomplete="off">
+                                        <input type="hidden" name="siteId[]" class="site-id-input">
+                                        <div class="autocomplete-suggestions" style="display: none;"></div>
+                                        <div class="invalid-feedback">Please select a construction site.</div>
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button>
@@ -244,6 +251,7 @@
         <script>
             let materialData = [];
             let employeeData = [];
+            let siteData = [];
 
             // Fetch materials from Servlet via AJAX
             async function fetchMaterials() {
@@ -273,6 +281,20 @@
                 }
             }
 
+            // Fetch sites from Servlet via AJAX
+            async function fetchSites() {
+                try {
+                    const response = await fetch('${pageContext.request.contextPath}/exportMaterial?fetch=sites');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    siteData = await response.json();
+                    console.log("Site Data:", siteData);
+                } catch (error) {
+                    console.error("Error fetching sites:", error);
+                }
+            }
+
             // Update serial numbers
             function updateSerialNumbers() {
                 document.querySelectorAll('#materialTableBody tr').forEach((row, index) => {
@@ -296,28 +318,35 @@
                 const tableBody = document.getElementById('materialTableBody');
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td class="serial-number"></td>
-                    <td style="position: relative;">
-                        <input type="text" class="form-control material-name-input" name="materialName[]" required autocomplete="off">
-                        <div class="autocomplete-suggestions" style="display: none;"></div>
-                    </td>
-                    <td><input type="text" class="form-control material-code-input" name="materialCode[]" readonly></td>
-                    <td><input type="number" class="form-control" name="quantity[]" min="1" required></td>
-                    <td><input type="text" class="form-control unit-display" name="unit[]" readonly></td>
-                    <td>
-                        <select class="form-select" name="condition[]" required>
-                            <option value="">Select condition</option>
-                            <option value="new">New</option>
-                            <option value="used">Used</option>
-                            <option value="damaged">Damaged</option>
-                        </select>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button>
-                    </td>
-                `;
+            <td class="serial-number"></td>
+            <td style="position: relative;">
+                <input type="text" class="form-control material-name-input" name="materialName[]" required autocomplete="off">
+                <div class="autocomplete-suggestions" style="display: none;"></div>
+            </td>
+            <td><input type="text" class="form-control material-code-input" name="materialCode[]" readonly></td>
+            <td><input type="number" class="form-control" name="quantity[]" min="1" required></td>
+            <td><input type="text" class="form-control unit-display" name="unit[]" readonly></td>
+            <td>
+                <select class="form-select" name="condition[]" required>
+                    <option value="">Select condition</option>
+                    <option value="new">New</option>
+                    <option value="used">Used</option>
+                    <option value="damaged">Damaged</option>
+                </select>
+            </td>
+            <td style="position: relative;">
+                <input type="text" class="form-control site-name-input" name="siteName[]" required autocomplete="off">
+                <input type="hidden" name="siteId[]" class="site-id-input">
+                <div class="autocomplete-suggestions" style="display: none;"></div>
+                <div class="invalid-feedback">Please select a construction site.</div>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button>
+            </td>
+        `;
                 tableBody.appendChild(row);
                 attachMaterialAutocomplete(row.querySelector('.material-name-input'));
+                attachSiteAutocomplete(row.querySelector('.site-name-input'));
                 updateSerialNumbers();
                 updateRemoveButtons();
                 checkFormValidity();
@@ -413,6 +442,45 @@
                 });
             }
 
+            // Autocomplete for construction sites
+            function attachSiteAutocomplete(input) {
+                input.addEventListener('input', function () {
+                    if (this.readOnly)
+                        return;
+                    const value = this.value.toLowerCase();
+                    const suggestionsDiv = this.nextElementSibling.nextElementSibling; // Skip hidden input
+                    suggestionsDiv.innerHTML = '';
+                    suggestionsDiv.style.display = 'none';
+
+                    if (value) {
+                        const matches = siteData.filter(site =>
+                            site.siteName.toLowerCase().includes(value)
+                        );
+                        if (matches.length > 0) {
+                            matches.forEach(site => {
+                                const suggestion = document.createElement('div');
+                                suggestion.className = 'autocomplete-suggestion';
+                                suggestion.textContent = site.siteName;
+                                suggestion.addEventListener('click', () => {
+                                    this.value = site.siteName;
+                                    this.closest('tr').querySelector('.site-id-input').value = site.siteId;
+                                    suggestionsDiv.style.display = 'none';
+                                    checkFormValidity();
+                                });
+                                suggestionsDiv.appendChild(suggestion);
+                            });
+                            suggestionsDiv.style.display = 'block';
+                        }
+                    }
+                });
+
+                input.addEventListener('blur', function () {
+                    setTimeout(() => {
+                        this.nextElementSibling.nextElementSibling.style.display = 'none';
+                    }, 200);
+                });
+            }
+
             // Export to Excel functionality
             function exportToExcel() {
                 if (!checkFormValidity())
@@ -435,17 +503,18 @@
                     ["Additional Notes", additionalNote || "None"],
                     [],
                     ["Material List"],
-                    ["No.", "Material Name", "Material Code", "Quantity", "Unit", "Condition"]
+                    ["No.", "Construction Site", "Material Name", "Material Code", "Quantity", "Unit", "Condition"]
                 ];
 
                 const materialRows = document.querySelectorAll('#materialTableBody tr');
                 materialRows.forEach((row, index) => {
+                    const siteName = row.querySelector('.site-name-input').value;
                     const materialName = row.querySelector('.material-name-input').value;
                     const materialCode = row.querySelector('.material-code-input').value;
                     const quantity = row.querySelector('input[name="quantity[]"]').value;
                     const unit = row.querySelector('.unit-display').value;
                     const condition = row.querySelector('select[name="condition[]"]').value;
-                    data.push([index + 1, materialName, materialCode, parseInt(quantity), unit, condition]);
+                    data.push([index + 1, siteName, materialName, materialCode, parseInt(quantity), unit, condition]);
                 });
 
                 const ws = XLSX.utils.aoa_to_sheet(data);
@@ -457,6 +526,7 @@
                 ws['D10'].s = {font: {bold: true}};
                 ws['E10'].s = {font: {bold: true}};
                 ws['F10'].s = {font: {bold: true}};
+                ws['G10'].s = {font: {bold: true}};
 
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Export Voucher");
@@ -479,6 +549,8 @@
                 const purpose = document.getElementById('purpose').value.trim();
                 const requiredDate = document.getElementById('requiredDate').value;
                 const additionalNote = document.getElementById('additionalNote').value.trim();
+                const siteNames = document.getElementsByName('siteName[]');
+                const siteIds = document.getElementsByName('siteId[]');
                 const materialNames = document.getElementsByName('materialName[]');
                 const materialCodes = document.getElementsByName('materialCode[]');
                 const quantities = document.getElementsByName('quantity[]');
@@ -521,7 +593,9 @@
                 }
 
                 for (let i = 0; i < materialNames.length; i++) {
-                    if (!materialNames[i].value.trim() || !materialCodes[i].value.trim() ||
+                    if (!siteNames[i].value.trim() || !siteIds[i].value ||
+                            !siteData.some(site => site.siteId === siteIds[i].value && site.siteName === siteNames[i].value.trim()) ||
+                            !materialNames[i].value.trim() || !materialCodes[i].value.trim() ||
                             !quantities[i].value || quantities[i].value <= 0 ||
                             !units[i].value || !conditions[i].value) {
                         rows[i].classList.add('error-row');
@@ -564,8 +638,9 @@
                 }
 
                 // Fetch data and attach autocompletes
-                Promise.all([fetchMaterials(), fetchEmployees()]).then(() => {
+                Promise.all([fetchMaterials(), fetchEmployees(), fetchSites()]).then(() => {
                     document.querySelectorAll(".material-name-input").forEach(attachMaterialAutocomplete);
+                    document.querySelectorAll(".site-name-input").forEach(attachSiteAutocomplete);
                     attachEmployeeAutocomplete(receiverInput);
                 });
 
@@ -588,10 +663,10 @@
 
             <c:if test="${not empty errorRow && errorRow >= 0}">
                 const rows = document.querySelectorAll('#materialTableBody tr');
-            if (rows[${fn:escapeXml(errorRow)}]) {
-                rows[${fn:escapeXml(errorRow)}].classList.add('error-row');
+                if (rows[${fn:escapeXml(errorRow)}]) {
+                    rows[${fn:escapeXml(errorRow)}].classList.add('error-row');
                 } else {
-                console.warn('Error row index ${fn:escapeXml(errorRow)} is out of bounds.');
+                    console.warn('Error row index ${fn:escapeXml(errorRow)} is out of bounds.');
                 }
             </c:if>
             });

@@ -1,10 +1,11 @@
-//exMa.servlet
+//exMa servlet
 package controller.importhistory;
 
 import Dal.DBContext;
 import dao.ExportDAO;
 import dao.UserDAO;
 import dao.MaterialDAO;
+import dao.ConstructionSiteDAO;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -18,6 +19,7 @@ import model.Export;
 import model.ExportDetail;
 import model.Material;
 import model.User;
+import model.ConstructionSite;
 import com.google.gson.Gson;
 
 public class ExportMaterial extends HttpServlet {
@@ -59,11 +61,27 @@ public class ExportMaterial extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\": \"Database error: " + e.getMessage() + "\"}");
             }
+        } else if ("sites".equals(fetch)) {
+            try(Connection conn = DBContext.getConnection()) {
+                ConstructionSiteDAO siteDAO = new ConstructionSiteDAO(conn);
+                List<ConstructionSite> sites = siteDAO.getAllConstructionSites();
+                Gson gson = new Gson();
+                String json = gson.toJson(sites);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(json);
+            } catch (SQLException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("{\"error\": \"Database error: " + e.getMessage() + "\"}");
+            }
         } else {
             try {
                 MaterialDAO materialDAO = new MaterialDAO();
                 List<Material> materials = materialDAO.getAllMaterials();
+                ConstructionSiteDAO siteDAO = new ConstructionSiteDAO();
+                List<ConstructionSite> sites = siteDAO.getAllConstructionSites();
                 request.setAttribute("material", materials);
+                request.setAttribute("sites", sites);
                 request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             } catch (SQLException e) {
                 throw new ServletException("Database error: " + e.getMessage(), e);
@@ -81,6 +99,7 @@ public class ExportMaterial extends HttpServlet {
         String username = (String) session.getAttribute("username");
         String voucherIdStr = request.getParameter("voucherId");
         String receiver = request.getParameter("receiver");
+        String siteIdStr = request.getParameter("siteId");
         String[] materialCodes = request.getParameterValues("materialCode[]");
         String[] quantities = request.getParameterValues("quantity[]");
         String[] conditions = request.getParameterValues("condition[]");
@@ -128,7 +147,34 @@ public class ExportMaterial extends HttpServlet {
             return;
         }
 
-        
+        if (siteIdStr == null || siteIdStr.trim().isEmpty()) {
+            errorMessage = "Construction site cannot be empty.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+        int siteId;
+        try(Connection conn = DBContext.getConnection()) {
+            siteId = Integer.parseInt(siteIdStr);
+            ConstructionSiteDAO siteDAO = new ConstructionSiteDAO(conn);
+            if (!siteDAO.siteExists(siteId)) {
+                errorMessage = "Invalid construction site selected.";
+                request.setAttribute("error", errorMessage);
+                request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+                return;
+            }
+        } catch (NumberFormatException e) {
+            errorMessage = "Invalid site ID format.";
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        } catch (SQLException e) {
+            errorMessage = "Database error while validating site: " + e.getMessage();
+            request.setAttribute("error", errorMessage);
+            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+            return;
+        }
+
         int receiverId = -1;
         try {
             receiverId = userDAO.getUserIdByFullName(receiver);
@@ -218,85 +264,103 @@ public class ExportMaterial extends HttpServlet {
         }
 
         int userId = user.getUserId();
-       
+
         try (Connection conn = DBContext.getConnection()) {
-            ExportDAO dao = new ExportDAO(conn);
-            Export export = new Export();
-            export.setExporterId(userId);
-            export.setReceiptId(voucherIdStr);
-            export.setReceiverId(receiverId);
-            export.setExportDate(LocalDate.now());
-            export.setNote(note);
-            int exportId = dao.saveExport(export);
-            if (exportId <= 0) {
-                errorMessage = "Unable to save export voucher. Please try again.";
-                request.setAttribute("error", errorMessage);
-                request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
-                return;
-            }
-            List<ExportDetail> detailList = new ArrayList<>();
-            for (int i = 0; i < materialCodes.length; i++) {
-                if (materialCodes[i] == null || materialCodes[i].trim().isEmpty()) {
-                    errorMessage = "Material code cannot be empty at row " + (i + 1);
+            conn.setAutoCommit(false); // Start transaction
+            try {
+                // Create a proposal
+                ExportDAO dao = new ExportDAO(conn);
+                int proposalId = dao.createExportProposal(userId, receiverId, note);
+                if (proposalId <= 0) {
+                    errorMessage = "Unable to create export proposal. Please try again.";
                     request.setAttribute("error", errorMessage);
-                    request.setAttribute("errorRow", i);
                     request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                     return;
                 }
-                if (quantities[i] == null || quantities[i].trim().isEmpty()) {
-                    errorMessage = "Quantity cannot be empty at row " + (i + 1);
+
+                // Save export receipt
+                Export export = new Export();
+                export.setExporterId(userId);
+                export.setReceiptId(voucherIdStr);
+                export.setReceiverId(receiverId);               
+                export.setProposalId(proposalId);
+                export.setExportDate(LocalDate.now());
+                export.setNote(note);
+                int exportId = dao.saveExport(export);
+                if (exportId <= 0) {
+                    errorMessage = "Unable to save export voucher. Please try again.";
                     request.setAttribute("error", errorMessage);
-                    request.setAttribute("errorRow", i);
                     request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                     return;
                 }
-                if (conditions[i] == null || conditions[i].trim().isEmpty()) {
-                    errorMessage = "Condition cannot be empty at row " + (i + 1);
-                    request.setAttribute("error", errorMessage);
-                    request.setAttribute("errorRow", i);
-                    request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
-                    return;
-                }
-                try {
-                    MaterialDAO m = new MaterialDAO();
-                    int materialId = m.getMaterialIdByCode(materialCodes[i]);
-                    int quantity = Integer.parseInt(quantities[i]);
-                    if (quantity <= 0) {
-                        errorMessage = "Quantity must be greater than 0 at row " + (i + 1);
+
+                // Save export details
+                List<ExportDetail> detailList = new ArrayList<>();
+                for (int i = 0; i < materialCodes.length; i++) {
+                    if (materialCodes[i] == null || materialCodes[i].trim().isEmpty()) {
+                        errorMessage = "Material code cannot be empty at row " + (i + 1);
                         request.setAttribute("error", errorMessage);
                         request.setAttribute("errorRow", i);
                         request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                         return;
                     }
-                    ExportDetail detail = new ExportDetail();
-                    detail.setExportId(exportId);
-                    detail.setMaterialId(materialId);
-                    detail.setQuantity(quantity);
-                    detail.setMaterialCondition(conditions[i]);
-                    detail.setReason(purpose);
-                    detailList.add(detail);
-                } catch (NumberFormatException e) {
-                    errorMessage = "Invalid material code or quantity at row " + (i + 1);
-                    request.setAttribute("error", errorMessage);
-                    request.setAttribute("errorRow", i);
-                    request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
-                    return;
+                    if (quantities[i] == null || quantities[i].trim().isEmpty()) {
+                        errorMessage = "Quantity cannot be empty at row " + (i + 1);
+                        request.setAttribute("error", errorMessage);
+                        request.setAttribute("errorRow", i);
+                        request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+                        return;
+                    }
+                    if (conditions[i] == null || conditions[i].trim().isEmpty()) {
+                        errorMessage = "Condition cannot be empty at row " + (i + 1);
+                        request.setAttribute("error", errorMessage);
+                        request.setAttribute("errorRow", i);
+                        request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+                        return;
+                    }
+                    try {
+                        MaterialDAO m = new MaterialDAO();
+                        int materialId = m.getMaterialIdByCode(materialCodes[i]);
+                        int quantity = Integer.parseInt(quantities[i]);
+                        if (quantity <= 0) {
+                            errorMessage = "Quantity must be greater than 0 at row " + (i + 1);
+                            request.setAttribute("error", errorMessage);
+                            request.setAttribute("errorRow", i);
+                            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+                            return;
+                        }
+                        ExportDetail detail = new ExportDetail();
+                        detail.setExportId(exportId);
+                        detail.setMaterialId(materialId);
+                        detail.setSiteId(siteId);
+                        detail.setQuantity(quantity);
+                        detail.setMaterialCondition(conditions[i]);
+                        detail.setReason(purpose);
+                        detailList.add(detail);
+                    } catch (NumberFormatException e) {
+                        errorMessage = "Invalid material code or quantity at row " + (i + 1);
+                        request.setAttribute("error", errorMessage);
+                        request.setAttribute("errorRow", i);
+                        request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
+                        return;
+                    }
                 }
-            }
 
-            try {
                 dao.saveExportDetails(detailList, exportId);
+                conn.commit(); // Commit transaction
+
+                request.setAttribute("message", "Export receipt saved successfully!");
+                request.setAttribute("exportId", exportId);
+                request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
             } catch (SQLException e) {
-                errorMessage = "Error saving export details. Please try again.";
+                conn.rollback(); // Rollback on error
+                errorMessage = "Error saving export details: " + e.getMessage();
                 request.setAttribute("error", errorMessage);
                 request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
                 return;
+            } finally {
+                conn.setAutoCommit(true);
             }
-
-            request.setAttribute("message", "Export voucher saved successfully!");
-            request.setAttribute("exportId", exportId);
-            request.getRequestDispatcher("./exportMaterial.jsp").forward(request, response);
-
         } catch (Exception e) {
             e.printStackTrace();
             errorMessage = "System error while processing export. Please try again or contact the administrator.";

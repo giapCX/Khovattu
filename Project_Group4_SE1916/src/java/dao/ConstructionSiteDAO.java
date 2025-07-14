@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -10,7 +11,7 @@ import java.util.List;
 import model.ConstructionSite;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
+import java.sql.SQLException;
 /**
  *
  * @author Admin
@@ -22,6 +23,11 @@ public class ConstructionSiteDAO {
     public ConstructionSiteDAO(Connection conn) {
         this.conn = conn;
     }
+
+    public ConstructionSiteDAO() {
+    }
+    
+    
 
     public List<ConstructionSite> getAllConstructionSites() {
         List<ConstructionSite> sites = new ArrayList<>();
@@ -134,6 +140,20 @@ public class ConstructionSiteDAO {
         }
 
         return sites;
+    }
+
+    public boolean siteExists(int siteId) {
+        String sql = "SELECT COUNT(*) FROM ConstructionSites WHERE site_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, siteId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+        }
+        return false; 
     }
 
 }

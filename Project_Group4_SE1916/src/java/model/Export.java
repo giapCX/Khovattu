@@ -1,4 +1,4 @@
-//export
+
 package model;
 
 import java.time.LocalDate;
@@ -12,11 +12,13 @@ public class Export {
     private String note;
     private String exporterName;
     private String receiverName;
+    
+    private int proposalId;
 
     public Export() {
     }
-    
-    public Export(int exportId, String receiptId, int exporterId, int receiverId, LocalDate exportDate, String note, String exporterName, String receiverName) {
+
+    public Export(int exportId, String receiptId, int exporterId, int receiverId, LocalDate exportDate, String note, String exporterName, String receiverName, int proposalId) {
         this.exportId = exportId;
         this.receiptId = receiptId;
         this.exporterId = exporterId;
@@ -25,16 +27,11 @@ public class Export {
         this.note = note;
         this.exporterName = exporterName;
         this.receiverName = receiverName;
-    }  
-
-    public String getReceiverName() {
-        return receiverName;
+        this.proposalId = proposalId;
     }
 
-    public void setReceiverName(String receiverName) {
-        this.receiverName = receiverName;
-    }
-        
+   
+
     public int getExportId() {
         return exportId;
     }
@@ -90,4 +87,25 @@ public class Export {
     public void setExporterName(String exporterName) {
         this.exporterName = exporterName;
     }
+
+    public String getReceiverName() {
+        return receiverName;
+    }
+
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
+    }
+
+    
+
+    public int getProposalId() {
+        return proposalId;
+    }
+
+    public void setProposalId(int proposalId) {
+        this.proposalId = proposalId;
+    }
+
+    
+    
 }

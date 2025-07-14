@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -10,7 +11,7 @@ package model;
  */
 public class Inventory {
      private int materialId;
-    private String materialName; // Từ bảng Materials
+    private String materialName; 
     private String materialCondition;
     private double quantityInStock;
     private String lastUpdated;
