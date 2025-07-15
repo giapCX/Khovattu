@@ -76,6 +76,10 @@
 
         <%
             String role = (String) session.getAttribute("role");
+            if (role == null) {
+                response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
+                return;
+            }
         %>
         <!-- Sidebar -->
         <c:choose>
@@ -139,6 +143,13 @@
                     <a href="${pageContext.request.contextPath}/ListConstructionSites" onclick="event.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" class="bg-yellow-500 text-white px-6 py-2 rounded-lg flex items-center">
                         <i class="fas fa-undo mr-2"></i> Reset form
                     </a>
+                    <div><span class="text-gray-700 dark:text-gray-300">Items per page:</span>
+                        <select name="recordsPerPage" onchange="this.form.submit()" 
+                                class="border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 search-input">
+                            <option value="10" ${recordsPerPage == '10' ? 'selected' : ''}>10 sites/page</option>
+                            <option value="20" ${recordsPerPage == '20' ? 'selected' : ''}>20 sites/page</option>
+                            <option value="30" ${recordsPerPage == '30' ? 'selected' : ''}>30 sites/page</option>
+                        </select></div>
                 </form>
 
                 <!-- Table -->
@@ -152,7 +163,9 @@
                                     <th class="p-4 text-left">Address</th>
                                     <th class="p-4 text-left">Status</th>
                                     <th class="p-4 text-left">Detail</th>
-                                    <th class="p-4 text-left">Edit</th>
+                                        <c:if test="${role == 'admin' || role == 'direction'}">
+                                        <th class="p-4 text-left">Action</th>
+                                        </c:if>
                                 </tr>
                             </thead>
                             <tbody>
@@ -182,13 +195,12 @@
                                                 <td class="p-4 font-medium">
                                                     <a href="ViewConstructionSiteServlet?siteId=${item.siteId}" class="text-primary-600 dark:text-primary-400 hover:underline">Detail</a>
                                                 </td>
-                                                <td class="p-4 font-medium">
-                                                    <c:if test="${sessionScope.role == 'admin' || sessionScope.role == 'direction'}">
-                                                        <button onclick="window.location.href='EditConstructionSiteServlet?siteId=${item.siteId}'" class="action-button edit-button">
-                                                            <i class="fas fa-edit mr-1"></i> Edit
-                                                        </button>
-                                                    </c:if>
-                                                </td>
+                                                <c:if test="${sessionScope.role == 'admin' || sessionScope.role == 'direction'}">
+                                                    <td class="p-4 font-medium">
+                                                        <a href="EditConstructionSiteServlet?siteId=${item.siteId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
+                                                    </td>
+                                                </c:if>
+
                                             </tr>
                                         </c:forEach>
                                     </c:when>
@@ -210,7 +222,7 @@
                     <!-- Previous Page -->
                     <c:choose>
                         <c:when test="${currentPage > 1}">
-                            <a href="ListConstructionSites?page=${currentPage - 1}&searchName=${param.searchName}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400"><</a>
+                            <a href="ListConstructionSites?page=${currentPage - 1}&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400"><</a>
                         </c:when>
                         <c:otherwise>
                             <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed"><</span>
@@ -222,7 +234,7 @@
                             <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">1</span>
                         </c:when>
                         <c:otherwise>
-                            <a href="ListConstructionSites?page=1&searchName=${param.searchName}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">1</a>
+                            <a href="ListConstructionSites?page=1&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">1</a>
                         </c:otherwise>
                     </c:choose>
                     <!-- Ellipsis if currentPage > 4 -->
@@ -236,7 +248,7 @@
                                 <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${i}</span>
                             </c:when>
                             <c:otherwise>
-                                <a href="ListConstructionSites?page=${i}&searchName=${param.searchName}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${i}</a>
+                                <a href="ListConstructionSites?page=${i}&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${i}</a>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
@@ -251,14 +263,14 @@
                                 <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${totalPages}</span>
                             </c:when>
                             <c:otherwise>
-                                <a href="ListConstructionSites?page=${totalPages}&searchName=${param.searchName}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${totalPages}</a>
+                                <a href="ListConstructionSites?page=${totalPages}&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${totalPages}</a>
                             </c:otherwise>
                         </c:choose>
                     </c:if>
                     <!-- Next Page -->
                     <c:choose>
                         <c:when test="${currentPage < totalPages}">
-                            <a href="ListConstructionSites?page=${currentPage + 1}&searchName=${param.searchName}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">></a>
+                            <a href="ListConstructionSites?page=${currentPage + 1}&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">></a>
                         </c:when>
                         <c:otherwise>
                             <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">></span>
@@ -266,20 +278,7 @@
                     </c:choose>
                 </div>
                 <div class="mt-6 flex justify-center">
-                    <c:choose>
-                        <c:when test="${role == 'admin'}">
-                            <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                        </c:when>
-                        <c:when test="${role == 'direction'}">
-                            <a href="${pageContext.request.contextPath}/view/direction/directionDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                        </c:when>
-                        <c:when test="${role == 'warehouse'}">
-                            <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                        </c:when>
-                        <c:when test="${role == 'employee'}">
-                            <a href="${pageContext.request.contextPath}/view/employee/employeeDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                        </c:when>
-                    </c:choose>
+                    <jsp:include page="/view/backToDashboardButton.jsp" />
                 </div>
             </div>
         </main>

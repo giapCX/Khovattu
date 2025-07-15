@@ -11,6 +11,7 @@ import model.ConstructionSite;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 /**
  *
  * @author Admin
@@ -87,36 +88,34 @@ public class ConstructionSiteDAO {
         return count;
     }
 
-    public List<ConstructionSite> searchConstructionSiteByNameAddressStatusWithPaging(String name, String address, String status, int offset, int limit) {
+    public List<ConstructionSite> searchConstructionSiteByNameAddressStatusWithPaging(
+            String name, String address, String status, int offset, int limit) {
+
         List<ConstructionSite> sites = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM ConstructionSites WHERE 1=1");
+        List<Object> params = new ArrayList<>();
 
         if (name != null && !name.trim().isEmpty()) {
             sql.append(" AND site_name LIKE ?");
+            params.add("%" + name.trim() + "%");
         }
         if (address != null && !address.trim().isEmpty()) {
             sql.append(" AND address LIKE ?");
+            params.add("%" + address.trim() + "%");
         }
         if (status != null && !status.trim().isEmpty()) {
             sql.append(" AND status = ?");
+            params.add(status.trim());
         }
 
         sql.append(" ORDER BY site_id DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            int index = 1;
-            if (name != null && !name.trim().isEmpty()) {
-                ps.setString(index++, "%" + name.trim() + "%");
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
             }
-            if (address != null && !address.trim().isEmpty()) {
-                ps.setString(index++, "%" + address.trim() + "%");
-            }
-            if (status != null && !status.trim().isEmpty()) {
-                ps.setString(index++, status.trim());
-            }
-
-            ps.setInt(index++, limit);
-            ps.setInt(index, offset);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -154,8 +153,8 @@ public class ConstructionSiteDAO {
     }
 
     public boolean addConstructionSite(ConstructionSite site) {
-        String sql = "INSERT INTO ConstructionSites (site_name, address, manager_id, start_date, end_date, status, note) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ConstructionSites (site_name, address, manager_id, start_date, end_date, status, note) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, site.getSiteName());
             ps.setString(2, site.getAddress());
@@ -174,8 +173,8 @@ public class ConstructionSiteDAO {
     }
 
     public boolean updateConstructionSite(ConstructionSite site) {
-        String sql = "UPDATE ConstructionSites SET site_name = ?, address = ?, manager_id = ?, start_date = ?, " +
-                     "end_date = ?, status = ?, note = ? WHERE site_id = ?";
+        String sql = "UPDATE ConstructionSites SET site_name = ?, address = ?, manager_id = ?, start_date = ?, "
+                + "end_date = ?, status = ?, note = ? WHERE site_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, site.getSiteName());
             ps.setString(2, site.getAddress());
