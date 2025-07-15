@@ -1,4 +1,3 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -179,6 +178,14 @@
                         <input class="form-control" value="${proposal.approval.directorStatus}" readonly>
                     </div>
                 </div>
+                <c:if test="${proposal.approval.directorStatus != 'pending'}">
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">Director Note</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" rows="3" readonly>${proposal.approval.directorNote}</textarea>
+                        </div>
+                    </div>
+                </c:if>
             </div>
         </div>
 
@@ -225,27 +232,22 @@
                     <h2 class="mb-0"><i class="fas fa-check-circle me-2"></i>Director Approval</h2>
                 </div>
                 <div class="card-body">
-                    <form action="${pageContext.request.contextPath}/DirectorApproveProposal" method="post">
+                    <form action="${pageContext.request.contextPath}/DirectorApproveProposal" method="post" onsubmit="return validateForm()">
                         <input type="hidden" name="proposalId" value="${proposal.proposalId}">
                         <div class="row mb-3">
                             <label class="col-sm-2 col-form-label">Director Status</label>
                             <div class="col-sm-10">
-                                <select name="directorStatus" class="form-select" required>
+                                <select name="directorStatus" id="directorStatus" class="form-select" required>
                                     <option value="approved">Approved</option>
                                     <option value="rejected">Rejected</option>
                                 </select>
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <label class="col-sm-2 col-form-label">Director Reason</label>
-                            <div class="col-sm-10">
-                                <textarea class="form-control" name="directorReason" rows="3" placeholder="Enter reason (required if rejected)"></textarea>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
                             <label class="col-sm-2 col-form-label">Director Note</label>
                             <div class="col-sm-10">
-                                <textarea class="form-control" name="directorNote" rows="3" placeholder="Enter additional notes (optional)"></textarea>
+                                <textarea class="form-control" name="directorNote" id="directorNote" rows="3" placeholder="Enter your notes (required if rejected)"></textarea>
+                                <small id="noteError" class="text-danger" style="display:none;">Note is required when rejecting</small>
                             </div>
                         </div>
                         <div class="d-flex justify-content-end gap-2">
@@ -256,6 +258,31 @@
                     </form>
                 </div>
             </div>
+            
+            <script>
+                function validateForm() {
+                    const status = document.getElementById('directorStatus').value;
+                    const note = document.getElementById('directorNote').value.trim();
+                    const noteError = document.getElementById('noteError');
+                    
+                    if (status === 'rejected' && note === '') {
+                        noteError.style.display = 'block';
+                        return false;
+                    }
+                    noteError.style.display = 'none';
+                    return true;
+                }
+                
+                // Show/hide note requirement based on status selection
+                document.getElementById('directorStatus').addEventListener('change', function() {
+                    const noteLabel = document.querySelector('label[for="directorNote"]');
+                    if (this.value === 'rejected') {
+                        noteLabel.innerHTML = 'Director Note <span class="text-danger">*</span>';
+                    } else {
+                        noteLabel.innerHTML = 'Director Note';
+                    }
+                });
+            </script>
         </c:if>
 
         <!-- Messages -->
