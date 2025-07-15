@@ -9,6 +9,13 @@
             <i class="fas fa-times"></i>
         </button>
     </div>
+    <div class="flex items-center space-x-3 bg-white bg-opacity-10 rounded-lg p-3 mb-6">
+        <img src="https://ui-avatars.com/api/?name=<%= java.net.URLEncoder.encode(username, "UTF-8")%>&background=0ea5e9&color=fff"
+             alt="Avatar" class="w-10 h-10 rounded-full border border-white shadow" />
+        <div class="text-white">
+            <p class="font-semibold text-base"><%= username%></p>
+        </div>
+    </div>
     <nav class="space-y-1">
         <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-2 justify-between">
             <div class="flex items-center">
@@ -41,7 +48,24 @@
                     <i class="fas fa-list mr-2 w-4 text-center"></i>
                     <span class="text-sm">Suppliers List</span>
                 </a>
-                
+
+            </div>
+        </div>
+        <div class="nav-item flex flex-col">
+            <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                <div class="flex items-center">
+                    <i class="fas fa-building mr-2 w-5 text-center"></i>
+                    <span class="text-base">Construction Site</span>
+                </div>
+                <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
+            </button>
+            <!-- Menu con - ẩn mặc định -->
+            <div class="submenu hidden pl-6 space-y-1 mt-1">
+                <a href="${pageContext.request.contextPath}/ListConstructionSites" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                    <i class="fas fa-list mr-2 w-4 text-center"></i>
+                    <span class="text-sm">List Construction Site</span>
+                </a>
+
             </div>
         </div>
 
@@ -50,24 +74,16 @@
             <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
                 <div class="flex items-center">
                     <i class="fas fas fa-file-alt mr-2 w-5 text-center"></i>
-                    <span class="text-base">Proposals</span>
+                    <span class="text-base">Requests</span>
                 </div>
                 <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
             </button>
 
             <!-- Menu con - ẩn mặc định -->
-            <div class="submenu hidden pl-6 space-y-1 mt-1">
-                <a href="${pageContext.request.contextPath}/ListProposalServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                    <i class="fas fa-list mr-2 w-4 text-center"></i>
-                    <span class="text-sm">My Submitted Proposals</span>
-                </a>
+            <div class="submenu hidden pl-6 space-y-1 mt-1">        
                 <a href="${pageContext.request.contextPath}/ListProposalExecute" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <i class="fas fa-list mr-2 w-4 text-center"></i>
-                    <span class="text-sm">Proposal Execute</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/ProposalServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                    <i class="fas fa-circle-plus mr-2 w-4 text-center"></i>
-                    <span class="text-sm">Create New Proposal</span>
+                    <span class="text-sm">List Requests Execute</span>
                 </a>
             </div>
         </div>

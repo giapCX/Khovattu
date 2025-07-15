@@ -218,7 +218,7 @@
         </style>
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
-              <!-- Session Check -->
+        <!-- Session Check -->
         <%
             String username = (String) session.getAttribute("username");
             if (username == null) {
@@ -274,7 +274,27 @@
                         </a>
                     </div>
                 </div>
-                            
+                <div class="nav-item flex flex-col">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                        <div class="flex items-center">
+                            <i class="fas fa-building mr-2 w-5 text-center"></i>
+                            <span class="text-base">Construction Site</span>
+                        </div>
+                        <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
+                    </button>
+                    <!-- Menu con - ẩn mặc định -->
+                    <div class="submenu hidden pl-6 space-y-1 mt-1">
+                        <a href="${pageContext.request.contextPath}/ListConstructionSites" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-list mr-2 w-4 text-center"></i>
+                            <span class="text-sm">List Construction Site</span>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/EditConstructionSiteServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-circle-plus mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Create New Site </span>
+                        </a>
+                    </div>
+                </div>
+
                 <a href="${pageContext.request.contextPath}/DirectorProposalsServlet" class="nav-item active flex items-center p-3">
                     <i class="fas fa-clipboard-list mr-3 w-6 text-center"></i>
                     <span class="text-lg">Phê duyệt yêu cầu</span>

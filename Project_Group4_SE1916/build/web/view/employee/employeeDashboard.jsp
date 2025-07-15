@@ -279,13 +279,23 @@
                         
                     </div>
                 </div>
-                <a href="${pageContext.request.contextPath}/ListConstructionSites" class="nav-item flex items-center p-2 justify-between">
-                    <div class="flex items-center">
-                        <i class="fas fa-building mr-2 w-5 text-center"></i>
-                        <span class="text-base">List Construction Site</span>
+                     <div class="nav-item flex flex-col">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                        <div class="flex items-center">
+                            <i class="fas fa-building mr-2 w-5 text-center"></i>
+                            <span class="text-base">Construction Site</span>
+                        </div>
+                        <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
+                    </button>
+                    <!-- Menu con - ẩn mặc định -->
+                    <div class="submenu hidden pl-6 space-y-1 mt-1">
+                        <a href="${pageContext.request.contextPath}/ListConstructionSites" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-list mr-2 w-4 text-center"></i>
+                            <span class="text-sm">List Construction Site</span>
+                        </a>
+               
                     </div>
-                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
-                </a>
+                </div>
                 <!-- Proposal - Menu cha -->
                 <div class="nav-item flex flex-col">
                     <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
