@@ -18,7 +18,7 @@
             String role = (String) session.getAttribute("role");
             Integer userId = (Integer) session.getAttribute("userId");
             String userFullName = (String) session.getAttribute("userFullName");
-      
+
             if (role == null || (!role.equals("employee"))) {
                 response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
                 return;
@@ -187,6 +187,29 @@
                 </div>
             </div>
         </main>
+        <script>
+            document.querySelectorAll('.nameMaterialInput').forEach(input => {
+                input.addEventListener('blur', function () {
+                    const name = this.value.trim();
+
+                    const found = Array.from(document.querySelectorAll('#materialList option'))
+                            .find(opt => opt.value === name);
+
+                    if (!found) {
+                        const confirmAdd = confirm('Material' + name + ' not listed.\nYou can add here: /Project_Group4_SE1916/AddMaterialController');
+                        if (confirmAdd) {
+                            window.location.href = '/Project_Group4_SE1916/AddMaterialController';
+                        }
+                    } else {
+                        const row = this.closest('tr');
+                        row.querySelector('.materialIdHidden').value = found.getAttribute('data-id');
+                        row.querySelector('.unitMaterial').value = found.getAttribute('data-unit');
+                    }
+                });
+            });
+
+
+        </script>
 
         <script>
             function addRow() {
@@ -353,11 +376,51 @@
                 });
             }
 
+// Chặn submit nếu material/supplier/site không có trong danh sách
+document.querySelector('form').addEventListener('submit', function (e) {
+    let isValid = true;
+    const rows = document.querySelectorAll('#itemsBody tr');
+
+    rows.forEach((row, index) => {
+        // Kiểm tra vật tư
+        const materialInput = row.querySelector('.nameMaterialInput');
+        const materialId = row.querySelector('.materialIdHidden').value;
+        if (materialInput && materialInput.value.trim() !== '' && !materialId) {
+            alert(` Material not listed. Please enter correct name.`);
+            isValid = false;
+            return;
+        }
+
+        // Kiểm tra supplier nếu hiển thị
+        const supplierInput = row.querySelector('input[name="supplierName[]"]');
+        const supplierId = row.querySelector('.supplierIdHidden')?.value;
+        if (supplierInput && !supplierInput.closest('td').classList.contains('hidden') && supplierInput.value.trim() !== '' && !supplierId) {
+            alert(`Supplier is not listed. Please enter correct name.`);
+            isValid = false;
+            return;
+        }
+
+        // Kiểm tra site nếu hiển thị
+        const siteInput = row.querySelector('input[name="siteName[]"]');
+        const siteId = row.querySelector('.siteIdHidden')?.value;
+        if (siteInput && !siteInput.closest('td').classList.contains('hidden') && siteInput.value.trim() !== '' && !siteId) {
+            alert(`The construction site is not in the list. Please enter the correct name.`);
+            isValid = false;
+            return;
+        }
+    });
+
+    if (!isValid) {
+        e.preventDefault();
+    }
+});
 
 
 
 
         </script>
+        <!-- JavaScript xử lý kiểm tra -->
+
         <!--JavaScript -->
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
     </body>
