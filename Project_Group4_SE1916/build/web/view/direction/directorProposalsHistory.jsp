@@ -112,62 +112,64 @@
         </div>
       </form>
 
-      <!-- Proposals Table -->
-      <div class="overflow-x-auto rounded-2xl shadow-xl">
-        <table class="min-w-full bg-white">
-          <thead class="bg-gradient-to-r from-sky-600 to-blue-600 text-white">
-            <tr>
-              <th class="py-4 px-6 text-left rounded-tl-2xl"><i class="fas fa-list-ol mr-2"></i>No.</th>
-              <th class="py-4 px-6 text-left"><i class="fas fa-box mr-2"></i>Proposal Type</th>
-              <th class="py-4 px-6 text-left"><i class="fas fa-user mr-2"></i>Sender</th>
-              <th class="py-4 px-6 text-left"><i class="fas fa-calendar-alt mr-2"></i>Submission Date</th>
-              <th class="py-4 px-6 text-left"><i class="fas fa-user-check mr-2"></i>Last Approver</th>
-              <th class="py-4 px-6 text-left"><i class="fas fa-calendar-check mr-2"></i>Approval Date Admin</th>
-              <th class="py-4 px-6 text-left"><i class="fas fa-calendar-check mr-2"></i>Approval Date Director</th>
-              <th class="py-4 px-6 text-left"><i class="fas fa-user-tie mr-2"></i>Director Status</th>
-              <th class="py-4 px-6 text-center view-details-cell rounded-tr-2xl"><i class="fas fa-eye mr-2"></i>View Details</th>
-            </tr>
-          </thead>
-          <tbody id="requestTableBody" class="divide-y divide-gray-200">
-            <c:forEach var="proposal" items="${requests}" varStatus="loop">
-              <tr class="hover:bg-gradient-to-r hover:from-sky-50 hover:to-cyan-50 transition-all duration-300">
-                <td class="py-4 px-6 font-medium">${(param.page == null ? 1 : param.page - 1) * (param.itemsPerPage == null ? 10 : param.itemsPerPage) + loop.count}</td>
-                <td class="py-4 px-6">${proposal.proposalType}</td>
-                <td class="py-4 px-6">${proposal.senderName}</td>
-                <td class="py-4 px-6"><fmt:formatDate value="${proposal.proposalSentDate}" pattern="yyyy-MM-dd"/></td>
-                <td class="py-4 px-6">${proposal.finalApprover == null ? 'Not Available' : proposal.finalApprover}</td>
-                <td class="py-4 px-6"><fmt:formatDate value="${proposal.approvalDate}" pattern="yyyy-MM-dd" var="formattedDate"/>${empty formattedDate ? 'Not Approved' : formattedDate}</td>
-                <td class="py-4 px-6">
-                  <fmt:formatDate value="${proposal.approval.directorApprovalDate}" pattern="yyyy-MM-dd" var="directorFormattedDate"/>
-                  ${empty directorFormattedDate ? 'Not Approved' : directorFormattedDate}
-                </td>
-                <td class="py-4 px-6">
-                  <span class="px-3 py-1 rounded-full font-semibold 
-                      <c:choose>
-                          <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
-                          <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'approved'}">bg-green-300 text-green-900</c:when>
-                          <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'rejected'}">bg-red-300 text-red-900</c:when>
-                          <c:otherwise>bg-gray-300 text-gray-900</c:otherwise>
-                      </c:choose>">
-                      <c:choose>
-                          <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'pending'}">Pending</c:when>
-                          <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'approved'}">Approved</c:when>
-                          <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'rejected'}">Rejected</c:when>
-                          <c:otherwise>Unknown</c:otherwise>
-                      </c:choose>
-                  </span>
-                </td>
-                <td class="py-4 px-6 text-center view-details-cell">
-                  <a href="${pageContext.request.contextPath}/DirectorApproveProposal?id=${proposal.proposalId}" 
-                     class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md">
-                    <i class="fas fa-eye mr-2"></i>View Details
-                  </a>
-                </td>
-              </tr>
-            </c:forEach>
-          </tbody>
-        </table>
-      </div>
+    <!-- Proposals Table -->
+<div class="overflow-x-auto rounded-2xl shadow-xl">
+  <table class="min-w-full bg-white">
+    <thead class="bg-gradient-to-r from-sky-600 to-blue-600 text-white">
+      <tr>
+        <th class="py-4 px-6 text-left rounded-tl-2xl"><i class="fas fa-list-ol mr-2"></i>No.</th>
+        <th class="py-4 px-6 text-left"><i class="fas mr-2"></i>Proposal ID</th> <!-- Thêm cột ID mới -->
+        <th class="py-4 px-6 text-left"><i class="fas fa-box mr-2"></i>Proposal Type</th>
+        <th class="py-4 px-6 text-left"><i class="fas fa-user mr-2"></i>Sender</th>
+        <th class="py-4 px-6 text-left"><i class="fas fa-calendar-alt mr-2"></i>Submission Date</th>
+        <th class="py-4 px-6 text-left"><i class="fas fa-user-check mr-2"></i>Last Approver</th>
+        <th class="py-4 px-6 text-left"><i class="fas fa-calendar-check mr-2"></i>Approval Date Admin</th>
+        <th class="py-4 px-6 text-left"><i class="fas fa-calendar-check mr-2"></i>Approval Date Director</th>
+        <th class="py-4 px-6 text-left"><i class="fas fa-user-tie mr-2"></i>Director Status</th>
+        <th class="py-4 px-6 text-center view-details-cell rounded-tr-2xl"><i class="fas fa-eye mr-2"></i>View Details</th>
+      </tr>
+    </thead>
+    <tbody id="requestTableBody" class="divide-y divide-gray-200">
+      <c:forEach var="proposal" items="${requests}" varStatus="loop">
+        <tr class="hover:bg-gradient-to-r hover:from-sky-50 hover:to-cyan-50 transition-all duration-300">
+          <td class="py-4 px-6 font-medium">${(param.page == null ? 1 : param.page - 1) * (param.itemsPerPage == null ? 10 : param.itemsPerPage) + loop.count}</td>
+          <td class="py-4 px-6 font-bold">${proposal.proposalId}</td> <!-- Hiển thị ID đơn -->
+          <td class="py-4 px-6">${proposal.proposalType}</td>
+          <td class="py-4 px-6">${proposal.senderName}</td>
+          <td class="py-4 px-6"><fmt:formatDate value="${proposal.proposalSentDate}" pattern="yyyy-MM-dd"/></td>
+          <td class="py-4 px-6">${proposal.finalApprover == null ? 'Not Available' : proposal.finalApprover}</td>
+          <td class="py-4 px-6"><fmt:formatDate value="${proposal.approvalDate}" pattern="yyyy-MM-dd" var="formattedDate"/>${empty formattedDate ? 'Not Approved' : formattedDate}</td>
+          <td class="py-4 px-6">
+            <fmt:formatDate value="${proposal.approval.directorApprovalDate}" pattern="yyyy-MM-dd" var="directorFormattedDate"/>
+            ${empty directorFormattedDate ? 'Not Approved' : directorFormattedDate}
+          </td>
+          <td class="py-4 px-6">
+            <span class="px-3 py-1 rounded-full font-semibold 
+                <c:choose>
+                    <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
+                    <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'approved'}">bg-green-300 text-green-900</c:when>
+                    <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'rejected'}">bg-red-300 text-red-900</c:when>
+                    <c:otherwise>bg-gray-300 text-gray-900</c:otherwise>
+                </c:choose>">
+                <c:choose>
+                    <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'pending'}">Pending</c:when>
+                    <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'approved'}">Approved</c:when>
+                    <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'rejected'}">Rejected</c:when>
+                    <c:otherwise>Unknown</c:otherwise>
+                </c:choose>
+            </span>
+          </td>
+          <td class="py-4 px-6 text-center view-details-cell">
+            <a href="${pageContext.request.contextPath}/DirectorApproveProposal?id=${proposal.proposalId}" 
+               class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md">
+              <i class="fas fa-eye mr-2"></i>View Details
+            </a>
+          </td>
+        </tr>
+      </c:forEach>
+    </tbody>
+  </table>
+</div>
 
       <!-- Pagination -->
       <div class="flex justify-center mt-6 gap-2">

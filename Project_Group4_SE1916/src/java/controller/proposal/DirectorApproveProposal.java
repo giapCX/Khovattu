@@ -64,7 +64,7 @@ public class DirectorApproveProposal extends HttpServlet {
 
         String proposalIdStr = request.getParameter("proposalId");
         String directorStatus = request.getParameter("directorStatus");
-        String directorReason = request.getParameter("directorReason");
+       
         String directorNote = request.getParameter("directorNote");
 
         if (proposalIdStr == null || directorStatus == null || directorStatus.isEmpty()) {
@@ -73,8 +73,8 @@ public class DirectorApproveProposal extends HttpServlet {
             return;
         }
 
-        if ("rejected".equals(directorStatus) && (directorReason == null || directorReason.trim().isEmpty())) {
-            request.setAttribute("error", "Reason is required when rejecting a proposal.");
+        if ("rejected".equals(directorStatus) && (directorNote == null || directorNote.trim().isEmpty())) {
+            request.setAttribute("error", "Note is required when rejecting a proposal.");
             request.getRequestDispatcher("view/direction/directorApproveProposal.jsp").forward(request, response);
             return;
         }
@@ -90,7 +90,7 @@ public class DirectorApproveProposal extends HttpServlet {
 
         try (Connection conn = DBContext.getConnection()) {
             ProposalDAO proposalDAO = new ProposalDAO(conn);
-            proposalDAO.directorUpdateProposal(proposalId, directorStatus, directorReason, directorNote, directorId);
+            proposalDAO.directorUpdateProposal(proposalId, directorStatus, null, directorNote, directorId);
             request.setAttribute("message", "Proposal updated successfully.");
             response.sendRedirect(request.getContextPath() + "/proposals");
         } catch (SQLException e) {
