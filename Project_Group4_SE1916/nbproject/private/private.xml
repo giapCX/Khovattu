@@ -3,11 +3,21 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/supplier/listMaterialOfSupplier.jsp</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/supplier/listSupplier.jsp</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/employee/employeeDashboard.jsp</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/ConstructionSiteDAO.java</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/admin/adminDashboard.jsp</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/direction/directorApproveProposal.jsp</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/direction/directorProposalsHistory.jsp</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/ProposalDAO.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/DetailProposalServlet.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/MaterialDAO.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/material/EditMaterialController.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/AdminApproveServlet.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/password/PasswordMigration.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/material/listParentCategory.jsp</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/material/listMaterial.jsp</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/material/ListParentCategoryController.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/DirectorProposalsServlet.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dal/DBContext.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/admin/adminApprove.jsp</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/DirectorApproveProposal.java</file>
         </group>
     </open-files>
 </project-private>

@@ -399,19 +399,19 @@ public class MaterialDAO {
         return materials;
     }
 
-    public List<Material> getMaterialsByParentCategory(int parentCategoryId, int page, int itemsPerPage) throws SQLException {
-        List<Material> materials = new ArrayList<>();
-        String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name, " +
-                     "mc.parent_id, mc2.name AS parent_category_name, mc.status AS child_category_status, mc2.status AS parent_category_status, " +
-                     "GROUP_CONCAT(s.name SEPARATOR ', ') AS supplier_names " +
-                     "FROM Materials m " +
-                     "JOIN MaterialCategories mc ON m.category_id = mc.category_id " +
-                     "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id " +
-                     "LEFT JOIN SupplierMaterials sm ON m.material_id = sm.material_id " +
-                     "LEFT JOIN Suppliers s ON sm.supplier_id = s.supplier_id " +
-                     "WHERE mc.parent_id = ? " +
-                     "GROUP BY m.material_id " +
-                     "LIMIT ? OFFSET ?";
+   public List<Material> getMaterialsByParentCategory(int parentCategoryId, int page, int itemsPerPage) throws SQLException {
+    List<Material> materials = new ArrayList<>();
+    String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name, " +
+                 "mc.parent_id, mc2.name AS parent_category_name, mc.status AS child_category_status, mc2.status AS parent_category_status, " +
+                 "GROUP_CONCAT(s.name SEPARATOR ', ') AS supplier_names " +
+                 "FROM Materials m " +
+                 "JOIN MaterialCategories mc ON m.category_id = mc.category_id " +
+                 "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id " +
+                 "LEFT JOIN SupplierMaterials sm ON m.material_id = sm.material_id " +
+                 "LEFT JOIN Suppliers s ON sm.supplier_id = s.supplier_id " +
+                 "WHERE mc.parent_id = ? AND m.status = 'active' " +  // Thêm điều kiện này
+                 "GROUP BY m.material_id " +
+                 "LIMIT ? OFFSET ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, parentCategoryId);
             ps.setInt(2, itemsPerPage);
@@ -468,8 +468,7 @@ public class MaterialDAO {
     }
 
     public int getTotalMaterialsByParentCategory(int parentCategoryId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Materials m JOIN MaterialCategories mc ON m.category_id = mc.category_id WHERE mc.parent_id = ? AND m.status = 'active'";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+String sql = "SELECT COUNT(*) FROM Materials m JOIN MaterialCategories mc ON m.category_id = mc.category_id WHERE mc.parent_id = ? AND m.status = 'active'";        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, parentCategoryId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -480,19 +479,19 @@ public class MaterialDAO {
         return 0;
     }
 
-    public List<Material> getMaterialsByChildCategory(int childCategoryId, int page, int itemsPerPage) throws SQLException {
-        List<Material> materials = new ArrayList<>();
-        String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name, " +
-                     "mc.parent_id, mc2.name AS parent_category_name, mc.status AS child_category_status, mc2.status AS parent_category_status, " +
-                     "GROUP_CONCAT(s.name SEPARATOR ', ') AS supplier_names " +
-                     "FROM Materials m " +
-                     "JOIN MaterialCategories mc ON m.category_id = mc.category_id " +
-                     "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id " +
-                     "LEFT JOIN SupplierMaterials sm ON m.material_id = sm.material_id " +
-                     "LEFT JOIN Suppliers s ON sm.supplier_id = s.supplier_id " +
-                     "WHERE m.category_id = ? " +
-                     "GROUP BY m.material_id " +
-                     "LIMIT ? OFFSET ?";
+  public List<Material> getMaterialsByChildCategory(int childCategoryId, int page, int itemsPerPage) throws SQLException {
+    List<Material> materials = new ArrayList<>();
+    String sql = "SELECT m.material_id, m.code, m.name, m.description, m.unit, m.image_url, m.category_id, mc.name AS category_name, " +
+                 "mc.parent_id, mc2.name AS parent_category_name, mc.status AS child_category_status, mc2.status AS parent_category_status, " +
+                 "GROUP_CONCAT(s.name SEPARATOR ', ') AS supplier_names " +
+                 "FROM Materials m " +
+                 "JOIN MaterialCategories mc ON m.category_id = mc.category_id " +
+                 "LEFT JOIN MaterialCategories mc2 ON mc.parent_id = mc2.category_id " +
+                 "LEFT JOIN SupplierMaterials sm ON m.material_id = sm.material_id " +
+                 "LEFT JOIN Suppliers s ON sm.supplier_id = s.supplier_id " +
+                 "WHERE m.category_id = ? AND m.status = 'active' " +  // Thêm điều kiện này
+                 "GROUP BY m.material_id " +
+                 "LIMIT ? OFFSET ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, childCategoryId);
             ps.setInt(2, itemsPerPage);
