@@ -5,6 +5,7 @@
         <group>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/direction/directorApproveProposal.jsp</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/direction/directorProposalsHistory.jsp</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/MaterialCategoryDAO.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/ProposalDAO.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/DetailProposalServlet.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/MaterialDAO.java</file>
