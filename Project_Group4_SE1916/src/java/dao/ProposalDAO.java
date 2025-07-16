@@ -23,7 +23,7 @@ public class ProposalDAO {
     }
 
     public boolean addProposal(Proposal proposal) throws SQLException {
-        String insertProposalSQL = "INSERT INTO EmployeeProposals (proposal_type, proposer_id, note, proposal_sent_date, final_status) VALUES (?, ?, ?, ?, ?)";
+        String insertProposalSQL = "INSERT INTO EmployeeProposals (proposal_type, proposer_id, note, proposal_sent_date, final_status,supplier_id, site_id) VALUES (?, ?, ?, ?, ?,?,?)";
         conn.setAutoCommit(false);
         try (PreparedStatement ps = conn.prepareStatement(insertProposalSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, proposal.getProposalType());
@@ -31,6 +31,9 @@ public class ProposalDAO {
             ps.setString(3, proposal.getNote());
             ps.setTimestamp(4, proposal.getProposalSentDate() != null ? proposal.getProposalSentDate() : new Timestamp(System.currentTimeMillis()));
             ps.setString(5, proposal.getFinalStatus() != null ? proposal.getFinalStatus() : "pending");
+            ps.setObject(6, proposal.getSupplierId(), java.sql.Types.INTEGER);
+            ps.setObject(7, proposal.getSiteId(), java.sql.Types.INTEGER);
+
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected > 0) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -64,7 +67,7 @@ public class ProposalDAO {
     }
 
     private boolean addProposalDetails(int proposalId, List<ProposalDetails> proposalDetailsList) throws SQLException {
-        String insertProposalDetailSQL = "INSERT INTO ProposalDetails (proposal_id, material_id, quantity, material_condition, price_per_unit, supplier_id, site_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String insertProposalDetailSQL = "INSERT INTO ProposalDetails (proposal_id, material_id, quantity, material_condition, price_per_unit) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = conn.prepareStatement(insertProposalDetailSQL)) {
             for (ProposalDetails detail : proposalDetailsList) {
@@ -73,27 +76,11 @@ public class ProposalDAO {
                 ps.setDouble(3, detail.getQuantity());
                 ps.setString(4, detail.getMaterialCondition());
 
-                // Giá - nếu null thì setNull
                 if (detail.getPrice() != null) {
                     ps.setDouble(5, detail.getPrice());
                 } else {
                     ps.setNull(5, java.sql.Types.DOUBLE);
                 }
-
-                // Supplier - nếu null thì setNull
-                if (detail.getSupplierId() != null) {
-                    ps.setInt(6, detail.getSupplierId());
-                } else {
-                    ps.setNull(6, java.sql.Types.INTEGER);
-                }
-
-                // Site - nếu null thì setNull
-                if (detail.getSiteId() != null) {
-                    ps.setInt(7, detail.getSiteId());
-                } else {
-                    ps.setNull(7, java.sql.Types.INTEGER);
-                }
-
                 ps.addBatch();
             }
 
@@ -712,10 +699,10 @@ public class ProposalDAO {
         Proposal proposal = null;
 
         String sql = "SELECT ep.proposal_id, ep.proposal_type, ep.proposer_id, u.full_name AS sender_name, "
-                + "ep.receiver_id, ep.executor_id, executor.full_name AS executor_name, ep.note, "
+                + "ep.executor_id, executor.full_name AS executor_name, ep.note, "
                 + "ep.proposal_sent_date, ep.final_status, ep.executed_date, "
                 + "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, "
-                + "pd.site_id, pd.supplier_id, pd.price_per_unit, "
+                + "ep.site_id, ep.supplier_id, pd.price_per_unit, "
                 + "m.name AS material_name, m.unit AS material_unit, "
                 + "cs.site_name, s.name AS supplier_name "
                 + "FROM EmployeeProposals ep "
@@ -723,8 +710,8 @@ public class ProposalDAO {
                 + "LEFT JOIN Users executor ON ep.executor_id = executor.user_id "
                 + "LEFT JOIN ProposalDetails pd ON ep.proposal_id = pd.proposal_id "
                 + "LEFT JOIN Materials m ON pd.material_id = m.material_id "
-                + "LEFT JOIN ConstructionSites cs ON pd.site_id = cs.site_id "
-                + "LEFT JOIN Suppliers s ON pd.supplier_id = s.supplier_id "
+                + "LEFT JOIN ConstructionSites cs ON ep.site_id = cs.site_id "
+                + "LEFT JOIN Suppliers s ON ep.supplier_id = s.supplier_id "
                 + "WHERE ep.proposal_id = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -740,11 +727,14 @@ public class ProposalDAO {
                         proposal.setSenderName(rs.getString("sender_name"));
                         proposal.setExecutorId(rs.getInt("executor_id"));
                         proposal.setExecutorName(rs.getString("executor_name"));
-                        proposal.setReceiverId(rs.getInt("receiver_id"));
                         proposal.setNote(rs.getString("note"));
                         proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
                         proposal.setFinalStatus(rs.getString("final_status"));
                         proposal.setExecuteDate(rs.getTimestamp("executed_date"));
+                        proposal.setSiteId((Integer) rs.getObject("site_id"));
+                        proposal.setSiteName(rs.getString("site_name"));
+                        proposal.setSupplierId((Integer) rs.getObject("supplier_id"));
+                        proposal.setSupplierName(rs.getString("supplier_name"));
                     }
 
                     int detailId = rs.getInt("proposal_detail_id");
@@ -758,10 +748,6 @@ public class ProposalDAO {
                         detail.setMaterialCondition(rs.getString("material_condition"));
                         detail.setUnit(rs.getString("material_unit"));
                         detail.setPrice(rs.getDouble("price_per_unit"));
-                        detail.setSiteId(rs.getInt("site_id"));
-                        detail.setSiteName(rs.getString("site_name"));
-                        detail.setSupplierId(rs.getInt("supplier_id"));
-                        detail.setSupplierName(rs.getString("supplier_name"));
                         detailsList.add(detail);
                     }
                 }
@@ -776,9 +762,9 @@ public class ProposalDAO {
     }
 
     public boolean updateProposalById(Integer proposalId, Proposal proposal) throws SQLException {
-        String updateProposalSQL = "UPDATE EmployeeProposals SET proposal_type = ?, proposer_id = ?, note = ?, proposal_sent_date = ?, final_status = ? WHERE proposal_id = ?";
+        String updateProposalSQL = "UPDATE EmployeeProposals SET proposal_type = ?, proposer_id = ?, note = ?, proposal_sent_date = ?, final_status = ?, supplier_id = ?, site_id = ? WHERE proposal_id = ?";
         String deleteProposalDetailsSQL = "DELETE FROM ProposalDetails WHERE proposal_id = ?";
-        String insertProposalDetailSQL = "INSERT INTO ProposalDetails (proposal_id, material_id, quantity, material_condition, price_per_unit, supplier_id, site_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String insertProposalDetailSQL = "INSERT INTO ProposalDetails (proposal_id, material_id, quantity, material_condition, price_per_unit) VALUES (?, ?, ?, ?, ?)";
 
         conn.setAutoCommit(false);
         try (
@@ -789,7 +775,9 @@ public class ProposalDAO {
             updateStmt.setString(3, proposal.getNote());
             updateStmt.setTimestamp(4, proposal.getProposalSentDate() != null ? proposal.getProposalSentDate() : new Timestamp(System.currentTimeMillis()));
             updateStmt.setString(5, proposal.getFinalStatus() != null ? proposal.getFinalStatus() : "pending");
-            updateStmt.setInt(6, proposalId);
+            updateStmt.setObject(6, proposal.getSupplierId(), java.sql.Types.INTEGER);
+            updateStmt.setObject(7, proposal.getSiteId(), java.sql.Types.INTEGER);
+            updateStmt.setInt(8, proposalId);
 
             int rowsAffected = updateStmt.executeUpdate();
             if (rowsAffected == 0) {
@@ -813,20 +801,6 @@ public class ProposalDAO {
                         insertStmt.setDouble(5, detail.getPrice());
                     } else {
                         insertStmt.setNull(5, java.sql.Types.DOUBLE);
-                    }
-
-                    // Supplier - nếu null thì setNull
-                    if (detail.getSupplierId() != null) {
-                        insertStmt.setInt(6, detail.getSupplierId());
-                    } else {
-                        insertStmt.setNull(6, java.sql.Types.INTEGER);
-                    }
-
-                    // Site - nếu null thì setNull
-                    if (detail.getSiteId() != null) {
-                        insertStmt.setInt(7, detail.getSiteId());
-                    } else {
-                        insertStmt.setNull(7, java.sql.Types.INTEGER);
                     }
 
                     insertStmt.addBatch();

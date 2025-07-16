@@ -74,9 +74,30 @@
                             </select>
                         </div>
 
-                        <div class="space-y-2">
-                            <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Note</label>
-                            <textarea class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" name="note" rows="3" required>${proposal.note}</textarea>
+                    <div class="space-y-2 supplier-column hidden">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Supplier:</label>
+                        <input list="supplierList" id="supplierName" name="supplierName" value="${proposal.supplierName != null ? proposal.supplierName : ''}" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter supplier name">
+                        <datalist id="supplierList">
+                            <c:forEach var="supplier" items="${suppliers}">
+                                <option value="${supplier.supplierName}" data-id="${supplier.supplierId}">${supplier.supplierName}</option>
+                            </c:forEach>
+                        </datalist>
+                        <input type="hidden" name="supplierId" id="supplierIdHidden" value="${proposal.supplierId}">
+                    </div>
+                    <div class="space-y-2 constructionSite-column hidden">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Construction Site:</label>
+                        <input list="siteList" id="siteName" name="siteName" value="${proposal.siteName != null ? proposal.siteName : ''}" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter site name">
+                        <datalist id="siteList">
+                            <c:forEach var="site" items="${constructionSites}">
+                                <option value="${site.siteName}" data-id="${site.siteId}">${site.siteName}</option>
+                            </c:forEach>
+                        </datalist>
+                        <input type="hidden" name="siteId" id="siteIdHidden" value="${proposal.siteId}">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Note</label>
+                        <textarea class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" name="note" rows="3" required>${proposal.note}</textarea>
                     </div> 
 
                     <div class="space-y-2">
@@ -91,9 +112,7 @@
                                             <th class="p-2 text-left w-[7%]">Unit</th> 
                                             <th class="p-2 text-left w-[10%]">Quantity</th>
                                             <th class="p-2 text-left w-[9%]">Condition</th> 
-                                            <th class="p-2 text-left w-[23%] supplier-column">Supplier</th>
-                                            <th class="p-2 text-left w-[12%] price-column">Price (VNĐ)</th>
-                                            <th class="p-2 text-left w-[13%] constructionSite-column">Construction Site</th>
+                                            <th class="p-2 text-left w-[12%] price-column">Price(VNĐ)</th>
                                             <th class="p-2 text-left w-[5%]">Action</th>
                                         </tr>
                                     </thead>
@@ -129,15 +148,6 @@
                                                         <option class="damaged-option" value="damaged" ${detail.materialCondition == 'damaged' ? 'selected' : ''}>Damaged</option>
                                                     </select>
                                                 </td>
-                                                <td class="supplier-column hidden">
-                                                    <input list="supplierList" name="supplierName[]"  value="${detail.supplierName}" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" placeholder="Enter supplier name">
-                                                    <datalist id="supplierList">
-                                                        <c:forEach var="supplier" items="${suppliers}">
-                                                            <option value="${supplier.supplierName}" data-id="${supplier.supplierId}">${supplier.supplierName}</option>
-                                                        </c:forEach>
-                                                    </datalist>
-                                                    <input type="hidden" name="supplierId[]" class="supplierIdHidden" value="${detail.supplierId}">
-                                                </td>
                                                 <td class="price-column hidden">
                                                     <input 
                                                         type="number" 
@@ -145,15 +155,6 @@
                                                         value="<fmt:formatNumber value='${detail.price}' type='number' groupingUsed='false' maxFractionDigits='0' />" 
                                                         class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" 
                                                         step="1000" min="1000" />
-                                                </td>
-                                                <td class="constructionSite-column hidden">
-                                                    <input  list="siteList" name="siteName[]" value="${detail.siteName}" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" placeholder="Enter site name">
-                                                    <datalist id="siteList">
-                                                        <c:forEach var="site" items="${constructionSites}">
-                                                            <option value="${site.siteName}" data-id="${site.siteId}">${site.siteName}</option>
-                                                        </c:forEach>
-                                                    </datalist>
-                                                    <input type="hidden" name="siteId[]" class="siteIdHidden" value="${detail.siteId}">
                                                 </td>
                                                 <td>
                                                     <button type="button" class="p-2 text-red-600 hover:text-red-800 pr-2" onclick="removeRow(this)">
@@ -315,7 +316,7 @@
                 }
             }
 
-            // Kích hoạt khi thay đổi loại đề xuất
+// Kích hoạt khi thay đổi loại đề xuất
             document.getElementById('proposalType').addEventListener('change', function () {
                 toggleTableColumns(this.value);
                 toggleMaterialConditionOptions(this.value); // THÊM
@@ -323,7 +324,7 @@
             });
 
 
-            // Gọi một lần ban đầu nếu cần
+// Gọi một lần ban đầu nếu cần
             toggleTableColumns(document.getElementById('proposalType').value);
 
             function toggleMaterialConditionOptions(proposalType) {
@@ -372,8 +373,36 @@
                     }
                 });
             }
-
         </script>
+        <!-- JavaScript xử lý kiểm tra -->
+        <script>
+            // Gán supplierId từ supplierName
+            document.getElementById('supplierName')?.addEventListener('input', function () {
+                const selectedName = this.value.trim();
+                const options = document.querySelectorAll('#supplierList option');
+                let foundId = '';
+                options.forEach(opt => {
+                    if (opt.value === selectedName) {
+                        foundId = opt.getAttribute('data-id');
+                    }
+                });
+                document.getElementById('supplierIdHidden').value = foundId;
+            });
+
+            // Gán siteId từ siteName
+            document.getElementById('siteName')?.addEventListener('input', function () {
+                const selectedName = this.value.trim();
+                const options = document.querySelectorAll('#siteList option');
+                let foundId = '';
+                options.forEach(opt => {
+                    if (opt.value === selectedName) {
+                        foundId = opt.getAttribute('data-id');
+                    }
+                });
+                document.getElementById('siteIdHidden').value = foundId;
+            });
+        </script>
+
         <!--JavaScript -->
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
     </body>

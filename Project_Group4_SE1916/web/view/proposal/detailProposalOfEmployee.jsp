@@ -120,11 +120,68 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="w-full flex justify-center">
                     <div class="w-full max-w-6xl bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-6">
-                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">List material</h3>
+                        <div class="text-center my-4">
+                            <c:if test="${proposal.proposalType == 'import_from_supplier'}">
+                                <h1 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Purchase from supplier: ${proposal.supplierName}(<c:choose>
+                                        <c:when test="${proposal.finalStatus == 'rejected'}">
+                                            <span >Rejected</span> 
+                                        </c:when>
+                                        <c:when test="${proposal.finalStatus == 'pending'}">
+                                            <span >Pending</span> 
+                                        </c:when>
+                                        <c:when test="${proposal.finalStatus == 'approved_by_admin'}">
+                                            <span >Approved by admin</span> 
+                                        </c:when>
+                                        <c:when test="${proposal.finalStatus == 'approved_but_not_executed'}">
+                                            <span >To Be Execute</span> 
+                                        </c:when>
+                                        <c:when test="${proposal.finalStatus == 'executed'}">
+                                            <span >Executed</span> 
+                                        </c:when>
+                                    </c:choose>)</h1>
+                                </c:if>
+                                <c:if test="${proposal.proposalType == 'export'}">
+                                <h1 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Export for construction site: ${proposal.siteName} (<c:choose>
+                                        <c:when test="${proposal.finalStatus == 'rejected'}">
+                                            <span>Rejected</span> 
+                                        </c:when>
+                                        <c:when test="${proposal.finalStatus == 'pending'}">
+                                            <span>Pending</span> 
+                                        </c:when>
+                                        <c:when test="${proposal.finalStatus == 'approved_by_admin'}">
+                                            <span >Approved by admin</span> 
+                                        </c:when>
+                                        <c:when test="${proposal.finalStatus == 'approved_but_not_executed'}">
+                                            <span >To Be Execute</span> 
+                                        </c:when>
+                                        <c:when test="${proposal.finalStatus == 'executed'}">
+                                            <span >Executed</span> 
+                                        </c:when>
+                                    </c:choose>)</h1>
+                                </c:if>
+                                <c:if test="${proposal.proposalType == 'import_returned'}">
+                                <h1 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Retrieve from construction site: ${proposal.siteName} (<c:choose>
+                                        <c:when test="${proposal.finalStatus == 'rejected'}">
+                                            <span >Rejected</span> 
+                                        </c:when>
+                                        <c:when test="${proposal.finalStatus == 'pending'}">
+                                            <span >Pending</span> 
+                                        </c:when>
+                                        <c:when test="${proposal.finalStatus == 'approved_by_admin'}">
+                                            <span >Approved by admin</span> 
+                                        </c:when>
+                                        <c:when test="${proposal.finalStatus == 'approved_but_not_executed'}">
+                                            <span >To Be Execute</span> 
+                                        </c:when>
+                                        <c:when test="${proposal.finalStatus == 'executed'}">
+                                            <span >Executed</span> 
+                                        </c:when>
 
+                                    </c:choose>)</h1>
+                                </c:if>
+                        </div>
                         <!-- Table -->
                         <div class="table-container bg-white dark:bg-gray-800">
                             <div class="overflow-x-auto">
@@ -136,14 +193,8 @@
                                             <th class="p-2 text-left w-[7%]">Unit</th> 
                                             <th class="p-2 text-left w-[10%]">Quantity</th>
                                             <th class="p-2 text-left w-[9%]">Condition</th>
-
-                                            <c:if test="${proposal.proposalType == 'import_from_supplier'}">
-                                                <th class="p-2 text-left w-[23%]">Supplier</th>
+                                                <c:if test="${proposal.proposalType == 'import_from_supplier'}">
                                                 <th class="p-2 text-left w-[12%]">Price (VNĐ)</th>
-                                                </c:if>
-
-                                            <c:if test="${proposal.proposalType == 'export' || proposal.proposalType == 'import_returned'}">
-                                                <th class="p-2 text-left w-[13%]">Construction Site</th>
                                                 </c:if>
                                         </tr>
                                     </thead>
@@ -158,19 +209,12 @@
                                                 </td>
                                                 <td class="p-2">${detail.materialCondition}</td>
                                                 <c:if test="${proposal.proposalType == 'import_from_supplier'}">
-                                                    <td class="p-2">${detail.supplierName}</td>
                                                     <td class="p-2">
                                                         <fmt:formatNumber value="${detail.price}" type="number" minFractionDigits="0" maxFractionDigits="2" />
                                                     </td>
-
-                                                </c:if>
-
-                                                <c:if test="${proposal.proposalType == 'export' || proposal.proposalType == 'import_returned'}">
-                                                    <td class="p-2">${detail.siteName}</td>
                                                 </c:if>
                                             </tr>
                                         </c:forEach>
-
                                     </tbody>
                                 </table>
                             </div>

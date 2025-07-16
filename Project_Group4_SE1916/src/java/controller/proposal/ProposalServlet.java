@@ -91,9 +91,9 @@ public class ProposalServlet extends HttpServlet {
         String[] units = request.getParameterValues("unit[]");
         String[] quantities = request.getParameterValues("quantity[]");
         String[] conditions = request.getParameterValues("materialCondition[]");
-        String[] supplierIds = request.getParameterValues("supplierId[]");
+        String supplierIdStr = request.getParameter("supplierId");
         String[] prices = request.getParameterValues("pricePerUnit[]");
-        String[] siteIds = request.getParameterValues("siteId[]");
+        String siteIdStr = request.getParameter("siteId");
 
         Proposal proposal = new Proposal();
         proposal.setProposalType(proposalType);
@@ -103,31 +103,28 @@ public class ProposalServlet extends HttpServlet {
         proposal.setFinalStatus("pending");
 
         List<ProposalDetails> details = new ArrayList<>();
-
+        if ("import_from_supplier".equals(proposalType)) {
+            if (supplierIdStr != null && !supplierIdStr.isEmpty()) {
+                proposal.setSupplierId(Integer.parseInt(supplierIdStr));
+            }
+        } else if ("export".equals(proposalType) || "import_returned".equals(proposalType)) {
+            if (siteIdStr != null && !siteIdStr.isEmpty()) {
+                proposal.setSiteId(Integer.parseInt(siteIdStr));
+            }
+        }
         for (int i = 0; i < materialIds.length; i++) {
             ProposalDetails detail = new ProposalDetails();
             detail.setMaterialId(Integer.parseInt(materialIds[i]));
             detail.setQuantity(Integer.parseInt(quantities[i]));
             detail.setUnit(units[i]);
             detail.setMaterialCondition(conditions[i]);
-
             if ("import_from_supplier".equals(proposalType)) {
-                if (supplierIds != null && i < supplierIds.length && supplierIds[i] != null && !supplierIds[i].isEmpty()) {
-                    detail.setSupplierId(Integer.parseInt(supplierIds[i]));
-                }
-
                 if (prices != null && i < prices.length && prices[i] != null && !prices[i].isEmpty()) {
                     detail.setPrice(Double.parseDouble(prices[i]));
-                }
-
-            } else if ("export".equals(proposalType) || "import_returned".equals(proposalType)) {
-                if (siteIds != null && i < siteIds.length && siteIds[i] != null && !siteIds[i].isEmpty()) {
-                    detail.setSiteId(Integer.parseInt(siteIds[i]));
                 }
             }
 
             details.add(detail);
-            
         }
         proposal.setProposalDetails(details);
 

@@ -63,11 +63,34 @@
                             <option value="export">Export</option>
                         </select>
                     </div>
+                    <div class="space-y-2 supplier-column hidden">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Supplier:</label>
+                        <input list="supplierList" id="supplierName" name="supplierName" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter supplier name">
+                        <datalist id="supplierList">
+                            <c:forEach var="supplier" items="${suppliers}">
+                                <option value="${supplier.supplierName}" data-id="${supplier.supplierId}">${supplier.supplierName}</option>
+                            </c:forEach>
+                        </datalist>
+                        <!-- CHỈ CẦN 1 HIDDEN INPUT Ở ĐÂY -->
+                        <input type="hidden" name="supplierId" id="supplierIdHidden">
+                    </div>
+
+                    <div class="space-y-2 constructionSite-column hidden">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Construction Site:</label>
+                        <input list="siteList" id="siteName" name="siteName" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter site name">
+                        <datalist id="siteList">
+                            <c:forEach var="site" items="${constructionSites}">
+                                <option value="${site.siteName}" data-id="${site.siteId}">${site.siteName}</option>
+                            </c:forEach>
+                        </datalist>
+                        <!-- CHỈ CẦN 1 HIDDEN INPUT Ở ĐÂY -->
+                        <input type="hidden" name="siteId" id="siteIdHidden">
+                    </div>
+
                     <div class="space-y-2">
                         <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Note</label>
                         <textarea class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" name="note" rows="3" required></textarea>
                     </div> 
-
                     <div class="space-y-2">
                         <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">List of Materials</label>
                         <br/>
@@ -80,9 +103,7 @@
                                             <th class="p-2 text-left w-[7%]">Unit</th> 
                                             <th class="p-2 text-left w-[10%]">Quantity</th>
                                             <th class="p-2 text-left w-[9%]">Condition</th> 
-                                            <th class="p-2 text-left w-[23%] supplier-column">Supplier</th>
                                             <th class="p-2 text-left w-[12%] price-column">Price (VNĐ)</th>
-                                            <th class="p-2 text-left w-[13%] constructionSite-column">Construction Site</th>
                                             <th class="p-2 text-left w-[5%]">Action</th>
                                         </tr>
                                     </thead>
@@ -116,26 +137,8 @@
                                                     <option value="damaged" class="damaged-option">Damaged</option>
                                                 </select>
                                             </td>
-                                            <td class="supplier-column hidden">
-                                                <input list="supplierList" name="supplierName[]"  class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" placeholder="Enter supplier name">
-                                                <datalist id="supplierList">
-                                                    <c:forEach var="supplier" items="${suppliers}">
-                                                        <option value="${supplier.supplierName}" data-id="${supplier.supplierId}">${supplier.supplierName}</option>
-                                                    </c:forEach>
-                                                </datalist>
-                                                <input type="hidden" name="supplierId[]" class="supplierIdHidden">
-                                            </td>
                                             <td class="price-column hidden">
                                                 <input type="number" name="pricePerUnit[]"  class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" step="1000" min="1000">
-                                            </td>
-                                            <td class="constructionSite-column hidden">
-                                                <input list="siteList" name="siteName[]"  class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md" placeholder="Enter site name">
-                                                <datalist id="siteList">
-                                                    <c:forEach var="site" items="${constructionSites}">
-                                                        <option value="${site.siteName}" data-id="${site.siteId}">${site.siteName}</option>
-                                                    </c:forEach>
-                                                </datalist>
-                                                <input type="hidden" name="siteId[]" class="siteIdHidden">
                                             </td>
                                             <td>
                                                 <button type="button" class="p-2 text-red-600 hover:text-red-800 pr-2" onclick="removeRow(this)">
@@ -158,12 +161,10 @@
                         <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg flex items-center justify-center">
                             <i class="fas fa-plus-circle mr-2"></i> Submit 
                         </button>
-
                         <a href="${pageContext.request.contextPath}/ProposalServlet" onclick="event.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg inline-flex items-center">
                             <i class="fas fa-undo mr-2"></i> Reset form
                         </a>
                     </div>
-
                 </form>
 
                 <c:if test="${not empty error}">
@@ -187,29 +188,6 @@
                 </div>
             </div>
         </main>
-        <script>
-            document.querySelectorAll('.nameMaterialInput').forEach(input => {
-                input.addEventListener('blur', function () {
-                    const name = this.value.trim();
-
-                    const found = Array.from(document.querySelectorAll('#materialList option'))
-                            .find(opt => opt.value === name);
-
-                    if (!found) {
-                        const confirmAdd = confirm('Material' + name + ' not listed.\nYou can add here: /Project_Group4_SE1916/AddMaterialController');
-                        if (confirmAdd) {
-                            window.location.href = '/Project_Group4_SE1916/AddMaterialController';
-                        }
-                    } else {
-                        const row = this.closest('tr');
-                        row.querySelector('.materialIdHidden').value = found.getAttribute('data-id');
-                        row.querySelector('.unitMaterial').value = found.getAttribute('data-unit');
-                    }
-                });
-            });
-
-
-        </script>
 
         <script>
             function addRow() {
@@ -375,51 +353,35 @@
                     }
                 });
             }
-
-// Chặn submit nếu material/supplier/site không có trong danh sách
-document.querySelector('form').addEventListener('submit', function (e) {
-    let isValid = true;
-    const rows = document.querySelectorAll('#itemsBody tr');
-
-    rows.forEach((row, index) => {
-        // Kiểm tra vật tư
-        const materialInput = row.querySelector('.nameMaterialInput');
-        const materialId = row.querySelector('.materialIdHidden').value;
-        if (materialInput && materialInput.value.trim() !== '' && !materialId) {
-            alert(` Material not listed. Please enter correct name.`);
-            isValid = false;
-            return;
-        }
-
-        // Kiểm tra supplier nếu hiển thị
-        const supplierInput = row.querySelector('input[name="supplierName[]"]');
-        const supplierId = row.querySelector('.supplierIdHidden')?.value;
-        if (supplierInput && !supplierInput.closest('td').classList.contains('hidden') && supplierInput.value.trim() !== '' && !supplierId) {
-            alert(`Supplier is not listed. Please enter correct name.`);
-            isValid = false;
-            return;
-        }
-
-        // Kiểm tra site nếu hiển thị
-        const siteInput = row.querySelector('input[name="siteName[]"]');
-        const siteId = row.querySelector('.siteIdHidden')?.value;
-        if (siteInput && !siteInput.closest('td').classList.contains('hidden') && siteInput.value.trim() !== '' && !siteId) {
-            alert(`The construction site is not in the list. Please enter the correct name.`);
-            isValid = false;
-            return;
-        }
-    });
-
-    if (!isValid) {
-        e.preventDefault();
-    }
-});
-
-
-
-
         </script>
         <!-- JavaScript xử lý kiểm tra -->
+        <script>
+            // Gán supplierId từ supplierName
+            document.getElementById('supplierName')?.addEventListener('input', function () {
+                const selectedName = this.value.trim();
+                const options = document.querySelectorAll('#supplierList option');
+                let foundId = '';
+                options.forEach(opt => {
+                    if (opt.value === selectedName) {
+                        foundId = opt.getAttribute('data-id');
+                    }
+                });
+                document.getElementById('supplierIdHidden').value = foundId;
+            });
+
+            // Gán siteId từ siteName
+            document.getElementById('siteName')?.addEventListener('input', function () {
+                const selectedName = this.value.trim();
+                const options = document.querySelectorAll('#siteList option');
+                let foundId = '';
+                options.forEach(opt => {
+                    if (opt.value === selectedName) {
+                        foundId = opt.getAttribute('data-id');
+                    }
+                });
+                document.getElementById('siteIdHidden').value = foundId;
+            });
+        </script>
 
         <!--JavaScript -->
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>

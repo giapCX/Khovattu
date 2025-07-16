@@ -9,12 +9,15 @@ public class Proposal {
     private String proposalType;
     private int proposerId;
     private int executorId;
-    private int receiverId;
     private String senderName;
     private String executorName;
     private String note;
     private Timestamp proposalSentDate;
     private String finalStatus;
+     private Integer supplierId;
+    private String supplierName;
+    private Integer  siteId;
+    private String siteName;
     private Timestamp executeDate;
     private Timestamp approvalDate;
     private List<ProposalDetails> proposalDetails;
@@ -154,12 +157,36 @@ public class Proposal {
         this.executorName = executorName;
     }
 
-    public int getReceiverId() {
-        return receiverId;
+    public Integer getSupplierId() {
+        return supplierId;
     }
 
-    public void setReceiverId(int receiverId) {
-        this.receiverId = receiverId;
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public Integer getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(Integer siteId) {
+        this.siteId = siteId;
+    }
+
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
     }
     
     

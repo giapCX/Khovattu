@@ -14,23 +14,12 @@ public class ProposalDetails {
     private String materialCondition;
     private String unit;
     private Double  price;
-    private Integer supplierId;
-    private String supplierName;
-    private Integer  siteId;
-    private String siteName;
+   
 
     public ProposalDetails() {
     }
 
-    public ProposalDetails(int proposalDetailId, Proposal proposal, int materialId, double quantity, String materialCondition) {
-        this.proposalDetailId = proposalDetailId;
-        this.proposal = proposal;
-        this.materialId = materialId;
-        this.quantity = quantity;
-        this.materialCondition = materialCondition;
-    }
-
-    public ProposalDetails(int proposalDetailId, String materialName, Proposal proposal, int materialId, double quantity, String materialCondition, String unit) {
+    public ProposalDetails(int proposalDetailId, String materialName, Proposal proposal, int materialId, double quantity, String materialCondition, String unit, Double price) {
         this.proposalDetailId = proposalDetailId;
         this.materialName = materialName;
         this.proposal = proposal;
@@ -38,6 +27,7 @@ public class ProposalDetails {
         this.quantity = quantity;
         this.materialCondition = materialCondition;
         this.unit = unit;
+        this.price = price;
     }
 
     public int getProposalDetailId() {
@@ -103,39 +93,8 @@ public class ProposalDetails {
     public void setPrice(Double price) {
         this.price = price;
     }
-
-    public Integer getSupplierId() {
-        return supplierId;
-    }
-
-    public void setSupplierId(Integer supplierId) {
-        this.supplierId = supplierId;
-    }
-
-    public String getSupplierName() {
-        return supplierName;
-    }
-
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
-    }
-
-    public Integer getSiteId() {
-        return siteId;
-    }
-
-    public void setSiteId(Integer siteId) {
-        this.siteId = siteId;
-    }
-
-    public String getSiteName() {
-        return siteName;
-    }
-
-    public void setSiteName(String siteName) {
-        this.siteName = siteName;
-    }
-
+    
+   
     
 
 }
