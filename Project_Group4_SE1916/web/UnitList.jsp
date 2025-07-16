@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -167,8 +168,22 @@
                 border-radius: 0.5rem;
                 padding: 12px 24px;
                 transition: background-color 0.3s;
-                margin-left: 500px;
                 margin-top: 20px;
+            }
+            .btn-add-unit {
+                background-color: #10b981; /* Matches bg-green-500 */
+                color: #fff;
+                border-radius: 0.5rem;
+                padding: 8px 16px;
+                transition: background-color 0.3s;
+                text-decoration: none;
+                font-weight: bold;               
+            }
+            .btn-add-unit:hover {
+                background-color: #059669; /* Matches bg-green-600 */
+            }
+            .button-back {
+                justify-self: center;
             }
             .btn-secondary:hover {
                 background-color: #ca8a04; /* Darker shade of yellow-500 */
@@ -186,7 +201,7 @@
                 table {
                     font-size: 14px;
                 }
-                .btn-secondary {
+                .btn-secondary, .btn-add-unit {
                     margin-left: 0;
                     width: 100%;
                     text-align: center;
@@ -230,14 +245,24 @@
                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Unit List</h2>
                     </div>
                 </div>
+                
 
                 <!-- Search Form -->
-                <form action="units" method="get" class="filter-form">
+                <form action="unit" method="get" class="filter-form">
                     <label for="name">Unit Name:</label>
                     <input type="text" id="name" name="name" value="${fn:escapeXml(name)}" placeholder="Unit Name">
                     <input type="submit" value="Search">
-                    <input type="button" value="Reset" onclick="clearFormAndSubmit();">
+                    <input type="button" value="Reset" onclick="window.location.href='unit';">
                 </form>
+                    
+                    <!-- Add Unit Button (Restricted to Admin and Warehouse Roles) -->
+                <c:if test="${role == 'admin' || role == 'warehouse'}">
+                    <div class="mb-4 add-btn">
+                        <a href="${pageContext.request.contextPath}/addUnit" class="btn-add-unit">
+                            <i class="fas fa-plus mr-2"></i>Add Unit
+                        </a>
+                    </div>
+                </c:if>
 
                 <!-- Error Message -->
                 <c:if test="${not empty errorMessage}">
@@ -275,7 +300,7 @@
                 <c:if test="${totalPages > 0}">
                     <div class="pagination">
                         <c:forEach begin="1" end="${totalPages}" var="i">
-                            <a href="units?page=${i}&name=${fn:escapeXml(name)}"
+                            <a href="unit?page=${i}&name=${fn:escapeXml(name)}"
                                class="${i == currentPage ? 'active' : ''}">${i}</a>
                         </c:forEach>
                     </div>
@@ -301,7 +326,9 @@
                     }
                 %>
                 <!-- Back to Home -->
-                <button onclick="window.location.href = '<%= redirectUrl%>'" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to Home</button>
+                <div class="button-back">
+                    <button onclick="window.location.href = '<%= redirectUrl%>'" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to Home</button>
+                </div>
             </div>
         </main>
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>

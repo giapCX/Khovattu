@@ -270,7 +270,7 @@
                     <label for="toDate">To:</label>
                     <input type="date" id="toDate" name="toDate" value="${fn:escapeXml(toDate)}">
                     <input type="submit" value="Search">
-                    <input type="button" value="Reset" onclick="clearFormAndSubmit();">
+                    <input type="button" value="Reset" onclick="window.location.href='inventory';">
 
                 </form>
 
