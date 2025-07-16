@@ -415,22 +415,21 @@
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tổng vật tư</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">1,284</h3>
-                            <p class="text-sm text-green-500 mt-3"><i class="fas fa-arrow-up mr-1"></i>12% tháng trước</p>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${totalMaterials}</h3>
                         </div>
                         <div class="p-4 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300">
                             <i class="fas fa-boxes text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="#" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
+                        <a href="${pageContext.request.contextPath}/ListMaterialController" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-100">
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Vật tư sắp hết</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">8</h3>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${lowStock}</h3>
                             <p class="text-sm text-red-500 mt-3"><i class="fas fa-exclamation-circle mr-1"></i>Cần bổ sung</p>
                         </div>
                         <div class="p-4 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300">
@@ -438,7 +437,7 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="#" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Kiểm tra ngay</a>
+                        <a href="${pageContext.request.contextPath}/ListMaterialController" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Kiểm tra ngay</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-200">
@@ -460,7 +459,7 @@
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Giao dịch hôm nay</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">24</h3>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${todayTransactions}</h3>
                             <p class="text-sm text-blue-500 mt-3"><i class="fas fa-sync-alt mr-1"></i>Cập nhật mới nhất</p>
                         </div>
                         <div class="p-4 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">

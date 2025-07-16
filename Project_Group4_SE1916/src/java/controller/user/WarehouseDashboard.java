@@ -5,6 +5,7 @@
 package controller.user;
 
 import Dal.DBContext;
+import dao.DashboardWarehouseDAO;
 import dao.ProposalDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -65,14 +66,19 @@ public class WarehouseDashboard extends HttpServlet {
             if (session == null || session.getAttribute("userId") == null) {
                 response.sendRedirect("login.jsp");
                 return;
-            }        
-
+            }
+            DashboardWarehouseDAO dao = new DashboardWarehouseDAO();
             ProposalDAO proposalDAO = new ProposalDAO(conn);
             // Filter proposals by import_from_supplier and import_returned types
             String[] proposalTypes = new String[]{"import_from_supplier", "import_returned"};
             int totalToBeExecute = proposalDAO.countProposalsByTypeExecuteStatusFromStartDateToEndDate(proposalTypes, "approved_but_not_executed", null, null);
-          
-            request.setAttribute("totalToBeExecute", totalToBeExecute);   
+            int totalMaterials = dao.countTotalMaterials();
+            int lowStock = dao.countLowStockMaterials(10);
+            int todayTransactions = dao.countTodayTransactions();
+            request.setAttribute("totalMaterials", totalMaterials);
+            request.setAttribute("lowStock", lowStock);
+            request.setAttribute("todayTransactions", todayTransactions);
+            request.setAttribute("totalToBeExecute", totalToBeExecute);
             request.getRequestDispatcher("/view/warehouse/warehouseDashboard.jsp").forward(request, response);
         } catch (Exception e) {
             throw new ServletException("Lỗi khi tải dashboard nhân viên: " + e.getMessage(), e);
