@@ -50,77 +50,101 @@ public class ListMaterialController extends HttpServlet {
         }
     }
 
-    // Trong ListMaterialController.java
-private void listMaterials(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-    List<Material> materials;
-    String filterParentCategory = request.getParameter("filterParentCategory");
-    String filterChildCategory = request.getParameter("filterCategory");
-    String search = request.getParameter("search");
-    String pageParam = request.getParameter("page");
-    String itemsPerPageParam = request.getParameter("itemsPerPage");
+    private void listMaterials(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        List<Material> materials;
+        String filterParentCategory = request.getParameter("filterParentCategory");
+        String filterChildCategory = request.getParameter("filterCategory");
+        String search = request.getParameter("search");
+        String pageParam = request.getParameter("page");
+        String itemsPerPageParam = request.getParameter("itemsPerPage");
 
-    int page = (pageParam != null && !pageParam.isEmpty()) ? Integer.parseInt(pageParam) : 1;
-    int itemsPerPage = (itemsPerPageParam != null && !itemsPerPageParam.isEmpty()) ? Integer.parseInt(itemsPerPageParam) : 10;
-
-    int totalRecords;
-    
-    if (search != null && !search.isEmpty()) {
-        // Tìm kiếm theo mã vật tư
-        materials = materialDAO.searchMaterialsByCode(search, page, itemsPerPage);
-        totalRecords = materialDAO.getTotalMaterialsByCode(search);
-    } else if (filterChildCategory != null && !filterChildCategory.isEmpty()) {
+        // Fix: Xử lý NumberFormatException khi parse page và itemsPerPage
+        int page = 1;
+        int itemsPerPage = 10;
+        
         try {
-            int childCategoryId = Integer.parseInt(filterChildCategory);
-            materials = materialDAO.getMaterialsByChildCategory(childCategoryId, page, itemsPerPage);
-            totalRecords = materialDAO.getTotalMaterialsByChildCategory(childCategoryId);
+            if (pageParam != null && !pageParam.isEmpty()) {
+                page = Integer.parseInt(pageParam);
+                if (page < 1) page = 1;
+            }
         } catch (NumberFormatException e) {
+            page = 1;
+        }
+
+        try {
+            if (itemsPerPageParam != null && !itemsPerPageParam.isEmpty()) {
+                itemsPerPage = Integer.parseInt(itemsPerPageParam);
+                if (itemsPerPage < 1) itemsPerPage = 10;
+            }
+        } catch (NumberFormatException e) {
+            itemsPerPage = 10;
+        }
+
+        int totalRecords;
+        
+        if (search != null && !search.isEmpty()) {
+            materials = materialDAO.searchMaterialsByCode(search, page, itemsPerPage);
+            totalRecords = materialDAO.getTotalMaterialsByCode(search);
+        } else if (filterChildCategory != null && !filterChildCategory.isEmpty()) {
+            try {
+                int childCategoryId = Integer.parseInt(filterChildCategory);
+                materials = materialDAO.getMaterialsByChildCategory(childCategoryId, page, itemsPerPage);
+                totalRecords = materialDAO.getTotalMaterialsByChildCategory(childCategoryId);
+            } catch (NumberFormatException e) {
+                materials = materialDAO.getAllMaterials(page, itemsPerPage);
+                filterChildCategory = null;
+                totalRecords = materialDAO.getTotalMaterials();
+            }
+        } else if (filterParentCategory != null && !filterParentCategory.isEmpty()) {
+            try {
+                int parentCategoryId = Integer.parseInt(filterParentCategory);
+                materials = materialDAO.getMaterialsByParentCategory(parentCategoryId, page, itemsPerPage);
+                totalRecords = materialDAO.getTotalMaterialsByParentCategory(parentCategoryId);
+            } catch (NumberFormatException e) {
+                materials = materialDAO.getAllMaterials(page, itemsPerPage);
+                filterParentCategory = null;
+                totalRecords = materialDAO.getTotalMaterials();
+            }
+        } else {
             materials = materialDAO.getAllMaterials(page, itemsPerPage);
-            filterChildCategory = null;
             totalRecords = materialDAO.getTotalMaterials();
         }
-    } else if (filterParentCategory != null && !filterParentCategory.isEmpty()) {
-        try {
-            int parentCategoryId = Integer.parseInt(filterParentCategory);
-            materials = materialDAO.getMaterialsByParentCategory(parentCategoryId, page, itemsPerPage);
-            totalRecords = materialDAO.getTotalMaterialsByParentCategory(parentCategoryId);
-        } catch (NumberFormatException e) {
-            materials = materialDAO.getAllMaterials(page, itemsPerPage);
-            filterParentCategory = null;
-            totalRecords = materialDAO.getTotalMaterials();
+
+        // Fix: Đảm bảo totalPages ít nhất là 1
+        int totalPages = (int) Math.ceil((double) totalRecords / itemsPerPage);
+        if (totalPages == 0) totalPages = 1;
+
+        List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
+        List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
+
+        Map<Integer, List<MaterialCategory>> childCategoriesMap = new HashMap<>();
+        for (MaterialCategory parent : parentCategories) {
+            List<MaterialCategory> childCategories = categoryDAO.getChildCategoriesByParentId(parent.getCategoryId());
+            childCategoriesMap.put(parent.getCategoryId(), childCategories);
         }
-    } else {
-        materials = materialDAO.getAllMaterials(page, itemsPerPage);
-        totalRecords = materialDAO.getTotalMaterials();
+
+        request.setAttribute("materials", materials);
+        request.setAttribute("categories", categories);
+        request.setAttribute("parentCategories", parentCategories);
+        request.setAttribute("childCategoriesMap", childCategoriesMap);
+        request.setAttribute("selectedParentCategory", filterParentCategory);
+        request.setAttribute("selectedChildCategory", filterChildCategory);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("itemsPerPage", itemsPerPage);
+        request.setAttribute("totalPages", totalPages);
+        
+        request.getRequestDispatcher("/view/material/listMaterial.jsp").forward(request, response);
     }
-
-    int totalPages = (int) Math.ceil((double) totalRecords / itemsPerPage);
-
-    List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
-    List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
-
-    Map<Integer, List<MaterialCategory>> childCategoriesMap = new HashMap<>();
-    for (MaterialCategory parent : parentCategories) {
-        List<MaterialCategory> childCategories = categoryDAO.getChildCategoriesByParentId(parent.getCategoryId());
-        childCategoriesMap.put(parent.getCategoryId(), childCategories);
-    }
-
-    request.setAttribute("materials", materials);
-    request.setAttribute("categories", categories);
-    request.setAttribute("parentCategories", parentCategories);
-    request.setAttribute("childCategoriesMap", childCategoriesMap);
-    request.setAttribute("selectedParentCategory", filterParentCategory);
-    request.setAttribute("selectedChildCategory", filterChildCategory);
-    request.setAttribute("currentPage", page);
-    request.setAttribute("itemsPerPage", itemsPerPage);
-    request.setAttribute("totalPages", totalPages);
-    
-    request.getRequestDispatcher("/view/material/listMaterial.jsp").forward(request, response);
-}
 
     private void deleteMaterial(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
-        int materialId = Integer.parseInt(request.getParameter("id"));
-        materialDAO.deleteMaterial(materialId);
-        request.getSession().setAttribute("successMessage", "Disabled successfully!");
+        // Fix: Xử lý NumberFormatException khi parse ID
+        try {
+            int materialId = Integer.parseInt(request.getParameter("id"));
+            materialDAO.deleteMaterial(materialId);
+            request.getSession().setAttribute("successMessage", "Disabled successfully!");
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("errorMessage", "Invalid ID!");
+        }
         response.sendRedirect(request.getContextPath() + "/ListMaterialController");
     }
 }
