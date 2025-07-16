@@ -252,6 +252,13 @@
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
+                <a href="${pageContext.request.contextPath}/inventory" class="nav-item flex items-center p-2 justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-boxes mr-2 w-5 text-center"></i>
+                        <span class="text-base">Inventory List</span>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
+                </a>
                 <!-- Supplier - Menu cha -->
                 <div class="nav-item flex flex-col">
                     <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
@@ -375,7 +382,7 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/inventoryReport.jsp" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem báo cáo</a>
+                        <a href="${pageContext.request.contextPath}/inventory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem báo cáo</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-100">
@@ -390,7 +397,7 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/pendingRequests.jsp" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Duyệt yêu cầu</a>
+                        <a href="${pageContext.request.contextPath}/DirectorApproveProposal" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Duyệt yêu cầu</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-200">
@@ -459,7 +466,7 @@
                         <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Yêu cầu chờ duyệt</h2>
                         <p class="text-sm text-gray-600 dark:text-gray-300">Danh sách yêu cầu xuất/mua/sửa vật tư</p>
                     </div>
-                    <a href="${pageContext.request.contextPath}/pendingRequests.jsp" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                    <a href="${pageContext.request.contextPath}/DirectorApproveProposal" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full table-auto">
@@ -515,7 +522,7 @@
                         <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Lịch sử yêu cầu</h2>
                         <p class="text-sm text-gray-600 dark:text-gray-300">Lịch sử yêu cầu xuất/mua/sửa vật tư</p>
                     </div>
-                    <a href="${pageContext.request.contextPath}/requestHistory.jsp" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                    <a href="${pageContext.request.contextPath}/proposals" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full table-auto">

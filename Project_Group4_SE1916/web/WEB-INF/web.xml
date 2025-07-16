@@ -209,8 +209,12 @@
         <servlet-class>controller.constructionSites.ViewConstructionSiteServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>UnitServlet</servlet-name>
+        <servlet-class>controller.unit.UnitServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>InventoryServlet</servlet-name>
-        <servlet-class>controller.auth.inventory.InventoryServlet</servlet-class>
+        <servlet-class>controller.inventory.InventoryServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
@@ -419,6 +423,10 @@
     <servlet-mapping>
         <servlet-name>ViewConstructionSiteServlet</servlet-name>
         <url-pattern>/ViewConstructionSiteServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UnitServlet</servlet-name>
+        <url-pattern>/unit</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>InventoryServlet</servlet-name>

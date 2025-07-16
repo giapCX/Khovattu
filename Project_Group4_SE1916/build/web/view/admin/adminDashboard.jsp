@@ -310,6 +310,13 @@
                         </a>
                     </div>
                 </div>
+                <a href="${pageContext.request.contextPath}/inventory" class="nav-item flex items-center p-2 justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-boxes mr-2 w-5 text-center"></i>
+                        <span class="text-base">Inventory List</span>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
+                </a>
                 <a href="${pageContext.request.contextPath}/listuser" class="nav-item flex items-center p-3">
                     <i class="fas fa-cog mr-3 w-6 text-center"></i>
                     <span class="text-lg">Danh sách người dùng</span>

@@ -1,12 +1,10 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Inventory List</title>
+        <title>Unit List</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="https://cdn.tailwindcss.com"></script>
@@ -40,19 +38,10 @@
                 flex-wrap: wrap;
                 align-items: center;
             }
-
-            .date {
-                display: flex;
-                gap: 15px;
-                margin-bottom: 20px;
-                flex-wrap: wrap;
-                align-items: center;
-            }
             .filter-form label {
                 font-weight: bold;
                 color: #374151; /* Matches text-gray-700 */
             }
-            .filter-form input[type="date"],
             .filter-form input[type="text"],
             .filter-form select {
                 padding: 8px;
@@ -64,7 +53,6 @@
                 background-color: #fff;
                 transition: border-color 0.2s, box-shadow 0.2s;
             }
-            .filter-form input[type="date"]:focus,
             .filter-form input[type="text"]:focus,
             .filter-form select:focus {
                 outline: none;
@@ -107,7 +95,7 @@
             }
             table {
                 width: 100%;
-                border-collapse: collapse;               
+                border-collapse: collapse;
             }
             th, td {
                 padding: 12px;
@@ -125,22 +113,13 @@
             tr:hover {
                 background-color: #f3f4f6; /* Matches hover:bg-gray-100 */
             }
-            td a {
-                color: #2563eb; /* Matches text-primary-600 */
-                text-decoration: none;
-                font-weight: bold;
-            }
-            td a:hover {
-                color: #1d4ed8; /* Darker shade of primary-600 */
-                text-decoration: underline;
-            }
             .no-data {
                 text-align: center;
                 color: #6b7280; /* Matches text-gray-500 */
                 padding: 20px;
             }
             .pagination {
-                text-align: personally;
+                text-align: center;
                 margin-top: 20px;
                 display: flex;
                 justify-content: center;
@@ -217,11 +196,7 @@
         <script>
             function clearFormAndSubmit() {
                 const form = document.querySelector('.filter-form');
-                document.getElementById('materialId').value = '';
-                document.getElementById('materialName').value = '';
-                document.getElementById('condition').value = '';
-                document.getElementById('fromDate').value = '';
-                document.getElementById('toDate').value = '';
+                document.getElementById('name').value = '';
                 form.submit();
             }
         </script>
@@ -252,26 +227,16 @@
                         <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                             <i class="fas fa-bars text-2xl"></i>
                         </button>
-                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Inventory List</h2>
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Unit List</h2>
                     </div>
                 </div>
 
                 <!-- Search Form -->
-                <form action="inventory" method="get" class="filter-form">
-                    <!--                    <label for="materialId">Material ID:</label>
-                                        <input type="text" id="materialId" name="materialId" value="${fn:escapeXml(materialId)}" placeholder="Material ID">-->
-                    <label for="materialName">Material Name:</label>
-                    <input type="text" id="materialName" name="materialName" value="${fn:escapeXml(materialName)}" placeholder="Material Name">
-                    <label for="condition">Condition:</label>
-                    <input type="text" id="condition" name="condition" value="${fn:escapeXml(condition)}" placeholder="Condition">
-
-                    <label for="fromDate">From:</label>
-                    <input type="date" id="fromDate" name="fromDate" value="${fn:escapeXml(fromDate)}">
-                    <label for="toDate">To:</label>
-                    <input type="date" id="toDate" name="toDate" value="${fn:escapeXml(toDate)}">
+                <form action="units" method="get" class="filter-form">
+                    <label for="name">Unit Name:</label>
+                    <input type="text" id="name" name="name" value="${fn:escapeXml(name)}" placeholder="Unit Name">
                     <input type="submit" value="Search">
                     <input type="button" value="Reset" onclick="clearFormAndSubmit();">
-
                 </form>
 
                 <!-- Error Message -->
@@ -279,33 +244,27 @@
                     <p class="error-message">${fn:escapeXml(errorMessage)}</p>
                 </c:if>
 
-                <!-- Inventory Table -->
+                <!-- Units Table -->
                 <div class="table-container">
                     <table>
                         <tr>
                             <th>No.</th>
-                            <th>Material ID</th>
-                            <th>Material Name</th>
-                            <th>Condition</th>
-                            <th>Quantity in Stock</th>
-                            <th>Last Updated</th>
+                            <th>Unit ID</th>
+                            <th>Unit Name</th>
                         </tr>
                         <c:choose>
-                            <c:when test="${not empty inventoryData}">
-                                <c:forEach items="${inventoryData}" var="item" varStatus="loop">
+                            <c:when test="${not empty unitData}">
+                                <c:forEach items="${unitData}" var="unit" varStatus="loop">
                                     <tr>
                                         <td>${(currentPage - 1) * 10 + loop.index + 1}</td>
-                                        <td>${fn:escapeXml(item.materialId)}</td>
-                                        <td>${fn:escapeXml(item.materialName)}</td>
-                                        <td>${fn:escapeXml(item.materialCondition)}</td>
-                                        <td>${item.quantityInStock}</td>
-                                        <td><fmt:formatDate value="${item.lastUpdated}" pattern="yyyy-MM-dd"/></td>
+                                        <td>${fn:escapeXml(unit.unitId)}</td>
+                                        <td>${fn:escapeXml(unit.name)}</td>
                                     </tr>
                                 </c:forEach>
                             </c:when>
                             <c:otherwise>
                                 <tr>
-                                    <td colspan="6" class="no-data">No data found.</td>
+                                    <td colspan="3" class="no-data">No data found.</td>
                                 </tr>
                             </c:otherwise>
                         </c:choose>
@@ -316,7 +275,7 @@
                 <c:if test="${totalPages > 0}">
                     <div class="pagination">
                         <c:forEach begin="1" end="${totalPages}" var="i">
-                            <a href="inventory?page=${i}&materialId=${fn:escapeXml(materialId)}&materialName=${fn:escapeXml(materialName)}&condition=${fn:escapeXml(condition)}&fromDate=${fn:escapeXml(fromDate)}&toDate=${fn:escapeXml(toDate)}"
+                            <a href="units?page=${i}&name=${fn:escapeXml(name)}"
                                class="${i == currentPage ? 'active' : ''}">${i}</a>
                         </c:forEach>
                     </div>

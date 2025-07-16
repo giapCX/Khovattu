@@ -1,25 +1,24 @@
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 /**
  *
  * @author ASUS
  */
+import java.sql.Date;
+
 public class Inventory {
-     private int materialId;
-    private String materialName; 
+
+    private int materialId;
+    private String materialName;
     private String materialCondition;
     private double quantityInStock;
-    private String lastUpdated;
+    private Date lastUpdated;
 
     public Inventory() {
     }
 
-    public Inventory(int materialId, String materialName, String materialCondition, double quantityInStock, String lastUpdated) {
+    public Inventory(int materialId, String materialName, String materialCondition, double quantityInStock, Date lastUpdated) {
         this.materialId = materialId;
         this.materialName = materialName;
         this.materialCondition = materialCondition;
@@ -59,14 +58,11 @@ public class Inventory {
         this.quantityInStock = quantityInStock;
     }
 
-    public String getLastUpdated() {
+    public Date getLastUpdated() {
         return lastUpdated;
     }
 
-    public void setLastUpdated(String lastUpdated) {
+    public void setLastUpdated(Date lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
-
-    
-    
 }

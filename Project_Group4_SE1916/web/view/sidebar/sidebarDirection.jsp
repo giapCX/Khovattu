@@ -32,6 +32,13 @@
             </div>
             <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
         </a>
+        <a href="${pageContext.request.contextPath}/inventory" class="nav-item flex items-center p-2 justify-between">
+            <div class="flex items-center">
+                <i class="fas fa-boxes mr-2 w-5 text-center"></i>
+                <span class="text-base">Inventory List</span>
+            </div>
+            <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
+        </a>
         <!-- Supplier - Menu cha -->
         <div class="nav-item flex flex-col">
             <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
