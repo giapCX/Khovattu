@@ -1,4 +1,5 @@
-//InvenDAO
+//invenDAO
+
 package dao;
 
 import model.Inventory;
@@ -17,7 +18,7 @@ public class InventoryDAO {
         this.conn = conn;
     }
 
-    public List<Inventory> searchInventory(String materialId, String materialName, String condition, Date fromDate, Date toDate, int page, int pageSize) throws SQLException {
+    public List<Inventory> searchInventory(String materialId, String materialName, String condition, Date fromDate, Date toDate, int page, int pageSize, String sortOrder) throws SQLException {
         List<Inventory> inventoryList = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT i.material_id, m.name, i.material_condition, i.quantity_in_stock, DATE(i.last_updated) AS last_updated " +
@@ -43,8 +44,16 @@ public class InventoryDAO {
             sql.append("AND DATE(i.last_updated) <= ? ");
         }
 
+        // Add sorting
+        if ("ASC".equalsIgnoreCase(sortOrder)) {
+            sql.append("ORDER BY i.quantity_in_stock ASC ");
+        } else if ("DESC".equalsIgnoreCase(sortOrder)) {
+            sql.append("ORDER BY i.quantity_in_stock DESC ");
+        } else {
+            sql.append("ORDER BY i.last_updated DESC ");
+        }
+
         // Add pagination
-        sql.append("ORDER BY i.last_updated DESC ");
         if (pageSize > 0) {
             sql.append("LIMIT ? OFFSET ?");
         }
@@ -107,7 +116,7 @@ public class InventoryDAO {
             sql.append("AND i.material_id = ? ");
         }
         if (materialName != null && !materialName.trim().isEmpty()) {
-            sql.append("AND m.material_name LIKE ? ");
+            sql.append("AND m.name LIKE ? ");
         }
         if (condition != null && !condition.trim().isEmpty()) {
             sql.append("AND i.material_condition LIKE ? ");
@@ -156,6 +165,6 @@ public class InventoryDAO {
     }
 
     public List<Inventory> getAllInventory() throws SQLException {
-        return searchInventory(null, null, null, null, null, 1, Integer.MAX_VALUE);
+        return searchInventory(null, null, null, null, null, 1, Integer.MAX_VALUE, null);
     }
 }

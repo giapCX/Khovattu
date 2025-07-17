@@ -1,11 +1,6 @@
-//invent servlet
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
+//invenServlet
 
 package controller.inventory;
-
 
 import Dal.DBContext;
 import dao.InventoryDAO;
@@ -20,6 +15,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.util.List;
 
+
 public class InventoryServlet extends HttpServlet {
 
     @Override
@@ -33,11 +29,12 @@ public class InventoryServlet extends HttpServlet {
         String fromDateStr = request.getParameter("fromDate");
         String toDateStr = request.getParameter("toDate");
         String pageParam = request.getParameter("page");
+        String sortOrder = request.getParameter("sortOrder");
 
         // Debugging: Log parameters
         System.out.println("Received parameters: materialId=" + materialId + ", materialName=" + materialName
                 + ", condition=" + condition + ", fromDate=" + fromDateStr + ", toDate=" + toDateStr
-                + ", page=" + pageParam);
+                + ", page=" + pageParam + ", sortOrder=" + sortOrder);
 
         // Set up pagination
         int page = (pageParam != null && !pageParam.trim().isEmpty()) ? Integer.parseInt(pageParam) : 1;
@@ -69,10 +66,10 @@ public class InventoryServlet extends HttpServlet {
                     || (materialName != null && !materialName.trim().isEmpty())
                     || (condition != null && !condition.trim().isEmpty())
                     || (fromDate != null || toDate != null)) {
-                inventoryList = dao.searchInventory(materialId, materialName, condition, fromDate, toDate, page, pageSize);
+                inventoryList = dao.searchInventory(materialId, materialName, condition, fromDate, toDate, page, pageSize, sortOrder);
                 totalRecords = dao.countInventory(materialId, materialName, condition, fromDate, toDate);
             } else {
-                inventoryList = dao.searchInventory(null, null, null, null, null, page, pageSize);
+                inventoryList = dao.searchInventory(null, null, null, null, null, page, pageSize, sortOrder);
                 totalRecords = dao.countInventory(null, null, null, null, null);
             }
 
@@ -88,6 +85,7 @@ public class InventoryServlet extends HttpServlet {
             request.setAttribute("condition", condition);
             request.setAttribute("fromDate", fromDateStr);
             request.setAttribute("toDate", toDateStr);
+            request.setAttribute("sortOrder", sortOrder);
 
             // Debugging: Log results
             System.out.println("Inventory list size: " + inventoryList.size() + ", Total pages: " + totalPages);
@@ -108,6 +106,6 @@ public class InventoryServlet extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Servlet to handle inventory requests with search and pagination";
+        return "Servlet to handle inventory requests with search, pagination, and sorting";
     }
 }

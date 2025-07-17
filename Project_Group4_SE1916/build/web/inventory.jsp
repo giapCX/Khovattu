@@ -1,4 +1,4 @@
-
+invent.jsp
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -40,7 +40,6 @@
                 flex-wrap: wrap;
                 align-items: center;
             }
-
             .date {
                 display: flex;
                 gap: 15px;
@@ -107,7 +106,7 @@
             }
             table {
                 width: 100%;
-                border-collapse: collapse;               
+                border-collapse: collapse;
             }
             th, td {
                 padding: 12px;
@@ -118,6 +117,10 @@
                 background-color: #0284C7; /* Matches bg-primary-600 */
                 color: #fff;
                 font-weight: bold;
+            }
+            th.sortable:hover {
+                background-color: #1d4ed8; /* Darker shade on hover */
+                cursor: pointer;
             }
             tr:nth-child(even) {
                 background-color: #f9fafb; /* Matches bg-gray-50 */
@@ -140,7 +143,7 @@
                 padding: 20px;
             }
             .pagination {
-                text-align: personally;
+                text-align: center;
                 margin-top: 20px;
                 display: flex;
                 justify-content: center;
@@ -246,7 +249,7 @@
             </c:when>
         </c:choose>
         <main class="flex-1 p-8 transition-all duration-300">
-            <div class="max-w-7xl mx-auto">
+            <div class="max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center gap-4">
                         <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
@@ -258,20 +261,24 @@
 
                 <!-- Search Form -->
                 <form action="inventory" method="get" class="filter-form">
-                    <!--                    <label for="materialId">Material ID:</label>
-                                        <input type="text" id="materialId" name="materialId" value="${fn:escapeXml(materialId)}" placeholder="Material ID">-->
                     <label for="materialName">Material Name:</label>
                     <input type="text" id="materialName" name="materialName" value="${fn:escapeXml(materialName)}" placeholder="Material Name">
                     <label for="condition">Condition:</label>
                     <input type="text" id="condition" name="condition" value="${fn:escapeXml(condition)}" placeholder="Condition">
-
-                    <label for="fromDate">From:</label>
-                    <input type="date" id="fromDate" name="fromDate" value="${fn:escapeXml(fromDate)}">
-                    <label for="toDate">To:</label>
-                    <input type="date" id="toDate" name="toDate" value="${fn:escapeXml(toDate)}">
+                    <label for="sortOrder">Sort Quantity:</label>
+                    <select id="sortOrder" name="sortOrder" onchange="this.form.submit()" class="bg-white">
+                        <option value="" ${empty sortOrder ? 'selected' : ''}>Default</option>
+                        <option value="ASC" ${sortOrder == 'ASC' ? 'selected' : ''}>Sort Ascending</option>
+                        <option value="DESC" ${sortOrder == 'DESC' ? 'selected' : ''}>Sort Descending</option>
+                    </select>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="fromDate">From:</label>
+                        <input type="date" id="fromDate" name="fromDate" value="${fn:escapeXml(fromDate)}">
+                        <label for="toDate">To:</label>
+                        <input type="date" id="toDate" name="toDate" value="${fn:escapeXml(toDate)}">
+                    </div>
                     <input type="submit" value="Search">
-                    <input type="button" value="Reset" onclick="window.location.href='inventory';">
-
+                    <input type="button" value="Reset" onclick="window.location.href = 'inventory';">
                 </form>
 
                 <!-- Error Message -->
@@ -316,7 +323,7 @@
                 <c:if test="${totalPages > 0}">
                     <div class="pagination">
                         <c:forEach begin="1" end="${totalPages}" var="i">
-                            <a href="inventory?page=${i}&materialId=${fn:escapeXml(materialId)}&materialName=${fn:escapeXml(materialName)}&condition=${fn:escapeXml(condition)}&fromDate=${fn:escapeXml(fromDate)}&toDate=${fn:escapeXml(toDate)}"
+                            <a href="inventory?page=${i}&materialId=${fn:escapeXml(materialId)}&materialName=${fn:escapeXml(materialName)}&condition=${fn:escapeXml(condition)}&fromDate=${fn:escapeXml(fromDate)}&toDate=${fn:escapeXml(toDate)}&sortOrder=${fn:escapeXml(sortOrder)}"
                                class="${i == currentPage ? 'active' : ''}">${i}</a>
                         </c:forEach>
                     </div>
