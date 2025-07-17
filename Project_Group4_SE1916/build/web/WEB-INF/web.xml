@@ -142,7 +142,7 @@
     </servlet>
     <servlet>
         <servlet-name>EditChildCategoryController</servlet-name>
-        <servlet-class>controller.material.EditChildCategoryController</servlet-class>
+        <servlet-class>controller.material.EditCategoryController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DirectorApproveProposal</servlet-name>

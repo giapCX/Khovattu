@@ -48,27 +48,17 @@
                     <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Add new category</h2>
                 </div>
 
-                <!-- Category Type Info -->
-                <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-lg">
-                    <p class="text-sm text-blue-700 dark:text-blue-300">
-                        <i class="fas fa-info-circle mr-2"></i><strong>Hướng dẫn:</strong>
-                    </p>
-                    <ul class="mt-2 text-sm text-blue-600 dark:text-blue-400 list-disc list-inside">
-                        <li>Để tạo <strong>danh mục cha</strong>: Không chọn danh mục cha</li>
-                        <li>Để tạo <strong>danh mục con</strong>: Chọn một danh mục cha từ dropdown</li>
-                    </ul>
-                </div>
-
+             
                 <form action="${pageContext.request.contextPath}/AddCategoryController" method="post" id="addCategoryForm" class="space-y-4">
                     <div class="space-y-2">
-                        <label for="parentCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Parent Category (Optional)</label>
+                        <label for="parentCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Root Category (Optional)</label>
                         <select id="parentCategory" name="parentCategory" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                            <option value="">-- Select Parent Category (Leave empty for parent category) --</option>
+                            <option value="">-- Select Root Category (Leave empty for Root category) --</option>
                             <c:forEach var="category" items="${parentCategories}">
                                 <option value="${category.categoryId}">${category.name}</option>
                             </c:forEach>
                         </select>
-                        <small class="text-sm text-gray-500 dark:text-gray-400">Nếu không chọn, danh mục sẽ được tạo như danh mục cha</small>
+                        <small class="text-sm text-gray-500 dark:text-gray-400">If not selected, the category will be created as the parent category.</small>
                     </div>
 
                     <div class="space-y-2">

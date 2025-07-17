@@ -285,4 +285,101 @@ public class MaterialCategoryDAO {
         ps.executeUpdate();
     }
 }
+    public MaterialCategory getCategoryById(int categoryId) throws SQLException {
+    String sql = "SELECT category_id, name, parent_id, status FROM MaterialCategories WHERE category_id = ?";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, categoryId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                MaterialCategory category = new MaterialCategory();
+                category.setCategoryId(rs.getInt("category_id"));
+                category.setName(rs.getString("name"));
+                
+                // Xử lý parent_id (có thể null)
+                int parentId = rs.getInt("parent_id");
+                if (rs.wasNull()) {
+                    category.setParentId(0); // 0 nghĩa là danh mục cha
+                } else {
+                    category.setParentId(parentId);
+                }
+                
+                category.setStatus(rs.getString("status"));
+                return category;
+            }
+        }
+    }
+    return null;
+}
+
+/**
+ * Kiểm tra danh mục có tồn tại theo tên (loại trừ một ID cụ thể)
+ */
+public boolean categoryExistsByNameExcludingId(String name, int parentId, int excludeId) throws SQLException {
+    String sql;
+    if (parentId == 0) {
+        sql = "SELECT COUNT(*) FROM MaterialCategories WHERE name = ? AND parent_id IS NULL AND category_id != ?";
+    } else {
+        sql = "SELECT COUNT(*) FROM MaterialCategories WHERE name = ? AND parent_id = ? AND category_id != ?";
+    }
+    
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, name.trim());
+        if (parentId == 0) {
+            ps.setInt(2, excludeId);
+        } else {
+            ps.setInt(2, parentId);
+            ps.setInt(3, excludeId);
+        }
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * Kiểm tra danh mục có vật tư đi kèm không
+ */
+public boolean hasMaterials(int categoryId) throws SQLException {
+    String sql = "SELECT COUNT(*) FROM Materials WHERE category_id = ?";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, categoryId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * Cập nhật danh mục thành danh mục cha
+ */
+public void updateToParentCategory(int categoryId, String name, String status) throws SQLException {
+    String sql = "UPDATE MaterialCategories SET name = ?, parent_id = NULL, status = ? WHERE category_id = ?";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, name);
+        ps.setString(2, status);
+        ps.setInt(3, categoryId);
+        ps.executeUpdate();
+    }
+}
+
+/**
+ * Cập nhật danh mục thành danh mục con
+ */
+public void updateToChildCategory(int categoryId, String name, int parentId, String status) throws SQLException {
+    String sql = "UPDATE MaterialCategories SET name = ?, parent_id = ?, status = ? WHERE category_id = ?";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, name);
+        ps.setInt(2, parentId);
+        ps.setString(3, status);
+        ps.setInt(4, categoryId);
+        ps.executeUpdate();
+    }
+}
 }
