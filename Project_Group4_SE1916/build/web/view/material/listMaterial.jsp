@@ -122,7 +122,7 @@
                     <div class="flex-1 min-w-[200px]">
                         <select id="filterParentCategory" name="filterParentCategory" 
                                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                            <option value="">All parent categories</option>
+                            <option value="">All root categories</option>
                             <c:forEach var="parentCat" items="${parentCategories}">
                                 <option value="${parentCat.categoryId}" <c:if test="${parentCat.categoryId == selectedParentCategory}">selected</c:if>>${parentCat.name}</option>
                             </c:forEach>
@@ -131,7 +131,7 @@
                     <div class="flex-1 min-w-[200px]">
                         <select id="filterCategory" name="filterCategory" 
                                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                            <option value="">All child categories</option>
+                            <option value="">All sub categories</option>
                             <c:if test="${not empty selectedParentCategory}">
                                 <c:forEach var="childCat" items="${childCategoriesMap[selectedParentCategory]}">
                                     <option value="${childCat.categoryId}" <c:if test="${childCat.categoryId == selectedChildCategory}">selected</c:if>>${childCat.name}</option>
@@ -169,11 +169,12 @@
                             <thead>
                                 <tr class="bg-primary-600 text-white">
                                     <th class="p-4 text-left sortable" data-sort="number">No</th>
-                                    <th class="p-4 text-left sortable" data-sort="string">Material Code</th>
-                                    <th class="p-4 text-left sortable" data-sort="string">Parent Category</th>
-                                    <th class="p-4 text-left sortable" data-sort="string">Child Category</th>
-                                    <th class="p-4 text-left sortable" data-sort="string">Child Category Status</th>
-                                    <th class="p-4 text-left sortable" data-sort="string">Material Name</th>
+                                   <th class="p-4 text-left sortable" data-sort="string">Material Name</th>
+                                    <th class="p-4 text-left sortable" data-sort="string">Sub Category</th>
+                                    <th class="p-4 text-left sortable" data-sort="string">Root Category</th>
+                                   
+                                    <th class="p-4 text-left sortable" data-sort="string">Sub Category Status</th>
+                                    
                                     <th class="p-4 text-left sortable" data-sort="string">Unit</th>
                                     <th class="p-4 text-left">Image</th>
                                     <th class="p-4 text-left">Actions</th>
@@ -185,9 +186,10 @@
                                         <c:forEach var="mat" items="${materials}" varStatus="loop">
                                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                                 <td class="p-4 font-medium">${(currentPage - 1) * itemsPerPage + loop.index + 1}</td>
-                                                <td class="p-4 font-medium">${mat.code}</td>
-                                                <td class="p-4 font-medium">${mat.category.parentCategoryName}</td>
+                                                <td class="p-4 font-medium">${mat.name}</td>
                                                 <td class="p-4 font-medium">${mat.category.name}</td>
+                                                <td class="p-4 font-medium">${mat.category.parentCategoryName}</td>
+                                            
                                                 <td class="p-4 font-medium">
                                                     <c:choose>
                                                         <c:when test="${mat.category.childCategoryStatus == 'inactive'}">
@@ -198,7 +200,7 @@
                                                         </c:when>
                                                     </c:choose>
                                                 </td>
-                                                <td class="p-4 font-medium">${mat.name}</td>
+                                               
                                                 <td class="p-4 font-medium">${mat.unit}</td>
                                                 <td class="p-4 font-medium">
                                                     <img src="${mat.imageUrl}" class="thumbnail" alt="Material image">
@@ -331,7 +333,7 @@ $(document).ready(function () {
         var currentSelectedValue = $childCategorySelect.val();
         
         $childCategorySelect.empty();
-        $childCategorySelect.append('<option value="">All child categories</option>');
+        $childCategorySelect.append('<option value="">All sub categories</option>');
 
         if (!parentCategoryId) {
             <c:forEach var="cat" items="${categories}">

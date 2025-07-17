@@ -167,9 +167,7 @@
           <table class="w-full table-auto">
             <thead>
               <tr class="bg-primary-600 text-white">
-                <th class="p-3 text-left table-header">
-                  <i class="fas fa-list-ol mr-1"></i>No.
-                </th>
+               
                 <th class="p-3 text-left sortable table-header" data-sort="proposalId">
                   <i class="fas fa-hashtag mr-1"></i>Proposal ID
                   <i class="fas fa-sort ml-1"></i>
@@ -212,7 +210,6 @@
                 <c:when test="${not empty requests}">
                   <c:forEach var="proposal" items="${requests}" varStatus="loop">
                     <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td class="p-4 font-medium">${(param.page == null ? 1 : param.page - 1) * (param.itemsPerPage == null ? 10 : param.itemsPerPage) + loop.count}</td>
                       <td class="p-4 font-bold">${proposal.proposalId}</td>
                       <td class="p-4">${proposal.proposalType}</td>
                       <td class="p-4">${proposal.senderName}</td>
