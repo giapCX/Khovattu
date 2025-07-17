@@ -1,4 +1,3 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -8,9 +7,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Construction Material Request History</title>
+  
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Style CSS -->
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
+  
   <style>
     .view-details-cell {
       min-width: 120px;
@@ -19,17 +26,59 @@
     .view-details-cell a {
       display: inline-block;
       white-space: nowrap;
+      background-color: #3b82f6;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      transition: background-color 0.2s;
+    }
+    .view-details-cell a:hover {
+      background-color: #2563eb;
     }
     .error-message {
       color: red;
       font-size: 0.875rem;
       margin-top: 0.25rem;
     }
+    .badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .badge-warning {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    .badge-success {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    .badge-danger {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+    .badge-secondary {
+      background-color: #f3f4f6;
+      color: #374151;
+    }
+    /* Smaller header text */
+    .table-header {
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
   </style>
 </head>
-<body class="bg-white font-sans min-h-screen">  <%
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
+  <%
       String role = (String) session.getAttribute("role");
+      if (role == null) {
+          response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
+          return;
+      }
   %>
+  
   <!-- Sidebar -->
   <c:choose>
       <c:when test="${role == 'admin'}">
@@ -47,64 +96,64 @@
   </c:choose>
 
   <!-- Main Content -->
-  <main class="flex-1 p-6 transition-all duration-300">
-    <div class="container mx-auto">
-      <!-- Title and Hamburger Button -->
+  <main class="flex-1 p-8 transition-all duration-300">
+    <div class="max-w-7xl mx-auto">
+      <!-- Title and Back Button -->
       <div class="flex justify-between items-center mb-6">
         <div class="flex items-center gap-4">
-          <button id="toggleSidebarMobile" class="text-gray-700 hover:text-sky-600">
+          <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
             <i class="fas fa-bars text-2xl"></i>
           </button>
-          <h1 class="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-blue-600 animate-pulse">
-            Construction Material Request History
-          </h1>
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Construction Material Request History</h2>
         </div>
         <a href="${pageContext.request.contextPath}/view/direction/directionDashboard.jsp" 
-           class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md inline-flex items-center">
+           class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
           <i class="fas fa-arrow-left mr-2"></i>Previous page 
         </a>
       </div>
 
-      <!-- Search and Filter Bar -->
-      <form id="searchForm" action="${pageContext.request.contextPath}/proposals" method="get" onsubmit="return validateForm()">
-        <div class="flex flex-col md:flex-row justify-between mb-6 gap-4">
-          <div class="flex w-full md:w-1/3 gap-2">
-            <div class="relative flex-1">
-              <input type="text" id="searchInput" name="search" value="${param.search}" placeholder="Search by Proposal ID or Sender..." 
-                     class="p-3 pl-10 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md">
-              <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
-            </div>
-            <button type="submit" id="searchButton" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md">
-              <i class="fas fa-search mr-2"></i>Search
-            </button>
+      <!-- Search and Filter Form -->
+      <form id="searchForm" action="${pageContext.request.contextPath}/proposals" method="get" onsubmit="return validateForm()" class="mb-6">
+        <div class="flex flex-wrap gap-4 items-center mb-4">
+          <div class="flex-1 min-w-[200px]">
+            <input type="text" id="searchInput" name="search" value="${param.search}" 
+                   placeholder="Search by Proposal ID or Sender..." 
+                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
           </div>
-          <div class="flex flex-col md:flex-row gap-4 w-full md:w-2/3">
-            <div class="relative w-full md:w-1/2">
-              <input type="date" id="startDate" name="startDate" value="${param.startDate}" 
-                     class="p-3 pl-10 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md">
-              <i class="fas fa-calendar-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
-              <div id="startDateError" class="error-message"></div>
-            </div>
-            <div class="relative w-full md:w-1/2">
-              <input type="date" id="endDate" name="endDate" value="${param.endDate}" 
-                     class="p-3 pl-10 border-2 border-sky-300 rounded-xl w-full focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md">
-              <i class="fas fa-calendar-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-sky-400"></i>
-              <div id="endDateError" class="error-message"></div>
-            </div>
+          <div class="flex-1 min-w-[150px]">
+            <select id="statusFilter" name="status" 
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+              <option value="">All Statuses</option>
+              <option value="pending" ${param.status == 'pending' ? 'selected' : ''}>Pending</option>
+              <option value="approved" ${param.status == 'approved' ? 'selected' : ''}>Approved</option>
+              <option value="rejected" ${param.status == 'rejected' ? 'selected' : ''}>Rejected</option>
+            </select>
           </div>
-          <select id="statusFilter" name="status" onchange="this.form.submit()" 
-                  class="p-3 border-2 border-sky-300 rounded-xl w-full md:w-1/4 focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
-            <option value="">All Statuses</option>
-            <option value="pending" ${param.status == 'pending' ? 'selected' : ''}>Pending</option>
-            <option value="approved" ${param.status == 'approved' ? 'selected' : ''}>Approved</option>
-            <option value="rejected" ${param.status == 'rejected' ? 'selected' : ''}>Rejected</option>
-          </select>
+          <div class="flex-1 min-w-[150px]">
+            <input type="date" id="startDate" name="startDate" value="${param.startDate}" 
+                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+            <div id="startDateError" class="error-message"></div>
+          </div>
+          <div class="flex-1 min-w-[150px]">
+            <input type="date" id="endDate" name="endDate" value="${param.endDate}" 
+                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+            <div id="endDateError" class="error-message"></div>
+          </div>
+          <button type="submit" id="searchButton" class="btn-primary text-white px-6 py-2 rounded-lg flex items-center">
+            <i class="fas fa-search mr-2"></i>Search
+          </button>
+          <a href="${pageContext.request.contextPath}/proposals" 
+             onclick="event.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" 
+             class="bg-yellow-500 text-white px-6 py-2 rounded-lg flex items-center">
+            <i class="fas fa-undo mr-2"></i>Reset form
+          </a>
         </div>
-
+        
         <!-- Items per Page Selector -->
-        <div class="flex justify-end mb-4">
+        <div class="flex items-center gap-4">
+          <span class="text-gray-700 dark:text-gray-300">Items per page:</span>
           <select id="itemsPerPage" name="itemsPerPage" onchange="this.form.submit()" 
-                  class="p-3 border-2 border-sky-300 rounded-xl w-full md:w-1/5 focus:outline-none focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white">
+                  class="border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
             <option value="10" ${param.itemsPerPage == '10' ? 'selected' : ''}>10 items/page</option>
             <option value="20" ${param.itemsPerPage == '20' ? 'selected' : ''}>20 items/page</option>
             <option value="30" ${param.itemsPerPage == '30' ? 'selected' : ''}>30 items/page</option>
@@ -112,89 +161,193 @@
         </div>
       </form>
 
-    <!-- Proposals Table -->
-<div class="overflow-x-auto rounded-2xl shadow-xl">
-  <table class="min-w-full bg-white">
-    <thead class="bg-gradient-to-r from-sky-600 to-blue-600 text-white">
-      <tr>
-        <th class="py-4 px-6 text-left rounded-tl-2xl"><i class="fas fa-list-ol mr-2"></i>No.</th>
-        <th class="py-4 px-6 text-left"><i class="fas mr-2"></i>Proposal ID</th> <!-- Thêm cột ID mới -->
-        <th class="py-4 px-6 text-left"><i class="fas fa-box mr-2"></i>Proposal Type</th>
-        <th class="py-4 px-6 text-left"><i class="fas fa-user mr-2"></i>Sender</th>
-        <th class="py-4 px-6 text-left"><i class="fas fa-calendar-alt mr-2"></i>Submission Date</th>
-        <th class="py-4 px-6 text-left"><i class="fas fa-user-check mr-2"></i>Last Approver</th>
-        <th class="py-4 px-6 text-left"><i class="fas fa-calendar-check mr-2"></i>Approval Date Admin</th>
-        <th class="py-4 px-6 text-left"><i class="fas fa-calendar-check mr-2"></i>Approval Date Director</th>
-        <th class="py-4 px-6 text-left"><i class="fas fa-user-tie mr-2"></i>Director Status</th>
-        <th class="py-4 px-6 text-center view-details-cell rounded-tr-2xl"><i class="fas fa-eye mr-2"></i>View Details</th>
-      </tr>
-    </thead>
-    <tbody id="requestTableBody" class="divide-y divide-gray-200">
-      <c:forEach var="proposal" items="${requests}" varStatus="loop">
-        <tr class="hover:bg-gradient-to-r hover:from-sky-50 hover:to-cyan-50 transition-all duration-300">
-          <td class="py-4 px-6 font-medium">${(param.page == null ? 1 : param.page - 1) * (param.itemsPerPage == null ? 10 : param.itemsPerPage) + loop.count}</td>
-          <td class="py-4 px-6 font-bold">${proposal.proposalId}</td> <!-- Hiển thị ID đơn -->
-          <td class="py-4 px-6">${proposal.proposalType}</td>
-          <td class="py-4 px-6">${proposal.senderName}</td>
-          <td class="py-4 px-6"><fmt:formatDate value="${proposal.proposalSentDate}" pattern="yyyy-MM-dd"/></td>
-          <td class="py-4 px-6">${proposal.finalApprover == null ? 'Not Available' : proposal.finalApprover}</td>
-          <td class="py-4 px-6"><fmt:formatDate value="${proposal.approvalDate}" pattern="yyyy-MM-dd" var="formattedDate"/>${empty formattedDate ? 'Not Approved' : formattedDate}</td>
-          <td class="py-4 px-6">
-            <fmt:formatDate value="${proposal.approval.directorApprovalDate}" pattern="yyyy-MM-dd" var="directorFormattedDate"/>
-            ${empty directorFormattedDate ? 'Not Approved' : directorFormattedDate}
-          </td>
-          <td class="py-4 px-6">
-            <span class="px-3 py-1 rounded-full font-semibold 
-                <c:choose>
-                    <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'pending'}">bg-yellow-300 text-yellow-900 animate-bounce</c:when>
-                    <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'approved'}">bg-green-300 text-green-900</c:when>
-                    <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'rejected'}">bg-red-300 text-red-900</c:when>
-                    <c:otherwise>bg-gray-300 text-gray-900</c:otherwise>
-                </c:choose>">
-                <c:choose>
-                    <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'pending'}">Pending</c:when>
-                    <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'approved'}">Approved</c:when>
-                    <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'rejected'}">Rejected</c:when>
-                    <c:otherwise>Unknown</c:otherwise>
-                </c:choose>
-            </span>
-          </td>
-          <td class="py-4 px-6 text-center view-details-cell">
-            <a href="${pageContext.request.contextPath}/DirectorApproveProposal?id=${proposal.proposalId}" 
-               class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md">
-              <i class="fas fa-eye mr-2"></i>View Details
-            </a>
-          </td>
-        </tr>
-      </c:forEach>
-    </tbody>
-  </table>
-</div>
+      <!-- Table -->
+      <div class="table-container bg-white dark:bg-gray-800">
+        <div class="overflow-x-auto">
+          <table class="w-full table-auto">
+            <thead>
+              <tr class="bg-primary-600 text-white">
+                <th class="p-3 text-left table-header">
+                  <i class="fas fa-list-ol mr-1"></i>No.
+                </th>
+                <th class="p-3 text-left sortable table-header" data-sort="proposalId">
+                  <i class="fas fa-hashtag mr-1"></i>Proposal ID
+                  <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th class="p-3 text-left sortable table-header" data-sort="proposalType">
+                  <i class="fas fa-box mr-1"></i>Proposal Type
+                  <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th class="p-3 text-left sortable table-header" data-sort="senderName">
+                  <i class="fas fa-user mr-1"></i>Sender
+                  <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th class="p-3 text-left sortable table-header" data-sort="proposalSentDate">
+                  <i class="fas fa-calendar-alt mr-1"></i>Submission Date
+                  <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th class="p-3 text-left sortable table-header" data-sort="finalApprover">
+                  <i class="fas fa-user-check mr-1"></i>Last Approver
+                  <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th class="p-3 text-left sortable table-header" data-sort="approvalDate">
+                  <i class="fas fa-calendar-check mr-1"></i>Approval Date Admin
+                  <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th class="p-3 text-left sortable table-header" data-sort="directorApprovalDate">
+                  <i class="fas fa-calendar-check mr-1"></i>Approval Date Director
+                  <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th class="p-3 text-left sortable table-header" data-sort="directorStatus">
+                  <i class="fas fa-user-tie mr-1"></i>Director Status
+                  <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th class="p-3 text-center view-details-cell table-header">
+                  <i class="fas fa-eye mr-1"></i>View Details
+                </th>
+              </tr>
+            </thead>
+            <tbody id="requestTableBody" class="divide-y divide-gray-200">
+              <c:choose>
+                <c:when test="${not empty requests}">
+                  <c:forEach var="proposal" items="${requests}" varStatus="loop">
+                    <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td class="p-4 font-medium">${(param.page == null ? 1 : param.page - 1) * (param.itemsPerPage == null ? 10 : param.itemsPerPage) + loop.count}</td>
+                      <td class="p-4 font-bold">${proposal.proposalId}</td>
+                      <td class="p-4">${proposal.proposalType}</td>
+                      <td class="p-4">${proposal.senderName}</td>
+                      <td class="p-4"><fmt:formatDate value="${proposal.proposalSentDate}" pattern="yyyy-MM-dd"/></td>
+                      <td class="p-4">${proposal.finalApprover == null ? 'Not Available' : proposal.finalApprover}</td>
+                      <td class="p-4">
+                        <fmt:formatDate value="${proposal.approvalDate}" pattern="yyyy-MM-dd" var="formattedDate"/>
+                        ${empty formattedDate ? 'Not Approved' : formattedDate}
+                      </td>
+                      <td class="p-4">
+                        <fmt:formatDate value="${proposal.approval.directorApprovalDate}" pattern="yyyy-MM-dd" var="directorFormattedDate"/>
+                        ${empty directorFormattedDate ? 'Not Approved' : directorFormattedDate}
+                      </td>
+                      <td class="p-4">
+                        <c:choose>
+                          <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'pending'}">
+                            <span class="badge badge-warning">Pending</span>
+                          </c:when>
+                          <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'approved'}">
+                            <span class="badge badge-success">Approved</span>
+                          </c:when>
+                          <c:when test="${proposal.approval != null and proposal.approval.directorStatus == 'rejected'}">
+                            <span class="badge badge-danger">Rejected</span>
+                          </c:when>
+                          <c:otherwise>
+                            <span class="badge badge-secondary">Unknown</span>
+                          </c:otherwise>
+                        </c:choose>
+                      </td>
+                      <td class="p-4 text-center view-details-cell">
+                        <a href="${pageContext.request.contextPath}/DirectorApproveProposal?id=${proposal.proposalId}">
+                          <i class="fas fa-eye mr-1"></i>View Details
+                        </a>
+                      </td>
+                    </tr>
+                  </c:forEach>
+                </c:when>
+                <c:otherwise>
+                  <tr>
+                    <td colspan="10" class="p-4 text-center text-gray-500 dark:text-gray-400">
+                      No proposals found
+                    </td>
+                  </tr>
+                </c:otherwise>
+              </c:choose>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       <!-- Pagination -->
-      <div class="flex justify-center mt-6 gap-2">
+      <div class="pagination flex items-center justify-center space-x-1 mt-6">
         <c:set var="currentPage" value="${param.page == null ? 1 : param.page}"/>
         <c:set var="totalPages" value="${totalPages}"/>
-        <a href="${pageContext.request.contextPath}/proposals?page=${currentPage - 1}&search=${param.search}&status=${param.status}&startDate=${param.startDate}&endDate=${param.endDate}&itemsPerPage=${param.itemsPerPage}" 
-           class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md ${currentPage == 1 ? 'opacity-50 pointer-events-none' : ''}">
-          <i class="fas fa-chevron-left mr-2"></i>Previous Page
-        </a>
-        <div class="flex gap-2">
-          <c:forEach begin="1" end="${totalPages}" var="i">
-            <a href="${pageContext.request.contextPath}/proposals?page=${i}&search=${param.search}&status=${param.status}&startDate=${param.startDate}&endDate=${param.endDate}&itemsPerPage=${param.itemsPerPage}" 
-               class="px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${i == currentPage ? 'bg-blue-600 text-white' : 'bg-sky-200 text-sky-800 hover:bg-sky-300'}">${i}</a>
-          </c:forEach>
-        </div>
-        <a href="${pageContext.request.contextPath}/proposals?page=${currentPage + 1}&search=${param.search}&status=${param.status}&startDate=${param.startDate}&endDate=${param.endDate}&itemsPerPage=${param.itemsPerPage}" 
-           class="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-lg hover:from-sky-600 hover:to-blue-600 transition-all duration-300 shadow-md ${currentPage == totalPages ? 'opacity-50 pointer-events-none' : ''}">
-          Next Page<i class="fas fa-chevron-right ml-2"></i>
-        </a>
+        
+        <!-- Previous Button -->
+        <c:choose>
+          <c:when test="${currentPage > 1}">
+            <a href="${pageContext.request.contextPath}/proposals?page=${currentPage - 1}&search=${param.search}&status=${param.status}&startDate=${param.startDate}&endDate=${param.endDate}&itemsPerPage=${param.itemsPerPage}" 
+               class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&lt;</a>
+          </c:when>
+          <c:otherwise>
+            <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">&lt;</span>
+          </c:otherwise>
+        </c:choose>
+        
+        <!-- Page 1 -->
+        <c:choose>
+          <c:when test="${currentPage == 1}">
+            <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">1</span>
+          </c:when>
+          <c:otherwise>
+            <a href="${pageContext.request.contextPath}/proposals?page=1&search=${param.search}&status=${param.status}&startDate=${param.startDate}&endDate=${param.endDate}&itemsPerPage=${param.itemsPerPage}" 
+               class="px-3 py-1 rounded border hover:border-blue-500">1</a>
+          </c:otherwise>
+        </c:choose>
+        
+        <!-- Ellipsis if needed -->
+        <c:if test="${currentPage > 4}">
+          <span class="px-3 py-1">...</span>
+        </c:if>
+        
+        <!-- Middle pages -->
+        <c:forEach var="i" begin="${currentPage - 1 > 1 ? currentPage - 1 : 2}" end="${currentPage + 1 < totalPages ? currentPage + 1 : totalPages - 1}">
+          <c:choose>
+            <c:when test="${i == currentPage}">
+              <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${i}</span>
+            </c:when>
+            <c:otherwise>
+              <a href="${pageContext.request.contextPath}/proposals?page=${i}&search=${param.search}&status=${param.status}&startDate=${param.startDate}&endDate=${param.endDate}&itemsPerPage=${param.itemsPerPage}" 
+                 class="px-3 py-1 rounded border hover:border-blue-500">${i}</a>
+            </c:otherwise>
+          </c:choose>
+        </c:forEach>
+        
+        <!-- Ellipsis if needed -->
+        <c:if test="${currentPage < totalPages - 3}">
+          <span class="px-3 py-1">...</span>
+        </c:if>
+        
+        <!-- Last page -->
+        <c:if test="${totalPages > 1}">
+          <c:choose>
+            <c:when test="${currentPage == totalPages}">
+              <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${totalPages}</span>
+            </c:when>
+            <c:otherwise>
+              <a href="${pageContext.request.contextPath}/proposals?page=${totalPages}&search=${param.search}&status=${param.status}&startDate=${param.startDate}&endDate=${param.endDate}&itemsPerPage=${param.itemsPerPage}" 
+                 class="px-3 py-1 rounded border hover:border-blue-500">${totalPages}</a>
+            </c:otherwise>
+          </c:choose>
+        </c:if>
+        
+        <!-- Next Button -->
+        <c:choose>
+          <c:when test="${currentPage < totalPages}">
+            <a href="${pageContext.request.contextPath}/proposals?page=${currentPage + 1}&search=${param.search}&status=${param.status}&startDate=${param.startDate}&endDate=${param.endDate}&itemsPerPage=${param.itemsPerPage}" 
+               class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&gt;</a>
+          </c:when>
+          <c:otherwise>
+            <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">&gt;</span>
+          </c:otherwise>
+        </c:choose>
+      </div>
+      
+      <!-- Back to Dashboard Button -->
+      <div class="mt-6 flex justify-center">
+        <jsp:include page="/view/backToDashboardButton.jsp" />
       </div>
     </div>
   </main>
 
   <!-- JavaScript -->
   <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
+  <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
   <script>
     function validateForm() {
       const startDateInput = document.getElementById('startDate').value;
