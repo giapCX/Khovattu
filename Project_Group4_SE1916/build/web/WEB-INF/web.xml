@@ -220,6 +220,10 @@
         <servlet-name>AddUnitServlet</servlet-name>
         <servlet-class>controller.unit.AddUnitServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>EditUnitServlet</servlet-name>
+        <servlet-class>controller.unit.EditUnitServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -439,6 +443,10 @@
     <servlet-mapping>
         <servlet-name>AddUnitServlet</servlet-name>
         <url-pattern>/addUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditUnitServlet</servlet-name>
+        <url-pattern>/editUnit</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

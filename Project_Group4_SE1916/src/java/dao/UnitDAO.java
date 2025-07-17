@@ -1,4 +1,3 @@
-
 package dao;
 
 import model.Unit;
@@ -113,10 +112,9 @@ public class UnitDAO {
     }
 
     public boolean addUnit(String name) throws SQLException {
-        String sql = "INSERT INTO Units (name, status) VALUES (?, ?)";
+        String sql = "INSERT INTO Units (name, status) VALUES (?, 'active')";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, name);
-            stmt.setString(2, "active");
             return stmt.executeUpdate() > 0;
         }
     }
@@ -142,5 +140,45 @@ public class UnitDAO {
             stmt.setInt(2, unitId);
             return stmt.executeUpdate() > 0;
         }
+    }
+
+    public Unit getUnitById(int id) throws SQLException {
+        String sql = "SELECT * FROM Units WHERE unit_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Unit unit = new Unit();
+                    unit.setUnitId(rs.getInt("unit_id"));
+                    unit.setName(rs.getString("name"));
+                    unit.setStatus(rs.getString("status"));
+                    return unit;
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean updateUnit(Unit unit) throws SQLException {
+        String sql = "UPDATE Units SET name = ?, status = ? WHERE unit_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, unit.getName());
+            stmt.setString(2, unit.getStatus());
+            stmt.setInt(3, unit.getUnitId());
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public boolean checkIfUnitIsUsed(int unitId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Materials WHERE unit_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, unitId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
     }
 }
