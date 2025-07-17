@@ -216,6 +216,10 @@
         <servlet-name>InventoryServlet</servlet-name>
         <servlet-class>controller.inventory.InventoryServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AddUnitServlet</servlet-name>
+        <servlet-class>controller.unit.AddUnitServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
@@ -431,6 +435,10 @@
     <servlet-mapping>
         <servlet-name>InventoryServlet</servlet-name>
         <url-pattern>/inventory</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddUnitServlet</servlet-name>
+        <url-pattern>/addUnit</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>

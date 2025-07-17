@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UnitDAO {
+
     private Connection conn;
 
     public UnitDAO(Connection conn) {
@@ -18,9 +19,9 @@ public class UnitDAO {
     public List<Unit> searchUnits(String name, int page, int pageSize) throws SQLException {
         List<Unit> unitList = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT unit_id, name " +
-                "FROM Units " +
-                "WHERE 1=1 "
+                "SELECT unit_id, name "
+                + "FROM Units "
+                + "WHERE 1=1 "
         );
 
         // Add search condition
@@ -63,9 +64,9 @@ public class UnitDAO {
 
     public int countUnits(String name) throws SQLException {
         StringBuilder sql = new StringBuilder(
-                "SELECT COUNT(*) " +
-                "FROM Units " +
-                "WHERE 1=1 "
+                "SELECT COUNT(*) "
+                + "FROM Units "
+                + "WHERE 1=1 "
         );
 
         if (name != null && !name.trim().isEmpty()) {
@@ -90,6 +91,23 @@ public class UnitDAO {
         }
 
         return 0;
+    }
+
+    public boolean addUnit(String name) throws SQLException {
+        String sql = "INSERT INTO Units (name) VALUES (?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public boolean checkUnitExistsByName(String name) throws SQLException {
+        String sql = "SELECT 1 FROM Units WHERE name = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        }
     }
 
     public List<Unit> getAllUnits() throws SQLException {
