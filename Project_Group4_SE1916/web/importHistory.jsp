@@ -129,7 +129,20 @@
         %>
 
         <!-- Sidebar -->
-        
+        <c:choose>
+            <c:when test="${role == 'admin'}">
+                <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
+            </c:when>
+            <c:when test="${role == 'direction'}">
+                <jsp:include page="/view/sidebar/sidebarDirection.jsp" />
+            </c:when>
+            <c:when test="${role == 'warehouse'}">
+                <jsp:include page="/view/sidebar/sidebarWarehouse.jsp" />
+            </c:when>
+            <c:when test="${role == 'employee'}">
+                <jsp:include page="/view/sidebar/sidebarEmployee.jsp" />
+            </c:when>
+        </c:choose>
 
         <!-- Main content -->
         <main class="flex-1 p-8 transition-all duration-300">
