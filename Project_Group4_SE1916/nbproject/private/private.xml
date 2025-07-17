@@ -3,6 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/SupplierDAO.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/direction/directorApproveProposal.jsp</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/backToDashboardButton.jsp</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/MaterialCategoryDAO.java</file>
@@ -13,11 +14,10 @@
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/inventory/InventoryServlet.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/material/addCategory.jsp</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/material/listMaterial.jsp</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/model/Material.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/admin/adminApprove.jsp</file>
-            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/uploads/1752750327312_437778122_955735125783312_963467501773466280_n.jpg</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/material/AddCategoryController.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/DirectorApproveProposal.java</file>
-            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/uploads/1752750293762_437778122_955735125783312_963467501773466280_n.jpg</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/material/editCategory.jsp</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/supplier/ListSupplierServlet.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/direction/directorProposalsHistory.jsp</file>
@@ -25,9 +25,9 @@
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/DetailProposalServlet.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/supplier/addSupplier.jsp</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/DashboardWarehouseDAO.java</file>
-            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/uploads/1752750312445_437778122_955735125783312_963467501773466280_n.jpg</file>
-            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/MaterialDAO.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/unitList.jsp</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/material/EditMaterialController.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/MaterialDAO.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/AdminApproveServlet.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/password/PasswordMigration.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/material/ListMaterialController.java</file>
@@ -35,9 +35,12 @@
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/material/listParentCategory.jsp</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/material/ListParentCategoryController.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/DirectorProposalsServlet.java</file>
-            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/uploads/1752740930657_Screenshot%202025-07-17%20145541.png</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/model/MaterialCategory.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/UnitDAO.java</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dal/DBContext.java</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/material/addMaterial.jsp</file>
             <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/material/editParentCategory.jsp</file>
+            <file>file:/D:/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/material/AddMaterialController.java</file>
         </group>
     </open-files>
 </project-private>

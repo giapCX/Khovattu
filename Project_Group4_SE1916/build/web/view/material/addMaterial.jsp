@@ -128,18 +128,18 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-2">
-                            <label for="parentCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Parent Category</label>
+                            <label for="parentCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Root Category</label>
                             <div class="autocomplete-container">
-                                <input type="text" id="parentCategory" name="parentCategory" required autocomplete="off" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Select parent category">
+                                <input type="text" id="parentCategory" name="parentCategory" required autocomplete="off" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Select root category">
                                 <input type="hidden" id="parentCategoryId" name="parentCategoryId">
                                 <div class="autocomplete-dropdown" id="parentCategoryDropdown"></div>
                             </div>
                         </div>
                         
                         <div class="space-y-2">
-                            <label for="childCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Child Category</label>
+                            <label for="childCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sub Category</label>
                             <div class="autocomplete-container">
-                                <input type="text" id="childCategory" name="childCategoryName" required autocomplete="off" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Select child category">
+                                <input type="text" id="childCategory" name="childCategoryName" required autocomplete="off" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Select sub category">
                                 <input type="hidden" id="childCategoryId" name="childCategory">
                                 <div class="autocomplete-dropdown" id="childCategoryDropdown"></div>
                             </div>
