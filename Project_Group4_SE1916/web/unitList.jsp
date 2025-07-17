@@ -62,7 +62,7 @@
             }
             .filter-form input[type="submit"] {
                 padding: 8px 16px;
-                background-color: #2563eb; /* Matches btn-primary / bg-primary-600 */
+                background-color: #4f46e5; /* Matches bg-indigo-600 */
                 color: #fff;
                 border: none;
                 border-radius: 0.5rem;
@@ -79,7 +79,7 @@
                 transition: background-color 0.3s;
             }
             .filter-form input[type="submit"]:hover {
-                background-color: #1d4ed8; /* Darker shade of primary-600 */
+                background-color: #4338ca; /* Darker shade of indigo-600 */
             }
             .filter-form input[type="button"]:hover {
                 background-color: #ca8a04; /* Darker shade of yellow-500 */
@@ -107,6 +107,10 @@
                 background-color: #0284C7; /* Matches bg-primary-600 */
                 color: #fff;
                 font-weight: bold;
+                cursor: pointer;
+            }
+            th.sortable:hover {
+                background-color: #0267a0; /* Darker shade for hover */
             }
             tr:nth-child(even) {
                 background-color: #f9fafb; /* Matches bg-gray-50 */
@@ -170,20 +174,36 @@
                 transition: background-color 0.3s;
                 margin-top: 20px;
             }
-            .btn-add-unit {
+            .btn-add-unit, .btn-edit-unit {
                 background-color: #10b981; /* Matches bg-green-500 */
                 color: #fff;
                 border-radius: 0.5rem;
                 padding: 8px 16px;
                 transition: background-color 0.3s;
                 text-decoration: none;
-                font-weight: bold;               
+                font-weight: bold;
+                margin-right: 8px;
             }
-            .btn-add-unit:hover {
+            .btn-disable-unit, .btn-enable-unit {
+                background-color: #f97316; /* Matches bg-orange-500 for Disable */
+                color: #fff;
+                border-radius: 0.5rem;
+                padding: 8px 16px;
+                transition: background-color 0.3s;
+                text-decoration: none;
+                font-weight: bold;
+            }
+            .btn-enable-unit {
+                background-color: #3b82f6; /* Matches bg-blue-500 for Enable */
+            }
+            .btn-add-unit:hover, .btn-edit-unit:hover {
                 background-color: #059669; /* Matches bg-green-600 */
             }
-            .button-back {
-                justify-self: center;
+            .btn-disable-unit:hover {
+                background-color: #ea580c; /* Darker shade of orange-500 */
+            }
+            .btn-enable-unit:hover {
+                background-color: #2563eb; /* Darker shade of blue-500 */
             }
             .btn-secondary:hover {
                 background-color: #ca8a04; /* Darker shade of yellow-500 */
@@ -201,24 +221,23 @@
                 table {
                     font-size: 14px;
                 }
-                .btn-secondary, .btn-add-unit {
+                .btn-secondary, .btn-add-unit, .btn-edit-unit, .btn-disable-unit, .btn-enable-unit {
                     margin-left: 0;
                     width: 100%;
                     text-align: center;
+                    margin-bottom: 8px;
                 }
             }
-        </style>
-        <script>
-            function clearFormAndSubmit() {
-                const form = document.querySelector('.filter-form');
-                document.getElementById('name').value = '';
-                form.submit();
+            .button-back {
+                justify-self: center;
             }
-        </script>
+        </style>
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
         <%
             String role = (String) session.getAttribute("role");
+            String sortByStatus = request.getParameter("sortByStatus");
+            if (sortByStatus == null) sortByStatus = "";
         %>
         <!-- Sidebar -->
         <c:choose>
@@ -236,7 +255,7 @@
             </c:when>
         </c:choose>
         <main class="flex-1 p-8 transition-all duration-300">
-            <div class="max-w-7xl mx-auto">
+            <div class="max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center gap-4">
                         <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
@@ -245,17 +264,22 @@
                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Unit List</h2>
                     </div>
                 </div>
-                
 
-                <!-- Search Form -->
+                <!-- Search Form with Sort -->
                 <form action="unit" method="get" class="filter-form">
                     <label for="name">Unit Name:</label>
                     <input type="text" id="name" name="name" value="${fn:escapeXml(name)}" placeholder="Unit Name">
+                    <label for="sortByStatus">Sort by Status:</label>
+                    <select id="sortByStatus" name="sortByStatus">
+                        <option value="">All Status</option>
+                        <option value="active" ${sortByStatus == 'active' ? 'selected' : ''}>Active</option>
+                        <option value="inactive" ${sortByStatus == 'inactive' ? 'selected' : ''}>Inactive</option>
+                    </select>
                     <input type="submit" value="Search">
-                    <input type="button" value="Reset" onclick="window.location.href='unit';">
+                    <input type="button" value="Reset" onclick="clearFormAndSubmit();">
                 </form>
-                    
-                    <!-- Add Unit Button (Restricted to Admin and Warehouse Roles) -->
+
+                <!-- Add Unit Button (Restricted to Admin and Warehouse Roles) -->
                 <c:if test="${role == 'admin' || role == 'warehouse'}">
                     <div class="mb-4 add-btn">
                         <a href="${pageContext.request.contextPath}/addUnit" class="btn-add-unit">
@@ -276,6 +300,8 @@
                             <th>No.</th>
                             <th>Unit ID</th>
                             <th>Unit Name</th>
+                            <th>Status</th>
+                            <th>Action</th>
                         </tr>
                         <c:choose>
                             <c:when test="${not empty unitData}">
@@ -284,12 +310,20 @@
                                         <td>${(currentPage - 1) * 10 + loop.index + 1}</td>
                                         <td>${fn:escapeXml(unit.unitId)}</td>
                                         <td>${fn:escapeXml(unit.name)}</td>
+                                        <td>${fn:escapeXml(unit.status)}</td>
+                                        <td>
+                                            <c:if test="${role == 'admin' || role == 'warehouse'}">
+                                                <a href="${pageContext.request.contextPath}/editUnit?unitId=${fn:escapeXml(unit.unitId)}" class="btn-edit-unit">
+                                                    <i class="fas fa-edit mr-2"></i>Edit
+                                                </a>
+                                            </c:if>
+                                        </td>
                                     </tr>
                                 </c:forEach>
                             </c:when>
                             <c:otherwise>
                                 <tr>
-                                    <td colspan="3" class="no-data">No data found.</td>
+                                    <td colspan="5" class="no-data">No data found.</td>
                                 </tr>
                             </c:otherwise>
                         </c:choose>
@@ -300,7 +334,7 @@
                 <c:if test="${totalPages > 0}">
                     <div class="pagination">
                         <c:forEach begin="1" end="${totalPages}" var="i">
-                            <a href="unit?page=${i}&name=${fn:escapeXml(name)}"
+                            <a href="unit?page=${i}&name=${fn:escapeXml(name)}&sortByStatus=${fn:escapeXml(sortByStatus)}"
                                class="${i == currentPage ? 'active' : ''}">${i}</a>
                         </c:forEach>
                     </div>
@@ -331,6 +365,14 @@
                 </div>
             </div>
         </main>
+        <script>
+            function clearFormAndSubmit() {
+                const form = document.querySelector('.filter-form');
+                document.getElementId('name').value = '';
+                document.getElementById('sortByStatus').value = '';
+                form.submit();
+            }
+        </script>
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
         <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
     </body>
