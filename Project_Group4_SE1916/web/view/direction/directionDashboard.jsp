@@ -388,37 +388,37 @@
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-100">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Yêu cầu chờ duyệt</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Danh sách nhân viên</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">5</h3>
-                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Đang chờ xử lý</p>
+                            <!--                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Đang chờ xử lý</p>-->
                         </div>
                         <div class="p-4 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300">
-                            <i class="fas fa-clipboard-list text-2xl"></i>
+                            <i class="fas fa-users text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/proposals" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Duyệt yêu cầu</a>
+                        <a href="${pageContext.request.contextPath}/listuser" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-200">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Chi phí kỳ gần nhất</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">500M VND</h3>
-                            <p class="text-sm text-blue-500 mt-3"><i class="fas fa-dollar-sign mr-1"></i>Mua & Sửa chữa</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Nhà cung cấp</p>
+                            <!--                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">500M VND</h3>
+                                                        <p class="text-sm text-blue-500 mt-3"><i class="fas fa-dollar-sign mr-1"></i>Mua & Sửa chữa</p>-->
                         </div>
                         <div class="p-4 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
-                            <i class="fas fa-money-bill-wave text-2xl"></i>
+                            <i class="fas fa-building text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/costReport.jsp" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem báo cáo</a>
+                        <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tồn kho thấp</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tồn kho </p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">8</h3>
                             <p class="text-sm text-red-500 mt-3"><i class="fas fa-exclamation-circle mr-1"></i>Cần bổ sung</p>
                         </div>
@@ -427,37 +427,81 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/lowInventoryReport.jsp" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
+                        <a href="${pageContext.request.contextPath}/inventory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
                     </div>
                 </div>
-            </div>
 
-            <!-- Charts Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                <div class="lg:col-span-2 card bg-white dark:bg-gray-800 p-6">
-                    <div class="flex justify-between items-center mb-4">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
+                    <div class="p-6 flex items-start justify-between">
                         <div>
-                            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Xu hướng Xuất - Nhập - Tồn</h2>
-                            <p class="text-sm text-gray-600 dark:text-gray-300">Theo dõi nhập/xuất kho theo thời gian</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Danh sách công trình</p>
+
                         </div>
-                        <div class="flex space-x-2">
-                            <button class="chart-filter px-4 py-2 text-sm bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 rounded-full active">Tuần</button>
-                            <button class="chart-filter px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Tháng</button>
-                            <button class="chart-filter px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Năm</button>
+                        <div class="p-4 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-red-red-300">
+                            <i class="fas fa-building text-2xl"></i>
                         </div>
                     </div>
-                    <canvas id="inventoryChart" class="border rounded-lg"></canvas>
-                    <button onclick="exportToExcel('inventoryChart')" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Xuất Excel</button>
+                    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
+                        <a href="${pageContext.request.contextPath}/ListConstructionSites" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
+                    </div>
                 </div>
-                <div class="card bg-white dark:bg-gray-800 p-6">
-                    <div class="mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Phân bố chi phí</h2>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">Chi phí mua và sửa chữa vật tư</p>
+                <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
+                    <div class="p-6 flex items-start justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Lịch sử xuất kho</p>
+
+                        </div>
+                        <div class="p-4 rounded-full bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-red-red-300">
+                            <i class="fas fa-history text-2xl"></i>
+                        </div>
                     </div>
-                    <canvas id="costChart" class="border rounded-lg"></canvas>
-                    <button onclick="exportToExcel('costChart')" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Xuất Excel</button>
+                    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
+                        <a href="${pageContext.request.contextPath}/exportHistory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
+                    </div>
+                </div>
+                <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
+                    <div class="p-6 flex items-start justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Lịch sử nhập kho</p>
+
+                        </div>
+                        <div class="p-4 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-red-red-300">
+                            <i class="fas fa-history text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
+                        <a href="${pageContext.request.contextPath}/importhistory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
+                    </div>
                 </div>
             </div>
+            <!--             Charts Row 
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                            <div class="lg:col-span-2 card bg-white dark:bg-gray-800 p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <div>
+                                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Xu hướng Xuất - Nhập - Tồn</h2>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">Theo dõi nhập/xuất kho theo thời gian</p>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button class="chart-filter px-4 py-2 text-sm bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 rounded-full active">Tuần</button>
+                                        <button class="chart-filter px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Tháng</button>
+                                        <button class="chart-filter px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Năm</button>
+                                    </div>
+                                </div>
+                                <canvas id="inventoryChart" class="border rounded-lg"></canvas>
+                                <button onclick="exportToExcel('inventoryChart')" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Xuất Excel</button>
+                            </div>
+                            <div class="card bg-white dark:bg-gray-800 p-6">
+                                <div class="mb-4">
+                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Phân bố chi phí</h2>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300">Chi phí mua và sửa chữa vật tư</p>
+                                </div>
+                                <canvas id="costChart" class="border rounded-lg"></canvas>
+                                <button onclick="exportToExcel('costChart')" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Xuất Excel</button>
+                            </div>
+                        </div>-->
 
             <!-- Request Management Table -->
             <div class="table-container bg-white dark:bg-gray-800 mb-8">
