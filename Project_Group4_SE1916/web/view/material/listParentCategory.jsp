@@ -17,110 +17,237 @@
         <!-- style CSS -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
         <style>
-            .badge {
-                padding: 0.25rem 0.75rem;
-                border-radius: 0.5rem;
-                font-size: 1rem;
-                font-weight: 600;
-            }
+    .badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+    }
 
-            .badge-success {
-                background-color: #d1fae5;
-                color: #065f46;
-            }
+    .badge-success {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
 
-            .badge-danger {
-                background-color: #fee2e2;
-                color: #991b1b;
-            }
+    .badge-danger {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
 
-            .dropdown-container {
-                position: relative;
-                display: inline-block;
-            }
-            
-            .dropdown-btn {
-                cursor: pointer;
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
-                background-color: #e0f2fe;
-                color: #0369a1;
-                border: none;
-                font-weight: 500;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-            
-            .dropdown-content {
-                display: none;
-                position: absolute;
-                background-color: white;
-                min-width: 250px;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-                z-index: 10;
-                border-radius: 0.5rem;
-                padding: 0.5rem 0;
-                max-height: 300px;
-                overflow-y: auto;
-                border: 1px solid #e2e8f0;
-                margin-top: 0.5rem;
-            }
-            
-            .dropdown-item {
-                padding: 0.75rem 1rem;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                transition: background-color 0.2s;
-                border-bottom: 1px solid #f1f5f9;
-            }
-            
-            .dropdown-item:last-child {
-                border-bottom: none;
-            }
-            
-            .dropdown-item:hover {
-                background-color: #f8fafc;
-            }
-            
-            .action-btns {
-                display: flex;
-                gap: 0.5rem;
-            }
-            
-            .action-btn {
-                padding: 0.375rem 0.75rem;
-                border-radius: 0.375rem;
-                font-size: 0.75rem;
-                cursor: pointer;
-                transition: all 0.2s;
-                display: flex;
-                align-items: center;
-                gap: 0.25rem;
-            }
-            
-            .view-btn {
-                background-color: #3b82f6;
-                color: white;
-            }
-            
-            .edit-btn {
-                background-color: #f59e0b;
-                color: white;
-            }
-            
-            .view-all-materials {
-                background-color: #f8fafc;
-                padding: 0.75rem 1rem;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                color: #3b82f6;
-                font-weight: 500;
-                text-decoration: none;
-            }
-        </style>
+    .dropdown-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .dropdown-btn {
+        cursor: pointer;
+        padding: 0.3rem 1.25rem;
+        border-radius: 0.75rem;
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        color: #0369a1;
+        border: 0px solid #0ea5e9;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dropdown-btn:hover {
+        background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .dropdown-btn.active {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        color: white;
+        border-color: #0284c7;
+    }
+    
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 350px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        z-index: 20;
+        border-radius: 1rem;
+        padding: 1rem 0;
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #e2e8f0;
+        margin-top: 0.75rem;
+        backdrop-filter: blur(10px);
+    }
+    
+    .dropdown-item {
+        padding: 1rem 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid #f1f5f9;
+        position: relative;
+    }
+    
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+    
+    .dropdown-item:hover {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        transform: translateX(5px);
+    }
+    
+    .dropdown-item-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex: 1;
+    }
+    
+    .dropdown-item-name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 1rem;
+    }
+    
+    .dropdown-item-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .status-active {
+        background-color: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+    
+    .status-inactive {
+        background-color: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+    }
+    
+   .action-btns {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 2rem;
+    margin-bottom: -2rem;
+}
+    
+    .action-btn {
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        text-decoration: none;
+        font-weight: 500;
+        border: 1px solid transparent;
+    }
+    
+    .view-btn {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+    }
+    
+    .view-btn:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+    }
+    
+    .edit-btn {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+    
+    .edit-btn:hover {
+        background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(217, 119, 6, 0.3);
+    }
+    
+    .view-all-materials {
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #3b82f6;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-top: 2px solid #e2e8f0;
+        margin-top: 0.5rem;
+    }
+    
+    .view-all-materials:hover {
+        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+        color: #1d4ed8;
+        transform: translateX(5px);
+    }
+    
+    .dropdown-chevron {
+        transition: transform 0.3s ease;
+    }
+    
+    .dropdown-btn.active .dropdown-chevron {
+        transform: rotate(180deg);
+    }
+    
+    /* Scrollbar styling */
+    .dropdown-content::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .dropdown-content::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 3px;
+    }
+    
+    .dropdown-content::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+    
+    .dropdown-content::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+    
+    /* Animation for dropdown */
+    .dropdown-content.show {
+        display: block;
+        animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
 
@@ -215,39 +342,63 @@
                                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                                 <td class="p-4 font-medium">${cat.categoryId}</td>
                                                 <td class="p-4 font-medium">${cat.name}</td>
-                                                <td class="p-4 font-medium">
-                                                    <div class="dropdown-container">
-                                                        <button onclick="toggleDropdown('dropdown-${cat.categoryId}', this)" 
-                                                                class="dropdown-btn">
-                                                            <span>${cat.childCount} sub categories</span>
-                                                            <i class="fas fa-chevron-down text-xs"></i>
-                                                        </button>
-                                                        <div id="dropdown-${cat.categoryId}" class="dropdown-content">
-                                                            <c:forEach var="childCat" items="${childCategoriesMap[cat.categoryId]}">
-                                                                <div class="dropdown-item">
-                                                                    <span>${childCat.name}</span>
-                                                                    <div class="action-btns">
-                                                                        <a href="${pageContext.request.contextPath}/ListMaterialController?filterParentCategory=${cat.categoryId}&filterCategory=${childCat.categoryId}"
-                                                                           class="action-btn view-btn">
-                                                                            <i class="fas fa-eye"></i>
-                                                                            <span>View</span>
-                                                                        </a>
-                                                                        <a href="${pageContext.request.contextPath}/EditChildCategoryController?id=${childCat.categoryId}"
-                                                                           class="action-btn edit-btn">
-                                                                            <i class="fas fa-edit"></i>
-                                                                            <span>Edit</span>
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-                                                            </c:forEach>
-                                                            <a href="${pageContext.request.contextPath}/ListMaterialController?filterParentCategory=${cat.categoryId}"
-                                                               class="view-all-materials">
-                                                                <i class="fas fa-boxes"></i>
-                                                                <span>View All Materials</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </td>
+                                               <td class="p-4 font-medium">
+    <div class="dropdown-container">
+        <button onclick="toggleDropdown('dropdown-${cat.categoryId}', this)" 
+                class="dropdown-btn">
+            <i class="fas fa-layer-group"></i>
+            <span>${cat.childCount} sub categories</span>
+            <i class="fas fa-chevron-down text-sm dropdown-chevron"></i>
+        </button>
+        <div id="dropdown-${cat.categoryId}" class="dropdown-content">
+            <c:forEach var="childCat" items="${childCategoriesMap[cat.categoryId]}">
+                <div class="dropdown-item">
+                    <div class="dropdown-item-content">
+                        <div class="dropdown-item-name">${childCat.name}</div>
+                        <div class="dropdown-item-status">
+                            <span class="text-xs text-gray-500">Status:</span>
+                            <c:choose>
+                                <c:when test="${childCat.status == 'active'}">
+                                    <span class="status-badge status-active">
+                                        <i class="fas fa-check-circle"></i> Active
+                                    </span>
+                                </c:when>
+                                <c:when test="${childCat.status == 'inactive'}">
+                                    <span class="status-badge status-inactive">
+                                        <i class="fas fa-times-circle"></i> Inactive
+                                    </span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="status-badge status-inactive">
+                                        <i class="fas fa-question-circle"></i> Unknown
+                                    </span>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </div>
+                    <div class="action-btns">
+                        <a href="${pageContext.request.contextPath}/ListMaterialController?filterParentCategory=${cat.categoryId}&filterCategory=${childCat.categoryId}"
+                           class="action-btn view-btn">
+                            <i class="fas fa-eye"></i>
+                            <span>View</span>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/EditChildCategoryController?id=${childCat.categoryId}"
+                           class="action-btn edit-btn">
+                            <i class="fas fa-edit"></i>
+                            <span>Edit</span>
+                        </a>
+                    </div>
+                </div>
+            </c:forEach>
+            <a href="${pageContext.request.contextPath}/ListMaterialController?filterParentCategory=${cat.categoryId}"
+               class="view-all-materials">
+                <i class="fas fa-boxes"></i>
+                <span>View All Materials in Category</span>
+                <i class="fas fa-arrow-right ml-auto"></i>
+            </a>
+        </div>
+    </div>
+</td>
                                                 <td class="p-4 font-medium">
                                                     <c:choose>
                                                         <c:when test="${cat.status == 'active'}">
@@ -348,37 +499,43 @@
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
         <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
         
-        <script>
-            function toggleDropdown(dropdownId, button) {
-                var dropdown = document.getElementById(dropdownId);
-                if (dropdown.style.display === 'block') {
-                    dropdown.style.display = 'none';
-                    button.classList.remove('active');
-                } else {
-                    // Close all other dropdowns before opening this one
-                    document.querySelectorAll('.dropdown-content').forEach(function(content) {
-                        content.style.display = 'none';
-                    });
-                    document.querySelectorAll('.dropdown-btn').forEach(function(btn) {
-                        btn.classList.remove('active');
-                    });
-                    
-                    dropdown.style.display = 'block';
-                    button.classList.add('active');
-                }
-            }
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!event.target.matches('.dropdown-btn') && !event.target.closest('.dropdown-content')) {
-                    document.querySelectorAll('.dropdown-content').forEach(function(dropdown) {
-                        dropdown.style.display = 'none';
-                    });
-                    document.querySelectorAll('.dropdown-btn').forEach(function(btn) {
-                        btn.classList.remove('active');
-                    });
-                }
+       <script>
+    function toggleDropdown(dropdownId, button) {
+        var dropdown = document.getElementById(dropdownId);
+        var isVisible = dropdown.classList.contains('show');
+        
+        if (isVisible) {
+            dropdown.classList.remove('show');
+            dropdown.style.display = 'none';
+            button.classList.remove('active');
+        } else {
+            // Close all other dropdowns before opening this one
+            document.querySelectorAll('.dropdown-content').forEach(function(content) {
+                content.classList.remove('show');
+                content.style.display = 'none';
             });
-        </script>
+            document.querySelectorAll('.dropdown-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            
+            dropdown.classList.add('show');
+            dropdown.style.display = 'block';
+            button.classList.add('active');
+        }
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.dropdown-container')) {
+            document.querySelectorAll('.dropdown-content').forEach(function(dropdown) {
+                dropdown.classList.remove('show');
+                dropdown.style.display = 'none';
+            });
+            document.querySelectorAll('.dropdown-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+        }
+    });
+</script>
     </body>
 </html>

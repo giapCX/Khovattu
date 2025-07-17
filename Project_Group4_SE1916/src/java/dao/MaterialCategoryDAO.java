@@ -232,22 +232,24 @@ public class MaterialCategoryDAO {
         return false;
     }
 
-    public List<MaterialCategory> getChildCategoriesByParentId(int parentId) throws SQLException {
-        List<MaterialCategory> categories = new ArrayList<>();
-        String sql = "SELECT category_id, name FROM MaterialCategories WHERE parent_id = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, parentId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    MaterialCategory category = new MaterialCategory();
-                    category.setCategoryId(rs.getInt("category_id"));
-                    category.setName(rs.getString("name"));
-                    categories.add(category);
-                }
+// Cập nhật phương thức getChildCategoriesByParentId trong MaterialCategoryDAO.java
+public List<MaterialCategory> getChildCategoriesByParentId(int parentId) throws SQLException {
+    List<MaterialCategory> categories = new ArrayList<>();
+    String sql = "SELECT category_id, name, status FROM MaterialCategories WHERE parent_id = ? ORDER BY name";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, parentId);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                MaterialCategory category = new MaterialCategory();
+                category.setCategoryId(rs.getInt("category_id"));
+                category.setName(rs.getString("name"));
+                category.setStatus(rs.getString("status")); // Thêm dòng này
+                categories.add(category);
             }
         }
-        return categories;
     }
+    return categories;
+}
 
     public boolean updateChildCategory(int categoryId, String newName, int parentId) {
         String query = "UPDATE MaterialCategories SET name = ?, parent_id = ? WHERE category_id = ? AND status = 'active'";
