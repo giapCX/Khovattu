@@ -156,17 +156,14 @@
                         <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                             <i class="fas fa-bars text-2xl"></i>
                         </button>
-                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Parent Category List</h2>
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Category List</h2>
                     </div>
                     <div class="flex gap-4">
-                        <a href="${pageContext.request.contextPath}/AddParentCategoryController" 
+                        <a href="${pageContext.request.contextPath}/AddCategoryController" 
                            class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
-                            <i class="fas fa-plus-circle mr-2"></i> Add Parent Category
+                            <i class="fas fa-plus-circle mr-2"></i> Add Category
                         </a>
-                        <a href="${pageContext.request.contextPath}/AddChildCategoryController" 
-                           class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
-                            <i class="fas fa-plus-circle mr-2"></i> Add Child Category
-                        </a>
+                     
                     </div>
                 </div>
 
@@ -205,8 +202,8 @@
                             <thead>
                                 <tr class="bg-primary-600 text-white">
                                     <th class="p-4 text-left">ID</th>
-                                    <th class="p-4 text-left">Category Name</th>
-                                    <th class="p-4 text-left">Child Categories</th>
+                                    <th class="p-4 text-left">Root</th>
+                                    <th class="p-4 text-left">Sub Categories</th>
                                     <th class="p-4 text-left">Status</th>
                                     <th class="p-4 text-left">Action</th>
                                 </tr>
@@ -222,7 +219,7 @@
                                                     <div class="dropdown-container">
                                                         <button onclick="toggleDropdown('dropdown-${cat.categoryId}', this)" 
                                                                 class="dropdown-btn">
-                                                            <span>${cat.childCount} child categories</span>
+                                                            <span>${cat.childCount} sub categories</span>
                                                             <i class="fas fa-chevron-down text-xs"></i>
                                                         </button>
                                                         <div id="dropdown-${cat.categoryId}" class="dropdown-content">

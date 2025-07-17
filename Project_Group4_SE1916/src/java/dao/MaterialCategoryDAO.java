@@ -276,4 +276,13 @@ public class MaterialCategoryDAO {
     }
     return 0;
 }
+    public void addChildCategory(String name, int parentId, String status) throws SQLException {
+    String sql = "INSERT INTO MaterialCategories (name, parent_id, status) VALUES (?, ?, ?)";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, name);
+        ps.setInt(2, parentId);
+        ps.setString(3, status);
+        ps.executeUpdate();
+    }
+}
 }

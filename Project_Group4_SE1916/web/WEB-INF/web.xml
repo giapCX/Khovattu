@@ -106,7 +106,7 @@
     </servlet>
     <servlet>
         <servlet-name>AddParentCategoryController</servlet-name>
-        <servlet-class>controller.material.AddParentCategoryController</servlet-class>
+        <servlet-class>controller.material.AddCategoryController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ImportMaterialServlet</servlet-name>
