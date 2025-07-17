@@ -1,4 +1,3 @@
-//exportHisDetailServlet
 package controller.importhistory;
 
 import dao.ExportDetailDAO;
@@ -14,7 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-
 
 public class ExportHistoryDetailServlet extends HttpServlet {
     private static final int PAGE_SIZE = 5;
@@ -40,8 +38,8 @@ public class ExportHistoryDetailServlet extends HttpServlet {
             }
 
             String materialName = request.getParameter("materialName");
-            String constructionSite = request.getParameter("constructionSite");
-            String reason = request.getParameter("reason");
+            String unit = request.getParameter("unit");
+            String condition = request.getParameter("condition");
             String pageRaw = request.getParameter("page");
 
             int page = 1;
@@ -63,16 +61,16 @@ public class ExportHistoryDetailServlet extends HttpServlet {
 
             // Get details based on parameters
             List<ExportDetail> details;
-            if ((materialName != null && !materialName.isEmpty()) || 
-                (constructionSite != null && !constructionSite.isEmpty()) || 
-                (reason != null && !reason.isEmpty())) {
-                details = exportDetailDAO.searchByCriteria(exportId, materialName, constructionSite, reason, page, PAGE_SIZE);
+            if ((materialName != null && !materialName.isEmpty()) ||
+                (unit != null && !unit.isEmpty()) ||
+                (condition != null && !condition.isEmpty())) {
+                details = exportDetailDAO.searchByCriteria(exportId, materialName, unit, condition, page, PAGE_SIZE);
             } else {
                 details = exportDetailDAO.getByExportId(exportId, page, PAGE_SIZE);
             }
 
             // Calculate total pages
-            int totalItems = exportDetailDAO.countSearchByCriteria(exportId, materialName, constructionSite, reason);
+            int totalItems = exportDetailDAO.countSearchByCriteria(exportId, materialName, unit, condition);
             int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
 
             // Set attributes
@@ -80,8 +78,8 @@ public class ExportHistoryDetailServlet extends HttpServlet {
             request.setAttribute("details", details);
             request.setAttribute("exportId", exportId);
             request.setAttribute("materialName", materialName);
-            request.setAttribute("constructionSite", constructionSite);
-            request.setAttribute("reason", reason);
+            request.setAttribute("unit", unit);
+            request.setAttribute("condition", condition);
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
 

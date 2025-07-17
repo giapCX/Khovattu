@@ -1,9 +1,10 @@
-
+//export
 package model;
 
 import java.time.LocalDate;
 
 public class Export {
+
     private int exportId;
     private String receiptId;
     private int exporterId;
@@ -11,13 +12,15 @@ public class Export {
     private LocalDate exportDate;
     private String note;
     private String exporterName;
-    private String receiverName;    
+    private String receiverName;
     private int proposalId;
+    private String siteName;
+    private int siteId;
 
     public Export() {
     }
 
-    public Export(int exportId, String receiptId, int exporterId, int receiverId, LocalDate exportDate, String note, String exporterName, String receiverName, int proposalId) {
+    public Export(int exportId, String receiptId, int exporterId, int receiverId, LocalDate exportDate, String note, String exporterName, String receiverName, int proposalId, String siteName, int siteId) {
         this.exportId = exportId;
         this.receiptId = receiptId;
         this.exporterId = exporterId;
@@ -27,9 +30,9 @@ public class Export {
         this.exporterName = exporterName;
         this.receiverName = receiverName;
         this.proposalId = proposalId;
+        this.siteName = siteName;
+        this.siteId = siteId;
     }
-
-   
 
     public int getExportId() {
         return exportId;
@@ -95,8 +98,6 @@ public class Export {
         this.receiverName = receiverName;
     }
 
-    
-
     public int getProposalId() {
         return proposalId;
     }
@@ -105,6 +106,20 @@ public class Export {
         this.proposalId = proposalId;
     }
 
-    
-    
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
+    }
+
+    public int getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(int siteId) {
+        this.siteId = siteId;
+    }
+
 }

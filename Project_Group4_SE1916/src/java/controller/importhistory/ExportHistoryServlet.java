@@ -1,4 +1,3 @@
-//exHisServlet
 package controller.importhistory;
 
 import Dal.DBContext;
@@ -25,24 +24,24 @@ public class ExportHistoryServlet extends HttpServlet {
         String pageParam = request.getParameter("page");
 
         // Set up pagination
-        int page = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
+        int page = (pageParam != null && !pageParam.isEmpty()) ? Integer.parseInt(pageParam) : 1;
         int pageSize = 10;
 
         // Convert dates
-        Date fromDate = (fromDateStr != null && !fromDateStr.isEmpty()) ? java.sql.Date.valueOf(fromDateStr) : null;
-        Date toDate = (toDateStr != null && !toDateStr.isEmpty()) ? java.sql.Date.valueOf(toDateStr) : null;
-
+        Date fromDate = null;
+        Date toDate = null;
         try {
-            if (fromDateStr != null && !fromDateStr.isEmpty() && fromDate == null) {
-                throw new IllegalArgumentException("Invalid date format.");
+            if (fromDateStr != null && !fromDateStr.isEmpty()) {
+                fromDate = java.sql.Date.valueOf(fromDateStr);
             }
-            if (toDateStr != null && !toDateStr.isEmpty() && toDate == null) {
-                throw new IllegalArgumentException("Invalid date format.");
+            if (toDateStr != null && !toDateStr.isEmpty()) {
+                toDate = java.sql.Date.valueOf(toDateStr);
             }
         } catch (IllegalArgumentException e) {
-            request.setAttribute("errorMessage", e.getMessage());
+            request.setAttribute("errorMessage", "Invalid date format.");
         }
 
+        // Get database connection
         Connection conn = DBContext.getConnection();
 
         // Query data
@@ -51,7 +50,7 @@ public class ExportHistoryServlet extends HttpServlet {
         int totalRecords;
 
         // Handle default action (display all) or search-based action
-        if ((exporter != null && !exporter.trim().isEmpty()) || (fromDate != null || toDate != null)) {
+        if ((exporter != null && !exporter.trim().isEmpty()) || fromDate != null || toDate != null) {
             // Search by exporter name and/or dates
             receipts = dao.searchExportReceipts(fromDate, toDate, exporter, page, pageSize);
             totalRecords = dao.countExportReceipts(fromDate, toDate, exporter);

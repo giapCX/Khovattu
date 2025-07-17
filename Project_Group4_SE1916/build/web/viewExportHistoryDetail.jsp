@@ -57,7 +57,8 @@
                 transition: background-color 0.3s;
             }
             .btn-secondary:hover {
-                background-color: #ca8a04; /* Darker shade of yellow-500 */
+/*                background-color: #ca8a04;  Darker shade of yellow-500 */
+                opacity: 0.8;
             }
             /* Table styles */
             .table-container {
@@ -150,11 +151,11 @@
                 <div class="col-md-4">
                     <input type="text" name="materialName" value="${param.materialName}" class="form-control" placeholder="Search material name..." />
                 </div>
-                <div class="col-md-4">
-                    <input type="text" name="constructionSite" value="${param.constructionSite}" class="form-control" placeholder="Search construction site..." />
+               <div class="col-md-4">
+                    <input type="text" name="unit" value="${param.unit}" class="form-control" placeholder="Search unit ..." />
                 </div>
-                <div class="col-md-3">
-                    <input type="text" name="reason" value="${param.reason}" class="form-control" placeholder="Search reason..." />
+                <div class="col-md-4">
+                    <input type="text" name="materialCondition" value="${param.materialCondition}" class="form-control" placeholder="Search material condition..." />
                 </div>
                 <div class="col-md-1">
                     <button type="submit" class="btn btn-primary w-100">Search</button>
@@ -174,8 +175,7 @@
                                 <th>Quantity</th>
                                 <th>Unit</th>
                                 <th>Condition</th>
-                                <th>Construction Site</th>
-                                <th>Reason</th>
+                                
                             </tr>
                         </thead>
                         <tbody>
@@ -187,8 +187,7 @@
                                     <td>${detail.quantity}</td>
                                     <td>${detail.unit}</td>
                                     <td>${detail.materialCondition}</td>
-                                    <td>${detail.siteName}</td>
-                                    <td>${detail.reason}</td>
+                                  
                                 </tr>
                             </c:forEach>
                         </tbody>
@@ -202,7 +201,7 @@
                     <c:forEach var="i" begin="1" end="${totalPages}">
                         <li class="page-item ${i == currentPage ? 'active' : ''}">
                             <a class="page-link text-white"
-                               href="exportHistoryDetail?exportId=${receipt.exportId}&page=${i}&materialName=${param.materialName}&constructionSite=${param.constructionSite}&reason=${param.reason}">
+                               href="exportHistoryDetail?exportId=${receipt.exportId}&page=${i}&materialName=${param.materialName}&unit=${unit}&materialCondition=${materialCondition}">
                                 ${i}
                             </a>
                         </li>

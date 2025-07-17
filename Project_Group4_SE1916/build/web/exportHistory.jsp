@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -10,28 +9,24 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
-
-        <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-        <!-- Liên kết đến file CSS -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
         <style>
             body {
                 font-family: 'Segoe UI', Arial, sans-serif;
-                background-color: #f0f2f5; /* Matches bg-gray-50 */
+                background-color: #f0f2f5;
                 color: #1a1a1a;
             }
             .container {
                 margin: 0 auto;
                 background-color: #fff;
                 padding: 20px;
-                border-radius: 0 0 0.5rem 0.5rem; /* Rounded corners at the bottom */
+                border-radius: 0 0 0.5rem 0.5rem;
                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             }
             h1 {
                 text-align: center;
-                color: #1f2937; /* Matches text-gray-800 */
+                color: #1f2937;
                 margin-bottom: 20px;
             }
             .filter-form {
@@ -43,14 +38,14 @@
             }
             .filter-form label {
                 font-weight: bold;
-                color: #374151; /* Matches text-gray-700 */
+                color: #374151;
             }
             .filter-form input[type="date"],
             .filter-form input[type="text"],
             .filter-form select {
                 padding: 8px;
-                border: 1px solid #d1d5db; /* Matches border-gray-300 */
-                border-radius: 0.5rem; /* Rounded corners */
+                border: 1px solid #d1d5db;
+                border-radius: 0.5rem;
                 font-size: 14px;
                 width: 100%;
                 max-width: 200px;
@@ -61,12 +56,12 @@
             .filter-form input[type="text"]:focus,
             .filter-form select:focus {
                 outline: none;
-                border-color: #2563eb; /* Matches focus:ring-primary-500 */
+                border-color: #2563eb;
                 box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
             }
             .filter-form input[type="submit"] {
                 padding: 8px 16px;
-                background-color: #2563eb; /* Matches btn-primary / bg-primary-600 */
+                background-color: #2563eb;
                 color: #fff;
                 border: none;
                 border-radius: 0.5rem;
@@ -75,7 +70,7 @@
             }
             .filter-form input[type="button"] {
                 padding: 8px 16px;
-                background-color: #eab308; /* Matches bg-yellow-500 for reset button */
+                background-color: #eab308;
                 color: #fff;
                 border: none;
                 border-radius: 0.5rem;
@@ -83,19 +78,19 @@
                 transition: background-color 0.3s;
             }
             .filter-form input[type="submit"]:hover {
-                background-color: #1d4ed8; /* Darker shade of primary-600 */
+                background-color: #1d4ed8;
             }
             .filter-form input[type="button"]:hover {
-                background-color: #ca8a04; /* Darker shade of yellow-500 */
+                background-color: #ca8a04;
             }
             .error-message {
-                color: #991b1b; /* Matches badge-danger color */
+                color: #991b1b;
                 text-align: center;
                 margin-bottom: 15px;
             }
             .table-container {
                 background-color: #fff;
-                border-radius: 0 0 0.5rem 0.5rem; /* Rounded corners at the bottom */
+                border-radius: 0 0 0.5rem 0.5rem;
                 overflow: hidden;
             }
             table {
@@ -106,31 +101,31 @@
             th, td {
                 padding: 12px;
                 text-align: left;
-                border-bottom: 1px solid #e5e7eb; /* Matches border-gray-200 */
+                border-bottom: 1px solid #e5e7eb;
             }
             th {
-                background-color: #0284C7; /* Matches bg-primary-600 */
+                background-color: #0284C7;
                 color: #fff;
                 font-weight: bold;
             }
             tr:nth-child(even) {
-                background-color: #f9fafb; /* Matches bg-gray-50 */
+                background-color: #f9fafb;
             }
             tr:hover {
-                background-color: #f3f4f6; /* Matches hover:bg-gray-100 */
+                background-color: #f3f4f6;
             }
             td a {
-                color: #2563eb; /* Matches text-primary-600 */
+                color: #2563eb;
                 text-decoration: none;
                 font-weight: bold;
             }
             td a:hover {
-                color: #1d4ed8; /* Darker shade of primary-600 */
+                color: #1d4ed8;
                 text-decoration: underline;
             }
             .no-data {
                 text-align: center;
-                color: #6b7280; /* Matches text-gray-500 */
+                color: #6b7280;
                 padding: 20px;
             }
             .pagination {
@@ -144,40 +139,40 @@
                 display: inline-block;
                 padding: 8px 12px;
                 text-decoration: none;
-                color: #2563eb; /* Matches text-primary-600 */
-                border: 1px solid #d1d5db; /* Matches border-gray-300 */
+                color: #2563eb;
+                border: 1px solid #d1d5db;
                 border-radius: 0.5rem;
                 transition: background-color 0.3s, border-color 0.3s;
             }
             .pagination a.active, .pagination span.active {
-                background-color: #2563eb; /* Matches bg-primary-600 */
+                background-color: #2563eb;
                 color: #fff;
                 border-color: #2563eb;
                 font-weight: bold;
             }
             .pagination a:hover {
-                background-color: #e5e7eb; /* Matches hover:bg-gray-200 */
+                background-color: #e5e7eb;
                 border-color: #2563eb;
             }
             .pagination span.disabled {
-                color: #6b7280; /* Matches text-gray-500 */
-                background-color: #e5e7eb; /* Matches bg-gray-200 */
+                color: #6b7280;
+                background-color: #e5e7eb;
                 cursor: not-allowed;
             }
             .home-link {
                 display: inline-block;
                 margin-top: 20px;
                 text-align: center;
-                color: #2563eb; /* Matches text-primary-600 */
+                color: #2563eb;
                 text-decoration: none;
                 font-weight: bold;
-            }   
+            }
             .home-link:hover {
-                color: #1d4ed8; /* Darker shade of primary-600 */
+                color: #1d4ed8;
                 text-decoration: underline;
             }
             .btn-secondary {
-                background-color: #eab308; /* Matches bg-yellow-500 */
+                background-color: #eab308;
                 color: #fff;
                 border-radius: 0.5rem;
                 padding: 12px 24px;
@@ -186,7 +181,7 @@
                 margin-top: 20px;
             }
             .btn-secondary:hover {
-                background-color: #ca8a04; /* Darker shade of yellow-500 */
+                background-color: #ca8a04;
             }
             @media (max-width: 768px) {
                 .filter-form {
@@ -209,25 +204,8 @@
                 document.getElementById('fromDate').value = '';
                 document.getElementById('toDate').value = '';
                 document.getElementById('exporter').value = '';
-                document.getElementById('siteId').value = '';
                 form.submit();
             }
-
-            //        $(document).ready(function() {
-            //            // Fetch construction sites
-            //            $.getJSON('ExportMaterial?fetch=sites', function(data) {
-            //                var select = $('#siteId');
-            //                select.append('<option value="">Select site</option>');
-            //                $.each(data, function(i, site) {
-            //                    select.append('<option value="' + site.siteId + '">' + site.siteName + '</option>');
-            //                });
-            //                // Set the selected site if siteId is provided
-            //                var siteId = '${fn:escapeXml(siteId)}';
-            //                if (siteId) {
-            //                    select.val(siteId);
-            //                }
-            //            });
-            //        });
         </script>
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
@@ -268,7 +246,7 @@
                     <label for="exporter">Exporter Name: </label>
                     <input type="text" id="exporter" name="exporter" value="${fn:escapeXml(exporter)}" placeholder="Exporter Name">
                     <input type="submit" value="Search">
-                    <input type="button" value="Reset" onclick="window.location.href='exportHistory';">
+                    <input type="button" value="Reset" onclick="window.location.href = 'exportHistory';">
                 </form>
 
                 <c:if test="${not empty errorMessage}">
@@ -282,6 +260,7 @@
                         <th>Date</th>
                         <th>Exporter</th>
                         <th>Receiver</th>
+                        <th>Construction Name</th>
                         <th>Note</th>
                         <th>Action</th>
                     </tr>
@@ -294,6 +273,7 @@
                                     <td>${fn:escapeXml(item.exportDate)}</td>
                                     <td>${fn:escapeXml(item.exporterName)}</td>
                                     <td>${fn:escapeXml(item.receiverName)}</td>
+                                    <td>${fn:escapeXml(item.siteName)}</td>
                                     <td>${fn:escapeXml(item.note)}</td>
                                     <td><a href="exportHistoryDetail?exportId=${item.exportId}&keyword=${param.keyword}&sort=${param.sort}&page=1">View</a></td>
                                 </tr>

@@ -1,4 +1,3 @@
-//exHisDAO
 package dao;
 
 import Dal.DBContext;
@@ -25,10 +24,12 @@ public class ExportHistoryDAO {
         StringBuilder sql = new StringBuilder(
                 "SELECT DISTINCT er.export_id, er.receipt_id, er.export_date, er.note, "
                 + "u1.full_name AS exporter_name, u2.full_name AS receiver_name, "
+                + "cs.site_name, "
                 + "er.executor_id, er.receiver_id, er.proposal_id "
                 + "FROM ExportReceipts er "
                 + "JOIN Users u1 ON er.executor_id = u1.user_id "
                 + "JOIN Users u2 ON er.receiver_id = u2.user_id "
+                + "JOIN ConstructionSites cs ON er.site_id = cs.site_id "
                 + "LEFT JOIN ExportDetails ed ON er.export_id = ed.export_id "
                 + "WHERE 1=1 "
         );
@@ -77,6 +78,7 @@ public class ExportHistoryDAO {
                 receipt.setProposalId(rs.getInt("proposal_id"));
                 receipt.setExporterName(rs.getString("exporter_name"));
                 receipt.setReceiverName(rs.getString("receiver_name"));
+                receipt.setSiteName(rs.getString("site_name"));
                 list.add(receipt);
             }
         } catch (SQLException e) {
@@ -91,17 +93,18 @@ public class ExportHistoryDAO {
                 "SELECT COUNT(DISTINCT er.export_id) "
                 + "FROM ExportReceipts er "
                 + "JOIN Users u1 ON er.executor_id = u1.user_id "
+                + "JOIN ConstructionSites cs ON er.site_id = cs.site_id "
                 + "WHERE 1=1 "
         );
 
         if (fromDate != null) {
-            sql.append(" AND er.export_date >= ? ");
+            sql.append("AND er.export_date >= ? ");
         }
         if (toDate != null) {
-            sql.append(" AND er.export_date <= ? ");
+            sql.append("AND er.export_date <= ? ");
         }
         if (exporter != null && !exporter.trim().isEmpty()) {
-            sql.append(" AND u1.full_name LIKE ? ");
+            sql.append("AND u1.full_name LIKE ? ");
         }
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -131,14 +134,16 @@ public class ExportHistoryDAO {
         List<Export> list = new ArrayList<>();
         String sql = "SELECT er.export_id, er.receipt_id, er.export_date, er.note, "
                 + "u1.full_name AS exporter_name, u2.full_name AS receiver_name, "
+                + "cs.site_name, "
                 + "er.executor_id, er.receiver_id, er.proposal_id "
                 + "FROM ExportReceipts er "
                 + "JOIN Users u1 ON er.executor_id = u1.user_id "
                 + "JOIN Users u2 ON er.receiver_id = u2.user_id "
+                + "JOIN ConstructionSites cs ON er.site_id = cs.site_id "
                 + "JOIN ExportDetails ed ON er.export_id = ed.export_id "
                 + "WHERE u1.full_name LIKE ? "
                 + "GROUP BY er.export_id, er.receipt_id, er.export_date, er.note, "
-                + "u1.full_name, u2.full_name, er.executor_id, er.receiver_id, er.proposal_id "
+                + "u1.full_name, u2.full_name, cs.site_name, er.executor_id, er.receiver_id, er.proposal_id "
                 + "ORDER BY er.export_date DESC";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -155,6 +160,7 @@ public class ExportHistoryDAO {
                 receipt.setProposalId(rs.getInt("proposal_id"));
                 receipt.setExporterName(rs.getString("exporter_name"));
                 receipt.setReceiverName(rs.getString("receiver_name"));
+                receipt.setSiteName(rs.getString("site_name"));
                 list.add(receipt);
             }
         } catch (SQLException e) {
@@ -173,12 +179,14 @@ public class ExportHistoryDAO {
                 er.note, 
                 u1.full_name AS exporter_name,
                 u2.full_name AS receiver_name,
+                cs.site_name,
                 er.executor_id,
                 er.receiver_id,
                 er.proposal_id
             FROM ExportReceipts er
             JOIN Users u1 ON er.executor_id = u1.user_id
             JOIN Users u2 ON er.receiver_id = u2.user_id
+            JOIN ConstructionSites cs ON er.site_id = cs.site_id
             WHERE er.export_id = ?
         """;
 
@@ -196,6 +204,7 @@ public class ExportHistoryDAO {
                 receipt.setProposalId(rs.getInt("proposal_id"));
                 receipt.setExporterName(rs.getString("exporter_name"));
                 receipt.setReceiverName(rs.getString("receiver_name"));
+                receipt.setSiteName(rs.getString("site_name"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -295,6 +295,8 @@ public class ExportMaterial extends HttpServlet {
                 export.setReceiverId(receiverId);
                 export.setExportDate(LocalDate.now());
                 export.setNote(note);
+                export.setSiteId(siteId);
+                //export.setSiteName(site);
                 int exportId = dao.saveExport(export);
                 if (exportId <= 0) {
                     errorMessage = "Unable to save export voucher. Please try again.";
@@ -341,10 +343,10 @@ public class ExportMaterial extends HttpServlet {
                         ExportDetail detail = new ExportDetail();
                         detail.setExportId(exportId);
                         detail.setMaterialId(materialId);
-                        detail.setSiteId(siteId);
+                       // detail.setSiteId(siteId);
                         detail.setQuantity(quantity);
                         detail.setMaterialCondition(conditions[i]);
-                        detail.setReason(purpose);
+                        //detail.setReason(purpose);
                         detailList.add(detail);
                     } catch (NumberFormatException e) {
                         errorMessage = "Invalid material code or quantity at row " + (i + 1);
