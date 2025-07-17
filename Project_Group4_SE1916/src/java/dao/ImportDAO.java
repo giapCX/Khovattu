@@ -160,119 +160,122 @@ public class ImportDAO {
             }
         }
     }
-    
+
     public void updateProposalStatusToExecuted(int proposalId) throws SQLException {
-    String sql = "UPDATE EmployeeProposals  SET  final_status = ? WHERE proposal_id = ?";
+        String sql = "UPDATE EmployeeProposals  SET  final_status = ? WHERE proposal_id = ?";
 
-    try (PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setString(1, "executed");
-        ps.setInt(2, proposalId);
-        ps.executeUpdate();
-    }
-}
-
-public List<Import> searchImportsWithPagination(String proposalType, String executor, String fromDate, String toDate, int page, int pageSize) throws SQLException {
-    List<Import> result = new ArrayList<>();
-    StringBuilder sql = new StringBuilder(
-        "SELECT i.import_id, i.proposal_id, i.import_type, i.executor_id, i.import_date, i.note, u.full_name " +
-        "FROM ImportReceipts i " +
-        "JOIN Users u ON i.executor_id = u.user_id " +
-        "WHERE 1=1"
-    );
-    
-    List<Object> params = new ArrayList<>();
-
-    if (proposalType != null && !proposalType.isEmpty()) {
-        sql.append(" AND i.import_type LIKE ?");
-        params.add("%" + proposalType + "%");
-    }
-
-    if (executor != null && !executor.isEmpty()) {
-        sql.append(" AND u.full_name LIKE ?");
-        params.add("%" + executor + "%");
-    }
-
-    if (fromDate != null && !fromDate.isEmpty()) {
-        sql.append(" AND DATE(i.import_date) >= ?");
-        params.add(Date.valueOf(fromDate));
-    }
-
-    if (toDate != null && !toDate.isEmpty()) {
-        sql.append(" AND DATE(i.import_date) <= ?");
-        params.add(Date.valueOf(toDate));
-    }
-    int offset = (page - 1) * pageSize;
-    if (offset < 0) offset = 0;
-    sql.append(" ORDER BY i.import_date DESC LIMIT ?, ?");
-    
-    params.add(offset);
-    params.add(pageSize);
-
-    try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-        for (int i = 0; i < params.size(); i++) {
-            stmt.setObject(i + 1, params.get(i));
-        }
-
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            Import importObj = new Import();
-            importObj.setImportId(rs.getInt("import_id"));
-            importObj.setProposalId(rs.getInt("proposal_id"));
-            importObj.setImportType(rs.getString("import_type"));
-            importObj.setExecutorId(rs.getInt("executor_id"));
-            importObj.setImportDate(rs.getTimestamp("import_date"));
-            importObj.setNote(rs.getString("note"));
-
-            User executorObj = new User();
-            executorObj.setUserId(rs.getInt("executor_id"));
-            executorObj.setFullName(rs.getString("full_name"));
-            importObj.setExecutor(executorObj);
-
-            result.add(importObj);
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "executed");
+            ps.setInt(2, proposalId);
+            ps.executeUpdate();
         }
     }
 
-    return result;
-}
-public int countSearchImports(String proposalType, String executor, String fromDate, String toDate) throws SQLException {
-    StringBuilder sql = new StringBuilder(
-        "SELECT COUNT(*) FROM ImportReceipts i " +
-        "JOIN Users u ON i.executor_id = u.user_id WHERE 1=1"
-    );
+    public List<Import> searchImportsWithPagination(String proposalType, String executor, String fromDate, String toDate, int page, int pageSize) throws SQLException {
+        List<Import> result = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT i.import_id, i.proposal_id, i.import_type, i.executor_id, i.import_date, i.note, u.full_name "
+                + "FROM ImportReceipts i "
+                + "JOIN Users u ON i.executor_id = u.user_id "
+                + "WHERE 1=1"
+        );
 
-    List<Object> params = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
 
-    if (proposalType != null && !proposalType.isEmpty()) {
-        sql.append(" AND i.import_type LIKE ?");
-        params.add("%" + proposalType + "%");
-    }
-
-    if (executor != null && !executor.isEmpty()) {
-        sql.append(" AND u.full_name LIKE ?");
-        params.add("%" + executor + "%");
-    }
-
-    if (fromDate != null && !fromDate.isEmpty()) {
-        sql.append(" AND DATE(i.import_date) >= ?");
-        params.add(Date.valueOf(fromDate));
-    }
-
-    if (toDate != null && !toDate.isEmpty()) {
-        sql.append(" AND DATE(i.import_date) <= ?");
-        params.add(Date.valueOf(toDate));
-    }
-
-    try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-        for (int i = 0; i < params.size(); i++) {
-            stmt.setObject(i + 1, params.get(i));
+        if (proposalType != null && !proposalType.isEmpty()) {
+            sql.append(" AND i.import_type LIKE ?");
+            params.add("%" + proposalType + "%");
         }
 
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            return rs.getInt(1);
+        if (executor != null && !executor.isEmpty()) {
+            sql.append(" AND u.full_name LIKE ?");
+            params.add("%" + executor + "%");
         }
+
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql.append(" AND DATE(i.import_date) >= ?");
+            params.add(Date.valueOf(fromDate));
+        }
+
+        if (toDate != null && !toDate.isEmpty()) {
+            sql.append(" AND DATE(i.import_date) <= ?");
+            params.add(Date.valueOf(toDate));
+        }
+
+        int offset = (page - 1) * pageSize;
+        if (offset < 0) {
+            offset = 0;
+        }
+        sql.append(" ORDER BY i.import_date DESC LIMIT ?, ?");
+        params.add(offset);
+        params.add(pageSize);
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Import importObj = new Import();
+                importObj.setImportId(rs.getInt("import_id"));
+                importObj.setProposalId(rs.getInt("proposal_id"));
+                importObj.setImportType(rs.getString("import_type"));
+                importObj.setExecutorId(rs.getInt("executor_id"));
+                importObj.setImportDate(rs.getTimestamp("import_date"));
+                importObj.setNote(rs.getString("note"));
+
+                User executorObj = new User();
+                executorObj.setUserId(rs.getInt("executor_id"));
+                executorObj.setFullName(rs.getString("full_name"));
+                importObj.setExecutor(executorObj);
+
+                result.add(importObj);
+            }
+        }
+
+        return result;
     }
 
-    return 0;
-}
+    public int countSearchImports(String proposalType, String executor, String fromDate, String toDate) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) FROM ImportReceipts i "
+                + "JOIN Users u ON i.executor_id = u.user_id WHERE 1=1"
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (proposalType != null && !proposalType.isEmpty()) {
+            sql.append(" AND i.import_type LIKE ?");
+            params.add("%" + proposalType + "%");
+        }
+
+        if (executor != null && !executor.isEmpty()) {
+            sql.append(" AND u.full_name LIKE ?");
+            params.add("%" + executor + "%");
+        }
+
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql.append(" AND DATE(i.import_date) >= ?");
+            params.add(Date.valueOf(fromDate));
+        }
+
+        if (toDate != null && !toDate.isEmpty()) {
+            sql.append(" AND DATE(i.import_date) <= ?");
+            params.add(Date.valueOf(toDate));
+        }
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+
+        return 0;
+    }
 }
