@@ -6,6 +6,11 @@
         return;
     }
 %>
+<%
+    String role = (String) session.getAttribute("role");
+    Integer userId = (Integer) session.getAttribute("userId");
+    String userFullName = (String) session.getAttribute("userFullName");
+%>
 <!-- Sidebar -->
 <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50 hidden">
     <div class="sidebar-header flex items-center mb-4">

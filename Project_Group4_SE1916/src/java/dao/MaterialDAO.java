@@ -651,16 +651,39 @@ public class MaterialDAO {
         }
         return materials;
     }
-    public void addMaterial(Material material) throws SQLException {
-    String sqlMaterial = "INSERT INTO Materials (code, category_id, name, description, unit, image_url) VALUES (?, ?, ?, ?, ?, ?)";
+public void addMaterial(Material material) throws SQLException {
+    String sqlMaterial = "INSERT INTO Materials (category_id, name, description, unit, unit_id, image_url) VALUES (?, ?, ?, ?, ?, ?)";
     try (PreparedStatement ps = conn.prepareStatement(sqlMaterial, PreparedStatement.RETURN_GENERATED_KEYS)) {
-        ps.setString(1, material.getCode());
-        ps.setInt(2, material.getCategory().getCategoryId());
-        ps.setString(3, material.getName());
-        ps.setString(4, material.getDescription());
-        ps.setString(5, material.getUnit());
+        ps.setInt(1, material.getCategory().getCategoryId());
+        ps.setString(2, material.getName());
+        ps.setString(3, material.getDescription());
+        ps.setString(4, material.getUnit());
+        ps.setInt(5, material.getUnitId()); // Thêm dòng này
         ps.setString(6, material.getImageUrl());
         ps.executeUpdate();
     }
+}
+    public List<String> getUnits() throws SQLException {
+    List<String> units = new ArrayList<>();
+    String sql = "SELECT DISTINCT unit FROM Materials WHERE unit IS NOT NULL AND unit != '' ORDER BY unit";
+    try (PreparedStatement ps = conn.prepareStatement(sql); 
+         ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            units.add(rs.getString("unit"));
+        }
+    }
+    return units;
+}
+    public int getUnitIdByName(String unitName) throws SQLException {
+    String sql = "SELECT unit_id FROM Units WHERE name = ?";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, unitName);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("unit_id");
+            }
+        }
+    }
+    return -1;
 }
 }

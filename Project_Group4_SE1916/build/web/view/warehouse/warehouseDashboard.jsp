@@ -437,7 +437,7 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/ListMaterialController" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Kiểm tra ngay</a>
+                        <a href="${pageContext.request.contextPath}/inventory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Kiểm tra ngay</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-200">
@@ -484,15 +484,11 @@
                     <i class="fas fa-arrow-up text-3xl mb-3"></i>
                     <span class="text-lg">Xuất kho</span>
                 </button>
-                <button onclick="showToast('Đang chuyển đến trang tạo đơn...')" 
-                        class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
-                    <i class="fas fa-file-alt text-3xl mb-3"></i>
-                    <span class="text-lg">Tạo đơn hàng</span>
-                </button>
+                
             </div>
 
             <!-- Charts Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+<!--            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
                 <div class="lg:col-span-2 card bg-white dark:bg-gray-800 p-6">
                     <div class="flex justify-between items-center mb-4">
                         <div>
@@ -536,10 +532,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
 
             <!-- Tables Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!--            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="table-container bg-white dark:bg-gray-800">
                     <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                         <div>
@@ -586,8 +582,8 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-                <div class="table-container bg-white dark:bg-gray-800">
+                </div>-->
+<!--                <div class="table-container bg-white dark:bg-gray-800">
                     <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                         <div>
                             <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Giao dịch gần đây</h2>
@@ -633,7 +629,7 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div>-->
             </div>
         </main>
 

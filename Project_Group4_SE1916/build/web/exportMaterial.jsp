@@ -1,5 +1,4 @@
 
-
 <%-- 
     Document   : exportMaterial
     Created on : Jun 9, 2025, 7:27:11 PM
@@ -20,6 +19,7 @@
         <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
+<!--        <script src="https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js"></script>-->
         <style>
             body {
                 min-height: 100vh;
@@ -164,8 +164,8 @@
 
                     <div class="mb-3">
                         <label>Receipt ID</label>
-                        <input type="text" id="voucherId" name="voucherId" class="form-control" maxlength="50" pattern="[A-Za-z0-9-_]+" required readonly>
-                        <div class="invalid-feedback">Voucher ID is required, max 50 characters, alphanumeric, hyphens, or underscores only.</div>
+                        <input type="text" id="voucherId" name="voucherId" class="form-control" " required readonly>
+                        <div class="invalid-feedback">Voucher ID is required</div>
                     </div>
 
                     <div class="mb-3">
@@ -175,11 +175,22 @@
                         <div class="invalid-feedback">Please select a receiver.</div>
                     </div>
 
+                    <div class="mb-3" style="position: relative;">
+                        <label for="siteName" class="form-label">Construction Site</label>
+                        <input type="text" class="form-control site-name-input" id="siteName" name="siteName" required autocomplete="off">
+                        <input type="hidden" name="siteId" id="siteId">
+                        <div class="autocomplete-suggestions" style="display: none;"></div>
+                        <div class="invalid-feedback">Please select a construction site.</div>
+                    </div>
+
+
                     <div class="mb-3">
                         <label for="purpose" class="form-label">Export Purpose</label>
-                        <textarea class="form-control" id="purpose" name="purpose" rows="3" required maxlength="500" pattern="[A-Za-z0-9\s,.()-]+"></textarea>
-                        <div class="invalid-feedback">Purpose is required, max 500 characters, alphanumeric, spaces, commas, periods, parentheses, or hyphens only.</div>
-                    </div>
+                        <textarea class="form-control" id="purpose" name="purpose" rows="3" ></textarea>
+                        <div class="invalid-feedback">Purpose is required</div>
+                    </div>   
+
+
 
                     <div class="mb-3">
                         <label class="form-label">Material List</label>
@@ -192,7 +203,6 @@
                                     <th>Quantity</th>
                                     <th>Unit</th>
                                     <th>Condition</th>
-                                    <th>Construction Site</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -211,14 +221,8 @@
                                             <option value="">Select condition</option>
                                             <option value="new">New</option>
                                             <option value="used">Used</option>
-                                            <option value="damaged">Damaged</option>
+                                            <option value="damaged" disabled>Damaged</option>
                                         </select>
-                                    </td>
-                                    <td style="position: relative;">
-                                        <input type="text" class="form-control site-name-input" name="siteName[]" required autocomplete="off">
-                                        <input type="hidden" name="siteId[]" class="site-id-input">
-                                        <div class="autocomplete-suggestions" style="display: none;"></div>
-                                        <div class="invalid-feedback">Please select a construction site.</div>
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button>
@@ -237,8 +241,8 @@
 
                     <div class="mb-3">
                         <label for="additionalNote" class="form-label">Additional Notes</label>
-                        <textarea class="form-control" id="additionalNote" name="additionalNote" rows="3" maxlength="1000" pattern="[A-Za-z0-9\s,.()-]+"></textarea>
-                        <div class="invalid-feedback">Notes max 1000 characters, alphanumeric, spaces, commas, periods, parentheses, or hyphens only.</div>
+                        <textarea class="form-control" id="additionalNote" name="additionalNote" rows="3" "></textarea>
+
                     </div>
 
                     <button type="submit" class="btn btn-primary">Save Export</button>
@@ -271,7 +275,6 @@
                     voucherIdInput.value = generateReceiptId();
                 }
             };
-
 
             let materialData = [];
             let employeeData = [];
@@ -342,35 +345,28 @@
                 const tableBody = document.getElementById('materialTableBody');
                 const row = document.createElement('tr');
                 row.innerHTML = `
-            <td class="serial-number"></td>
-            <td style="position: relative;">
-                <input type="text" class="form-control material-name-input" name="materialName[]" required autocomplete="off">
-                <div class="autocomplete-suggestions" style="display: none;"></div>
-            </td>
-            <td><input type="text" class="form-control material-code-input" name="materialCode[]" readonly></td>
-            <td><input type="number" class="form-control" name="quantity[]" min="1" required></td>
-            <td><input type="text" class="form-control unit-display" name="unit[]" readonly></td>
-            <td>
-                <select class="form-select" name="condition[]" required>
-                    <option value="">Select condition</option>
-                    <option value="new">New</option>
-                    <option value="used">Used</option>
-                    <option value="damaged">Damaged</option>
-                </select>
-            </td>
-            <td style="position: relative;">
-                <input type="text" class="form-control site-name-input" name="siteName[]" required autocomplete="off">
-                <input type="hidden" name="siteId[]" class="site-id-input">
-                <div class="autocomplete-suggestions" style="display: none;"></div>
-                <div class="invalid-feedback">Please select a construction site.</div>
-            </td>
-            <td>
-                <button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button>
-            </td>
-        `;
+                    <td class="serial-number"></td>
+                    <td style="position: relative;">
+                        <input type="text" class="form-control material-name-input" name="materialName[]" required autocomplete="off">
+                        <div class="autocomplete-suggestions" style="display: none;"></div>
+                    </td>
+                    <td><input type="text" class="form-control material-code-input" name="materialCode[]" readonly></td>
+                    <td><input type="number" class="form-control" name="quantity[]" min="1" required></td>
+                    <td><input type="text" class="form-control unit-display" name="unit[]" readonly></td>
+                    <td>
+                        <select class="form-select" name="condition[]" required>
+                            <option value="">Select condition</option>
+                            <option value="new">New</option>
+                            <option value="used">Used</option>
+                            <option value="damaged" disabled>Damaged</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm remove-row" disabled>Delete</button>
+                    </td>
+                `;
                 tableBody.appendChild(row);
                 attachMaterialAutocomplete(row.querySelector('.material-name-input'));
-                attachSiteAutocomplete(row.querySelector('.site-name-input'));
                 updateSerialNumbers();
                 updateRemoveButtons();
                 checkFormValidity();
@@ -472,7 +468,7 @@
                     if (this.readOnly)
                         return;
                     const value = this.value.toLowerCase();
-                    const suggestionsDiv = this.nextElementSibling.nextElementSibling; // Skip hidden input
+                    const suggestionsDiv = this.nextElementSibling.nextElementSibling;
                     suggestionsDiv.innerHTML = '';
                     suggestionsDiv.style.display = 'none';
 
@@ -487,7 +483,7 @@
                                 suggestion.textContent = site.siteName;
                                 suggestion.addEventListener('click', () => {
                                     this.value = site.siteName;
-                                    this.closest('tr').querySelector('.site-id-input').value = site.siteId;
+                                    document.getElementById('siteId').value = site.siteId;
                                     suggestionsDiv.style.display = 'none';
                                     checkFormValidity();
                                 });
@@ -505,129 +501,165 @@
                 });
             }
 
-            // Export to Excel functionality
+            // Export form data to Excel
+            // Export form data to Excel
             function exportToExcel() {
-                if (!checkFormValidity())
-                    return;
+                // Collect form data with null checks
+                const voucherIdInput = document.getElementById('voucherId');
+                const voucherId = voucherIdInput?.value?.trim() || 'Untitled';
+                const exporter = document.querySelector('input[name="userFN"]')?.value?.trim() || 'Not Identified';
+                const receiver = document.getElementById('receiver')?.value?.trim() || 'N/A';
+                const siteName = document.getElementById('siteName')?.value?.trim() || 'N/A';
+                const purpose = document.getElementById('purpose')?.value?.trim() || '';
+                const requiredDate = document.getElementById('requiredDate')?.value?.trim() || 'N/A';
+                const additionalNote = document.getElementById('additionalNote')?.value?.trim() || '';
 
-                const exporter = document.querySelector('input[name="userFN"]').value;
-                const voucherId = document.getElementById('voucherId').value;
-                const receiver = document.getElementById('receiver').value;
-                const purpose = document.getElementById('purpose').value;
-                const requiredDate = document.getElementById('requiredDate').value;
-                const additionalNote = document.getElementById('additionalNote').value;
-
-                const data = [
-                    ["Export Voucher"],
-                    ["Exporter", exporter],
-                    ["Receipt ID", voucherId],
-                    ["Receiver", receiver],
-                    ["Purpose", purpose],
-                    ["Required Export Date", requiredDate],
-                    ["Additional Notes", additionalNote || "None"],
-                    [],
-                    ["Material List"],
-                    ["No.", "Construction Site", "Material Name", "Material Code", "Quantity", "Unit", "Condition"]
-                ];
-
-                const materialRows = document.querySelectorAll('#materialTableBody tr');
-                materialRows.forEach((row, index) => {
-                    const siteName = row.querySelector('.site-name-input').value;
-                    const materialName = row.querySelector('.material-name-input').value;
-                    const materialCode = row.querySelector('.material-code-input').value;
-                    const quantity = row.querySelector('input[name="quantity[]"]').value;
-                    const unit = row.querySelector('.unit-display').value;
-                    const condition = row.querySelector('select[name="condition[]"]').value;
-                    data.push([index + 1, siteName, materialName, materialCode, parseInt(quantity), unit, condition]);
+                // Debug: Log all form inputs
+                console.log('Form Inputs:', {
+                    voucherId,
+                    exporter,
+                    receiver,
+                    siteName,
+                    purpose,
+                    requiredDate,
+                    additionalNote
                 });
 
-                const ws = XLSX.utils.aoa_to_sheet(data);
-                ws['A1'].s = {font: {bold: true}};
-                ws['A9'].s = {font: {bold: true}};
-                ws['A10'].s = {font: {bold: true}};
-                ws['B10'].s = {font: {bold: true}};
-                ws['C10'].s = {font: {bold: true}};
-                ws['D10'].s = {font: {bold: true}};
-                ws['E10'].s = {font: {bold: true}};
-                ws['F10'].s = {font: {bold: true}};
-                ws['G10'].s = {font: {bold: true}};
+                // Collect material data from the table
+                const materialRows = document.querySelectorAll('#materialTableBody tr');
+                const materials = [];
+                let isValid = true;
 
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Export Voucher");
-                XLSX.writeFile(wb, `ExportVoucher_${voucherId}.xlsx`);
-            }
+                materialRows.forEach((row, index) => {
+                    const materialName = row.querySelector('input[name="materialName[]"]')?.value?.trim() || '';
+                    const materialCode = row.querySelector('input[name="materialCode[]"]')?.value?.trim() || '';
+                    const quantity = row.querySelector('input[name="quantity[]"]')?.value?.trim() || '';
+                    const unit = row.querySelector('input[name="unit[]"]')?.value?.trim() || '';
+                    const condition = row.querySelector('select[name="condition[]"]')?.value?.trim() || '';
 
-            // Check form validity to enable/disable export button
-            function checkFormValidity() {
-                const isValid = validateForm();
-                const exportBtn = document.getElementById('exportExcelBtn');
-                exportBtn.disabled = !isValid;
-                exportBtn.classList.toggle('btn-disabled', !isValid);
-                return isValid;
-            }
-
-            // Client-side form validation
-            function validateForm() {
-                const voucherId = document.getElementById('voucherId').value.trim();
-                const receiver = document.getElementById('receiver').value.trim();
-                const purpose = document.getElementById('purpose').value.trim();
-                const requiredDate = document.getElementById('requiredDate').value;
-                const additionalNote = document.getElementById('additionalNote').value.trim();
-                const siteNames = document.getElementsByName('siteName[]');
-                const siteIds = document.getElementsByName('siteId[]');
-                const materialNames = document.getElementsByName('materialName[]');
-                const materialCodes = document.getElementsByName('materialCode[]');
-                const quantities = document.getElementsByName('quantity[]');
-                const units = document.getElementsByName('unit[]');
-                const conditions = document.getElementsByName('condition[]');
-                const rows = document.querySelectorAll('#materialTableBody tr');
-
-                rows.forEach(row => row.classList.remove('error-row'));
-
-                const idRegex = /^[A-Za-z0-9-_]+$/;
-                const textRegex = /^[A-Za-z0-9\s,.()-]+$/;
-
-                if (!voucherId || voucherId.length > 50 || !idRegex.test(voucherId)) {
-                    rows[0].classList.add('error-row');
-                    return false;
-                }
-
-                if (!receiver || !employeeData.some(emp => emp.fullName === receiver)) {
-                    rows[0].classList.add('error-row');
-                    return false;
-                }
-
-                if (!purpose || purpose.length > 500 || !textRegex.test(purpose)) {
-                    rows[0].classList.add('error-row');
-                    return false;
-                }
-
-                if (!requiredDate) {
-                    rows[0].classList.add('error-row');
-                    return false;
-                }
-
-                if (additionalNote && (additionalNote.length > 1000 || !textRegex.test(additionalNote))) {
-                    rows[0].classList.add('error-row');
-                    return false;
-                }
-
-                if (materialNames.length === 0) {
-                    return false;
-                }
-
-                for (let i = 0; i < materialNames.length; i++) {
-                    if (!siteNames[i].value.trim() || !siteIds[i].value ||
-                            !siteData.some(site => site.siteId === siteIds[i].value && site.siteName === siteNames[i].value.trim()) ||
-                            !materialNames[i].value.trim() || !materialCodes[i].value.trim() ||
-                            !quantities[i].value || quantities[i].value <= 0 ||
-                            !units[i].value || !conditions[i].value) {
-                        rows[i].classList.add('error-row');
-                        return false;
+                    // Validate row data
+                    if (materialName && quantity && condition) {
+                        materials.push({
+                            'No.': index + 1,
+                            'Material Name': materialName,
+                            'Material Code': materialCode,
+                            'Quantity': parseFloat(quantity) || 0,
+                            'Unit': unit,
+                            'Condition': condition
+                        });
+                    } else {
+                        isValid = false;
+                        row.classList.add('error-row');
+                        console.warn(`Invalid material row ${index + 1}:`, {materialName, quantity, condition});
                     }
+                });
+
+                // Check if there are valid materials
+                if (!materials.length || !isValid) {
+                    alert('Please ensure all material rows are completely filled with valid data.');
+                    return;
                 }
 
-                return true;
+                // Debug: Log materials
+                console.log('Materials:', materials);
+
+                // Create data for the Excel sheet
+                const exportData = [
+                    {'Field': 'Receipt ID', 'Value': voucherId},
+                    {'Field': 'Exporter', 'Value': exporter},
+                    {'Field': 'Receiver', 'Value': receiver},
+                    {'Field': 'Construction Site', 'Value': siteName},
+                    {'Field': 'Export Purpose', 'Value': purpose},
+                    {'Field': 'Required Export Date', 'Value': requiredDate},
+                    {'Field': 'Additional Notes', 'Value': additionalNote},
+                    {}, // Empty row for spacing
+                    // Material table header
+                    {
+                        'Field': 'No.',
+                        'Value': 'Material Name',
+                        'Material Code': 'Material Code',
+                        'Quantity': 'Quantity',
+                        'Unit': 'Unit',
+                        'Condition': 'Condition'
+                    },
+                    ...materials.map(item => ({
+                            'Field': item['No.'],
+                            'Value': item['Material Name'],
+                            'Material Code': item['Material Code'],
+                            'Quantity': item['Quantity'],
+                            'Unit': item['Unit'],
+                            'Condition': item['Condition']
+                        }))
+                ];
+
+                // Debug: Log exportData
+                console.log('Export Data:', exportData);
+
+                try {
+                    // Create a new workbook and worksheet
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.json_to_sheet(exportData, {
+                        header: ['Field', 'Value', 'Material Code', 'Quantity', 'Unit', 'Condition']
+                    });
+
+                    // Adjust column widths
+                    const colWidths = [
+                        {wch: 20}, // Field
+                        {wch: 40}, // Value
+                        {wch: 20}, // Material Code
+                        {wch: 15}, // Quantity
+                        {wch: 15}, // Unit
+                        {wch: 15}  // Condition
+                    ];
+                    ws['!cols'] = colWidths;
+
+                    // Add the worksheet to the workbook
+                    XLSX.utils.book_append_sheet(wb, ws, 'Export Materials');
+
+                    // Generate and download the Excel file with sanitized filename
+                    const safeVoucherId = (voucherId || 'Untitled').replace(/[^a-zA-Z0-9-_]/g, '_');
+                    const fileName = `Export_Materials_${safeVoucherId}.xlsx`;
+                    console.log('Generated File Name:', fileName);
+
+                    // Verify XLSX library is loaded
+                    if (typeof XLSX === 'undefined') {
+                        throw new Error('XLSX library is not loaded');
+                    }
+
+                    XLSX.write(wb, fileName);
+                    alert('Excel file exported successfully!');
+                } catch (error) {
+                    console.error('Error exporting to Excel:', error);
+                    alert('An error occurred while exporting to Excel. Please check the console for details.');
+                }
+            }
+
+
+            // Check form validity and enable/disable export button
+            function checkFormValidity() {
+                const form = document.querySelector('.needs-validation');
+                const exportButton = document.getElementById('exportExcelBtn');
+                let isValid = form.checkValidity();
+
+                // Additional custom validation for material rows
+                const materialRows = document.querySelectorAll('#materialTableBody tr');
+                let allMaterialsValid = true;
+
+                materialRows.forEach(row => {
+                    const materialName = row.querySelector('input[name="materialName[]"]').value;
+                    const quantity = row.querySelector('input[name="quantity[]"]').value;
+                    const condition = row.querySelector('select[name="condition[]"]').value;
+
+                    if (!materialName || !quantity || !condition) {
+                        allMaterialsValid = false;
+                    }
+                });
+
+                isValid = isValid && allMaterialsValid;
+
+                // Enable/disable export button
+                exportButton.disabled = !isValid;
+                exportButton.classList.toggle('btn-disabled', !isValid);
             }
 
             // Bootstrap form validation
@@ -637,9 +669,8 @@
                 Array.from(forms).forEach(form => {
                     form.addEventListener('submit', event => {
                         if (!form.checkValidity() || !validateForm()) {
-                            // event.preventDefault(); // ❌ Bỏ chặn!
-                            // event.stopPropagation(); // ❌ Bỏ chặn!
-                            // Có thể log hoặc alert nếu muốn:
+                            // event.preventDefault(); //  Bỏ chặn!
+                            // event.stopPropagation(); //  Bỏ chặn!
                             console.warn('Form không hợp lệ nhưng vẫn submit!');
                         }
                         form.classList.add('was-validated');
@@ -652,15 +683,15 @@
                 });
             })();
 
-
             // Initialize
             document.addEventListener("DOMContentLoaded", () => {
                 const tableBody = document.getElementById('materialTableBody');
                 const addButton = document.getElementById('addMaterialBtn');
                 const exportButton = document.getElementById('exportExcelBtn');
                 const receiverInput = document.getElementById('receiver');
+                const siteInput = document.getElementById('siteName');
 
-                if (!tableBody || !addButton || !exportButton || !receiverInput) {
+                if (!tableBody || !addButton || !exportButton || !receiverInput || !siteInput) {
                     console.error('Required elements not found');
                     return;
                 }
@@ -668,8 +699,8 @@
                 // Fetch data and attach autocompletes
                 Promise.all([fetchMaterials(), fetchEmployees(), fetchSites()]).then(() => {
                     document.querySelectorAll(".material-name-input").forEach(attachMaterialAutocomplete);
-                    document.querySelectorAll(".site-name-input").forEach(attachSiteAutocomplete);
                     attachEmployeeAutocomplete(receiverInput);
+                    attachSiteAutocomplete(siteInput);
                 });
 
                 // Add row event

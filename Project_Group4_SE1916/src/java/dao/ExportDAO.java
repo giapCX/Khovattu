@@ -1,4 +1,5 @@
 //exDAO
+
 package dao;
 
 import Dal.DBContext;
@@ -8,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Date;
+import java.util.Arrays;
 import java.util.List;
 import model.Export;
 import model.ExportDetail;
@@ -25,14 +27,15 @@ public class ExportDAO {
     }
 
     public int saveExport(Export export) throws SQLException {
-        String sql = "INSERT INTO ExportReceipts (receipt_id, executor_id, receiver_id, export_date, note) "
-                + "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ExportReceipts (receipt_id, executor_id, receiver_id, export_date, note, site_id) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, export.getReceiptId());
             stmt.setInt(2, export.getExporterId());
             stmt.setInt(3, export.getReceiverId());
             stmt.setDate(4, Date.valueOf(export.getExportDate()));
             stmt.setString(5, export.getNote());
+            stmt.setInt(6, export.getSiteId());
             stmt.executeUpdate();
 
             ResultSet rs = stmt.getGeneratedKeys();
@@ -44,15 +47,14 @@ public class ExportDAO {
     }
 
     public void saveExportDetails(List<ExportDetail> details, int exportId) throws SQLException {
-        String sql = "INSERT INTO ExportDetails (export_id, material_id, site_id, quantity, material_condition, reason) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ExportDetails (export_id, material_id, quantity, material_condition) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             for (ExportDetail detail : details) {
                 stmt.setInt(1, exportId);
                 stmt.setInt(2, detail.getMaterialId());
-                stmt.setInt(3, detail.getSiteId()); 
-                stmt.setDouble(4, detail.getQuantity());
-                stmt.setString(5, detail.getMaterialCondition());
-                stmt.setString(6, detail.getReason());
+                stmt.setDouble(3, detail.getQuantity());
+                stmt.setString(4, detail.getMaterialCondition());
+
                 stmt.addBatch();
             }
             stmt.executeBatch();
@@ -72,7 +74,7 @@ public class ExportDAO {
     }
 
     public Export getExportById(int exportId) throws SQLException {
-        String sql = "SELECT export_id, receipt_id, executor_id, receiver_id, export_date, note "
+        String sql = "SELECT export_id, receipt_id, executor_id, receiver_id, export_date, note, site_id "
                 + "FROM ExportReceipts WHERE export_id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, exportId);
@@ -85,9 +87,36 @@ public class ExportDAO {
                 export.setReceiverId(rs.getInt("receiver_id"));
                 export.setExportDate(rs.getDate("export_date").toLocalDate());
                 export.setNote(rs.getString("note"));
+                export.setSiteId(rs.getInt("site_id"));
                 return export;
             }
         }
         return null; // Return null if no export is found
+    }
+
+    public void exportMaterial(int exportId, int materialId, double quantity, String condition) throws SQLException {
+        // Insert export detail
+        String insertDetailSql = "INSERT INTO ExportDetails (export_id, material_id, quantity, material_condition) " +
+                                "VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(insertDetailSql)) {
+            stmt.setInt(1, exportId);
+            stmt.setInt(2, materialId);
+            stmt.setDouble(3, quantity);
+            stmt.setString(4, condition);
+            stmt.executeUpdate();
+        }
+
+        // Update inventory
+        String updateInventorySql = "UPDATE Inventory SET quantity_in_stock = quantity_in_stock - ? " +
+                                   "WHERE material_id = ? AND material_condition = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(updateInventorySql)) {
+            stmt.setDouble(1, quantity);
+            stmt.setInt(2, materialId);
+            stmt.setString(3, condition);
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Cannot update inventory  " + materialId);
+            }
+        }
     }
 }

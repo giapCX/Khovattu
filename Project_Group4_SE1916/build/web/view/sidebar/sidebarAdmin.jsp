@@ -1,9 +1,15 @@
+<!-- Session Check -->
 <%
     String username = (String) session.getAttribute("username");
     if (username == null) {
         response.sendRedirect("Login.jsp");
         return;
     }
+%>
+<%
+    String role = (String) session.getAttribute("role");
+    Integer userId = (Integer) session.getAttribute("userId");
+    String userFullName = (String) session.getAttribute("userFullName");
 %>
 <!-- Sidebar -->
 <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50">
@@ -53,7 +59,7 @@
         </div>
         <a href="${pageContext.request.contextPath}/ListParentCategoryController" class="nav-item flex items-center p-3">
             <i class="fas fa-box-open mr-3 w-6 text-center"></i>
-            <span class="text-lg">Danh mục vật tư</span>
+            <span class="text-lg">Material Category</span>
             <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
         </a>
         <!-- Supplier - Menu cha -->

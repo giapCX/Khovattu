@@ -1,4 +1,5 @@
-//exdetail model
+//exportDetail
+
 package model;
 
 public class ExportDetail {
@@ -14,14 +15,12 @@ public class ExportDetail {
     private String materialName;
     private String unit;
     private String materialCategory;
-
-    private int siteId;
-    private String siteName;
+    
     
     public ExportDetail() {
     }
 
-    public ExportDetail(int exportDetailId, int exportId, int materialId, double quantity, String materialCondition, String reason, String materialCode, String materialName, String unit, String materialCategory, int siteId, String siteName) {
+    public ExportDetail(int exportDetailId, int exportId, int materialId, double quantity, String materialCondition, String reason, String materialCode, String materialName, String unit, String materialCategory) {
         this.exportDetailId = exportDetailId;
         this.exportId = exportId;
         this.materialId = materialId;
@@ -32,8 +31,7 @@ public class ExportDetail {
         this.materialName = materialName;
         this.unit = unit;
         this.materialCategory = materialCategory;
-        this.siteId = siteId;
-        this.siteName = siteName;
+        
     }
    
 
@@ -117,19 +115,5 @@ public class ExportDetail {
         this.materialCategory = materialCategory;
     }
     
-     public int getSiteId() {
-        return siteId;
-    }
-
-    public void setSiteId(int siteId) {
-        this.siteId = siteId;
-    }
-
-    public String getSiteName() {
-        return siteName;
-    }
-
-    public void setSiteName(String siteName) {
-        this.siteName = siteName;
-    }
+    
 }

@@ -18,6 +18,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024 * 2, // 2MB
@@ -39,8 +41,7 @@ public class AddMaterialController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
-            request.setAttribute("categories", categories);
+            loadFormData(request);
             request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new ServletException("Không thể lấy dữ liệu cho form", e);
@@ -50,86 +51,195 @@ public class AddMaterialController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Material material = new Material();
-
+        
+        // Set character encoding for Vietnamese
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        
         try {
+            Material material = new Material();
+            
             // Lấy dữ liệu từ form
-            material.setCode(request.getParameter("code"));
-            material.setName(request.getParameter("name"));
-            material.setDescription(request.getParameter("description"));
-            material.setUnit(request.getParameter("unit"));
-
-            // Xử lý upload ảnh
-            Part filePart = request.getPart("imageFile");
-            String imageUrl = "";
-            if (filePart == null || filePart.getSize() == 0) {
-                request.setAttribute("message", "Vui lòng chọn ảnh cho vật tư.");
-                request.setAttribute("messageType", "danger");
-                List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
-                request.setAttribute("categories", categories);
+            String name = request.getParameter("name");
+            String description = request.getParameter("description");
+            String unit = request.getParameter("unit");
+            String parentCategoryId = request.getParameter("parentCategoryId");
+            String childCategoryId = request.getParameter("childCategory"); // Khớp với name trong JSP
+            
+            // Validation
+            if (name == null || name.trim().isEmpty()) {
+                request.setAttribute("message", "Tên vật tư không được để trống!");
+                request.setAttribute("messageType", "error");
+                loadFormData(request);
                 request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
                 return;
             }
+            
+            if (unit == null || unit.trim().isEmpty()) {
+                request.setAttribute("message", "Đơn vị không được để trống!");
+                request.setAttribute("messageType", "error");
+                loadFormData(request);
+                request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
+                return;
+            }
+            
+            if (parentCategoryId == null || parentCategoryId.trim().isEmpty()) {
+                request.setAttribute("message", "Vui lòng chọn danh mục cha!");
+                request.setAttribute("messageType", "error");
+                loadFormData(request);
+                request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
+                return;
+            }
+            
+            if (childCategoryId == null || childCategoryId.trim().isEmpty()) {
+                request.setAttribute("message", "Vui lòng chọn danh mục con!");
+                request.setAttribute("messageType", "error");
+                loadFormData(request);
+                request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
+                return;
+            }
+            
+            // Set basic information
+            material.setName(name.trim());
+            material.setDescription(description != null ? description.trim() : "");
+            material.setUnit(unit.trim());
+            int unitId = materialDAO.getUnitIdByName(unit); // Cần thêm phương thức này trong MaterialDAO
 
+if (unitId == -1) {
+    request.setAttribute("message", "Đơn vị không hợp lệ!");
+    request.setAttribute("messageType", "error");
+    loadFormData(request);
+    request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
+    return;
+}
+
+material.setUnitId(unitId);
+            
+            // Xử lý upload ảnh
+            Part filePart = request.getPart("imageFile");
+            String imageUrl = "";
+            
             if (filePart != null && filePart.getSize() > 0) {
-                String fileName = System.currentTimeMillis() + "_" + Path.of(filePart.getSubmittedFileName()).getFileName();
-
-                // ✅ 1. Ghi vào thư mục build để có thể hiển thị khi chạy
+                // Validate file type
+                String contentType = filePart.getContentType();
+                if (!contentType.startsWith("image/")) {
+                    request.setAttribute("message", "Vui lòng chọn file ảnh hợp lệ!");
+                    request.setAttribute("messageType", "error");
+                    loadFormData(request);
+                    request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
+                    return;
+                }
+                
+                String originalFileName = filePart.getSubmittedFileName();
+                String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+                String fileName = System.currentTimeMillis() + "_" + name.replaceAll("[^a-zA-Z0-9]", "_") + fileExtension;
+                
+                // Save to build directory for immediate display
                 String buildPath = request.getServletContext().getRealPath("/uploads");
                 File buildDir = new File(buildPath);
                 if (!buildDir.exists()) {
                     buildDir.mkdirs();
                 }
-                filePart.write(buildPath + File.separator + fileName);
-
-                // ✅ 2. Copy về thư mục dự án để không bị mất khi Clean & Build
-                File buildDirFile = new File(buildPath);
-                File projectRoot = buildDirFile.getParentFile().getParentFile().getParentFile(); // build/web/uploads → build/web → build → root
-                File sourceUploadDir = new File(projectRoot, "web/uploads");
-                if (!sourceUploadDir.exists()) {
-                    sourceUploadDir.mkdirs();
+                
+                File buildFile = new File(buildDir, fileName);
+                filePart.write(buildFile.getAbsolutePath());
+                
+                // Copy to source directory to persist after clean & build
+                try {
+                    File buildDirFile = new File(buildPath);
+                    File projectRoot = buildDirFile.getParentFile().getParentFile().getParentFile();
+                    File sourceUploadDir = new File(projectRoot, "web/uploads");
+                    if (!sourceUploadDir.exists()) {
+                        sourceUploadDir.mkdirs();
+                    }
+                    
+                    Path source = buildFile.toPath();
+                    Path target = new File(sourceUploadDir, fileName).toPath();
+                    Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+                } catch (Exception e) {
+                    Logger.getLogger(AddMaterialController.class.getName()).log(Level.WARNING, "Could not copy to source directory", e);
                 }
-
-                Path source = Path.of(buildPath, fileName);
-                Path target = Path.of(sourceUploadDir.getAbsolutePath(), fileName);
-                Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-
+                
                 imageUrl = "uploads/" + fileName;
             }
-
+            
             material.setImageUrl(imageUrl);
-
-            // Lấy và gán category
-            int categoryId = Integer.parseInt(request.getParameter("category"));
-            MaterialCategory category = new MaterialCategory();
-            category.setCategoryId(categoryId);
-            material.setCategory(category);
-
-            // Lưu vào CSDL
-            materialDAO.addMaterial(material);
-            request.setAttribute("message", "Thêm vật tư thành công!");
-            request.setAttribute("messageType", "success");
-
+            
+            // Set category
+            try {
+                int categoryId = Integer.parseInt(childCategoryId);
+                MaterialCategory category = new MaterialCategory();
+                category.setCategoryId(categoryId);
+                material.setCategory(category);
+              
+            } catch (NumberFormatException e) {
+                request.setAttribute("message", "Danh mục không hợp lệ!");
+                request.setAttribute("messageType", "error");
+                loadFormData(request);
+                request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
+                return;
+            }
+           
+            
+            // Save to database
+            try {
+                materialDAO.addMaterial(material);
+                request.setAttribute("message", "Thêm vật tư thành công!");
+                request.setAttribute("messageType", "success");
+                
+                // Clear form data after successful save
+                request.removeAttribute("name");
+                request.removeAttribute("description");
+                request.removeAttribute("unit");
+                request.removeAttribute("parentCategoryId");
+                request.removeAttribute("childCategory");
+                
+            } catch (SQLException e) {
+                Logger.getLogger(AddMaterialController.class.getName()).log(Level.SEVERE, "Error saving material", e);
+                request.setAttribute("message", "Lỗi khi lưu vật tư: " + e.getMessage());
+                request.setAttribute("messageType", "error");
+                
+                // Preserve form data on error
+                request.setAttribute("name", name);
+                request.setAttribute("description", description);
+                request.setAttribute("unit", unit);
+                request.setAttribute("parentCategoryId", parentCategoryId);
+                request.setAttribute("childCategory", childCategoryId);
+            }
+            
         } catch (NumberFormatException e) {
             request.setAttribute("message", "Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.");
-            request.setAttribute("messageType", "danger");
-        } catch (SQLException e) {
-            if ("23000".equals(e.getSQLState()) && e.getErrorCode() == 1062) {
-                request.setAttribute("message", "Mã vật tư đã tồn tại!");
-            } else {
-                request.setAttribute("message", "Lỗi khi lưu vật tư: " + e.getMessage());
-            }
-            request.setAttribute("messageType", "danger");
+            request.setAttribute("messageType", "error");
+        } catch (Exception e) {
+            Logger.getLogger(AddMaterialController.class.getName()).log(Level.SEVERE, "Unexpected error", e);
+            request.setAttribute("message", "Đã xảy ra lỗi không mong muốn!");
+            request.setAttribute("messageType", "error");
         }
-
-        // Tải lại danh sách category
+        
+        // Reload form data and forward
         try {
-            List<MaterialCategory> categories = categoryDAO.getAllChildCategories();
-            request.setAttribute("categories", categories);
-        } catch (SQLException e) {
-            throw new ServletException("Không thể lấy dữ liệu cho form", e);
+            loadFormData(request);
+            request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(AddMaterialController.class.getName()).log(Level.SEVERE, "Error loading form data", ex);
+            throw new ServletException("Không thể tải dữ liệu form", ex);
         }
-
-        request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
     }
+    
+    private void loadFormData(HttpServletRequest request) throws SQLException {
+        // Get parent categories for dropdown
+        List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories2();
+        request.setAttribute("parentCategories", parentCategories);
+        
+        // Get all child categories for autocomplete
+        List<MaterialCategory> childCategories = categoryDAO.getAllChildCategories();
+        request.setAttribute("childCategories", childCategories);
+        
+        // Get all units for autocomplete
+        List<String> units = materialDAO.getUnits();
+        request.setAttribute("units", units);
+    }
+    
+// Auto-generate code based on name and timestamp
+
 }

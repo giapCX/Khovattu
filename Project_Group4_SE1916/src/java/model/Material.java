@@ -23,6 +23,7 @@ public class Material {
     private MaterialCategory category;
     private List<Supplier> suppliers;
     private String status;
+    private int unitId;
 
     public Material() {
     }
@@ -39,6 +40,14 @@ public class Material {
         this.category = category;
         this.suppliers = suppliers;
         this.status = status;
+    }
+
+    public int getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(int unitId) {
+        this.unitId = unitId;
     }
 
     public int getMaterialId() {
