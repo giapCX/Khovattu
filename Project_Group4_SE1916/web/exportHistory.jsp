@@ -243,8 +243,8 @@
                     <input type="date" id="fromDate" name="fromDate" value="${fn:escapeXml(fromDate)}">
                     <label for="toDate">To: </label>
                     <input type="date" id="toDate" name="toDate" value="${fn:escapeXml(toDate)}">
-                    <label for="exporter">Exporter Name: </label>
-                    <input type="text" id="exporter" name="exporter" value="${fn:escapeXml(exporter)}" placeholder="Exporter Name">
+                    <label for="exporter">Search key: </label>
+                    <input type="text" id="exporter" name="exporter" value="${fn:escapeXml(exporter)}" placeholder="Exporter Name, Material name">
                     <input type="submit" value="Search">
                     <input type="button" value="Reset" onclick="window.location.href = 'exportHistory';">
                 </form>

@@ -38,11 +38,8 @@ public class InventoryDAO {
             sql.append("AND i.material_condition LIKE ? ");
         }
         if (fromDate != null) {
-            sql.append("AND DATE(i.last_updated) >= ? ");
-        }
-        if (toDate != null) {
             sql.append("AND DATE(i.last_updated) <= ? ");
-        }
+        }        
 
         // Add sorting
         if ("ASC".equalsIgnoreCase(sortOrder)) {
@@ -122,11 +119,8 @@ public class InventoryDAO {
             sql.append("AND i.material_condition LIKE ? ");
         }
         if (fromDate != null) {
-            sql.append("AND DATE(i.last_updated) >= ? ");
-        }
-        if (toDate != null) {
             sql.append("AND DATE(i.last_updated) <= ? ");
-        }
+        }       
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int index = 1;

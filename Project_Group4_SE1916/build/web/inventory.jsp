@@ -271,11 +271,8 @@
                         <option value="ASC" ${sortOrder == 'ASC' ? 'selected' : ''}>Sort Ascending</option>
                         <option value="DESC" ${sortOrder == 'DESC' ? 'selected' : ''}>Sort Descending</option>
                     </select>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <label for="fromDate">From:</label>
-                        <input type="date" id="fromDate" name="fromDate" value="${fn:escapeXml(fromDate)}">
-                        <label for="toDate">To:</label>
-                        <input type="date" id="toDate" name="toDate" value="${fn:escapeXml(toDate)}">
+                    <div style="display: flex; align-items: center; gap: 10px;">                        
+                        <input type="date" id="fromDate" name="fromDate" value="${fn:escapeXml(fromDate)}">                        
                     </div>
                     <input type="submit" value="Search">
                     <input type="button" value="Reset" onclick="window.location.href = 'inventory';">
