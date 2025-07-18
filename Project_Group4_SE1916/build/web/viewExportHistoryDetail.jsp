@@ -1,3 +1,4 @@
+//exMaDetail.jsp
 
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -57,7 +58,7 @@
                 transition: background-color 0.3s;
             }
             .btn-secondary:hover {
-/*                background-color: #ca8a04;  Darker shade of yellow-500 */
+                /*                background-color: #ca8a04;  Darker shade of yellow-500 */
                 opacity: 0.8;
             }
             /* Table styles */
@@ -120,6 +121,16 @@
                 text-align: center;
                 margin-top: 1.5rem;
             }
+
+            .filter-form input[type="button"] {
+                padding: 8px 16px;
+                background-color: #eab308;
+                color: #fff;
+                border: none;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
         </style>
     </head>
     <body class="bg-light text-dark">
@@ -148,18 +159,22 @@
             <!-- Filters -->
             <form method="get" action="exportHistoryDetail" class="row g-2 mb-4">
                 <input type="hidden" name="exportId" value="${receipt.exportId}" />
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <input type="text" name="materialName" value="${param.materialName}" class="form-control" placeholder="Search material name..." />
                 </div>
-               <div class="col-md-4">
+                <div class="col-md-3">
                     <input type="text" name="unit" value="${param.unit}" class="form-control" placeholder="Search unit ..." />
                 </div>
-                <div class="col-md-4">
-                    <input type="text" name="materialCondition" value="${param.materialCondition}" class="form-control" placeholder="Search material condition..." />
+                <div class="col-md-3">
+                    <input type="text" name="condition" value="${param.condition}" class="form-control" placeholder="Search material condition..." />
                 </div>
                 <div class="col-md-1">
                     <button type="submit" class="btn btn-primary w-100">Search</button>
                 </div>
+                <div class="col-md-1 filter-form">
+                    <input type="button" value="Reset" onclick="window.location.href = 'exportHistoryDetail?exportId=${receipt.exportId}';">
+                </div>
+
             </form>
 
             <!-- Material Details Table -->
@@ -175,7 +190,7 @@
                                 <th>Quantity</th>
                                 <th>Unit</th>
                                 <th>Condition</th>
-                                
+
                             </tr>
                         </thead>
                         <tbody>
@@ -187,7 +202,7 @@
                                     <td>${detail.quantity}</td>
                                     <td>${detail.unit}</td>
                                     <td>${detail.materialCondition}</td>
-                                  
+
                                 </tr>
                             </c:forEach>
                         </tbody>
@@ -200,8 +215,8 @@
                 <ul class="pagination justify-content-center">
                     <c:forEach var="i" begin="1" end="${totalPages}">
                         <li class="page-item ${i == currentPage ? 'active' : ''}">
-                            <a class="page-link text-white"
-                               href="exportHistoryDetail?exportId=${receipt.exportId}&page=${i}&materialName=${param.materialName}&unit=${unit}&materialCondition=${materialCondition}">
+                            <a class="page-link"
+                               href="exportHistoryDetail?exportId=${receipt.exportId}&page=${i}&materialName=${param.materialName}&unit=${param.unit}&materialCondition=${param.condition}">
                                 ${i}
                             </a>
                         </li>

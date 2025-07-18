@@ -1,4 +1,5 @@
 //exDAO
+
 package dao;
 
 import Dal.DBContext;
@@ -8,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Date;
+import java.util.Arrays;
 import java.util.List;
 import model.Export;
 import model.ExportDetail;
@@ -50,7 +52,6 @@ public class ExportDAO {
             for (ExportDetail detail : details) {
                 stmt.setInt(1, exportId);
                 stmt.setInt(2, detail.getMaterialId());
-
                 stmt.setDouble(3, detail.getQuantity());
                 stmt.setString(4, detail.getMaterialCondition());
 
@@ -91,5 +92,31 @@ public class ExportDAO {
             }
         }
         return null; // Return null if no export is found
+    }
+
+    public void exportMaterial(int exportId, int materialId, double quantity, String condition) throws SQLException {
+        // Insert export detail
+        String insertDetailSql = "INSERT INTO ExportDetails (export_id, material_id, quantity, material_condition) " +
+                                "VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(insertDetailSql)) {
+            stmt.setInt(1, exportId);
+            stmt.setInt(2, materialId);
+            stmt.setDouble(3, quantity);
+            stmt.setString(4, condition);
+            stmt.executeUpdate();
+        }
+
+        // Update inventory
+        String updateInventorySql = "UPDATE Inventory SET quantity_in_stock = quantity_in_stock - ? " +
+                                   "WHERE material_id = ? AND material_condition = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(updateInventorySql)) {
+            stmt.setDouble(1, quantity);
+            stmt.setInt(2, materialId);
+            stmt.setString(3, condition);
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Cannot update inventory  " + materialId);
+            }
+        }
     }
 }
