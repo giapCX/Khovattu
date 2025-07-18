@@ -200,6 +200,7 @@
         }
 
         .password-toggle {
+            margin-top: 15px;
             position: absolute;
             right: 10px;
             top: 50%;
@@ -221,11 +222,13 @@
         .password-toggle:hover {
             background: linear-gradient(90deg, #5a3de5, #00b5e2);
             transform: translateY(-50%) scale(1.1);
+            margin-top: 15px;
         }
 
         .password-toggle i {
             margin: 0;
         }
+       
     </style>
 </head>
 <body>
