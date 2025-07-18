@@ -13,42 +13,32 @@ public class Import {
     private Integer executorId;
     private String note;
     private Timestamp importDate;
+    private String deliverySupplierName;
+    private String deliverySupplierPhone;
     private List<ImportDetail> importDetail;
     private User executor;
     private Proposal proposal;
-    
 
     public Import() {
     }
 
-    public Import(int importId, String receiptId, int proposalId, String importType, int responsible_id, int executor_id, String note, Timestamp importDate, List<ImportDetail> importDetail) {
+    public Import(int importId, String receiptId, int proposalId, String importType, Integer responsibleId, Integer executorId,
+                  String note, Timestamp importDate, String deliverySupplierName, String deliverySupplierPhone,
+                  List<ImportDetail> importDetail) {
         this.importId = importId;
         this.receiptId = receiptId;
         this.proposalId = proposalId;
         this.importType = importType;
-        this.responsibleId = responsible_id;
-        this.executorId = executor_id;
+        this.responsibleId = responsibleId;
+        this.executorId = executorId;
         this.note = note;
         this.importDate = importDate;
+        this.deliverySupplierName = deliverySupplierName;
+        this.deliverySupplierPhone = deliverySupplierPhone;
         this.importDetail = importDetail;
     }
 
-    public User getExecutor() {
-        return executor;
-    }
-
-    public void setExecutor(User executor) {
-        this.executor = executor;
-    }
-
-    public Proposal getProposal() {
-        return proposal;
-    }
-
-    public void setProposal(Proposal proposal) {
-        this.proposal = proposal;
-    }
-
+    // Getters and Setters
     public int getImportId() {
         return importId;
     }
@@ -113,6 +103,22 @@ public class Import {
         this.importDate = importDate;
     }
 
+    public String getDeliverySupplierName() {
+        return deliverySupplierName;
+    }
+
+    public void setDeliverySupplierName(String deliverySupplierName) {
+        this.deliverySupplierName = deliverySupplierName;
+    }
+
+    public String getDeliverySupplierPhone() {
+        return deliverySupplierPhone;
+    }
+
+    public void setDeliverySupplierPhone(String deliverySupplierPhone) {
+        this.deliverySupplierPhone = deliverySupplierPhone;
+    }
+
     public List<ImportDetail> getImportDetail() {
         return importDetail;
     }
@@ -121,7 +127,19 @@ public class Import {
         this.importDetail = importDetail;
     }
 
-    
+    public User getExecutor() {
+        return executor;
+    }
 
-    
+    public void setExecutor(User executor) {
+        this.executor = executor;
+    }
+
+    public Proposal getProposal() {
+        return proposal;
+    }
+
+    public void setProposal(Proposal proposal) {
+        this.proposal = proposal;
+    }
 }

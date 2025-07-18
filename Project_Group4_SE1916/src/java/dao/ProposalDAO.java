@@ -975,4 +975,11 @@ public class ProposalDAO {
         }
         return list;
     }
+    public void updateProposalStatusToExecuted(int proposalId) throws SQLException {
+    String sql = "UPDATE EmployeeProposals SET final_status = 'executed' WHERE proposal_id = ?";
+    try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, proposalId);
+        ps.executeUpdate();
+    }
+}
 }
