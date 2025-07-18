@@ -220,7 +220,7 @@
                                                 <td class="p-4 font-medium"><fmt:formatDate value="${imp.importDate}" pattern="HH:mm, dd MMM yyyy"/></td>
                                                 <td class="p-4 font-medium">${imp.note}</td>
                                                 <td class="p-4 font-medium">
-                                                    <a href="ViewImportDetailServlet?importId=${imp.importId}" class="text-primary-600 dark:text-primary-400 hover:underline">View</a>
+                                                    <a href="importhistorydetail?importId=${imp.importId}" class="text-primary-600 dark:text-primary-400 hover:underline">View</a>
                                                 </td>
                                             </tr>
                                         </c:forEach>
