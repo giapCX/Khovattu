@@ -16,47 +16,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_add_edit.css">
-    <style>
-        /* Sidebar styles from userProfile.jsp */
-        .sidebar {
-            width: 18rem;
-            background: linear-gradient(to bottom, #1e40af, #3b82f6);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
-            transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-            transform: translateX(-100%);
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 50;
-        }
-        .sidebar.active {
-            transform: translateX(0);
-        }
-        .nav-item {
-            transition: all 0.2s ease;
-            border-radius: 0.5rem;
-        }
-        .nav-item:hover {
-            background: linear-gradient(to right, #3b82f6, #8b5cf6);
-            transform: translateX(5px) scale(1.02);
-        }
-        .nav-item.active {
-            background-color: rgba(255, 255, 255, 0.2);
-            font-weight: 600;
-        }
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                max-width: 280px;
-                z-index: 50;
-            }
-            .sidebar.active ~ main {
-                margin-left: 0;
-            }
-        }
-    </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans antialiased">
     <%
@@ -343,45 +302,13 @@
         ];
 
         document.addEventListener("DOMContentLoaded", function () {
-            const toggleButton = document.getElementById("toggleSidebarMobile");
-            const closeButton = document.getElementById("toggleSidebar");
-            const sidebar = document.querySelector(".sidebar");
-
-            // Toggle sidebar visibility
-            if (toggleButton && sidebar) {
-                toggleButton.addEventListener("click", () => {
-                    sidebar.classList.toggle("active");
+            const toggleSidebar = document.getElementById("toggleSidebarMobile");
+            if (toggleSidebar) {
+                toggleSidebar.addEventListener("click", function () {
+                    const sidebar = document.querySelector(".sidebar");
+                    sidebar.classList.toggle("hidden");
                 });
             }
-            if (closeButton && sidebar) {
-                closeButton.addEventListener("click", () => {
-                    sidebar.classList.toggle("active");
-                });
-            }
-
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener("click", (event) => {
-                if (window.innerWidth <= 768 && sidebar.classList.contains("active") &&
-                    !sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
-                    sidebar.classList.remove("active");
-                }
-            });
-
-            // Submenu Toggle
-            const toggles = document.querySelectorAll(".toggle-submenu");
-            toggles.forEach(toggle => {
-                toggle.addEventListener("click", (event) => {
-                    event.stopPropagation();
-                    const submenu = toggle.parentElement.querySelector(".submenu");
-                    if (submenu) {
-                        submenu.classList.toggle("hidden");
-                        const icon = toggle.querySelector(".fa-chevron-down");
-                        if (icon) {
-                            icon.classList.toggle("rotate-180");
-                        }
-                    }
-                });
-            });
 
             const responsibleInput = document.getElementById("responsibleId");
             const displayBox = document.getElementById("userInfoDisplay");
@@ -412,12 +339,12 @@
             const responsibleDiv = document.getElementById("responsibleIdDiv");
             const supplierNameDiv = document.getElementById("deliverySupplierNameDiv");
             const supplierPhoneDiv = document.getElementById("deliverySupplierPhoneDiv");
-            responsibleDiv.style.display = proposalType === "import_returned" ? "block" : "none";
-            supplierNameDiv.style.display = proposalType === "import_from_supplier" ? "block" : "none";
-            supplierPhoneDiv.style.display = proposalType === "import_from_supplier" ? "block" : "none";
-            responsibleDiv.querySelector("input").required = proposalType === "import_returned";
-            supplierNameDiv.querySelector("input").required = proposalType === "import_from_supplier";
-            supplierPhoneDiv.querySelector("input").required = proposalType === "import_from_supplier";
+            responsibleDiv.style.display = proposalType === 'import_returned' ? 'block' : 'none';
+            supplierNameDiv.style.display = proposalType === 'import_from_supplier' ? 'block' : 'none';
+            supplierPhoneDiv.style.display = proposalType === 'import_from_supplier' ? 'block' : 'none';
+            responsibleDiv.querySelector("input").required = proposalType === 'import_returned';
+            supplierNameDiv.querySelector("input").required = proposalType === 'import_from_supplier';
+            supplierPhoneDiv.querySelector("input").required = proposalType === 'import_from_supplier';
         });
     </script>
     <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>

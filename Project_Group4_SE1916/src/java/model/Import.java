@@ -13,18 +13,17 @@ public class Import {
     private Integer executorId;
     private String note;
     private Timestamp importDate;
-    private String deliverySupplierName;
-    private String deliverySupplierPhone;
     private List<ImportDetail> importDetail;
     private User executor;
     private Proposal proposal;
+    private String deliverySupplierName; // New field
+    private String deliverySupplierPhone; // New field
 
     public Import() {
     }
 
-    public Import(int importId, String receiptId, int proposalId, String importType, Integer responsibleId, Integer executorId,
-                  String note, Timestamp importDate, String deliverySupplierName, String deliverySupplierPhone,
-                  List<ImportDetail> importDetail) {
+    public Import(int importId, String receiptId, int proposalId, String importType, Integer responsibleId, Integer executorId, 
+                  String note, Timestamp importDate, List<ImportDetail> importDetail, String deliverySupplierName, String deliverySupplierPhone) {
         this.importId = importId;
         this.receiptId = receiptId;
         this.proposalId = proposalId;
@@ -33,12 +32,28 @@ public class Import {
         this.executorId = executorId;
         this.note = note;
         this.importDate = importDate;
+        this.importDetail = importDetail;
         this.deliverySupplierName = deliverySupplierName;
         this.deliverySupplierPhone = deliverySupplierPhone;
-        this.importDetail = importDetail;
     }
 
-    // Getters and Setters
+    // Getters and Setters for existing fields
+    public User getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(User executor) {
+        this.executor = executor;
+    }
+
+    public Proposal getProposal() {
+        return proposal;
+    }
+
+    public void setProposal(Proposal proposal) {
+        this.proposal = proposal;
+    }
+
     public int getImportId() {
         return importId;
     }
@@ -103,6 +118,15 @@ public class Import {
         this.importDate = importDate;
     }
 
+    public List<ImportDetail> getImportDetail() {
+        return importDetail;
+    }
+
+    public void setImportDetail(List<ImportDetail> importDetail) {
+        this.importDetail = importDetail;
+    }
+
+    // New getters and setters for deliverySupplierName and deliverySupplierPhone
     public String getDeliverySupplierName() {
         return deliverySupplierName;
     }
@@ -117,29 +141,5 @@ public class Import {
 
     public void setDeliverySupplierPhone(String deliverySupplierPhone) {
         this.deliverySupplierPhone = deliverySupplierPhone;
-    }
-
-    public List<ImportDetail> getImportDetail() {
-        return importDetail;
-    }
-
-    public void setImportDetail(List<ImportDetail> importDetail) {
-        this.importDetail = importDetail;
-    }
-
-    public User getExecutor() {
-        return executor;
-    }
-
-    public void setExecutor(User executor) {
-        this.executor = executor;
-    }
-
-    public Proposal getProposal() {
-        return proposal;
-    }
-
-    public void setProposal(Proposal proposal) {
-        this.proposal = proposal;
     }
 }

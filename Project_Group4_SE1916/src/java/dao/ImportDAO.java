@@ -1,15 +1,11 @@
 package dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import Dal.DBContext;
 import model.Import;
 import model.ImportDetail;
-import Dal.DBContext;
 import model.User;
 
 public class ImportDAO {
@@ -25,7 +21,7 @@ public class ImportDAO {
     }
 
     public boolean addImport(Import importOb) throws SQLException {
-        String insertImportSQL = "INSERT INTO ImportReceipts (proposal_id, import_type, responsible_id, executor_id, note, import_date, delivery_supplier_name, delivery_supplier_phone) "
+        String insertImportSQL = "INSERT INTO ImportReceipts(proposal_id, import_type, responsible_id, executor_id, note, import_date, delivery_supplier_name, delivery_supplier_phone) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         conn.setAutoCommit(false);
@@ -33,8 +29,16 @@ public class ImportDAO {
         try (PreparedStatement ps = conn.prepareStatement(insertImportSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, importOb.getProposalId());
             ps.setString(2, importOb.getImportType());
-            ps.setObject(3, importOb.getResponsibleId());
-            ps.setObject(4, importOb.getExecutorId());
+            if (importOb.getResponsibleId() != null) {
+                ps.setInt(3, importOb.getResponsibleId());
+            } else {
+                ps.setNull(3, Types.INTEGER);
+            }
+            if (importOb.getExecutorId() != null) {
+                ps.setInt(4, importOb.getExecutorId());
+            } else {
+                ps.setNull(4, Types.INTEGER);
+            }
             ps.setString(5, importOb.getNote());
             ps.setTimestamp(6, importOb.getImportDate());
             ps.setString(7, importOb.getDeliverySupplierName());
@@ -64,24 +68,37 @@ public class ImportDAO {
     }
 
     private boolean addImportDetails(int importId, List<ImportDetail> details) throws SQLException {
-        String insertDetailSQL = "INSERT INTO ImportDetails (import_id, material_id, quantity, price_per_unit, material_condition) "
-                + "VALUES (?, ?, ?, ?, ?)";
+        String insertDetailSQL = "INSERT INTO ImportDetails (import_id, material_id, quantity, price_per_unit, material_condition, supplier_id, site_id) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = conn.prepareStatement(insertDetailSQL)) {
-            if (details != null) {
-                for (ImportDetail detail : details) {
-                    ps.setInt(1, importId);
-                    ps.setInt(2, detail.getMaterialId());
-                    ps.setDouble(3, detail.getQuantity());
-                    ps.setObject(4, detail.getPrice());
-                    ps.setString(5, detail.getMaterialCondition());
-                    ps.addBatch();
+            for (ImportDetail detail : details) {
+                ps.setInt(1, importId);
+                ps.setInt(2, detail.getMaterialId());
+                ps.setDouble(3, detail.getQuantity());
+                if (detail.getPrice() != null) {
+                    ps.setDouble(4, detail.getPrice());
+                } else {
+                    ps.setNull(4, Types.DOUBLE);
                 }
-                int[] results = ps.executeBatch();
-                for (int r : results) {
-                    if (r == PreparedStatement.EXECUTE_FAILED) {
-                        return false;
-                    }
+                ps.setString(5, detail.getMaterialCondition());
+                if (detail.getSupplierId() != null) {
+                    ps.setInt(6, detail.getSupplierId());
+                } else {
+                    ps.setNull(6, Types.INTEGER);
+                }
+                if (detail.getSiteId() != null) {
+                    ps.setInt(7, detail.getSiteId());
+                } else {
+                    ps.setNull(7, Types.INTEGER);
+                }
+                ps.addBatch();
+            }
+
+            int[] results = ps.executeBatch();
+            for (int r : results) {
+                if (r == PreparedStatement.EXECUTE_FAILED) {
+                    return false;
                 }
             }
             return true;
@@ -89,10 +106,8 @@ public class ImportDAO {
     }
 
     public void addToInventory(List<ImportDetail> details) throws SQLException {
-        if (details != null) {
-            for (ImportDetail detail : details) {
-                addToInventory(detail);
-            }
+        for (ImportDetail detail : details) {
+            addToInventory(detail);
         }
     }
 
@@ -121,11 +136,7 @@ public class ImportDAO {
     }
 
     public void updateProposalStatusToExecuted(int proposalId) throws SQLException {
-<<<<<<< Updated upstream
-        String sql = "UPDATE EmployeeProposals  SET  final_status = ? WHERE proposal_id = ?";
-=======
         String sql = "UPDATE EmployeeProposals SET final_status = ? WHERE proposal_id = ?";
->>>>>>> Stashed changes
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "executed");
@@ -137,18 +148,11 @@ public class ImportDAO {
     public List<Import> searchImportsWithPagination(String proposalType, String executor, String fromDate, String toDate, int page, int pageSize) throws SQLException {
         List<Import> result = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-<<<<<<< Updated upstream
-                "SELECT i.import_id, i.proposal_id, i.import_type, i.executor_id, i.import_date, i.note, u.full_name "
-                + "FROM ImportReceipts i "
-                + "JOIN Users u ON i.executor_id = u.user_id "
-                + "WHERE 1=1"
+            "SELECT i.import_id, i.proposal_id, i.import_type, i.executor_id, i.import_date, i.note, u.full_name " +
+            "FROM ImportReceipts i " +
+            "JOIN Users u ON i.executor_id = u.user_id " +
+            "WHERE 1=1"
         );
-=======
-                "SELECT i.import_id, i.proposal_id, i.import_type, i.executor_id, i.import_date, i.note, i.delivery_supplier_name, i.delivery_supplier_phone, u.full_name "
-                + "FROM ImportReceipts i "
-                + "JOIN Users u ON i.executor_id = u.user_id "
-                + "WHERE 1=1");
->>>>>>> Stashed changes
 
         List<Object> params = new ArrayList<>();
 
@@ -164,37 +168,19 @@ public class ImportDAO {
 
         if (fromDate != null && !fromDate.isEmpty()) {
             sql.append(" AND DATE(i.import_date) >= ?");
-<<<<<<< Updated upstream
             params.add(Date.valueOf(fromDate));
-=======
-            params.add(java.sql.Date.valueOf(fromDate));
->>>>>>> Stashed changes
         }
 
         if (toDate != null && !toDate.isEmpty()) {
             sql.append(" AND DATE(i.import_date) <= ?");
-<<<<<<< Updated upstream
             params.add(Date.valueOf(toDate));
         }
-
-        int offset = (page - 1) * pageSize;
-        if (offset < 0) {
-            offset = 0;
-        }
-        sql.append(" ORDER BY i.import_date DESC LIMIT ?, ?");
-        params.add(offset);
-        params.add(pageSize);
-=======
-            params.add(java.sql.Date.valueOf(toDate));
-        }
-
         int offset = (page - 1) * pageSize;
         if (offset < 0) offset = 0;
-        sql.append(" ORDER BY i.import_date DESC LIMIT ? OFFSET ?");
+        sql.append(" ORDER BY i.import_date DESC LIMIT ?, ?");
 
-        params.add(pageSize);
         params.add(offset);
->>>>>>> Stashed changes
+        params.add(pageSize);
 
         try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
@@ -210,11 +196,6 @@ public class ImportDAO {
                 importObj.setExecutorId(rs.getInt("executor_id"));
                 importObj.setImportDate(rs.getTimestamp("import_date"));
                 importObj.setNote(rs.getString("note"));
-<<<<<<< Updated upstream
-=======
-                importObj.setDeliverySupplierName(rs.getString("delivery_supplier_name"));
-                importObj.setDeliverySupplierPhone(rs.getString("delivery_supplier_phone"));
->>>>>>> Stashed changes
 
                 User executorObj = new User();
                 executorObj.setUserId(rs.getInt("executor_id"));
@@ -230,13 +211,9 @@ public class ImportDAO {
 
     public int countSearchImports(String proposalType, String executor, String fromDate, String toDate) throws SQLException {
         StringBuilder sql = new StringBuilder(
-                "SELECT COUNT(*) FROM ImportReceipts i "
-<<<<<<< Updated upstream
-                + "JOIN Users u ON i.executor_id = u.user_id WHERE 1=1"
+            "SELECT COUNT(*) FROM ImportReceipts i " +
+            "JOIN Users u ON i.executor_id = u.user_id WHERE 1=1"
         );
-=======
-                + "JOIN Users u ON i.executor_id = u.user_id WHERE 1=1");
->>>>>>> Stashed changes
 
         List<Object> params = new ArrayList<>();
 
@@ -252,20 +229,12 @@ public class ImportDAO {
 
         if (fromDate != null && !fromDate.isEmpty()) {
             sql.append(" AND DATE(i.import_date) >= ?");
-<<<<<<< Updated upstream
             params.add(Date.valueOf(fromDate));
-=======
-            params.add(java.sql.Date.valueOf(fromDate));
->>>>>>> Stashed changes
         }
 
         if (toDate != null && !toDate.isEmpty()) {
             sql.append(" AND DATE(i.import_date) <= ?");
-<<<<<<< Updated upstream
             params.add(Date.valueOf(toDate));
-=======
-            params.add(java.sql.Date.valueOf(toDate));
->>>>>>> Stashed changes
         }
 
         try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
@@ -281,8 +250,4 @@ public class ImportDAO {
 
         return 0;
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

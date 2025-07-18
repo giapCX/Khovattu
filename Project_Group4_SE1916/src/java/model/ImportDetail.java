@@ -1,52 +1,23 @@
 package model;
 
 public class ImportDetail {
-    private int importDetailId;
-    private Import importOb;
+    private int importId;
     private int materialId;
-    private String materialName;
-    private Double quantity;
-    private String unit;
+    private double quantity;
     private Double price;
     private String materialCondition;
     private Integer supplierId;
-    private String supplierName;
-    private Integer  siteId;
-    private String siteName;
-   
+    private Integer siteId;
 
     public ImportDetail() {
     }
 
-    public ImportDetail(int importDetailId, Import importOb, int materialId, String materialName, double quantity, String unit, double price, String materialCondition, Integer supplierId, String supplierName, Integer siteId, String siteName) {
-        this.importDetailId = importDetailId;
-        this.importOb = importOb;
-        this.materialId = materialId;
-        this.materialName = materialName;
-        this.quantity = quantity;
-        this.unit = unit;
-        this.price = price;
-        this.materialCondition = materialCondition;
-        this.supplierId = supplierId;
-        this.supplierName = supplierName;
-        this.siteId = siteId;
-        this.siteName = siteName;
+    public int getImportId() {
+        return importId;
     }
 
-    public int getImportDetailId() {
-        return importDetailId;
-    }
-
-    public void setImportDetailId(int importDetailId) {
-        this.importDetailId = importDetailId;
-    }
-
-    public Import getImportOb() {
-        return importOb;
-    }
-
-    public void setImportOb(Import importOb) {
-        this.importOb = importOb;
+    public void setImportId(int importId) {
+        this.importId = importId;
     }
 
     public int getMaterialId() {
@@ -57,28 +28,12 @@ public class ImportDetail {
         this.materialId = materialId;
     }
 
-    public String getMaterialName() {
-        return materialName;
-    }
-
-    public void setMaterialName(String materialName) {
-        this.materialName = materialName;
-    }
-
-    public Double getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Double quantity) {
+    public void setQuantity(double quantity) {
         this.quantity = quantity;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
     }
 
     public Double getPrice() {
@@ -105,14 +60,6 @@ public class ImportDetail {
         this.supplierId = supplierId;
     }
 
-    public String getSupplierName() {
-        return supplierName;
-    }
-
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
-    }
-
     public Integer getSiteId() {
         return siteId;
     }
@@ -120,16 +67,4 @@ public class ImportDetail {
     public void setSiteId(Integer siteId) {
         this.siteId = siteId;
     }
-
-    public String getSiteName() {
-        return siteName;
-    }
-
-    public void setSiteName(String siteName) {
-        this.siteName = siteName;
-    }
-
-    
-
-    
 }
