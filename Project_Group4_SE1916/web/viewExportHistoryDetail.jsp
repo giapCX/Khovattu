@@ -1,4 +1,4 @@
-//exMaDetail.jsp
+
 
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -8,7 +8,7 @@
         <meta charset="UTF-8">
         <title>Export Receipt Details</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+        
         <style>
             body {
                 font-family: 'Inter', sans-serif;
@@ -166,7 +166,14 @@
                     <input type="text" name="unit" value="${param.unit}" class="form-control" placeholder="Search unit ..." />
                 </div>
                 <div class="col-md-3">
-                    <input type="text" name="condition" value="${param.condition}" class="form-control" placeholder="Search material condition..." />
+<!--                    <input type="text" name="condition" value="${param.condition}" class="form-control" placeholder="Search material condition..." />-->
+                    <select name="condition" value="${param.condition}" class="form-control">
+                        <option value=""> All condition</option>
+                        <option value="New" ${param.condition == 'New' ? 'selected' : ''}>New</option>
+                        <option value="Used" ${param.condition == 'Used' ? 'selected' : ''}>Used</option>
+                        <option value="Damaged" ${param.condition == 'Damaged' ? 'selected' : ''}>Damaged</option>
+
+                    </select>
                 </div>
                 <div class="col-md-1">
                     <button type="submit" class="btn btn-primary w-100">Search</button>

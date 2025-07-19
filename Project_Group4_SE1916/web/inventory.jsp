@@ -264,7 +264,14 @@
                     <label for="materialName">Material Name:</label>
                     <input type="text" id="materialName" name="materialName" value="${fn:escapeXml(materialName)}" placeholder="Material Name">
                     <label for="condition">Condition:</label>
-                    <input type="text" id="condition" name="condition" value="${fn:escapeXml(condition)}" placeholder="Condition">
+<!--                    <input type="text" id="condition" name="condition" value="${fn:escapeXml(condition)}" placeholder="Condition">-->
+                    <select name="condition" value="${fn:escapeXml(condition)}" class="form-control">
+                        <option value=""> All condition</option>
+                        <option value="New" ${fn:escapeXml(condition) == 'New' ? 'selected' : ''}>New</option>
+                        <option value="Used" ${fn:escapeXml(condition) == 'Used' ? 'selected' : ''}>Used</option>
+                        <option value="Damaged" ${fn:escapeXml(condition) == 'Damaged' ? 'selected' : ''}>Damaged</option>
+
+                    </select>
                     <label for="sortOrder">Sort Quantity:</label>
                     <select id="sortOrder" name="sortOrder" onchange="this.form.submit()" class="bg-white">
                         <option value="" ${empty sortOrder ? 'selected' : ''}>Default</option>
