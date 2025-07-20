@@ -1,3 +1,4 @@
+<%@page import="dao.DashboardDirectorDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="vi">
@@ -226,6 +227,25 @@
                 return;
             }
         %>
+        <%
+            DashboardDirectorDAO dao = new DashboardDirectorDAO();
+            int totalMaterials = 0;
+            int lowInventory = 0;
+            int conSite = 0;
+            int supplier = 0;
+            int emp = 0;
+            int proPend = 0;
+            try {
+                totalMaterials = dao.countTotalMaterials();
+                lowInventory = dao.countLowStockMaterials(10);
+                conSite = dao.countOngoingSites();
+                supplier = dao.countActiveSuppliers();
+                emp = dao.countUsers();
+                proPend = dao.countPendingDirectorProposals();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        %>
         <!-- Sidebar -->
         <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50 hidden">
             <div class="sidebar-header flex items-center mb-4">
@@ -374,8 +394,8 @@
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tổng vật tư</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">1,284</h3>
-                            <p class="text-sm text-green-500 mt-3"><i class="fas fa-arrow-up mr-1"></i>12% tháng trước</p>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= totalMaterials%></h3>
+
                         </div>
                         <div class="p-4 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300">
                             <i class="fas fa-boxes text-2xl"></i>
@@ -389,7 +409,7 @@
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Danh sách nhân viên</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">5</h3>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= emp%></h3>
                             <!--                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Đang chờ xử lý</p>-->
                         </div>
                         <div class="p-4 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300">
@@ -404,6 +424,7 @@
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Nhà cung cấp</p>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= supplier%></h3>
                             <!--                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">500M VND</h3>
                                                         <p class="text-sm text-blue-500 mt-3"><i class="fas fa-dollar-sign mr-1"></i>Mua & Sửa chữa</p>-->
                         </div>
@@ -418,8 +439,8 @@
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tồn kho </p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">8</h3>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tồn kho thấp </p>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= lowInventory%></h3>
                             <p class="text-sm text-red-500 mt-3"><i class="fas fa-exclamation-circle mr-1"></i>Cần bổ sung</p>
                         </div>
                         <div class="p-4 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-red-300">
@@ -437,7 +458,8 @@
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Danh sách công trình</p>
-
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= conSite%></h3>
+                            <p class="text-sm text-green-500 mt-3"><i class="fas  mr-1"></i>Đang hoạt động</p>
                         </div>
                         <div class="p-4 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-red-red-300">
                             <i class="fas fa-building text-2xl"></i>
@@ -448,6 +470,21 @@
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
+                    <div class="p-6 flex items-start justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Yêu cầu chờ duyệt</p>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= proPend %></h3>
+                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Đang chờ xử lý</p>
+                        </div>
+                        <div class="p-4 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300">
+                            <i class="fas fa-clipboard-list text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
+                        <a href="${pageContext.request.contextPath}/proposals" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                    </div>
+                </div>
+<!--                <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Lịch sử xuất kho</p>
@@ -474,7 +511,7 @@
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
                         <a href="${pageContext.request.contextPath}/importhistory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
                     </div>
-                </div>
+                </div>-->
             </div>
             <!--             Charts Row 
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
@@ -504,7 +541,7 @@
                         </div>-->
 
             <!-- Request Management Table -->
-            <div class="table-container bg-white dark:bg-gray-800 mb-8">
+<!--            <div class="table-container bg-white dark:bg-gray-800 mb-8">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <div>
                         <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Yêu cầu chờ duyệt</h2>
@@ -559,7 +596,7 @@
                 </div>
             </div>
 
-            <!-- Request History Table -->
+             Request History Table 
             <div class="table-container bg-white dark:bg-gray-800">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <div>
@@ -597,7 +634,7 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </div>-->
         </main>
 
         <!-- Footer -->
