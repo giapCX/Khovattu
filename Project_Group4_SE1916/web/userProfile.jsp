@@ -229,11 +229,11 @@
                 <!-- Read-only View -->
                 <div class="info-section">
                     <div class="info-group">
-                        <label>Tên đăng nhập:</label>
+                        <label>User Name:</label>
                         <span class="info-value">${user.username}</span>
                     </div>
                     <div class="info-group">
-                        <label>Họ và tên:</label>
+                        <label>Full Name:</label>
                         <span class="info-value">${user.fullName}</span>
                     </div>
                     <div class="info-group">
@@ -241,52 +241,52 @@
                         <span class="info-value">${user.email}</span>
                     </div>
                     <div class="info-group">
-                        <label>Số điện thoại:</label>
+                        <label>Phone number:</label>
                         <span class="info-value">${user.phone}</span>
                     </div>
                     <div class="info-group">
-                        <label>Địa chỉ:</label>
+                        <label>Address:</label>
                         <span class="info-value">${user.address}</span>
                     </div>
                     <div class="info-group">
-                        <label>Ngày sinh:</label>
+                        <label>Birth of date:</label>
                         <span class="info-value">${user.dateOfBirth}</span>
                     </div>
                     <div class="info-group">
-                        <label>Trạng thái:</label>
+                        <label>Status:</label>
                         <span class="info-value">${user.status}</span>
                     </div>
                     <div class="info-group">
-                        <label>Vai trò:</label>
+                        <label>Role:</label>
                         <span class="info-value">${role}</span>
                     </div>
                     <div class="info-group">
-                        <label>Ảnh đại diện:</label>
+                        <label>Profile Picture:</label>
                         <span class="info-value">${not empty user.image ? user.image : 'Mặc định'}</span>
                     </div>
                     <div class="button-group mt-3">
-                        <a href="${pageContext.request.contextPath}/userprofile?edit=true" class="btn btn-primary btn-edit">Chỉnh sửa</a>
+                        <a href="${pageContext.request.contextPath}/userprofile?edit=true" class="btn btn-primary btn-edit">Edit</a>
                         <%
                             String backUrl = request.getContextPath() + "/view/login.jsp";
                             if (role != null) {
                                 switch (role.toLowerCase()) {
                                     case "admin":
-                                        backUrl = request.getContextPath() + "/view/admin/adminDashboard.jsp";
+                                        backUrl = request.getContextPath() + "/AdminDashboard";
                                         break;
                                     case "direction":
-                                        backUrl = request.getContextPath() + "/view/direction/directionDashboard.jsp";
+                                        backUrl = request.getContextPath() + "/DirectionDashboard";
                                         break;
                                     case "warehouse":
-                                        backUrl = request.getContextPath() + "/view/warehouse/warehouseDashboard.jsp";
+                                        backUrl = request.getContextPath() + "/WarehouseDashboard";
                                         break;
                                     case "employee":
-                                        backUrl = request.getContextPath() + "/view/employee/employeeDashboard.jsp";
+                                        backUrl = request.getContextPath() + "/EmployeeDashboard";
                                         break;
                                 }
                             }
                         %>
                         <a href="<%= backUrl%>" class="btn btn-secondary btn-back">
-                            <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
                         </a>
                     </div>
                 </div>
@@ -333,8 +333,8 @@
                         </div>
                     </div>
                     <div class="button-group mt-3">
-                        <button type="submit" class="btn btn-primary btn-update">Cập nhật hồ sơ</button>
-                        <a href="${pageContext.request.contextPath}/userprofile" class="btn btn-secondary btn-cancel">Hủy</a>
+                        <button type="submit" class="btn btn-primary btn-update">Update Profile</button>
+                        <a href="${pageContext.request.contextPath}/userprofile" class="btn btn-secondary btn-cancel">Cancel</a>
                     </div>
                 </form>
             </div>

@@ -39,24 +39,12 @@
         String currentDateTime = now.format(formatter);
     %>
 
-    <!-- Hiển thị thông báo lỗi hoặc thành công -->
-    <c:if test="${not empty error}">
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <span class="block sm:inline">${error}</span>
-        </div>
-    </c:if>
-    <c:if test="${not empty success}">
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            <span class="block sm:inline">${success}</span>
-        </div>
-    </c:if>
-
     <div class="flex">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar w-72 text-white p-4 fixed h-full z-50">
+        <!-- Sidebar từ sidebarWarehouse.jsp -->
+        <aside id="sidebar" class="sidebar w-72 text-white p-4 fixed h-full z-50 bg-gray-800">
             <div class="sidebar-header flex items-center mb-4">
                 <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-2">
-                    <i class="fas fa-boxes text-primary-600 text-xl"></i>
+                    <i class="fas fa-boxes text-blue-600 text-xl"></i>
                 </div>
                 <h2 class="text-xl font-bold">Materials Management</h2>
                 <button id="toggleSidebar" class="ml-auto text-white opacity-75 hover:opacity-100">
@@ -64,37 +52,36 @@
                 </button>
             </div>
             <nav class="space-y-1">
-                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-user mr-2 w-5 text-center"></i>
                         <span class="text-base">My Information</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/ListMaterialController" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/ListMaterialController" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-box-open mr-2 w-5 text-center"></i>
                         <span class="text-base">Materials List</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/inventory" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/inventory" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-boxes mr-2 w-5 text-center"></i>
                         <span class="text-base">Inventory List</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/unit" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/unit" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-clipboard-list mr-2 w-5 text-center"></i>
                         <span class="text-base">Unit List</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <!-- Supplier - Menu cha -->
                 <div class="nav-item flex flex-col">
-                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu hover:bg-white hover:bg-opacity-20 rounded-lg">
                         <div class="flex items-center">
                             <i class="fas fa-truck mr-2 w-5 text-center"></i>
                             <span class="text-base">Suppliers</span>
@@ -108,9 +95,8 @@
                         </a>
                     </div>
                 </div>
-                <!-- Proposal - Menu cha -->
                 <div class="nav-item flex flex-col">
-                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu hover:bg-white hover:bg-opacity-20 rounded-lg">
                         <div class="flex items-center">
                             <i class="fas fa-file-alt mr-2 w-5 text-center"></i>
                             <span class="text-base">Proposals</span>
@@ -140,21 +126,21 @@
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/importhistory" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/importhistory" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-history mr-2 w-5 text-center"></i>
                         <span class="text-base">Import History</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/exportMaterial.jsp" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/exportMaterial.jsp" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-arrow-up mr-2 w-5 text-center"></i>
                         <span class="text-base">Export Materials</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-history mr-2 w-5 text-center"></i>
                         <span class="text-base">Export History</span>
@@ -174,8 +160,20 @@
             </div>
         </aside>
 
-        <main class="flex-1 p-8 transition-all duration-300">
+        <main class="flex-1 p-8 ml-72 transition-all duration-300">
             <div class="max-w-6xl mx-auto">
+                <!-- Hiển thị thông báo lỗi hoặc thành công -->
+                <c:if test="${not empty error}">
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        <span class="block sm:inline">${error}</span>
+                    </div>
+                </c:if>
+                <c:if test="${not empty success}">
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                        <span class="block sm:inline">${success}</span>
+                    </div>
+                </c:if>
+
                 <form action="${pageContext.request.contextPath}/ImportServlet" method="post" class="space-y-6">
                     <input type="hidden" name="proposalId" value="${proposalId}" />
                     <input type="hidden" name="executorId" value="<%= userId %>" />
@@ -183,7 +181,7 @@
                     <!-- Tiêu đề -->
                     <div class="flex justify-between items-center mb-6">
                         <div class="flex items-center gap-4">
-                            <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
+                            <button id="toggleSidebarMobile" class="text-gray-700 hover:text-blue-600">
                                 <i class="fas fa-bars text-2xl"></i>
                             </button>
                             <h2 class="text-2xl font-bold text-gray-800">Import Material</h2>
@@ -201,16 +199,16 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Import Date</label>
-                                <input type="datetime-local" name="importDate" value="<%= currentDateTime %>" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                <input type="datetime-local" name="importDate" value="<%= currentDateTime %>" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Proposal Type</label>
-                                <input type="text" name="proposalType" value="${proposalType}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" readonly>
+                                <input type="text" name="proposalType" value="${proposalType}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100" readonly>
                                 <input type="hidden" name="proposalType" value="${proposalType}">
                             </div>
                             <div id="responsibleIdDiv" style="display: ${proposalType == 'import_returned' ? 'block' : 'none'}">
                                 <label class="block text-sm font-medium text-gray-700">Responsible ID</label>
-                                <input type="number" id="responsibleId" name="responsibleId" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" <c:if test="${proposalType == 'import_returned'}">required</c:if>>
+                                <input type="number" id="responsibleId" name="responsibleId" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" <c:if test="${proposalType == 'import_returned'}">required</c:if>>
                                 <div id="userInfoDisplay" class="hidden mt-2 p-2 bg-gray-100 rounded">
                                     <p><strong>Full Name:</strong> <span id="userFullName"></span></p>
                                     <p><strong>Phone:</strong> <span id="userPhone"></span></p>
@@ -218,15 +216,15 @@
                             </div>
                             <div id="deliverySupplierNameDiv" style="display: ${proposalType == 'import_from_supplier' ? 'block' : 'none'}">
                                 <label class="block text-sm font-medium text-gray-700">Delivery Supplier Name</label>
-                                <input type="text" name="deliverySupplierName" value="" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" <c:if test="${proposalType == 'import_from_supplier'}">required</c:if>>
+                                <input type="text" name="deliverySupplierName" value="${proposal.supplierName}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" <c:if test="${proposalType == 'import_from_supplier'}">required</c:if>>
                             </div>
                             <div id="deliverySupplierPhoneDiv" style="display: ${proposalType == 'import_from_supplier' ? 'block' : 'none'}">
                                 <label class="block text-sm font-medium text-gray-700">Delivery Supplier Phone</label>
-                                <input type="text" name="deliverySupplierPhone" value="" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" <c:if test="${proposalType == 'import_from_supplier'}">required</c:if>>
+                                <input type="text" name="deliverySupplierPhone" value="${proposal.supplierPhone}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" <c:if test="${proposalType == 'import_from_supplier'}">required</c:if>>
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700">Note</label>
-                                <textarea name="note" id="note" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" rows="3" required></textarea>
+                                <textarea name="note" id="note" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" rows="3" required></textarea>
                             </div>
                         </div>
                         <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit Import</button>
@@ -347,7 +345,7 @@
             supplierPhoneDiv.querySelector("input").required = proposalType === 'import_from_supplier';
         });
     </script>
-    <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/sidebar_darkmode.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
 </body>
 </html>

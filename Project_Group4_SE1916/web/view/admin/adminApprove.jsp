@@ -331,7 +331,7 @@
 
                 <!-- Back to Dashboard -->
                 <div class="mt-6 flex justify-center">
-                    <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" 
+                    <a href="${pageContext.request.contextPath}/AdminDashboard" 
                        class="btn-secondary text-white px-6 py-3 rounded-lg">Back to Dashboard</a>
                 </div>
             </div>

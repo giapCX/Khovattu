@@ -33,11 +33,11 @@
     %>
 
     <div class="flex">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar w-72 text-white p-4 fixed h-full z-50">
+        <!-- Sidebar từ sidebarWarehouse.jsp -->
+        <aside id="sidebar" class="sidebar w-72 text-white p-4 fixed h-full z-50 bg-gray-800">
             <div class="sidebar-header flex items-center mb-4">
                 <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-2">
-                    <i class="fas fa-boxes text-primary-600 text-xl"></i>
+                    <i class="fas fa-boxes text-blue-600 text-xl"></i>
                 </div>
                 <h2 class="text-xl font-bold">Materials Management</h2>
                 <button id="toggleSidebar" class="ml-auto text-white opacity-75 hover:opacity-100">
@@ -45,37 +45,36 @@
                 </button>
             </div>
             <nav class="space-y-1">
-                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-user mr-2 w-5 text-center"></i>
                         <span class="text-base">My Information</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/ListMaterialController" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/ListMaterialController" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-box-open mr-2 w-5 text-center"></i>
                         <span class="text-base">Materials List</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/inventory" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/inventory" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-boxes mr-2 w-5 text-center"></i>
                         <span class="text-base">Inventory List</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/unit" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/unit" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-clipboard-list mr-2 w-5 text-center"></i>
                         <span class="text-base">Unit List</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <!-- Supplier - Menu cha -->
                 <div class="nav-item flex flex-col">
-                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu hover:bg-white hover:bg-opacity-20 rounded-lg">
                         <div class="flex items-center">
                             <i class="fas fa-truck mr-2 w-5 text-center"></i>
                             <span class="text-base">Suppliers</span>
@@ -89,9 +88,8 @@
                         </a>
                     </div>
                 </div>
-                <!-- Proposal - Menu cha -->
                 <div class="nav-item flex flex-col">
-                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu hover:bg-white hover:bg-opacity-20 rounded-lg">
                         <div class="flex items-center">
                             <i class="fas fa-file-alt mr-2 w-5 text-center"></i>
                             <span class="text-base">Proposals</span>
@@ -103,7 +101,7 @@
                             <i class="fas fa-list mr-2 w-4 text-center"></i>
                             <span class="text-sm">My Submitted Proposals</span>
                         </a>
-                        <a href="${pageContext.request.contextPath}/ListProposalExecute" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                        <a href="${pageContext.request.contextPath}/ListProposalExecute" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg bg-white bg-opacity-10">
                             <i class="fas fa-list mr-2 w-4 text-center"></i>
                             <span class="text-sm">Proposal Execute</span>
                         </a>
@@ -114,28 +112,28 @@
                     </div>
                 </div>
                 <div class="border-t border-white border-opacity-20 my-2"></div>
-                <a href="${pageContext.request.contextPath}/view/warehouse/importData.jsp" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/view/warehouse/importData.jsp" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-arrow-down mr-2 w-5 text-center"></i>
                         <span class="text-base">Import Materials</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/importhistory" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/importhistory" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-history mr-2 w-5 text-center"></i>
                         <span class="text-base">Import History</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/exportMaterial.jsp" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/exportMaterial.jsp" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-arrow-up mr-2 w-5 text-center"></i>
                         <span class="text-base">Export Materials</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between hover:bg-white hover:bg-opacity-20 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-history mr-2 w-5 text-center"></i>
                         <span class="text-base">Export History</span>
@@ -155,11 +153,11 @@
             </div>
         </aside>
 
-        <main class="flex-1 p-8 transition-all duration-300">
+        <main class="flex-1 p-8 ml-72 transition-all duration-300">
             <div class="max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center gap-4">
-                        <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
+                        <button id="toggleSidebarMobile" class="text-gray-700 hover:text-blue-600">
                             <i class="fas fa-bars text-2xl"></i>
                         </button>
                         <h2 class="text-2xl font-bold text-gray-800">List Requests Awaiting Execution</h2>
@@ -167,9 +165,9 @@
                 </div>
 
                 <!-- Search and Filter Form -->
-                <form action="${pageContext.request.contextPath}/ListProposalExecute" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
+                <form action="${pageContext.request.contextPath}/ListProposalExecute" method="get" class="mb-6 flex flex-wrap gap-4 items-center bg-white shadow-md rounded-lg p-6">
                     <div class="flex-1 min-w-[200px]">
-                        <select name="searchType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <select name="searchType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">All Types</option>
                             <option value="import_from_supplier" ${param.searchType == 'import_from_supplier' ? 'selected' : ''}>Purchase</option>
                             <option value="import_returned" ${param.searchType == 'import_returned' ? 'selected' : ''}>Retrieve</option>
@@ -178,11 +176,11 @@
                     </div>
                     <div class="flex-1 min-w-[200px]">
                         <input type="date" name="searchStartDate" id="searchStartDate" value="${param.searchStartDate}"
-                               max="<%= java.time.LocalDate.now() %>" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                               max="<%= java.time.LocalDate.now() %>" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div class="flex-1 min-w-[200px]">
                         <input type="date" name="searchEndDate" id="searchEndDate" value="${param.searchEndDate}"
-                               max="<%= java.time.LocalDate.now() %>" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                               max="<%= java.time.LocalDate.now() %>" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg flex items-center hover:bg-blue-600">
                         <i class="fas fa-search mr-2"></i> Search
@@ -192,7 +190,7 @@
                     </a>
                     <div class="w-full flex items-center gap-2 mt-2">
                         <span class="text-gray-700">Items per page:</span>
-                        <select name="recordsPerPage" onchange="this.form.submit()" class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <select name="recordsPerPage" onchange="this.form.submit()" class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="5" ${recordsPerPage == 5 ? 'selected' : ''}>5 requests/page</option>
                             <option value="10" ${recordsPerPage == 10 ? 'selected' : ''}>10 requests/page</option>
                             <option value="15" ${recordsPerPage == 15 ? 'selected' : ''}>15 requests/page</option>
@@ -294,7 +292,7 @@
 
                 <!-- Nút quay lại -->
                 <div class="mt-6 flex justify-center">
-                    <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600">Back to Dashboard</a>
+                    <a href="${pageContext.request.contextPath}/WarehouseDashboard" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600">Back to Dashboard</a>
                 </div>
             </div>
         </main>
@@ -344,7 +342,7 @@
             }
         });
     </script>
-    <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/sidebar_darkmode.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
 </body>
 </html>
