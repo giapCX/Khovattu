@@ -107,9 +107,10 @@ public class ImportServlet extends HttpServlet {
             return;
         }
         String note = request.getParameter("note");
-        System.out.println("Note received: " + note);
         if (note == null || note.trim().isEmpty()) {
-            System.out.println("Warning: Note is null or empty");
+            request.setAttribute("error", "Note is required.");
+            request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
+            return;
         }
         String deliverySupplierName = request.getParameter("deliverySupplierName");
         String deliverySupplierPhone = request.getParameter("deliverySupplierPhone");
@@ -126,6 +127,16 @@ public class ImportServlet extends HttpServlet {
                     request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
                     return;
                 }
+                if (proposal.getProposalDetails() == null || proposal.getProposalDetails().isEmpty()) {
+                    request.setAttribute("error", "No proposal details found.");
+                    request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
+                    return;
+                }
+                if (importDAO.checkProposalIdExists(proposalId)) {
+                    request.setAttribute("error", "Proposal ID has already been used for import.");
+                    request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
+                    return;
+                }
             }
 
             if (proposalType == null || proposalType.isEmpty()) {
@@ -134,29 +145,35 @@ public class ImportServlet extends HttpServlet {
                 return;
             }
 
-            Import importOb = new Import();
-            importOb.setProposalId(proposalId != null ? proposalId : 0);
-            importOb.setImportType(proposalType);
-            importOb.setImportDate(importDate);
-            importOb.setNote(note != null ? note : "");
-            importOb.setExecutorId(userId);
-
             if ("import_from_supplier".equals(proposalType)) {
                 if (deliverySupplierName == null || deliverySupplierName.trim().isEmpty() || deliverySupplierPhone == null || deliverySupplierPhone.trim().isEmpty()) {
                     request.setAttribute("error", "Delivery Supplier Name and Phone are required for Purchase.");
                     request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
                     return;
                 }
-                importOb.setDeliverySupplierName(deliverySupplierName);
-                importOb.setDeliverySupplierPhone(deliverySupplierPhone);
             } else if ("import_returned".equals(proposalType)) {
                 if (responsibleId == null) {
                     request.setAttribute("error", "Responsible ID is required for Retrieve.");
                     request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
                     return;
                 }
-                importOb.setResponsibleId(responsibleId);
+                UserDAO userDAO = new UserDAO();
+                if (userDAO.getUserById(responsibleId) == null) {
+                    request.setAttribute("error", "Responsible ID does not exist.");
+                    request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
+                    return;
+                }
             }
+
+            Import importOb = new Import();
+            importOb.setProposalId(proposalId != null ? proposalId : 0);
+            importOb.setImportType(proposalType);
+            importOb.setImportDate(importDate);
+            importOb.setNote(note);
+            importOb.setExecutorId(userId);
+            importOb.setDeliverySupplierName(deliverySupplierName);
+            importOb.setDeliverySupplierPhone(deliverySupplierPhone);
+            importOb.setResponsibleId(responsibleId);
 
             if (proposal != null) {
                 importOb.setProposal(proposal);

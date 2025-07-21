@@ -20,6 +20,18 @@ public class ImportDAO {
         this.conn = conn;
     }
 
+    public boolean checkProposalIdExists(int proposalId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM ImportReceipts WHERE proposal_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, proposalId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
+
     public boolean addImport(Import importOb) throws SQLException {
         String insertImportSQL = "INSERT INTO ImportReceipts(proposal_id, import_type, responsible_id, executor_id, note, import_date, delivery_supplier_name, delivery_supplier_phone) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -40,7 +52,7 @@ public class ImportDAO {
                 ps.setNull(4, Types.INTEGER);
             }
             ps.setString(5, importOb.getNote());
-            ps.setTimestamp(6, importOb.getImportDate());
+            ps.setDate(6, new java.sql.Date(importOb.getImportDate().getTime()));
             ps.setString(7, importOb.getDeliverySupplierName());
             ps.setString(8, importOb.getDeliverySupplierPhone());
 
@@ -49,9 +61,14 @@ public class ImportDAO {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
                         int importId = rs.getInt(1);
-                        if (addImportDetails(importId, importOb.getImportDetail())) {
-                            conn.commit();
-                            return true;
+                        if (importOb.getImportDetail() != null && !importOb.getImportDetail().isEmpty()) {
+                            if (addImportDetails(importId, importOb.getImportDetail())) {
+                                conn.commit();
+                                return true;
+                            }
+                        } else {
+                            conn.rollback();
+                            return false;
                         }
                     }
                 }
@@ -68,8 +85,8 @@ public class ImportDAO {
     }
 
     private boolean addImportDetails(int importId, List<ImportDetail> details) throws SQLException {
-        String insertDetailSQL = "INSERT INTO ImportDetails (import_id, material_id, quantity, price_per_unit, material_condition, supplier_id, site_id) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String insertDetailSQL = "INSERT INTO ImportDetails (import_id, material_id, quantity, price_per_unit, material_condition) "
+                + "VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = conn.prepareStatement(insertDetailSQL)) {
             for (ImportDetail detail : details) {
@@ -82,16 +99,6 @@ public class ImportDAO {
                     ps.setNull(4, Types.DOUBLE);
                 }
                 ps.setString(5, detail.getMaterialCondition());
-                if (detail.getSupplierId() != null) {
-                    ps.setInt(6, detail.getSupplierId());
-                } else {
-                    ps.setNull(6, Types.INTEGER);
-                }
-                if (detail.getSiteId() != null) {
-                    ps.setInt(7, detail.getSiteId());
-                } else {
-                    ps.setNull(7, Types.INTEGER);
-                }
                 ps.addBatch();
             }
 

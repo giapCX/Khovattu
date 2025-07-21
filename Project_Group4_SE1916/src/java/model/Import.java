@@ -18,7 +18,7 @@ public class Import {
     private Proposal proposal;
     private String deliverySupplierName; // New field
     private String deliverySupplierPhone; // New field
-
+    
     public Import() {
     }
 
