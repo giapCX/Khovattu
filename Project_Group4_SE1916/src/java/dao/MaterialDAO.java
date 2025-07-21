@@ -1,11 +1,6 @@
 package dao;
 
 import Dal.DBContext;
-import model.Material;
-import model.MaterialCategory;
-import model.ImportDetail;
-import model.Supplier;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,8 +9,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import model.ImportDetail;
+import model.Material;
+import model.MaterialCategory;
+import model.Supplier;
 
 public class MaterialDAO {
     private static final Logger LOGGER = Logger.getLogger(MaterialDAO.class.getName());
@@ -652,14 +651,15 @@ public class MaterialDAO {
         return materials;
     }
 public void addMaterial(Material material) throws SQLException {
-    String sqlMaterial = "INSERT INTO Materials (category_id, name, description, unit, unit_id, image_url) VALUES (?, ?, ?, ?, ?, ?)";
+    String sqlMaterial = "INSERT INTO Materials (code, category_id, name, description, unit, unit_id, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)";
     try (PreparedStatement ps = conn.prepareStatement(sqlMaterial, PreparedStatement.RETURN_GENERATED_KEYS)) {
-        ps.setInt(1, material.getCategory().getCategoryId());
-        ps.setString(2, material.getName());
-        ps.setString(3, material.getDescription());
-        ps.setString(4, material.getUnit());
-        ps.setInt(5, material.getUnitId()); // Thêm dòng này
-        ps.setString(6, material.getImageUrl());
+        ps.setString(1, material.getCode());
+        ps.setInt(2, material.getCategory().getCategoryId());
+        ps.setString(3, material.getName());
+        ps.setString(4, material.getDescription());
+        ps.setString(5, material.getUnit());
+        ps.setInt(6, material.getUnitId());
+        ps.setString(7, material.getImageUrl());
         ps.executeUpdate();
     }
 }

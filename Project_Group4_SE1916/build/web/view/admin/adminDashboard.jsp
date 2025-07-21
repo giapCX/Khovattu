@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="Dal.DBContext" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -396,8 +398,8 @@
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tổng vật tư</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">1,284</h3>
-                            <p class="text-sm text-green-500 mt-3"><i class="fas fa-arrow-up mr-1"></i>12% tháng trước</p>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${totalMaterials}</h3>
+                            <p class="text-sm text-green-500 mt-3"><i class="fas fa-arrow-up mr-1"></i></p>
                         </div>
                         <div class="p-4 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300">
                             <i class="fas fa-boxes text-2xl"></i>
@@ -411,7 +413,7 @@
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Vật tư sắp hết</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">8</h3>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${lowStockCount}</h3>
                             <p class="text-sm text-red-500 mt-3"><i class="fas fa-exclamation-circle mr-1"></i>Cần bổ sung</p>
                         </div>
                         <div class="p-4 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300">
@@ -426,7 +428,7 @@
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Đơn chờ duyệt</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">5</h3>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${pendingProposals}</h3>
                             <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Đang chờ xử lý</p>
                         </div>
                         <div class="p-4 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300">
@@ -441,7 +443,7 @@
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Giao dịch hôm nay</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">24</h3>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${todayTransactions}</h3>
                             <p class="text-sm text-blue-500 mt-3"><i class="fas fa-sync-alt mr-1"></i>Cập nhật mới nhất</p>
                         </div>
                         <div class="p-4 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
@@ -462,11 +464,6 @@
                             <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Xu hướng tồn kho</h2>
                             <p class="text-sm text-gray-600 dark:text-gray-300">Theo dõi nhập/xuất kho theo thời gian</p>
                         </div>
-                        <div class="flex space-x-2">
-                            <button class="px-4 py-2 text-sm bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 rounded-full">Tuần</button>
-                            <button class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Tháng</button>
-                            <button class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Năm</button>
-                        </div>
                     </div>
                     <canvas id="inventoryChart" class="border rounded-lg"></canvas>
                 </div>
@@ -476,28 +473,6 @@
                         <p class="text-sm text-gray-600 dark:text-gray-300">Tỷ lệ các loại vật tư trong kho</p>
                     </div>
                     <canvas id="distributionChart" class="border rounded-lg"></canvas>
-                    <div class="mt-6 grid grid-cols-2 gap-3">
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-primary-500 rounded-full mr-2"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư A (35%)</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-blue-400 rounded-full mr-2"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư B (25%)</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-green-400 rounded-full mr-2"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư C (20%)</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-yellow-400 rounded-full mr-2"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư D (15%)</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-red-400 rounded-full mr-2"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư E (5%)</span>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -544,37 +519,32 @@
                         <table class="w-full table-auto">
                             <thead>
                                 <tr class="bg-primary-600 text-white">
-                                    <th class="p-4 text-left">Mã vật tư</th>
                                     <th class="p-4 text-left">Tên vật tư</th>
                                     <th class="p-4 text-left">Số lượng</th>
                                     <th class="p-4 text-left">Trạng thái</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4 font-medium">VT001</td>
-                                    <td class="p-4">Bàn gỗ cao cấp</td>
-                                    <td class="p-4">5</td>
-                                    <td class="p-4"><span class="badge badge-warning">Sắp hết</span></td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4 font-medium">VT005</td>
-                                    <td class="p-4">Ghế xoay văn phòng</td>
-                                    <td class="p-4">3</td>
-                                    <td class="p-4"><span class="badge badge-danger">Cảnh báo</span></td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4 font-medium">VT012</td>
-                                    <td class="p-4">Màn hình LCD 24"</td>
-                                    <td class="p-4">2</td>
-                                    <td class="p-4"><span class="badge badge-danger">Cảnh báo</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="p-4 font-medium">VT018</td>
-                                    <td class="p-4">Bàn phím cơ</td>
-                                    <td class="p-4">7</td>
-                                    <td class="p-4"><span class="badge badge-success">Đủ dùng</span></td>
-                                </tr>
+                                <%-- Hiển thị danh sách vật tư sắp hết --%>
+                                <c:forEach var="item" items="${lowStockMaterials}">
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <td class="p-4">${item.materialName}</td>
+                                        <td class="p-4">${item.quantityInStock}</td>
+                                        <td class="p-4">
+                                            <c:choose>
+                                                <c:when test="${item.quantityInStock <= 3}">
+                                                    <span class="badge badge-danger">Cảnh báo</span>
+                                                </c:when>
+                                                <c:when test="${item.quantityInStock <= 10}">
+                                                    <span class="badge badge-warning">Sắp hết</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="badge badge-success">Đủ dùng</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
                             </tbody>
                         </table>
                     </div>
@@ -593,35 +563,29 @@
                                 <tr class="bg-primary-600 text-white">
                                     <th class="p-4 text-left">Thời gian</th>
                                     <th class="p-4 text-left">Loại</th>
-                                    <th class="p-4 text-left">Mã vật tư</th>
+                                    <th class="p-4 text-left">Tên vật tư</th>
                                     <th class="p-4 text-left">Số lượng</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4">10:30 23/05/2025</td>
-                                    <td class="p-4"><span class="text-green-500"><i class="fas fa-arrow-down mr-1"></i>Nhập kho</span></td>
-                                    <td class="p-4">VT001</td>
-                                    <td class="p-4">50</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4">09:15 23/05/2025</td>
-                                    <td class="p-4"><span class="text-red-500"><i class="fas fa-arrow-up mr-1"></i>Xuất kho</span></td>
-                                    <td class="p-4">VT002</td>
-                                    <td class="p-4">20</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4">08:45 23/05/2025</td>
-                                    <td class="p-4"><span class="text-green-500"><i class="fas fa-arrow-down mr-1"></i>Nhập kho</span></td>
-                                    <td class="p-4">VT003</td>
-                                    <td class="p-4">30</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-4">15:20 22/05/2025</td>
-                                    <td class="p-4"><span class="text-red-500"><i class="fas fa-arrow-up mr-1"></i>Xuất kho</span></td>
-                                    <td class="p-4">VT005</td>
-                                    <td class="p-4">15</td>
-                                </tr>
+                                <%-- Hiển thị nhập kho --%>
+                                <c:forEach var="imp" items="${recentImports}">
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <td class="p-4"><fmt:formatDate value="${imp.importDate}" pattern="HH:mm dd/MM/yyyy"/></td>
+                                        <td class="p-4"><span class="text-green-500"><i class="fas fa-arrow-down mr-1"></i>Nhập kho</span></td>
+                                        <td class="p-4">${imp.importerName}</td>
+                                        <td class="p-4">${imp.total}</td>
+                                    </tr>
+                                </c:forEach>
+                                <%-- Hiển thị xuất kho --%>
+                                <c:forEach var="exp" items="${recentExports}">
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <td class="p-4"><fmt:formatDate value="${exp.exportDate}" pattern="HH:mm dd/MM/yyyy"/></td>
+                                        <td class="p-4"><span class="text-red-500"><i class="fas fa-arrow-up mr-1"></i>Xuất kho</span></td>
+                                        <td class="p-4">${exp.exporterName}</td>
+                                        <td class="p-4">${exp.siteName}</td>
+                                    </tr>
+                                </c:forEach>
                             </tbody>
                         </table>
                     </div>
@@ -694,72 +658,34 @@
                 }).showToast();
             }
 
-            // Inventory Chart
+            // Inventory Chart - dữ liệu thật
+            const inventoryTrend = <%= new com.google.gson.Gson().toJson(request.getAttribute("inventoryTrend")) %>;
+            const months = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
+            const imported = inventoryTrend.map(item => item.imported);
+            const exported = inventoryTrend.map(item => item.exported);
+            const remaining = inventoryTrend.map(item => item.remaining);
             const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
             new Chart(inventoryCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'],
+                    labels: months,
                     datasets: [
-                        {
-                            label: 'Tồn kho',
-                            data: [1200, 1150, 1100, 1050, 1000, 950, 900],
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: true
-                        },
-                        {
-                            label: 'Nhập kho',
-                            data: [200, 150, 100, 80, 50, 30, 10],
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: true
-                        },
-                        {
-                            label: 'Xuất kho',
-                            data: [50, 70, 90, 120, 150, 100, 80],
-                            borderColor: '#ef4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: true
-                        }
+                        {label: 'Nhập kho', data: imported, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true},
+                        {label: 'Xuất kho', data: exported, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderWidth: 2, tension: 0.3, fill: true},
+                        {label: 'Tồn kho', data: remaining, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true}
                     ]
                 },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {position: 'top', labels: {usePointStyle: true, padding: 20}},
-                        tooltip: {enabled: true, mode: 'index', intersect: false}
-                    },
-                    scales: {
-                        y: {beginAtZero: false, grid: {drawBorder: false}},
-                        x: {grid: {display: false}}
-                    }
-                }
+                options: {responsive: true, plugins: {legend: {position: 'top', labels: {usePointStyle: true, padding: 20}}, tooltip: {enabled: true, mode: 'index', intersect: false}}, scales: {y: {beginAtZero: false, grid: {drawBorder: false}}, x: {grid: {display: false}}}}
             });
-
-            // Distribution Chart
+            // Distribution Chart - dữ liệu thật
+            const materialDistribution = <%= new com.google.gson.Gson().toJson(request.getAttribute("materialDistribution")) %>;
+            const distLabels = Object.keys(materialDistribution);
+            const distData = Object.values(materialDistribution);
             const distributionCtx = document.getElementById('distributionChart').getContext('2d');
             new Chart(distributionCtx, {
                 type: 'doughnut',
-                data: {
-                    labels: ['Vật tư A', 'Vật tư B', 'Vật tư C', 'Vật tư D', 'Vật tư E'],
-                    datasets: [{
-                            data: [35, 25, 20, 15, 5],
-                            backgroundColor: ['#3b82f6', '#60a5fa', '#34d399', '#fbbf24', '#f87171'],
-                            borderWidth: 0
-                        }]
-                },
-                options: {
-                    responsive: true,
-                    cutout: '70%',
-                    plugins: {legend: {display: false}}
-                }
+                data: {labels: distLabels, datasets: [{data: distData, backgroundColor: ['#3b82f6', '#60a5fa', '#34d399', '#fbbf24', '#f87171'], borderWidth: 0}]},
+                options: {responsive: true, cutout: '70%', plugins: {legend: {display: false}}}
             });
 
             // Table Sorting
