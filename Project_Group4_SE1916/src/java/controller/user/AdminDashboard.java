@@ -6,7 +6,18 @@
 package controller.user;
 
 import Dal.DBContext;
+import dao.DashboardWarehouseDAO;
+import dao.InventoryDAO;
 import dao.ProposalDAO;
+import dao.ExportHistoryDAO;
+import dao.ImportReceiptDAO;
+import model.Inventory;
+import model.InventoryTrendDTO;
+import java.util.List;
+import java.util.Map;
+import java.time.LocalDate;
+import java.time.Year;
+import java.sql.Date;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -54,21 +65,49 @@ public class AdminDashboard extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        try (Connection conn = DBContext.getConnection()) {
-            HttpSession session = request.getSession(false);
+        try {
+            // 1. Thống kê tổng quan
+            DashboardWarehouseDAO dashboardDAO = new DashboardWarehouseDAO();
+            ProposalDAO proposalDAO = new ProposalDAO(Dal.DBContext.getConnection());
+            int totalMaterials = dashboardDAO.countTotalMaterials();
+            int lowStockThreshold = 10; // Ngưỡng vật tư sắp hết, có thể điều chỉnh
+            int lowStockCount = dashboardDAO.countLowStockMaterials(lowStockThreshold);
+            int pendingProposals = proposalDAO.getPendingProposalsCount(null, null, null, "pending");
+            int todayTransactions = dashboardDAO.countTodayTransactions();
 
-            if (session == null || session.getAttribute("userId") == null) {
-                response.sendRedirect("login.jsp");
-                return;
-            }
+            // 2. Biểu đồ
+            int year = Year.now().getValue();
+            List<InventoryTrendDTO> inventoryTrend = dashboardDAO.getInventoryTrendByMonth(year);
+            Map<String, Integer> materialDistribution = dashboardDAO.getMaterialDistributionByParentCategory();
 
-            int userId = (Integer) session.getAttribute("userId");
+            // 3. Bảng vật tư sắp hết (lấy 5 vật tư tồn kho thấp nhất)
+            InventoryDAO inventoryDAO = new InventoryDAO(Dal.DBContext.getConnection());
+            List<Inventory> lowStockMaterials = inventoryDAO.searchInventory(null, null, null, null, null, 1, 5, "ASC");
+
+            // 4. Bảng giao dịch gần đây (5 giao dịch nhập + 5 giao dịch xuất gần nhất)
+            ExportHistoryDAO exportHistoryDAO = new ExportHistoryDAO(Dal.DBContext.getConnection());
+            ImportReceiptDAO importReceiptDAO = new ImportReceiptDAO();
+            List<model.Export> recentExports = exportHistoryDAO.searchExportReceipts(null, null, null, 1, 5);
+            List<model.ImportReceipt> recentImports = importReceiptDAO.searchImportReceipts(null, null, null, 1, 5);
+
+            // Đưa dữ liệu lên request
+            request.setAttribute("totalMaterials", totalMaterials);
+            request.setAttribute("lowStockCount", lowStockCount);
+            request.setAttribute("pendingProposals", pendingProposals);
+            request.setAttribute("todayTransactions", todayTransactions);
+            request.setAttribute("inventoryTrend", inventoryTrend);
+            request.setAttribute("materialDistribution", materialDistribution);
+            request.setAttribute("lowStockMaterials", lowStockMaterials);
+            request.setAttribute("recentExports", recentExports);
+            request.setAttribute("recentImports", recentImports);
+
+            // Forward sang JSP
             request.getRequestDispatcher("/view/admin/adminDashboard.jsp").forward(request, response);
         } catch (Exception e) {
-            throw new ServletException("Lỗi khi tải dashboard nhân viên: " + e.getMessage(), e);
+            e.printStackTrace();
+            response.sendError(500, "Lỗi lấy dữ liệu dashboard: " + e.getMessage());
         }
     } 
 
@@ -79,7 +118,6 @@ public class AdminDashboard extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         processRequest(request, response);

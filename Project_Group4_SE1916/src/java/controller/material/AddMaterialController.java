@@ -115,6 +115,10 @@ if (unitId == -1) {
 
 material.setUnitId(unitId);
             
+            // Sinh mã code tự động
+            String code = "VT_" + new java.text.SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
+            material.setCode(code);
+            
             // Xử lý upload ảnh
             Part filePart = request.getPart("imageFile");
             String imageUrl = "";
