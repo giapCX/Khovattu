@@ -31,6 +31,7 @@ public class ImportServlet extends HttpServlet {
         Integer proposalId = null;
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
+        System.out.println("ImportServlet.doGet: role=" + role + ", proposalIdStr=" + proposalIdStr);
         if (role == null || !role.equals("warehouse")) {
             request.setAttribute("error", "Access denied. Please log in as warehouse.");
             request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
@@ -44,22 +45,28 @@ public class ImportServlet extends HttpServlet {
                 try {
                     proposalId = Integer.parseInt(proposalIdStr);
                     proposal = proposalDAO.getProposalWithDetailsById(proposalId);
+                    System.out.println("ImportServlet.doGet: proposal=" + (proposal != null ? proposal.getProposalId() : "null"));
                 } catch (NumberFormatException e) {
+                    System.out.println("ImportServlet.doGet: Invalid proposal ID: " + proposalIdStr);
                     request.setAttribute("error", "Invalid proposal ID: " + proposalIdStr);
                 }
             }
 
             UserDAO userDAO = new UserDAO();
             List<User> activeUsers = userDAO.getAllActiveUsers() != null ? userDAO.getAllActiveUsers() : new ArrayList<>();
+            System.out.println("ImportServlet.doGet: activeUsers.size=" + activeUsers.size());
             request.setAttribute("activeUsers", activeUsers);
             request.setAttribute("proposal", proposal);
             request.setAttribute("proposalId", proposalId);
             request.setAttribute("proposalType", proposal != null ? proposal.getProposalType() : request.getParameter("proposalType"));
+            System.out.println("ImportServlet.doGet: Forwarding to importData.jsp, proposalType=" + request.getAttribute("proposalType"));
             request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
         } catch (SQLException e) {
+            System.out.println("ImportServlet.doGet: SQLException - " + e.getMessage());
             request.setAttribute("error", "Database error: " + e.getMessage());
             request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
         } catch (Exception e) {
+            System.out.println("ImportServlet.doGet: Exception - " + e.getMessage());
             request.setAttribute("error", "An error occurred: " + e.getMessage());
             request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
         }
@@ -71,7 +78,9 @@ public class ImportServlet extends HttpServlet {
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
+        System.out.println("ImportServlet.doPost: role=" + role + ", userId=" + userId);
         if (role == null || !role.equals("warehouse") || userId == null) {
+            System.out.println("ImportServlet.doPost: Unauthorized access");
             response.sendRedirect(request.getContextPath() + "/view/warehouse/importData.jsp?error=Unauthorized");
             return;
         }
@@ -83,6 +92,7 @@ public class ImportServlet extends HttpServlet {
                 proposalId = Integer.parseInt(proposalIdStr);
             }
         } catch (NumberFormatException e) {
+            System.out.println("ImportServlet.doPost: Invalid proposal ID: " + proposalIdStr);
             request.setAttribute("error", "Invalid proposal ID: " + proposalIdStr);
             request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
             return;
@@ -102,12 +112,14 @@ public class ImportServlet extends HttpServlet {
                 importDate = new Timestamp(System.currentTimeMillis());
             }
         } catch (Exception e) {
+            System.out.println("ImportServlet.doPost: Invalid date format: " + importDateStr);
             request.setAttribute("error", "Invalid date format. Use yyyy-MM-dd HH:mm.");
             request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
             return;
         }
         String note = request.getParameter("note");
         if (note == null || note.trim().isEmpty()) {
+            System.out.println("ImportServlet.doPost: Note is required");
             request.setAttribute("error", "Note is required.");
             request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
             return;
@@ -115,6 +127,7 @@ public class ImportServlet extends HttpServlet {
         String deliverySupplierName = request.getParameter("deliverySupplierName");
         String deliverySupplierPhone = request.getParameter("deliverySupplierPhone");
         String proposalType = request.getParameter("proposalType");
+        System.out.println("ImportServlet.doPost: proposalId=" + proposalId + ", proposalType=" + proposalType + ", responsibleId=" + responsibleId + ", deliverySupplierName=" + deliverySupplierName + ", deliverySupplierPhone=" + deliverySupplierPhone);
 
         try (Connection conn = DBContext.getConnection()) {
             ProposalDAO proposalDAO = new ProposalDAO(conn);
@@ -123,16 +136,19 @@ public class ImportServlet extends HttpServlet {
             if (proposalId != null) {
                 proposal = proposalDAO.getProposalWithDetailsById(proposalId);
                 if (proposal == null || !proposal.getFinalStatus().equals("approved_but_not_executed")) {
+                    System.out.println("ImportServlet.doPost: Proposal not found or not approved, proposalId=" + proposalId);
                     request.setAttribute("error", "Proposal not found or not approved for import.");
                     request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
                     return;
                 }
                 if (proposal.getProposalDetails() == null || proposal.getProposalDetails().isEmpty()) {
+                    System.out.println("ImportServlet.doPost: No proposal details found for proposalId=" + proposalId);
                     request.setAttribute("error", "No proposal details found.");
                     request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
                     return;
                 }
                 if (importDAO.checkProposalIdExists(proposalId)) {
+                    System.out.println("ImportServlet.doPost: Proposal ID already used, proposalId=" + proposalId);
                     request.setAttribute("error", "Proposal ID has already been used for import.");
                     request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
                     return;
@@ -140,6 +156,7 @@ public class ImportServlet extends HttpServlet {
             }
 
             if (proposalType == null || proposalType.isEmpty()) {
+                System.out.println("ImportServlet.doPost: Proposal type is required");
                 request.setAttribute("error", "Proposal type is required.");
                 request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
                 return;
@@ -147,18 +164,21 @@ public class ImportServlet extends HttpServlet {
 
             if ("import_from_supplier".equals(proposalType)) {
                 if (deliverySupplierName == null || deliverySupplierName.trim().isEmpty() || deliverySupplierPhone == null || deliverySupplierPhone.trim().isEmpty()) {
+                    System.out.println("ImportServlet.doPost: Delivery Supplier Name and Phone required for import_from_supplier");
                     request.setAttribute("error", "Delivery Supplier Name and Phone are required for Purchase.");
                     request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
                     return;
                 }
             } else if ("import_returned".equals(proposalType)) {
                 if (responsibleId == null) {
+                    System.out.println("ImportServlet.doPost: Responsible ID required for import_returned");
                     request.setAttribute("error", "Responsible ID is required for Retrieve.");
                     request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
                     return;
                 }
                 UserDAO userDAO = new UserDAO();
                 if (userDAO.getUserById(responsibleId) == null) {
+                    System.out.println("ImportServlet.doPost: Responsible ID does not exist: " + responsibleId);
                     request.setAttribute("error", "Responsible ID does not exist.");
                     request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
                     return;
@@ -194,15 +214,19 @@ public class ImportServlet extends HttpServlet {
                     importDAO.addToInventory(importOb.getImportDetail());
                     importDAO.updateProposalStatusToExecuted(proposalId);
                 }
-                response.sendRedirect(request.getContextPath() + "/view/warehouse/importData.jsp?success=Import succesfully&proposalId=" + (proposalId != null ? proposalId : ""));
+                System.out.println("ImportServlet.doPost: Import successful, redirecting to importData.jsp with success message");
+                response.sendRedirect(request.getContextPath() + "/view/warehouse/importData.jsp?success=Save successfully");
             } else {
+                System.out.println("ImportServlet.doPost: Import failed");
                 request.setAttribute("error", "Failed to process import.");
                 request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
             }
         } catch (SQLException e) {
+            System.out.println("ImportServlet.doPost: SQLException - " + e.getMessage());
             request.setAttribute("error", "Database error: " + e.getMessage());
             request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
         } catch (Exception e) {
+            System.out.println("ImportServlet.doPost: Exception - " + e.getMessage());
             request.setAttribute("error", "An error occurred: " + e.getMessage());
             request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
         }

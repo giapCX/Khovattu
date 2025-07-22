@@ -37,17 +37,14 @@
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         String currentDateTime = now.format(formatter);
+        // Lấy success từ query parameter
+        String success = request.getParameter("success");
     %>
 
-    <!-- Hiển thị thông báo lỗi hoặc thành công -->
+    <!-- Hiển thị thông báo lỗi -->
     <c:if test="${not empty error}">
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             <span class="block sm:inline">${error}</span>
-        </div>
-    </c:if>
-    <c:if test="${not empty success}">
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            <span class="block sm:inline">${success}</span>
         </div>
     </c:if>
 
@@ -237,6 +234,13 @@
             responsibleDiv.querySelector("input").required = proposalType === 'import_returned';
             supplierNameDiv.querySelector("input").required = proposalType === 'import_from_supplier';
             supplierPhoneDiv.querySelector("input").required = proposalType === 'import_from_supplier';
+
+            // Hiển thị thông báo thành công và chuyển hướng
+            const success = "<%= success != null ? success : "" %>";
+            if (success === "Save successfully") {
+                alert("Save successfully");
+                window.location.href = "${pageContext.request.contextPath}/importhistory";
+            }
         });
     </script>
 </body>
