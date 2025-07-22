@@ -194,7 +194,7 @@ public class ImportServlet extends HttpServlet {
                     importDAO.addToInventory(importOb.getImportDetail());
                     importDAO.updateProposalStatusToExecuted(proposalId);
                 }
-                response.sendRedirect(request.getContextPath() + "/view/warehouse/importData.jsp?success=Import successful&proposalId=" + (proposalId != null ? proposalId : ""));
+                response.sendRedirect(request.getContextPath() + "/view/warehouse/importData.jsp?success=Import succesfully&proposalId=" + (proposalId != null ? proposalId : ""));
             } else {
                 request.setAttribute("error", "Failed to process import.");
                 request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
