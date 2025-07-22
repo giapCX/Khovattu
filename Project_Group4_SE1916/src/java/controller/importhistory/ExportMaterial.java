@@ -297,7 +297,7 @@ public class ExportMaterial extends HttpServlet {
             ExportDAO dao = new ExportDAO(conn);
             Export export = new Export();
             export.setExporterId(userId);
-            export.setReceiptId(voucherIdStr);
+            //export.setReceiptId(voucherIdStr);
             export.setReceiverId(receiverId);
             export.setExportDate(LocalDate.now());
             export.setNote(note);

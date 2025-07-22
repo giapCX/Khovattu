@@ -27,15 +27,15 @@ public class ExportDAO {
     }
 
     public int saveExport(Export export) throws SQLException {
-        String sql = "INSERT INTO ExportReceipts (receipt_id, executor_id, receiver_id, export_date, note, site_id) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ExportReceipts (executor_id, receiver_id, export_date, note, site_id) "
+                + "VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, export.getReceiptId());
-            stmt.setInt(2, export.getExporterId());
-            stmt.setInt(3, export.getReceiverId());
-            stmt.setDate(4, Date.valueOf(export.getExportDate()));
-            stmt.setString(5, export.getNote());
-            stmt.setInt(6, export.getSiteId());
+            //stmt.setString(1, export.getReceiptId());
+            stmt.setInt(1, export.getExporterId());
+            stmt.setInt(2, export.getReceiverId());
+            stmt.setDate(3, Date.valueOf(export.getExportDate()));
+            stmt.setString(4, export.getNote());
+            stmt.setInt(5, export.getSiteId());
             stmt.executeUpdate();
 
             ResultSet rs = stmt.getGeneratedKeys();
