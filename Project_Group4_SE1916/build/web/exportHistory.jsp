@@ -1,3 +1,4 @@
+//exHis
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -177,7 +178,7 @@
                 border-radius: 0.5rem;
                 padding: 12px 24px;
                 transition: background-color 0.3s;
-                margin-left: 500px;
+                
                 margin-top: 20px;
             }
             .btn-secondary:hover {
@@ -196,6 +197,10 @@
                 table {
                     font-size: 14px;
                 }
+            }
+            
+            .button-back {
+                justify-self: center;
             }
         </style>
         <script>
@@ -296,26 +301,12 @@
                     </div>
                 </c:if>
 
-                <%
-                    String redirectUrl = "./login.jsp";
-                    if (role != null) {
-                        switch (role.toLowerCase()) {
-                            case "direction":
-                                redirectUrl = request.getContextPath() + "/view/direction/directionDashboard.jsp";
-                                break;
-                            case "employee":
-                                redirectUrl = request.getContextPath() + "/view/employee/employeeDashboard.jsp";
-                                break;
-                            case "warehouse":
-                                redirectUrl = request.getContextPath() + "/view/warehouse/warehouseDashboard.jsp";
-                                break;
-                            case "admin":
-                                redirectUrl = request.getContextPath() + "/view/admin/adminDashboard.jsp";
-                                break;
-                        }
-                    }
-                %>
-                <button onclick="window.location.href = '<%= redirectUrl%>'" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to Home</button>
+
+                <div class="mt-6 d-flex button-back">
+                    <jsp:include page="/view/backToDashboardButton.jsp" />
+                </div>
+
+
             </div>
         </main>
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>

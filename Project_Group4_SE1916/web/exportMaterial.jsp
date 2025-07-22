@@ -19,7 +19,7 @@
         <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
-<!--        <script src="https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js"></script>-->
+        <!--        <script src="https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js"></script>-->
         <style>
             body {
                 min-height: 100vh;
@@ -248,7 +248,9 @@
                     <button type="submit" class="btn btn-primary">Save Export</button>
                     <button type="reset" class="btn btn-info">Reset</button>
                     <button type="button" class="btn btn-success" id="exportExcelBtn" disabled>Export to Excel</button>
-                    <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn btn-secondary">Back to Home</a>
+                    <div class="mt-6 button-back">
+                        <jsp:include page="/view/backToDashboardButton.jsp" />
+                    </div>
                 </form>
             </div>
         </main>
