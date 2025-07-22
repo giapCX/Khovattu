@@ -209,10 +209,6 @@
         <servlet-class>controller.constructionSites.ViewConstructionSiteServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UnitServlet</servlet-name>
-        <servlet-class>controller.unit.UnitServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>InventoryServlet</servlet-name>
         <servlet-class>controller.inventory.InventoryServlet</servlet-class>
     </servlet>
@@ -223,6 +219,10 @@
     <servlet>
         <servlet-name>EditUnitServlet</servlet-name>
         <servlet-class>controller.unit.EditUnitServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UnitServlet</servlet-name>
+        <servlet-class>controller.unit.UnitServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>EditUserServlet</servlet-name>
@@ -433,10 +433,6 @@
         <url-pattern>/ViewConstructionSiteServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>UnitServlet</servlet-name>
-        <url-pattern>/unit</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>InventoryServlet</servlet-name>
         <url-pattern>/inventory</url-pattern>
     </servlet-mapping>
@@ -447,6 +443,10 @@
     <servlet-mapping>
         <servlet-name>EditUnitServlet</servlet-name>
         <url-pattern>/editUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UnitServlet</servlet-name>
+        <url-pattern>/unit</url-pattern>
     </servlet-mapping>
     <jsp-config>
         <jsp-property-group>
