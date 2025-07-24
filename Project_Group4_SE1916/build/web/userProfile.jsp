@@ -249,7 +249,7 @@
                         <span class="info-value">${user.address}</span>
                     </div>
                     <div class="info-group">
-                        <label>Birth of date:</label>
+                        <label>Date of birth:</label>
                         <span class="info-value">${user.dateOfBirth}</span>
                     </div>
                     <div class="info-group">
