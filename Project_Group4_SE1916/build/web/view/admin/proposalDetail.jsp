@@ -91,7 +91,7 @@
                         Admin Approve Proposal #${proposal.proposalId}
                     </h2>
                 </div>
-                <a href="${pageContext.request.contextPath}/proposals" 
+                <a href="${pageContext.request.contextPath}/AdminApproveServlet" 
                    class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
                     <i class="fas fa-arrow-left mr-2"></i>Back to Proposals History
                 </a>
