@@ -1,8 +1,6 @@
 package dao;
 
 import Dal.DBContext;
-import model.Proposal;
-import model.ProposalDetails;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +10,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import model.Proposal;
 import model.ProposalApprovals;
+import model.ProposalDetails;
 
 public class ProposalDAO {
 
@@ -383,16 +383,19 @@ public class ProposalDAO {
     public Proposal getProposalById(int proposalId) {
         Proposal proposal = null;
         String sql = "SELECT ep.*, u.full_name, "
-                + "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, m.name AS material_name, m.unit AS material_unit, "
+                + "pd.proposal_detail_id, pd.material_id, pd.quantity, pd.material_condition, pd.price_per_unit, m.name AS material_name, m.unit AS material_unit, "
                 + "pa.approval_id, pa.admin_approver_id, pa.director_approver_id, "
                 + "pa.admin_status, pa.director_status, "
                 + "pa.admin_approval_date, pa.admin_reason, pa.admin_note, "
-                + "pa.director_approval_date, pa.director_reason, pa.director_note "
+                + "pa.director_approval_date, pa.director_reason, pa.director_note, "
+                + "cs.site_name, s.name AS supplier_name "
                 + "FROM EmployeeProposals ep "
                 + "JOIN Users u ON ep.proposer_id = u.user_id "
                 + "LEFT JOIN ProposalDetails pd ON ep.proposal_id = pd.proposal_id "
                 + "LEFT JOIN Materials m ON pd.material_id = m.material_id "
                 + "LEFT JOIN ProposalApprovals pa ON ep.proposal_id = pa.proposal_id "
+                + "LEFT JOIN ConstructionSites cs ON ep.site_id = cs.site_id "
+                + "LEFT JOIN Suppliers s ON ep.supplier_id = s.supplier_id "
                 + "WHERE ep.proposal_id = ?";
 
         try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -412,6 +415,10 @@ public class ProposalDAO {
                     proposal.setNote(rs.getString("note"));
                     proposal.setProposalSentDate(rs.getTimestamp("proposal_sent_date"));
                     proposal.setFinalStatus(rs.getString("final_status"));
+                    proposal.setSupplierId((Integer) rs.getObject("supplier_id"));
+                    proposal.setSupplierName(rs.getString("supplier_name"));
+                    proposal.setSiteId((Integer) rs.getObject("site_id"));
+                    proposal.setSiteName(rs.getString("site_name"));
                 }
 
                 // Detail
@@ -425,6 +432,8 @@ public class ProposalDAO {
                     detail.setQuantity(rs.getDouble("quantity"));
                     detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setUnit(rs.getString("material_unit"));
+                    java.math.BigDecimal priceBD = (java.math.BigDecimal) rs.getObject("price_per_unit");
+                    detail.setPrice(priceBD != null ? priceBD.doubleValue() : null);
                     detailsMap.put(detailId, detail);
                 }
 

@@ -121,6 +121,20 @@
                             <input class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
                                    value="${proposal.proposalType}" readonly>
                         </div>
+                        <c:if test="${proposal.proposalType == 'import_from_supplier'}">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Supplier</label>
+                                <input class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
+                                       value="${proposal.supplierName}" readonly>
+                            </div>
+                        </c:if>
+                        <c:if test="${proposal.proposalType == 'import_returned' || proposal.proposalType == 'export'}">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Construction Site</label>
+                                <input class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
+                                       value="${proposal.siteName}" readonly>
+                            </div>
+                        </c:if>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Submission Date</label>
                             <input class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
@@ -169,11 +183,7 @@
                                 </c:choose>
                             </div>
                         </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Admin Reason</label>
-                            <textarea class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
-                                      rows="2" readonly>${proposal.approval.adminReason}</textarea>
-                        </div>
+                       
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Admin Note</label>
                             <textarea class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
@@ -215,6 +225,11 @@
                                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
                                         <i class="fas fa-info-circle mr-1"></i>Material Condition
                                     </th>
+                                    <c:if test="${proposal.proposalType == 'import_from_supplier'}">
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            <i class="fas fa-money-bill-wave mr-1"></i>Price (VNĐ)
+                                        </th>
+                                    </c:if>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -224,11 +239,16 @@
                                         <td class="px-4 py-3 text-gray-900 dark:text-gray-100">${detail.unit}</td>
                                         <td class="px-4 py-3 text-gray-900 dark:text-gray-100">${detail.quantity}</td>
                                         <td class="px-4 py-3 text-gray-900 dark:text-gray-100">${detail.materialCondition}</td>
+                                        <c:if test="${proposal.proposalType == 'import_from_supplier'}">
+                                            <td class="px-4 py-3 text-gray-900 dark:text-gray-100">
+                                                <fmt:formatNumber value="${detail.price}" type="number" minFractionDigits="0" maxFractionDigits="2" />
+                                            </td>
+                                        </c:if>
                                     </tr>
                                 </c:forEach>
                                 <c:if test="${empty proposal.proposalDetails}">
                                     <tr>
-                                        <td colspan="4" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                                        <td colspan="5" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                                             <i class="fas fa-inbox text-3xl mb-2"></i>
                                             <p>No materials proposed.</p>
                                         </td>
