@@ -44,7 +44,7 @@ public class AddMaterialController extends HttpServlet {
             loadFormData(request);
             request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
         } catch (SQLException e) {
-            throw new ServletException("Không thể lấy dữ liệu cho form", e);
+            throw new ServletException("Unable to load form data", e);
         }
     }
 
@@ -59,16 +59,15 @@ public class AddMaterialController extends HttpServlet {
         try {
             Material material = new Material();
             
-            // Lấy dữ liệu từ form
+            // Get data from form
             String name = request.getParameter("name");
             String description = request.getParameter("description");
             String unit = request.getParameter("unit");
-            // Đã xóa parentCategoryId
-            String childCategoryId = request.getParameter("childCategory"); // Khớp với name trong JSP
+            String childCategoryId = request.getParameter("childCategory"); // Match with name in JSP
             
             // Validation
             if (name == null || name.trim().isEmpty()) {
-                request.setAttribute("message", "Tên vật tư không được để trống!");
+                request.setAttribute("message", "Material name cannot be empty!");
                 request.setAttribute("messageType", "error");
                 loadFormData(request);
                 request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
@@ -76,25 +75,25 @@ public class AddMaterialController extends HttpServlet {
             }
             
             if (unit == null || unit.trim().isEmpty()) {
-                request.setAttribute("message", "Đơn vị không được để trống!");
-                request.setAttribute("messageType", "error");
-                loadFormData(request);
-                request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
-                return;
-            }
-            // Đã xóa kiểm tra parentCategoryId
-            if (childCategoryId == null || childCategoryId.trim().isEmpty()) {
-                request.setAttribute("message", "Vui lòng chọn danh mục con!");
+                request.setAttribute("message", "Unit cannot be empty!");
                 request.setAttribute("messageType", "error");
                 loadFormData(request);
                 request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
                 return;
             }
             
-            // Kiểm tra trùng tên vật tư trong cùng sub category
+            if (childCategoryId == null || childCategoryId.trim().isEmpty()) {
+                request.setAttribute("message", "Please select a child category!");
+                request.setAttribute("messageType", "error");
+                loadFormData(request);
+                request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
+                return;
+            }
+            
+            // Check for duplicate material name in the same sub category
             int subCategoryId = Integer.parseInt(childCategoryId);
             if (materialDAO.isMaterialNameExistsInSubCategory(name, subCategoryId)) {
-                request.setAttribute("message", "Tên vật tư đã tồn tại trong danh mục con này!");
+                request.setAttribute("message", "Material name already exists in this sub category!");
                 request.setAttribute("messageType", "error");
                 loadFormData(request);
                 request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
@@ -105,29 +104,29 @@ public class AddMaterialController extends HttpServlet {
             material.setName(name.trim());
             material.setDescription(description != null ? description.trim() : "");
             material.setUnit(unit.trim());
-            int unitId = materialDAO.getUnitIdByName(unit); // Cần thêm phương thức này trong MaterialDAO
+            int unitId = materialDAO.getUnitIdByName(unit); // Need to add this method in MaterialDAO
 
-if (unitId == -1) {
-    request.setAttribute("message", "Đơn vị không hợp lệ!");
-    request.setAttribute("messageType", "error");
-    loadFormData(request);
-    request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
-    return;
-}
+            if (unitId == -1) {
+                request.setAttribute("message", "Invalid unit!");
+                request.setAttribute("messageType", "error");
+                loadFormData(request);
+                request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
+                return;
+            }
 
-material.setUnitId(unitId);
+            material.setUnitId(unitId);
             
-            // Sinh mã code tự động
-            String code = "VT_" + new java.text.SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
+            // Auto-generate code
+            String code = "MT_" + new java.text.SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
             material.setCode(code);
             
-            // Xử lý upload ảnh
+            // Handle image upload
             Part filePart = request.getPart("imageFile");
             String imageUrl = "";
             
-            // Nếu chưa chọn ảnh thì báo lỗi
+            // If no image selected, show error
             if (filePart == null || filePart.getSize() == 0) {
-                request.setAttribute("message", "Vui lòng chọn ảnh vật tư!");
+                request.setAttribute("message", "Please select a material image!");
                 request.setAttribute("messageType", "error");
                 loadFormData(request);
                 request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
@@ -138,7 +137,7 @@ material.setUnitId(unitId);
                 // Validate file type
                 String contentType = filePart.getContentType();
                 if (!contentType.startsWith("image/")) {
-                    request.setAttribute("message", "Vui lòng chọn file ảnh hợp lệ!");
+                    request.setAttribute("message", "Please select a valid image file!");
                     request.setAttribute("messageType", "error");
                     loadFormData(request);
                     request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
@@ -188,7 +187,7 @@ material.setUnitId(unitId);
                 material.setCategory(category);
               
             } catch (NumberFormatException e) {
-                request.setAttribute("message", "Danh mục không hợp lệ!");
+                request.setAttribute("message", "Invalid category!");
                 request.setAttribute("messageType", "error");
                 loadFormData(request);
                 request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
@@ -199,28 +198,27 @@ material.setUnitId(unitId);
             // Save to database
             try {
                 materialDAO.addMaterial(material);
-                // Chuyển hướng về trang danh sách vật tư sau khi thêm thành công
+                // Redirect to material list page after successful addition
                 response.sendRedirect(request.getContextPath() + "/ListMaterialController?action=list");
                 return;
             } catch (SQLException e) {
                 Logger.getLogger(AddMaterialController.class.getName()).log(Level.SEVERE, "Error saving material", e);
-                request.setAttribute("message", "Lỗi khi lưu vật tư: " + e.getMessage());
+                request.setAttribute("message", "Error while saving material: " + e.getMessage());
                 request.setAttribute("messageType", "error");
                 
                 // Preserve form data on error
                 request.setAttribute("name", name);
                 request.setAttribute("description", description);
                 request.setAttribute("unit", unit);
-                // Đã xóa request.setAttribute("parentCategoryId", parentCategoryId);
                 request.setAttribute("childCategory", childCategoryId);
             }
             
         } catch (NumberFormatException e) {
-            request.setAttribute("message", "Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.");
+            request.setAttribute("message", "Invalid data! Please check again.");
             request.setAttribute("messageType", "error");
         } catch (Exception e) {
             Logger.getLogger(AddMaterialController.class.getName()).log(Level.SEVERE, "Unexpected error", e);
-            request.setAttribute("message", "Đã xảy ra lỗi không mong muốn!");
+            request.setAttribute("message", "An unexpected error occurred!");
             request.setAttribute("messageType", "error");
         }
         
@@ -230,7 +228,7 @@ material.setUnitId(unitId);
             request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
         } catch (SQLException ex) {
             Logger.getLogger(AddMaterialController.class.getName()).log(Level.SEVERE, "Error loading form data", ex);
-            throw new ServletException("Không thể tải dữ liệu form", ex);
+            throw new ServletException("Unable to load form data", ex);
         }
     }
     
@@ -239,7 +237,7 @@ material.setUnitId(unitId);
         List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories2();
         request.setAttribute("parentCategories", parentCategories);
         
-        // Get all child categories for autocomplete (chỉ lấy active)
+        // Get all child categories for autocomplete (only active ones)
         List<MaterialCategory> childCategories = categoryDAO.getAllActiveChildCategories();
         request.setAttribute("childCategories", childCategories);
         
@@ -248,6 +246,5 @@ material.setUnitId(unitId);
         request.setAttribute("units", units);
     }
     
-// Auto-generate code based on name and timestamp
-
+    // Auto-generate code based on name and timestamp
 }

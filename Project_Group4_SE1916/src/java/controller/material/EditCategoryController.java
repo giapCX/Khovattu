@@ -31,18 +31,18 @@ public class EditCategoryController extends HttpServlet {
 
             int categoryId = Integer.parseInt(idParam);
             
-            // Lấy thông tin danh mục cần chỉnh sửa
+            // Get category information to edit
             MaterialCategory categoryToEdit = categoryDAO.getCategoryById(categoryId);
             if (categoryToEdit == null) {
-                request.setAttribute("errorMessage", "Danh mục không tồn tại!");
+                request.setAttribute("errorMessage", "Category does not exist!");
                 request.getRequestDispatcher("/view/material/editCategory.jsp").forward(request, response);
                 return;
             }
 
-            // Lấy danh sách tất cả danh mục cha để hiển thị trong dropdown
+            // Get all parent categories to display in dropdown
             List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories2();
             
-            // Nếu đang chỉnh sửa danh mục cha, loại bỏ chính nó khỏi danh sách
+            // If editing a parent category, remove itself from the list
             if (categoryToEdit.getParentId() == 0) {
                 parentCategories.removeIf(cat -> cat.getCategoryId() == categoryId);
             }
@@ -52,10 +52,10 @@ public class EditCategoryController extends HttpServlet {
             request.getRequestDispatcher("/view/material/editCategory.jsp").forward(request, response);
             
         } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "ID danh mục không hợp lệ!");
+            request.setAttribute("errorMessage", "Invalid category ID!");
             request.getRequestDispatcher("/view/material/editCategory.jsp").forward(request, response);
         } catch (SQLException e) {
-            request.setAttribute("errorMessage", "Lỗi khi tải thông tin danh mục: " + e.getMessage());
+            request.setAttribute("errorMessage", "Error loading category information: " + e.getMessage());
             request.getRequestDispatcher("/view/material/editCategory.jsp").forward(request, response);
         }
     }
@@ -70,100 +70,100 @@ public class EditCategoryController extends HttpServlet {
         try {
             int categoryId = Integer.parseInt(categoryIdParam);
             
-            // Lấy thông tin danh mục hiện tại
+            // Get current category information
             MaterialCategory currentCategory = categoryDAO.getCategoryById(categoryId);
             if (currentCategory == null) {
-                request.setAttribute("errorMessage", "Danh mục không tồn tại!");
+                request.setAttribute("errorMessage", "Category does not exist!");
                 loadDataAndForward(request, response, categoryId);
                 return;
             }
 
-            // Kiểm tra dữ liệu đầu vào
+            // Validate input data
             if (name == null || name.trim().isEmpty()) {
-                request.setAttribute("errorMessage", "Tên danh mục không được để trống!");
+                request.setAttribute("errorMessage", "Category name cannot be empty!");
                 loadDataAndForward(request, response, categoryId);
                 return;
             }
 
             if (status == null || (!status.equals("active") && !status.equals("inactive"))) {
-                request.setAttribute("errorMessage", "Trạng thái không hợp lệ!");
+                request.setAttribute("errorMessage", "Invalid status!");
                 loadDataAndForward(request, response, categoryId);
                 return;
             }
 
-            // Xử lý trường hợp chuyển đổi từ danh mục con thành danh mục cha
+            // Handle case of converting from child category to parent category
             if (parentCategoryParam == null || parentCategoryParam.trim().isEmpty()) {
-                // Kiểm tra xem danh mục có vật tư không (nếu là danh mục con)
+                // Check if category has materials (if it's a child category)
                 if (currentCategory.getParentId() != 0) {
                     if (categoryDAO.hasMaterials(categoryId)) {
-                        request.setAttribute("errorMessage", "Không thể cập nhật. Danh mục này đang được sử dụng bởi các vật tư. Hãy di chuyển vật tư sang danh mục khác trước.");
+                        request.setAttribute("errorMessage", "Cannot update. This category is being used by materials. Please move materials to another category first.");
                         loadDataAndForward(request, response, categoryId);
                         return;
                     }
                 }
 
-                // Kiểm tra tên danh mục cha đã tồn tại (loại trừ chính nó)
+                // Check if parent category name already exists (excluding itself)
                 if (categoryDAO.categoryExistsByNameExcludingId(name.trim(), 0, categoryId)) {
-                    request.setAttribute("errorMessage", "Tên danh mục cha đã tồn tại!");
+                    request.setAttribute("errorMessage", "Parent category name already exists!");
                     loadDataAndForward(request, response, categoryId);
                     return;
                 }
 
-                // Cập nhật thành danh mục cha
+                // Update to parent category
                 categoryDAO.updateToParentCategory(categoryId, name.trim(), status);
                 response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
                 return;
             } else {
-                // Xử lý trường hợp cập nhật danh mục con
+                // Handle case of updating child category
                 int parentId;
                 try {
                     parentId = Integer.parseInt(parentCategoryParam);
                 } catch (NumberFormatException e) {
-                    request.setAttribute("errorMessage", "ID danh mục cha không hợp lệ!");
+                    request.setAttribute("errorMessage", "Invalid parent category ID!");
                     loadDataAndForward(request, response, categoryId);
                     return;
                 }
 
-                // Kiểm tra danh mục cha có tồn tại không
+                // Check if parent category exists
                 MaterialCategory parentCategory = categoryDAO.getParentCategoryById(parentId);
                 if (parentCategory == null) {
-                    request.setAttribute("errorMessage", "Danh mục cha không tồn tại!");
+                    request.setAttribute("errorMessage", "Parent category does not exist!");
                     loadDataAndForward(request, response, categoryId);
                     return;
                 }
 
-                // Kiểm tra không thể chọn chính nó làm danh mục cha
+                // Cannot select itself as parent category
                 if (parentId == categoryId) {
-                    request.setAttribute("errorMessage", "Không thể chọn chính nó làm danh mục cha!");
+                    request.setAttribute("errorMessage", "Cannot select itself as parent category!");
                     loadDataAndForward(request, response, categoryId);
                     return;
                 }
 
-                // Nếu đang là danh mục cha, kiểm tra có danh mục con không
+                // If currently a parent category, check if it has child categories
                 if (currentCategory.getParentId() == 0) {
                     if (categoryDAO.getChildCategoryCount(categoryId) > 0) {
-                        request.setAttribute("errorMessage", "Không thể chuyển danh mục cha thành danh mục con khi còn có danh mục con!");
+                        request.setAttribute("errorMessage", "Cannot convert parent category to child category when it still has child categories!");
                         loadDataAndForward(request, response, categoryId);
                         return;
                     }
                 }
 
-                // Kiểm tra tên danh mục con đã tồn tại trong cùng danh mục cha (loại trừ chính nó)
+                // Check if child category name already exists in the same parent category (excluding itself)
                 if (categoryDAO.categoryExistsByNameExcludingId(name.trim(), parentId, categoryId)) {
-                    request.setAttribute("errorMessage", "Tên danh mục con đã tồn tại trong danh mục cha này!");
+                    request.setAttribute("errorMessage", "Child category name already exists in this parent category!");
                     loadDataAndForward(request, response, categoryId);
                     return;
                 }
 
-                // Cập nhật thành danh mục con
+                // Update to child category
                 categoryDAO.updateToChildCategory(categoryId, name.trim(), parentId, status);
                 response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
                 return;
             }
 
-            // Không cần load lại form khi đã chuyển hướng
+            // No need to reload form when already redirected
         } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "ID danh mục không hợp lệ!");
+            request.setAttribute("errorMessage", "Invalid category ID!");
             try {
                 int categoryId = Integer.parseInt(categoryIdParam);
                 loadDataAndForward(request, response, categoryId);
@@ -171,7 +171,7 @@ public class EditCategoryController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
             }
         } catch (SQLException e) {
-            request.setAttribute("errorMessage", "Lỗi khi cập nhật danh mục: " + e.getMessage());
+            request.setAttribute("errorMessage", "Error updating category: " + e.getMessage());
             try {
                 int categoryId = Integer.parseInt(categoryIdParam);
                 loadDataAndForward(request, response, categoryId);
@@ -187,7 +187,7 @@ public class EditCategoryController extends HttpServlet {
             MaterialCategory categoryToEdit = categoryDAO.getCategoryById(categoryId);
             List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories2();
             
-            // Nếu đang chỉnh sửa danh mục cha, loại bỏ chính nó khỏi danh sách
+            // If editing a parent category, remove itself from the list
             if (categoryToEdit != null && categoryToEdit.getParentId() == 0) {
                 parentCategories.removeIf(cat -> cat.getCategoryId() == categoryId);
             }
@@ -195,7 +195,7 @@ public class EditCategoryController extends HttpServlet {
             request.setAttribute("categoryToEdit", categoryToEdit);
             request.setAttribute("parentCategories", parentCategories);
         } catch (SQLException e) {
-            request.setAttribute("errorMessage", "Lỗi khi tải dữ liệu: " + e.getMessage());
+            request.setAttribute("errorMessage", "Error loading data: " + e.getMessage());
         }
         request.getRequestDispatcher("/view/material/editCategory.jsp").forward(request, response);
     }
