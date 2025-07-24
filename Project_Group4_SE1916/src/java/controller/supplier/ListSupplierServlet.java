@@ -62,9 +62,7 @@ public class ListSupplierServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String searchName = request.getParameter("searchName");
-        String searchPhone = request.getParameter("searchPhone");
-        String searchAddress = request.getParameter("searchAddress");
+        String search = request.getParameter("search");
         String searchStatus = request.getParameter("searchStatus");
         String pageParam = request.getParameter("page");
         int currentPage = 1;
@@ -92,7 +90,7 @@ public class ListSupplierServlet extends HttpServlet {
         try (Connection conn = DBContext.getConnection()) {
             SupplierDAO supplierDAO = new SupplierDAO(conn);
 
-            int totalRecords = supplierDAO.countSuppliersByNamePhoneAddressStatus(searchName, searchPhone, searchAddress, searchStatus);
+            int totalRecords = supplierDAO.countSuppliersBySearchAndStatus(search, searchStatus);
 
             // Nếu không có bản ghi nào, set totalPages tối thiểu là 1
             int totalPages = 1;
@@ -107,7 +105,7 @@ public class ListSupplierServlet extends HttpServlet {
 
             int offset = (currentPage - 1) * recordsPerPage;
 
-            List<Supplier> suppliers = supplierDAO.searchSuppliersByNamePhoneAddressStatusWithPaging(searchName, searchPhone, searchAddress, searchStatus, offset, recordsPerPage);
+            List<Supplier> suppliers = supplierDAO.searchSuppliersBySearchAndStatusWithPaging(search, searchStatus, offset, recordsPerPage);
 
             // Đảm bảo suppliers không null, nếu null thì khởi tạo list rỗng
             if (suppliers == null) {
@@ -115,9 +113,7 @@ public class ListSupplierServlet extends HttpServlet {
             }
 
             request.setAttribute("suppliers", suppliers);
-            request.setAttribute("searchName", searchName);
-            request.setAttribute("searchPhone", searchPhone);
-            request.setAttribute("searchAddress", searchAddress);
+            request.setAttribute("search", search);
             request.setAttribute("searchStatus", searchStatus);
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("totalPages", totalPages);

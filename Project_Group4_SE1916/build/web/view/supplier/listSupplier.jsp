@@ -83,13 +83,7 @@
                 <!-- Search and Filter Form -->
                 <form action="ListSupplierServlet" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchName" placeholder="Search name"  value="${param.searchName}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                    </div>
-                    <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchPhone" placeholder="Search phone" value="${param.searchPhone}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                    </div>
-                    <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="searchAddress" placeholder="Search address " value="${param.searchAddress}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="search" placeholder="Search name/phone/address of supplier " value="${param.search}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <div class="flex-1 min-w-[150px]">
                         <select name="searchStatus" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">                         
@@ -103,14 +97,18 @@
                     </button>
                     <a href="${pageContext.request.contextPath}/ListSupplierServlet" onclick="Listevent.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" class="bg-yellow-500 text-white px-6 py-2 rounded-lg flex items-center">
                         <i class="fas fa-undo mr-2"></i> Reset form
-                    </a><br/>
-                    <span class="text-gray-700 dark:text-gray-300">Items per page:</span>
-                    <select name="recordsPerPage" onchange="this.form.submit()" 
-                            class="border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 search-input">
-                        <option value="10" ${recordsPerPage == '10' ? 'selected' : ''}>10 suppliers/page</option>
-                        <option value="20" ${recordsPerPage == '20' ? 'selected' : ''}>20 suppliers/page</option>
-                        <option value="30" ${recordsPerPage == '30' ? 'selected' : ''}>30 suppliers/page</option>
-                    </select>
+                    </a>
+                        
+                    <div class="w-full flex items-center gap-2 mt-2">
+                        <span class="text-gray-700 dark:text-gray-300">Items per page:</span>
+                        <select name="recordsPerPage" onchange="this.form.submit()" 
+                                class="border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 search-input">
+                            <option value="10" ${recordsPerPage == '10' ? 'selected' : ''}>10 suppliers/page</option>
+                            <option value="20" ${recordsPerPage == '20' ? 'selected' : ''}>20 suppliers/page</option>
+                            <option value="30" ${recordsPerPage == '30' ? 'selected' : ''}>30 suppliers/page</option>
+                        </select>
+                    </div>
+
                 </form>
 
                 <!-- Table -->
@@ -179,7 +177,7 @@
                     <!-- Nút trang trước -->
                     <c:choose>
                         <c:when test="${currentPage > 1}">
-                            <a href="ListSupplierServlet?page=${currentPage - 1}&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&lt;</a>
+                            <a href="ListSupplierServlet?page=${currentPage - 1}&recordsPerPage=${param.recordsPerPage}&search=${param.search}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&lt;</a>
                         </c:when>
                         <c:otherwise>
                             <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">&lt;</span>
@@ -191,7 +189,7 @@
                             <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">1</span>
                         </c:when>
                         <c:otherwise>
-                            <a href="ListSupplierServlet?page=1&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">1</a>
+                            <a href="ListSupplierServlet?page=1&recordsPerPage=${param.recordsPerPage}&search=${param.search}" class="px-3 py-1 rounded border hover:border-blue-500">1</a>
                         </c:otherwise>
                     </c:choose>
                     <!-- Dấu ... nếu khoảng cách trang hiện tại > 3 với trang 1 -->
@@ -205,7 +203,7 @@
                                 <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${i}</span>
                             </c:when>
                             <c:otherwise>
-                                <a href="ListSupplierServlet?page=${i}&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${i}</a>
+                                <a href="ListSupplierServlet?page=${i}&recordsPerPage=${param.recordsPerPage}&search=${param.search}" class="px-3 py-1 rounded border hover:border-blue-500">${i}</a>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
@@ -220,14 +218,14 @@
                                 <span class="px-3 py-1 rounded border border-blue-500 text-blue-500 font-bold">${totalPages}</span>
                             </c:when>
                             <c:otherwise>
-                                <a href="ListSupplierServlet?page=${totalPages}&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded border hover:border-blue-500">${totalPages}</a>
+                                <a href="ListSupplierServlet?page=${totalPages}&recordsPerPage=${param.recordsPerPage}&search=${param.search}" class="px-3 py-1 rounded border hover:border-blue-500">${totalPages}</a>
                             </c:otherwise>
                         </c:choose>
                     </c:if>
                     <!-- Nút trang sau -->
                     <c:choose>
                         <c:when test="${currentPage < totalPages}">
-                            <a href="ListSupplierServlet?page=${currentPage + 1}&recordsPerPage=${param.recordsPerPage}&searchName=${param.searchName}&searchPhone=${param.searchPhone}&searchAddress=${param.searchAddress}&searchStatus=${param.searchStatus}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&gt;</a>
+                            <a href="ListSupplierServlet?page=${currentPage + 1}&recordsPerPage=${param.recordsPerPage}&search=${param.search}" class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&gt;</a>
                         </c:when>
                         <c:otherwise>
                             <span class="px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed">&gt;</span>
