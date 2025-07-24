@@ -184,8 +184,8 @@
                   <i class="fas fa-calendar-alt mr-1"></i>Submission Date
                   <i class="fas fa-sort ml-1"></i>
                 </th>
-                <th class="p-3 text-left sortable table-header" data-sort="finalApprover">
-                  <i class="fas fa-user-check mr-1"></i>Last Approver
+                <th class="p-3 text-left sortable table-header" data-sort="note">
+                  <i class="fas fa-sticky-note mr-1"></i>Note Sender
                   <i class="fas fa-sort ml-1"></i>
                 </th>
                 <th class="p-3 text-left sortable table-header" data-sort="approvalDate">
@@ -214,7 +214,7 @@
                       <td class="p-4">${proposal.proposalType}</td>
                       <td class="p-4">${proposal.senderName}</td>
                       <td class="p-4"><fmt:formatDate value="${proposal.proposalSentDate}" pattern="yyyy-MM-dd"/></td>
-                      <td class="p-4">${proposal.finalApprover == null ? 'Not Available' : proposal.finalApprover}</td>
+                      <td class="p-4">${proposal.note}</td>
                       <td class="p-4">
                         <fmt:formatDate value="${proposal.approvalDate}" pattern="yyyy-MM-dd" var="formattedDate"/>
                         ${empty formattedDate ? 'Not Approved' : formattedDate}
