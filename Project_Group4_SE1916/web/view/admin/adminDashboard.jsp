@@ -444,7 +444,7 @@
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Giao dịch hôm nay</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${todayTransactions}</h3>
-                            <p class="text-sm text-blue-500 mt-3"><i class="fas fa-sync-alt mr-1"></i>Cập nhật mới nhất</p>
+                            <a href="" class="text-sm text-blue-500 mt-3 hover:underline"><i class="fas fa-sync-alt mr-1"></i>Cập nhật mới nhất</a>
                         </div>
                         <div class="p-4 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
                             <i class="fas fa-exchange-alt text-2xl"></i>
@@ -474,44 +474,15 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="mb-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-                <button onclick="showToast('Đang chuyển đến trang thêm vật tư...')" 
-                        class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
-                    <i class="fas fa-plus-circle text-3xl mb-3"></i>
-                    <span class="text-lg">Thêm vật tư</span>
-                </button>
-                <button onclick="showToast('Đang chuyển đến trang nhập kho...')" 
-                        class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
-                    <i class="fas fa-arrow-down text-3xl mb-3"></i>
-                    <span class="text-lg">Nhập kho</span>
-                </button>
-                <button onclick="showToast('Đang chuyển đến trang xuất kho...')" 
-                        class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
-                    <i class="fas fa-arrow-up text-3xl mb-3"></i>
-                    <span class="text-lg">Xuất kho</span>
-                </button>
-                <button onclick="showToast('Đang chuyển đến trang tạo đơn...')" 
-                        class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
-                    <i class="fas fa-file-alt text-3xl mb-3"></i>
-                    <span class="text-lg">Tạo đơn hàng</span>
-                </button>
-                <button onclick="showToast('Đang chuyển đến trang báo cáo...')" 
-                        class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
-                    <i class="fas fa-chart-pie text-3xl mb-3"></i>
-                    <span class="text-lg">Báo cáo</span>
-                </button>
-            </div>
-
             <!-- Tables Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class=" grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="table-container bg-white dark:bg-gray-800">
                     <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                         <div>
                             <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Vật tư sắp hết</h2>
                             <p class="text-sm text-gray-600 dark:text-gray-300">Danh sách vật tư cần bổ sung</p>
                         </div>
-                        <a href="#" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                        <a href="${pageContext.request.contextPath}/inventory?sortOrder=ASC&quantityThreshold=10"class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full table-auto">
@@ -530,7 +501,7 @@
                                         <td class="p-4">${item.quantityInStock}</td>
                                         <td class="p-4">
                                             <c:choose>
-                                                <c:when test="${item.quantityInStock <= 3}">
+                                                <c:when test="${item.quantityInStock <= 5}">
                                                     <span class="badge badge-danger">Cảnh báo</span>
                                                 </c:when>
                                                 <c:when test="${item.quantityInStock <= 10}">
@@ -547,48 +518,7 @@
                         </table>
                     </div>
                 </div>
-                <div class="table-container bg-white dark:bg-gray-800">
-                    <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <div>
-                            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Giao dịch gần đây</h2>
-                            <p class="text-sm text-gray-600 dark:text-gray-300">Lịch sử nhập/xuất kho mới nhất</p>
-                        </div>
-                        <a href="#" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full table-auto">
-                            <thead>
-                                <tr class="bg-primary-600 text-white">
-                                    <th class="p-4 text-left">Thời gian</th>
-                                    <th class="p-4 text-left">Loại</th>
-                                    <th class="p-4 text-left">Tên vật tư</th>
-                                    <th class="p-4 text-left">Số lượng</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <%-- Hiển thị nhập kho --%>
-                                <c:forEach var="imp" items="${recentImports}">
-                                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                                        <td class="p-4"><fmt:formatDate value="${imp.importDate}" pattern="HH:mm dd/MM/yyyy"/></td>
-                                        <td class="p-4"><span class="text-green-500"><i class="fas fa-arrow-down mr-1"></i>Nhập kho</span></td>
-                                        <td class="p-4">${imp.importerName}</td>
-                                        <td class="p-4">${imp.total}</td>
-                                    </tr>
-                                </c:forEach>
-                                <%-- Hiển thị xuất kho --%>
-                                <c:forEach var="exp" items="${recentExports}">
-                                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                                        <td class="p-4"><fmt:formatDate value="${exp.exportDate}" pattern="HH:mm dd/MM/yyyy"/></td>
-                                        <td class="p-4"><span class="text-red-500"><i class="fas fa-arrow-up mr-1"></i>Xuất kho</span></td>
-                                        <td class="p-4">${exp.exporterName}</td>
-                                        <td class="p-4">${exp.siteName}</td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            
         </main>
 
         <!-- Footer -->
