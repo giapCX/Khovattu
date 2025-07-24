@@ -1,3 +1,4 @@
+//exHis DAO
 package dao;
 
 import Dal.DBContext;
@@ -19,7 +20,12 @@ public class ExportHistoryDAO {
         this.conn = DBContext.getConnection();
     }
 
-    public List<Export> searchExportReceipts(Date fromDate, Date toDate, String exporter, int page, int pageSize) {
+
+
+    /**
+     * Tìm kiếm theo ngày & keyword (áp cho exporter OR receiver OR material)
+     */
+    public List<Export> searchExportReceipts(Date fromDate, Date toDate, String keyword, int page, int pageSize) {
         List<Export> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT DISTINCT er.export_id, er.receipt_id, er.export_date, er.note, "
@@ -31,6 +37,7 @@ public class ExportHistoryDAO {
                 + "JOIN Users u2 ON er.receiver_id = u2.user_id "
                 + "JOIN ConstructionSites cs ON er.site_id = cs.site_id "
                 + "LEFT JOIN ExportDetails ed ON er.export_id = ed.export_id "
+                + "LEFT JOIN Materials m ON ed.material_id = m.material_id "
                 + "WHERE 1=1 "
         );
 
@@ -40,14 +47,14 @@ public class ExportHistoryDAO {
         if (toDate != null) {
             sql.append("AND er.export_date <= ? ");
         }
-        if (exporter != null && !exporter.trim().isEmpty()) {
-            sql.append("AND u1.full_name LIKE ? ");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (u1.full_name LIKE ? OR u2.full_name LIKE ? OR m.name LIKE ?) ");
         }
 
         sql.append("ORDER BY er.export_date DESC ");
 
         if (pageSize > 0) {
-            sql.append("LIMIT ? OFFSET ?");
+            sql.append("LIMIT ? OFFSET ? ");
         }
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -58,8 +65,11 @@ public class ExportHistoryDAO {
             if (toDate != null) {
                 ps.setDate(index++, toDate);
             }
-            if (exporter != null && !exporter.trim().isEmpty()) {
-                ps.setString(index++, "%" + exporter + "%");
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String likeKeyword = "%" + keyword.trim() + "%";
+                ps.setString(index++, likeKeyword);
+                ps.setString(index++, likeKeyword);
+                ps.setString(index++, likeKeyword);
             }
             if (pageSize > 0) {
                 ps.setInt(index++, pageSize);
@@ -71,7 +81,7 @@ public class ExportHistoryDAO {
                 Export receipt = new Export();
                 receipt.setExportId(rs.getInt("export_id"));
                 receipt.setReceiptId(rs.getString("receipt_id"));
-                receipt.setExportDate(rs.getDate("export_date").toLocalDate());
+                receipt.setExportDate(rs.getTimestamp("export_date"));
                 receipt.setNote(rs.getString("note"));
                 receipt.setExporterId(rs.getInt("executor_id"));
                 receipt.setReceiverId(rs.getInt("receiver_id"));
@@ -88,12 +98,18 @@ public class ExportHistoryDAO {
         return list;
     }
 
-    public int countExportReceipts(Date fromDate, Date toDate, String exporter) {
+    /**
+     * Đếm tổng số bản ghi phù hợp với điều kiện
+     */
+    public int countExportReceipts(Date fromDate, Date toDate, String keyword) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(DISTINCT er.export_id) "
                 + "FROM ExportReceipts er "
                 + "JOIN Users u1 ON er.executor_id = u1.user_id "
+                + "JOIN Users u2 ON er.receiver_id = u2.user_id "
                 + "JOIN ConstructionSites cs ON er.site_id = cs.site_id "
+                + "LEFT JOIN ExportDetails ed ON er.export_id = ed.export_id "
+                + "LEFT JOIN Materials m ON ed.material_id = m.material_id "
                 + "WHERE 1=1 "
         );
 
@@ -103,8 +119,8 @@ public class ExportHistoryDAO {
         if (toDate != null) {
             sql.append("AND er.export_date <= ? ");
         }
-        if (exporter != null && !exporter.trim().isEmpty()) {
-            sql.append("AND u1.full_name LIKE ? ");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (u1.full_name LIKE ? OR u2.full_name LIKE ? OR m.name LIKE ?) ");
         }
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -115,8 +131,11 @@ public class ExportHistoryDAO {
             if (toDate != null) {
                 ps.setDate(index++, toDate);
             }
-            if (exporter != null && !exporter.trim().isEmpty()) {
-                ps.setString(index++, "%" + exporter.trim() + "%");
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String likeKeyword = "%" + keyword.trim() + "%";
+                ps.setString(index++, likeKeyword);
+                ps.setString(index++, likeKeyword);
+                ps.setString(index++, likeKeyword);
             }
 
             ResultSet rs = ps.executeQuery();
@@ -153,7 +172,7 @@ public class ExportHistoryDAO {
                 Export receipt = new Export();
                 receipt.setExportId(rs.getInt("export_id"));
                 receipt.setReceiptId(rs.getString("receipt_id"));
-                receipt.setExportDate(rs.getDate("export_date").toLocalDate());
+                receipt.setExportDate(rs.getTimestamp("export_date"));
                 receipt.setNote(rs.getString("note"));
                 receipt.setExporterId(rs.getInt("executor_id"));
                 receipt.setReceiverId(rs.getInt("receiver_id"));
@@ -197,7 +216,7 @@ public class ExportHistoryDAO {
                 receipt = new Export();
                 receipt.setExportId(rs.getInt("export_id"));
                 receipt.setReceiptId(rs.getString("receipt_id"));
-                receipt.setExportDate(rs.getDate("export_date").toLocalDate());
+                receipt.setExportDate(rs.getTimestamp("export_date"));
                 receipt.setNote(rs.getString("note"));
                 receipt.setExporterId(rs.getInt("executor_id"));
                 receipt.setReceiverId(rs.getInt("receiver_id"));

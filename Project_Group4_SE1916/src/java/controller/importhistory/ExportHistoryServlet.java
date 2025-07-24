@@ -1,3 +1,4 @@
+//exHisServlet
 package controller.importhistory;
 
 import Dal.DBContext;
@@ -20,9 +21,10 @@ public class ExportHistoryServlet extends HttpServlet {
         // Retrieve parameters from the request
         String fromDateStr = request.getParameter("fromDate");
         String toDateStr = request.getParameter("toDate");
-        String exporter = request.getParameter("exporter");
+        String keyword = request.getParameter("keyword");
         String pageParam = request.getParameter("page");
-
+        
+        
         // Set up pagination
         int page = (pageParam != null && !pageParam.isEmpty()) ? Integer.parseInt(pageParam) : 1;
         int pageSize = 10;
@@ -50,11 +52,11 @@ public class ExportHistoryServlet extends HttpServlet {
         int totalRecords;
 
         // Handle default action (display all) or search-based action
-        if ((exporter != null && !exporter.trim().isEmpty()) || fromDate != null || toDate != null) {
+        if ((keyword != null && !keyword.trim().isEmpty()) || fromDate != null || toDate != null) {
             // Search by exporter name and/or dates
-            receipts = dao.searchExportReceipts(fromDate, toDate, exporter, page, pageSize);
-            totalRecords = dao.countExportReceipts(fromDate, toDate, exporter);
-            System.out.println("Searching by exporter: " + exporter + ", fromDate: " + fromDate + ", toDate: " + toDate);
+            receipts = dao.searchExportReceipts(fromDate, toDate, keyword, page, pageSize);
+            totalRecords = dao.countExportReceipts(fromDate, toDate, keyword);
+            System.out.println("Searching by exporter: " + keyword + ", fromDate: " + fromDate + ", toDate: " + toDate);
             System.out.println("Result size: " + receipts.size());
         } else {
             // Display all records by default
@@ -74,7 +76,7 @@ public class ExportHistoryServlet extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("fromDate", fromDateStr);
         request.setAttribute("toDate", toDateStr);
-        request.setAttribute("exporter", exporter);
+        request.setAttribute("keyword", keyword);
 
         // Forward to JSP
         request.getRequestDispatcher("exportHistory.jsp").forward(request, response);

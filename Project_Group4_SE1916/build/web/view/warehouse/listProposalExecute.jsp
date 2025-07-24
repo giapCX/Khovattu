@@ -244,7 +244,7 @@
                                                 <td class="p-4 font-medium">
                                                     <c:choose>
                                                         <c:when test="${item.finalStatus == 'approved_but_not_executed' && item.proposalType == 'export'}">
-                                                            <a href="${pageContext.request.contextPath}/ExportServlet?proposalId=${item.proposalId}" class="text-blue-600 hover:underline">Execute</a>
+                                                            <a href="${pageContext.request.contextPath}/exportMaterial?proposalId=${item.proposalId}" class="text-blue-600 hover:underline">Execute</a>
                                                         </c:when>
                                                         <c:when test="${item.finalStatus == 'approved_but_not_executed' && (item.proposalType == 'import_from_supplier' || item.proposalType == 'import_returned')}">
                                                             <a href="${pageContext.request.contextPath}/ImportServlet?proposalId=${item.proposalId}" class="text-blue-600 hover:underline">Execute</a>

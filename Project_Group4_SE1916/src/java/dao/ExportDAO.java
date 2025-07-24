@@ -1,5 +1,4 @@
 //exDAO
-
 package dao;
 
 import Dal.DBContext;
@@ -8,11 +7,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Date;
-import java.util.Arrays;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+
 import java.util.List;
+import java.sql.*;
+
 import model.Export;
 import model.ExportDetail;
+import model.User;
 
 public class ExportDAO {
 
@@ -26,97 +29,220 @@ public class ExportDAO {
         this.conn = conn;
     }
 
-    public int saveExport(Export export) throws SQLException {
-        String sql = "INSERT INTO ExportReceipts (executor_id, receiver_id, export_date, note, site_id) "
-                + "VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            //stmt.setString(1, export.getReceiptId());
-            stmt.setInt(1, export.getExporterId());
-            stmt.setInt(2, export.getReceiverId());
-            stmt.setDate(3, Date.valueOf(export.getExportDate()));
-            stmt.setString(4, export.getNote());
-            stmt.setInt(5, export.getSiteId());
-            stmt.executeUpdate();
-
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1); // Return generated export_id
-            }
-        }
-        return -1;
-    }
-
-    public void saveExportDetails(List<ExportDetail> details, int exportId) throws SQLException {
-        String sql = "INSERT INTO ExportDetails (export_id, material_id, quantity, material_condition) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            for (ExportDetail detail : details) {
-                stmt.setInt(1, exportId);
-                stmt.setInt(2, detail.getMaterialId());
-                stmt.setDouble(3, detail.getQuantity());
-                stmt.setString(4, detail.getMaterialCondition());
-
-                stmt.addBatch();
-            }
-            stmt.executeBatch();
-        }
-    }
-
-    public boolean checkReceiptIdExists(String receiptId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM ExportReceipts WHERE receipt_id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, receiptId);
-            ResultSet rs = stmt.executeQuery();
+    public boolean checkProposalIdExists(int proposalId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM ExportReceipts WHERE proposal_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, proposalId);
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1) > 0;
             }
-            return false;
+        }
+        return false;
+    }
+
+    public int saveExport(Export export) throws SQLException {
+        String sql = "INSERT INTO ExportReceipts (proposal_id, executor_id, receiver_id, export_date, note, site_id) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
+        conn.setAutoCommit(false);
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, export.getProposalId());
+            ps.setInt(2, export.getExporterId());
+            ps.setInt(3, export.getReceiverId());
+            ps.setTimestamp(4, export.getExportDate());
+            ps.setString(5, export.getNote());
+            ps.setInt(6, export.getSiteId());
+            int rows = ps.executeUpdate();
+            if (rows > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        int exportId = rs.getInt(1);
+                        if (export.getExportDetail() != null && !export.getExportDetail().isEmpty()) {
+                            if (addExportDetails(exportId, export.getExportDetail())) {
+                                conn.commit();
+                                return exportId;
+                            }
+                        } else {
+                            conn.rollback();
+                            return -1;
+                        }
+                    }
+                }
+            }
+            conn.rollback();
+            return -1;
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
         }
     }
 
-    public Export getExportById(int exportId) throws SQLException {
-        String sql = "SELECT export_id, receipt_id, executor_id, receiver_id, export_date, note, site_id "
-                + "FROM ExportReceipts WHERE export_id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, exportId);
+    private boolean addExportDetails(int exportId, List<ExportDetail> details) throws SQLException {
+        String sql = "INSERT INTO ExportDetails (export_id, material_id, quantity, material_condition) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (ExportDetail detail : details) {
+                ps.setInt(1, exportId);
+                ps.setInt(2, detail.getMaterialId());
+                ps.setDouble(3, detail.getQuantity());
+                ps.setString(4, detail.getMaterialCondition());
+                ps.addBatch();
+            }
+            int[] results = ps.executeBatch();
+            for (int r : results) {
+                if (r == Statement.EXECUTE_FAILED) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    public void exportMaterial(int exportId, List<ExportDetail> details) throws SQLException {
+        conn.setAutoCommit(false);
+        try {
+            for (ExportDetail detail : details) {
+                String updateSql = "UPDATE Inventory SET quantity_in_stock = quantity_in_stock - ? "
+                        + "WHERE material_id = ? AND material_condition = ?";
+                try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                    updateStmt.setDouble(1, detail.getQuantity());
+                    updateStmt.setInt(2, detail.getMaterialId());
+                    updateStmt.setString(3, detail.getMaterialCondition());
+                    int updated = updateStmt.executeUpdate();
+                    if (updated == 0) {
+                        throw new SQLException("Cannot update inventory for material ID " + detail.getMaterialId() + " with condition " + detail.getMaterialCondition());
+                    }
+                }
+                String insertDetailSql = "INSERT INTO ExportDetails (export_id, material_id, quantity, material_condition) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement insertStmt = conn.prepareStatement(insertDetailSql)) {
+                    insertStmt.setInt(1, exportId);
+                    insertStmt.setInt(2, detail.getMaterialId());
+                    insertStmt.setDouble(3, detail.getQuantity());
+                    insertStmt.setString(4, detail.getMaterialCondition());
+                    insertStmt.executeUpdate();
+                }
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
+    }
+
+    public void updateProposalStatusToExecuted(int proposalId) throws SQLException {
+        String sql = "UPDATE EmployeeProposals SET final_status = ? WHERE proposal_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "executed");
+            ps.setInt(2, proposalId);
+            ps.executeUpdate();
+        }
+    }
+
+    public List<Export> searchExportsWithPagination(String purpose, String executor, String fromDate, String toDate, int page, int pageSize) throws SQLException {
+        List<Export> result = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT e.export_id, e.proposal_id, e.executor_id, e.receiver_id, e.export_date, e.note, e.site_id, u.full_name "
+                + "FROM ExportReceipts e "
+                + "JOIN Users u ON e.executor_id = u.user_id "
+                + "JOIN EmployeeProposals ep ON e.proposal_id = ep.proposal_id "
+                + "WHERE 1=1"
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (purpose != null && !purpose.isEmpty()) {
+            sql.append(" AND ep.purpose LIKE ?");
+            params.add("%" + purpose + "%");
+        }
+
+        if (executor != null && !executor.isEmpty()) {
+            sql.append(" AND u.full_name LIKE ?");
+            params.add("%" + executor + "%");
+        }
+
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql.append(" AND DATE(e.export_date) >= ?");
+            params.add(Date.valueOf(fromDate));
+        }
+
+        if (toDate != null && !toDate.isEmpty()) {
+            sql.append(" AND DATE(e.export_date) <= ?");
+            params.add(Date.valueOf(toDate));
+        }
+
+        int offset = (page - 1) * pageSize;
+        if (offset < 0) {
+            offset = 0;
+        }
+        sql.append(" ORDER BY e.export_date DESC LIMIT ?, ?");
+        params.add(offset);
+        params.add(pageSize);
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) {
                 Export export = new Export();
                 export.setExportId(rs.getInt("export_id"));
-                export.setReceiptId(rs.getString("receipt_id"));
+                export.setProposalId(rs.getInt("proposal_id"));
                 export.setExporterId(rs.getInt("executor_id"));
                 export.setReceiverId(rs.getInt("receiver_id"));
-                export.setExportDate(rs.getDate("export_date").toLocalDate());
+                export.setExportDate(rs.getTimestamp("export_date"));
                 export.setNote(rs.getString("note"));
                 export.setSiteId(rs.getInt("site_id"));
-                return export;
+                User executorObj = new User();
+                executorObj.setUserId(rs.getInt("executor_id"));
+                executorObj.setFullName(rs.getString("full_name"));
+                export.setExecutor(executorObj);
+                result.add(export);
             }
         }
-        return null; // Return null if no export is found
+        return result;
     }
 
-    public void exportMaterial(int exportId, int materialId, double quantity, String condition) throws SQLException {
-        // Insert export detail
-        String insertDetailSql = "INSERT INTO ExportDetails (export_id, material_id, quantity, material_condition) " +
-                                "VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(insertDetailSql)) {
-            stmt.setInt(1, exportId);
-            stmt.setInt(2, materialId);
-            stmt.setDouble(3, quantity);
-            stmt.setString(4, condition);
-            stmt.executeUpdate();
+    public int countSearchExports(String purpose, String executor, String fromDate, String toDate) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) FROM ExportReceipts e "
+                + "JOIN Users u ON e.executor_id = u.user_id "
+                + "JOIN EmployeeProposals ep ON e.proposal_id = ep.proposal_id WHERE 1=1"
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (purpose != null && !purpose.isEmpty()) {
+            sql.append(" AND ep.purpose LIKE ?");
+            params.add("%" + purpose + "%");
         }
 
-        // Update inventory
-        String updateInventorySql = "UPDATE Inventory SET quantity_in_stock = quantity_in_stock - ? " +
-                                   "WHERE material_id = ? AND material_condition = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(updateInventorySql)) {
-            stmt.setDouble(1, quantity);
-            stmt.setInt(2, materialId);
-            stmt.setString(3, condition);
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Cannot update inventory  " + materialId);
+        if (executor != null && !executor.isEmpty()) {
+            sql.append(" AND u.full_name LIKE ?");
+            params.add("%" + executor + "%");
+        }
+
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql.append(" AND DATE(e.export_date) >= ?");
+            params.add(Date.valueOf(fromDate));
+        }
+
+        if (toDate != null && !toDate.isEmpty()) {
+            sql.append(" AND DATE(e.export_date) <= ?");
+            params.add(Date.valueOf(toDate));
+        }
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
             }
         }
+        return 0;
     }
 }

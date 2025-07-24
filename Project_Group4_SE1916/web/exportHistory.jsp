@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -208,7 +207,7 @@
                 const form = document.querySelector('.filter-form');
                 document.getElementById('fromDate').value = '';
                 document.getElementById('toDate').value = '';
-                document.getElementById('exporter').value = '';
+                document.getElementById('keyword').value = '';
                 form.submit();
             }
         </script>
@@ -248,8 +247,8 @@
                     <input type="date" id="fromDate" name="fromDate" value="${fn:escapeXml(fromDate)}">
                     <label for="toDate">To: </label>
                     <input type="date" id="toDate" name="toDate" value="${fn:escapeXml(toDate)}">
-                    <label for="exporter">Search key: </label>
-                    <input type="text" id="exporter" name="exporter" value="${fn:escapeXml(exporter)}" placeholder="Exporter Name, Material name">
+                    <label for="keyword">Search key: </label>
+                    <input type="text" id="keyword" name="keyword" value="${fn:escapeXml(keyword)}" placeholder="Exporter Name, Material name">
                     <input type="submit" value="Search">
                     <input type="button" value="Reset" onclick="window.location.href = 'exportHistory';">
                 </form>
@@ -295,7 +294,7 @@
                 <c:if test="${totalPages > 0}">
                     <div class="pagination">
                         <c:forEach begin="1" end="${totalPages}" var="i">
-                            <a href="exportHistory?page=${i}&fromDate=${fn:escapeXml(fromDate)}&toDate=${fn:escapeXml(toDate)}&exporter=${fn:escapeXml(exporter)}"
+                            <a href="exportHistory?page=${i}&fromDate=${fn:escapeXml(fromDate)}&toDate=${fn:escapeXml(toDate)}&keyword=${fn:escapeXml(keyword)}"
                                class="${i == currentPage ? 'active' : ''}">${i}</a>
                         </c:forEach>
                     </div>

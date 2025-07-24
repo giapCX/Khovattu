@@ -1,7 +1,9 @@
 //export
 package model;
 
-import java.time.LocalDate;
+import java.sql.Timestamp;
+
+import java.util.List;
 
 public class Export {
 
@@ -9,18 +11,20 @@ public class Export {
     private String receiptId;
     private int exporterId;
     private int receiverId;
-    private LocalDate exportDate;
+    private Timestamp exportDate;
     private String note;
     private String exporterName;
     private String receiverName;
     private int proposalId;
     private String siteName;
     private int siteId;
+    private User executor;
+    private List<ExportDetail> exportDetail;
 
     public Export() {
     }
 
-    public Export(int exportId, String receiptId, int exporterId, int receiverId, LocalDate exportDate, String note, String exporterName, String receiverName, int proposalId, String siteName, int siteId) {
+    public Export(int exportId, String receiptId, int exporterId, int receiverId, Timestamp exportDate, String note, String exporterName, String receiverName, int proposalId, String siteName, int siteId, User executor, List<ExportDetail> exportDetail) {
         this.exportId = exportId;
         this.receiptId = receiptId;
         this.exporterId = exporterId;
@@ -32,6 +36,8 @@ public class Export {
         this.proposalId = proposalId;
         this.siteName = siteName;
         this.siteId = siteId;
+        this.executor = executor;
+        this.exportDetail = exportDetail;
     }
 
     public int getExportId() {
@@ -66,11 +72,11 @@ public class Export {
         this.receiverId = receiverId;
     }
 
-    public LocalDate getExportDate() {
+    public Timestamp getExportDate() {
         return exportDate;
     }
 
-    public void setExportDate(LocalDate exportDate) {
+    public void setExportDate(Timestamp exportDate) {
         this.exportDate = exportDate;
     }
 
@@ -121,5 +127,24 @@ public class Export {
     public void setSiteId(int siteId) {
         this.siteId = siteId;
     }
+
+    public User getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(User executor) {
+        this.executor = executor;
+    }
+
+    public List<ExportDetail> getExportDetail() {
+        return exportDetail;
+    }
+
+    public void setExportDetail(List<ExportDetail> exportDetail) {
+        this.exportDetail = exportDetail;
+    }
+
+    
+   
 
 }

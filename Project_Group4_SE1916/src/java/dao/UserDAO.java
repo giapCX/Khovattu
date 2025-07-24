@@ -65,14 +65,15 @@ public class UserDAO {
 
     public List<User> getAllEmployees() throws SQLException {
         List<User> employees = new ArrayList<>();
-        String sql = "SELECT  u.full_name "
+        String sql = "SELECT u.user_id, u.full_name "
                 + "FROM Users u "
                 + "INNER JOIN Roles r ON u.role_id = r.role_id "
                 + "WHERE r.role_name = 'employee'";
+
         try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 User user = new User();
-
+                user.setUserId(rs.getInt("user_id"));      
                 user.setFullName(rs.getString("full_name"));
                 employees.add(user);
             }

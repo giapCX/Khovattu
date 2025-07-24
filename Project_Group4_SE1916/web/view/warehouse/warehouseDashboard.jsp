@@ -353,7 +353,7 @@
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/exportMaterial.jsp" class="nav-item flex items-center p-2 justify-between">
+                <a href="${pageContext.request.contextPath}/exportMaterial" class="nav-item flex items-center p-2 justify-between">
                     <div class="flex items-center">
                         <i class="fas fa-arrow-up mr-2 w-5 text-center"></i>
                         <span class="text-base">Export Materials</span>
@@ -479,7 +479,7 @@
                     <i class="fas fa-arrow-down text-3xl mb-3"></i>
                     <span class="text-lg">Nhập kho</span>
                 </button>
-                <button onclick="window.location.href = '${pageContext.request.contextPath}/exportMaterial.jsp'" 
+                <button onclick="window.location.href = '${pageContext.request.contextPath}/exportMaterial'" 
                         class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
                     <i class="fas fa-arrow-up text-3xl mb-3"></i>
                     <span class="text-lg">Xuất kho</span>
