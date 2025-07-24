@@ -414,7 +414,7 @@
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tổng vật tư</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Materials</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${totalMaterials}</h3>
                         </div>
                         <div class="p-4 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300">
@@ -428,16 +428,16 @@
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-100">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Vật tư sắp hết</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Low Stock</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${lowStock}</h3>
-                            <p class="text-sm text-red-500 mt-3"><i class="fas fa-exclamation-circle mr-1"></i>Cần bổ sung</p>
+                            <p class="text-sm text-red-500 mt-3"><i class="fas fa-exclamation-circle mr-1"></i>Needs Restocking</p>
                         </div>
                         <div class="p-4 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300">
                             <i class="fas fa-exclamation text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/inventory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Kiểm tra ngay</a>
+                        <a href="${pageContext.request.contextPath}/inventory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">>Check Now</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-200">
@@ -458,16 +458,16 @@
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Giao dịch hôm nay</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Today's Transactions</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${todayTransactions}</h3>
-                            <p class="text-sm text-blue-500 mt-3"><i class="fas fa-sync-alt mr-1"></i>Cập nhật mới nhất</p>
+                            <p class="text-sm text-blue-500 mt-3"><i class="fas fa-sync-alt mr-1"></i>Latest Update</p>
                         </div>
                         <div class="p-4 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
                             <i class="fas fa-exchange-alt text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="#" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                        <a href="#" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View All</a>
                     </div>
                 </div>
             </div>
@@ -477,12 +477,12 @@
                 <button onclick="window.location.href = '${pageContext.request.contextPath}/view/warehouse/importData.jsp'" 
                         class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
                     <i class="fas fa-arrow-down text-3xl mb-3"></i>
-                    <span class="text-lg">Nhập kho</span>
+                    <span class="text-lg">Import</span>
                 </button>
                 <button onclick="window.location.href = '${pageContext.request.contextPath}/exportMaterial'" 
                         class="btn-primary text-white px-6 py-4 rounded-lg flex flex-col items-center justify-center hover:shadow-lg transition-all">
                     <i class="fas fa-arrow-up text-3xl mb-3"></i>
-                    <span class="text-lg">Xuất kho</span>
+                    <span class="text-lg">Export</span>
                 </button>
                 
             </div>
