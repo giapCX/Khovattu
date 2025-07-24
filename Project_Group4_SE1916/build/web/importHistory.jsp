@@ -303,16 +303,16 @@
                 <div class="mt-6 flex justify-center">
                     <c:choose>
                         <c:when test="${role == 'admin'}">
-                            <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
+                            <a href="${pageContext.request.contextPath}/AdminDashboard" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
                         </c:when>
                         <c:when test="${role == 'direction'}">
-                            <a href="${pageContext.request.contextPath}/view/direction/directionDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
+                            <a href="${pageContext.request.contextPath}/DirectionDashboard" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
                         </c:when>
                         <c:when test="${role == 'warehouse'}">
-                            <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
+                            <a href="${pageContext.request.contextPath}/WarehouseDashboard" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
                         </c:when>
                         <c:when test="${role == 'employee'}">
-                            <a href="${pageContext.request.contextPath}/view/employee/employeeDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
+                            <a href="${pageContext.request.contextPath}/EmployeeDashboard" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
                         </c:when>
                     </c:choose>
                 </div>
