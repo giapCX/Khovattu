@@ -213,7 +213,6 @@
                         <table class="w-full table-auto">
                             <thead>
                                 <tr class="bg-primary-600 text-white">
-                                    <th class="p-4 text-left cursor-pointer" data-sort="#">No.</th>
                                     <th class="p-4 text-left cursor-pointer" data-sort="proposalId">Proposal ID</th>
                                     <th class="p-4 text-left cursor-pointer" data-sort="proposalType">Proposal Type</th>
                                     <th class="p-4 text-left cursor-pointer" data-sort="sender">Sender</th>
@@ -226,19 +225,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="proposal" items="${pendingProposals}" varStatus="loop">
+                                <c:forEach var="proposal" items="${pendingProposals}">
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
-                                        <td class="p-4">${(currentPage - 1) * itemsPerPage + loop.count}</td>
                                         <td class="p-4">${not empty proposal.proposalId ? proposal.proposalId : 'N/A'}</td>
-                                        <td class="p-4">${not empty proposal.proposalType ? proposal.proposalType : 'N/A'}</td>
+                                        <td class="p-4">
+                                            <c:choose>
+                                                <c:when test="${proposal.proposalType == 'import_from_supplier'}">Purchase</c:when>
+                                                <c:when test="${proposal.proposalType == 'import_returned'}">Retrieve</c:when>
+                                                <c:when test="${proposal.proposalType == 'export'}">Export</c:when>
+                                                <c:otherwise>${not empty proposal.proposalType ? proposal.proposalType : 'N/A'}</c:otherwise>
+                                            </c:choose>
+                                        </td>
                                         <td class="p-4">${not empty proposal.senderName ? proposal.senderName : 'N/A'}</td>
                                         <td class="p-4">
-                                            <fmt:formatDate value="${proposal.proposalSentDate}" pattern="dd/MM/yyyy HH:mm" var="sendDateFormatted"/>
+                                            <fmt:formatDate value="${proposal.proposalSentDate}" pattern="dd/MM/yyyy" var="sendDateFormatted"/>
                                             ${not empty sendDateFormatted ? sendDateFormatted : 'N/A'}
                                         </td>
                                         <td class="p-4">${not empty proposal.note ? proposal.note : 'N/A'}</td>
                                         <td class="p-4">
-                                            <fmt:formatDate value="${proposal.approvalDate}" pattern="dd/MM/yyyy HH:mm" var="approvalDateFormatted"/>
+                                            <fmt:formatDate value="${proposal.approvalDate}" pattern="dd/MM/yyyy" var="approvalDateFormatted"/>
                                             ${not empty approvalDateFormatted ? approvalDateFormatted : 'Not Approved'}
                                         </td>
                                         <td class="p-4">
@@ -379,7 +384,7 @@
                     const rows = Array.from(tbody.querySelectorAll('tr'));
                     const columnIndex = th.cellIndex;
                     const sortKey = th.getAttribute('data-sort');
-                    const isNumeric = sortKey === '#' || sortKey === 'proposalId';
+                    const isNumeric = sortKey === 'proposalId';
                     const isDate = sortKey === 'sendDate' || sortKey === 'approvalDate';
                     const isAsc = th.classList.toggle('asc');
                     th.classList.toggle('desc', !isAsc);
@@ -399,8 +404,8 @@
                             bValue = parseFloat(bValue) || 0;
                             return isAsc ? aValue - bValue : bValue - aValue;
                         } else if (isDate) {
-                            aValue = aValue === 'Not Approved' ? '' : new Date(aValue.split(' ').reverse().join(' ').replace(/(\d+)\/(\d+)\/(\d+)/, '$3-$2-$1'));
-                            bValue = bValue === 'Not Approved' ? '' : new Date(bValue.split(' ').reverse().join(' ').replace(/(\d+)\/(\d+)\/(\d+)/, '$3-$2-$1'));
+                            aValue = aValue === 'Not Approved' ? '' : new Date(aValue.split('/').reverse().join('-'));
+                            bValue = bValue === 'Not Approved' ? '' : new Date(bValue.split('/').reverse().join('-'));
                             if (aValue === '' && bValue === '')
                                 return 0;
                             if (aValue === '')
