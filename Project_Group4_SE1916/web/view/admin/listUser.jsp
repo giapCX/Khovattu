@@ -32,6 +32,87 @@
                 background-color: #fee2e2;
                 color: #991b1b;
             }
+
+            .table-container {
+                background: #fff;
+                border-radius: 0.5rem;
+                overflow: hidden;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            thead {
+                background-color: #2563eb;
+                color: white;
+            }
+
+            th {
+                padding: 1rem;
+                text-align: left;
+                font-size: 0.875rem;
+                font-weight: 600;
+            }
+
+            td {
+                padding: 1rem;
+                font-size: 0.875rem;
+                font-weight: 500;
+            }
+
+            tr {
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            tr:hover {
+                background-color: #f9fafb;
+            }
+
+            .pagination {
+                display: flex;
+                justify-content: center;
+                gap: 0.5rem;
+                margin-top: 1.5rem;
+            }
+
+            .pagination a, .pagination span {
+                padding: 0.75rem 1rem;
+                border-radius: 0.375rem;
+                text-decoration: none;
+                color: #ffffff !important;
+            }
+
+            .pagination a {
+                border: 1px solid #d1d5db;
+                background-color: #2563eb;
+            }
+
+            .pagination a:hover {
+                border-color: #1d4ed8;
+                background-color: #1d4ed8;
+                color: #ffffff !important;
+            }
+
+            .pagination span {
+                border: 1px solid #2563eb;
+                background-color: #2563eb;
+                font-weight: 600;
+            }
+
+            .user-info {
+                position: absolute;
+                top: 1rem;
+                right: 3rem;
+/*                color: #ffffff;*/
+                font-size: 1rem;
+                font-weight: 500;
+/*                background-color: #2563eb;*/
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                z-index: 10;
+            }
         </style>
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
@@ -43,7 +124,7 @@
                 return;
             }
             if (request.getAttribute("data") == null && request.getParameter("fromServlet") == null) {
-                response.sendRedirect("listuser?fromServlet=true");
+                response.sendRedirect("${pageContext.request.contextPath}/user?fromServlet=true");
                 return;
             }
         %>
@@ -67,7 +148,20 @@
         </c:choose>
 
         <!-- Main Content -->
-        <main class="flex-1 p-8 transition-all duration-300">
+        <main class="flex-1 p-8 transition-all duration-300 relative">
+            <!-- User Info at Top Right -->
+            <% 
+                String usernameDisplay = (String) session.getAttribute("username");
+                
+                if (usernameDisplay == null) {
+                    out.println("<div class='user-info'>Username not found</div>");
+                } else {
+            %>
+            <div class="user-info">
+                Welcome, <%= usernameDisplay %>
+            </div>
+            <% } %>
+
             <div class="max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center gap-4">
@@ -82,7 +176,7 @@
                 </div>
 
                 <!-- Search and Filter Form -->
-                <form action="listuser" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
+                <form action="${pageContext.request.contextPath}/user" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
                     <div class="flex-1 min-w-[200px]">
                         <input type="text" name="search" placeholder="Tìm kiếm theo tên người dùng hoặc họ tên" value="${param.search}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
@@ -133,10 +227,18 @@
                                         <td class="p-4">${item.email}</td>
                                         <td class="p-4">${item.phone}</td>
                                         <td class="p-4">${item.role.roleName}</td>
-                                        <td class="p-4">${item.status}</td>
+                                        <td class="p-4">
+                                            <c:choose>
+                                                <c:when test="${item.status == 'active'}">
+                                                    <span class="badge badge-success">Active</span>
+                                                </c:when>
+                                                <c:when test="${item.status == 'inactive'}">
+                                                    <span class="badge badge-danger">Inactive</span>
+                                                </c:when>
+                                            </c:choose>
+                                        </td>
                                         <td class="p-4 flex gap-2">
                                             <a href="edituser?userId=${item.userId}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
-
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -150,17 +252,17 @@
                     <c:forEach begin="1" end="${totalPages}" var="i">
                         <c:choose>
                             <c:when test="${i == currentPage}">
-                                <span>[${i}]</span>
+                                <span class="px-3 py-1 rounded border border-blue-500 text-white font-bold">${i}</span>
                             </c:when>
                             <c:otherwise>
-                                <a href="listuser?page=${i}&search=${param.search}&roleId=${param.roleId}&status=${param.status}">${i}</a>
+                                <a href="${pageContext.request.contextPath}/user?page=${i}&search=${param.search}&roleId=${param.roleId}&status=${param.status}" class="px-3 py-1 rounded border hover:border-blue-500 text-white">${i}</a>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
                 </div>
 
                 <div class="mt-6 flex justify-center">
-                    <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
+                    <a href="${pageContext.request.contextPath}/AdminDashboard" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
                 </div>
             </div>
         </main>

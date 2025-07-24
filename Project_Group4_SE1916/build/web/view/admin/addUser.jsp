@@ -55,7 +55,7 @@
                     <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
                     <input type="text" id="username" name="username" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                 </div>
-                <div>
+                <div hidden>
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                     <input type="password" id="password" name="password" readonly class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                 </div>
@@ -84,14 +84,14 @@
                 </div>
                 <div>
                     <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
-                    <input type="text" id="phone" name="phone" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <input type="text" id="phone" name="phone" required="" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="dob" class="block text-sm font-medium text-gray-700">Date of Birth</label>
-                    <input type="date" id="dob" name="dob" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <input type="date" id="dob" name="dob" required="" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
                     <label for="status" class="block text-sm font-medium text-gray-700">Status</label>

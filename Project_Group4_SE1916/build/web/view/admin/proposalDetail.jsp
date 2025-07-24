@@ -1,134 +1,350 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="editable" value="${proposal.approval != null and (empty proposal.approval.adminStatus or proposal.approval.adminStatus eq 'pending')}" />
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Proposal Detail</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
-    </head>
-    <body class="bg-gray-50 min-h-screen font-sans antialiased">
-        <%
-            String role = (String) session.getAttribute("role");
-        %>
-        <c:choose>
-            <c:when test="${role == 'admin'}">
-                <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
-            </c:when>
-            <c:when test="${role == 'direction'}">
-                <jsp:include page="/view/sidebar/sidebarDirection.jsp" />
-            </c:when>
-            <c:when test="${role == 'warehouse'}">
-                <jsp:include page="/view/sidebar/sidebarWarehouse.jsp" />
-            </c:when>
-            <c:when test="${role == 'employee'}">
-                <jsp:include page="/view/sidebar/sidebarEmployee.jsp" />
-            </c:when>
-        </c:choose>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Approve Proposal</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Style CSS -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
+    
+    <style>
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .badge-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+        .success {
+            color: #059669;
+            font-weight: 600;
+        }
+        .error {
+            color: #dc2626;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
+    <%
+        String role = (String) session.getAttribute("role");
+        if (role == null) {
+            response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
+            return;
+        }
+    %>
+    
+    <!-- Sidebar -->
+    <c:choose>
+        <c:when test="${role == 'admin'}">
+            <jsp:include page="/view/sidebar/sidebarAdmin.jsp" />
+        </c:when>
+        <c:when test="${role == 'direction'}">
+            <jsp:include page="/view/sidebar/sidebarDirection.jsp" />
+        </c:when>
+        <c:when test="${role == 'warehouse'}">
+            <jsp:include page="/view/sidebar/sidebarWarehouse.jsp" />
+        </c:when>
+        <c:when test="${role == 'employee'}">
+            <jsp:include page="/view/sidebar/sidebarEmployee.jsp" />
+        </c:when>
+    </c:choose>
 
-        <main class="flex-1 p-8 transition-all duration-300">
-            <div class="max-w-4xl mx-auto">
-                <div class="flex items-center gap-4 mb-6">
+    <!-- Main Content -->
+    <main class="flex-1 p-8 transition-all duration-300">
+        <div class="max-w-7xl mx-auto">
+            <!-- Title and Back Button -->
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-4">
                     <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
-                    <h1 class="text-3xl font-bold text-gray-800">Proposal Detail – ID: ${proposal.proposalId}</h1>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                        <i class="fas fa-file-alt"></i>
+                        Admin Approve Proposal #${proposal.proposalId}
+                    </h2>
                 </div>
+                <a href="${pageContext.request.contextPath}/proposals" 
+                   class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Proposals History
+                </a>
+            </div>
 
-                <div class="bg-white p-6 rounded shadow mb-6">
-                    <h2 class="text-xl font-semibold mb-4">General Information</h2>
-                    <p><strong>Type:</strong> ${proposal.proposalType}</p>
-                    <p><strong>Sender:</strong> ${proposal.senderName}</p>
-                    <p><strong>Sent Date:</strong> <fmt:formatDate value="${proposal.proposalSentDate}" pattern="yyyy-MM-dd HH:mm" /></p>
-                    <p><strong>Note:</strong> ${proposal.note}</p>
-                    <p><strong>Final Status:</strong> ${proposal.finalStatus}</p>
-                    <c:if test="${proposal.approval != null}">
-                        <p><strong>Admin Status:</strong> ${proposal.approval.adminStatus}</p>
-                        <p><strong>Director Status:</strong> ${proposal.approval.directorStatus}</p>
-                        <c:if test="${proposal.approval.adminApprovalDate != null}">
-                            <p><strong>Admin Approval Date:</strong> <fmt:formatDate value="${proposal.approval.adminApprovalDate}" pattern="yyyy-MM-dd HH:mm" /></p>
-                        </c:if>
-                        <c:if test="${proposal.approval.directorApprovalDate != null}">
-                            <p><strong>Director Approval Date:</strong> <fmt:formatDate value="${proposal.approval.directorApprovalDate}" pattern="yyyy-MM-dd HH:mm" /></p>
-                        </c:if>
-                    </c:if>
+            <!-- Information Proposal Card -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+                <div class="bg-primary-600 text-white px-6 py-4 rounded-t-lg">
+                    <h3 class="text-lg font-semibold flex items-center gap-2">
+                        <i class="fas fa-info-circle"></i>
+                        Information Proposal
+                    </h3>
                 </div>
-
-                <div class="bg-white p-6 rounded shadow mb-6">
-                    <h2 class="text-xl font-semibold mb-4">Proposal Details</h2>
-                    <table class="w-full text-left border border-blue-300">
-                        <thead>
-                            <tr class="bg-blue-600 text-white">
-                                <th class="p-3 border border-blue-300">Material ID</th>
-                                <th class="p-3 border border-blue-300">Material Name</th>
-                                <th class="p-3 border border-blue-300">Quantity</th>
-                                <th class="p-3 border border-blue-300">Condition</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-black">
-                            <c:forEach var="detail" items="${proposal.proposalDetails}">
-                                <tr class="hover:bg-blue-50">
-                                    <td class="p-3 border border-blue-300">${detail.materialId}</td>
-                                    <td class="p-3 border border-blue-300">${detail.materialName}</td>
-                                    <td class="p-3 border border-blue-300">${detail.quantity}</td>
-                                    <td class="p-3 border border-blue-300">${detail.materialCondition}</td>
-                                </tr>
-                            </c:forEach>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="bg-white p-6 rounded shadow">
-                    <h2 class="text-xl font-semibold mb-4">Admin Approval</h2>
-                    <form method="post" action="${pageContext.request.contextPath}/AdminUpdateProposalServlet">
-                        <input type="hidden" name="proposalId" value="${proposal.proposalId}" />
-                        <input type="hidden" name="adminApproverId" value="${sessionScope.userId}" />
-                        <div class="mb-4">
-                            <label>Status</label>
-                            <select name="adminStatus" class="w-full border p-2 rounded" <c:if test="${!editable}">disabled</c:if>>
-                                <option value="approved" ${proposal.approval != null && proposal.approval.adminStatus == 'approved' ? 'selected' : ''}>Approved</option>
-                                <option value="rejected" ${proposal.approval != null && proposal.approval.adminStatus == 'rejected' ? 'selected' : ''}>Rejected</option>
-                            </select>
-                            <c:if test="${!editable}">
-                                <input type="hidden" name="adminStatus" value="${proposal.approval.adminStatus}" />
-                            </c:if>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Proposal ID</label>
+                            <input class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
+                                   value="${proposal.proposalId}" readonly>
                         </div>
-                        <c:if test="${editable}">
-                            <div class="mb-4">
-                                <label>Reason</label>
-                                <textarea name="adminReason" class="w-full border p-2 rounded">
-                                    ${proposal.approval != null ? proposal.approval.adminReason : ''}
-                                </textarea>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Proposer</label>
+                            <input class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
+                                   value="${proposal.senderName}" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Proposal Type</label>
+                            <input class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
+                                   value="${proposal.proposalType}" readonly>
+                        </div>
+                        <c:if test="${proposal.proposalType == 'import_from_supplier'}">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Supplier</label>
+                                <input class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
+                                       value="${proposal.supplierName}" readonly>
                             </div>
                         </c:if>
-                        <div class="mb-4">
-                            <label>Note</label>
-                            <textarea name="adminNote" class="w-full border p-2 rounded" <c:if test="${!editable}">readonly</c:if>>${proposal.approval != null ? proposal.approval.adminNote : ''}</textarea>
-                            <c:if test="${!editable}">
-                                <input type="hidden" name="adminNote" value="${proposal.approval.adminNote}" />
-                            </c:if>
+                        <c:if test="${proposal.proposalType == 'import_returned' || proposal.proposalType == 'export'}">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Construction Site</label>
+                                <input class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
+                                       value="${proposal.siteName}" readonly>
+                            </div>
+                        </c:if>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Submission Date</label>
+                            <input class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
+                                   value="<fmt:formatDate value='${proposal.proposalSentDate}' pattern='yyyy-MM-dd'/>" readonly>
                         </div>
-                        <c:if test="${editable}">
-                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save & Submit</button>
-                        </c:if>
-                        <c:if test="${!editable}">
-                            <p class="text-red-600">This proposal has already been processed.</p>
-                        </c:if>
-                    </form>
-                </div>
-
-                <div class="mt-6 text-center">
-                    <button onclick="history.back()" class="bg-gray-500 text-white px-4 py-2 rounded">&larr; Back</button>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Note</label>
+                            <textarea class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
+                                      rows="3" readonly>${proposal.note}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Admin Status</label>
+                            <div class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
+                                <c:choose>
+                                    <c:when test="${proposal.approval.adminStatus == 'pending'}">
+                                        <span class="badge badge-warning">Pending</span>
+                                    </c:when>
+                                    <c:when test="${proposal.approval.adminStatus == 'approved'}">
+                                        <span class="badge badge-success">Approved</span>
+                                    </c:when>
+                                    <c:when test="${proposal.approval.adminStatus == 'rejected'}">
+                                        <span class="badge badge-danger">Rejected</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge badge-secondary">${proposal.approval.adminStatus}</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Director Status</label>
+                            <div class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
+                                <c:choose>
+                                    <c:when test="${proposal.approval.directorStatus == 'pending'}">
+                                        <span class="badge badge-warning">Pending</span>
+                                    </c:when>
+                                    <c:when test="${proposal.approval.directorStatus == 'approved'}">
+                                        <span class="badge badge-success">Approved</span>
+                                    </c:when>
+                                    <c:when test="${proposal.approval.directorStatus == 'rejected'}">
+                                        <span class="badge badge-danger">Rejected</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge badge-secondary">${proposal.approval.directorStatus}</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Admin Note</label>
+                            <textarea class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
+                                      rows="2" readonly>${proposal.approval.adminNote}</textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </main>
 
-        <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
-    </body>
+            <!-- List of Proposed Materials Card -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+                <div class="bg-primary-600 text-white px-6 py-4 rounded-t-lg">
+                    <h3 class="text-lg font-semibold flex items-center gap-2">
+                        <i class="fas fa-list-alt"></i>
+                        List of Proposed Materials
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto">
+                            <thead>
+                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        <i class="fas fa-box mr-1"></i>Name of Material
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        <i class="fas fa-ruler mr-1"></i>Unit
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        <i class="fas fa-sort-numeric-up mr-1"></i>Quantity
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        <i class="fas fa-info-circle mr-1"></i>Material Condition
+                                    </th>
+                                    <c:if test="${proposal.proposalType == 'import_from_supplier'}">
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            <i class="fas fa-money-bill-wave mr-1"></i>Price (VNĐ)
+                                        </th>
+                                    </c:if>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <c:forEach var="detail" items="${proposal.proposalDetails}">
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td class="px-4 py-3 text-gray-900 dark:text-gray-100">${detail.materialName}</td>
+                                        <td class="px-4 py-3 text-gray-900 dark:text-gray-100">${detail.unit}</td>
+                                        <td class="px-4 py-3 text-gray-900 dark:text-gray-100">${detail.quantity}</td>
+                                        <td class="px-4 py-3 text-gray-900 dark:text-gray-100">${detail.materialCondition}</td>
+                                        <c:if test="${proposal.proposalType == 'import_from_supplier'}">
+                                            <td class="px-4 py-3 text-gray-900 dark:text-gray-100">
+                                                <fmt:formatNumber value="${detail.price}" type="number" minFractionDigits="0" maxFractionDigits="2" />
+                                            </td>
+                                        </c:if>
+                                    </tr>
+                                </c:forEach>
+                                <c:if test="${empty proposal.proposalDetails}">
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                                            <i class="fas fa-inbox text-3xl mb-2"></i>
+                                            <p>No materials proposed.</p>
+                                        </td>
+                                    </tr>
+                                </c:if>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Approval Form -->
+            <c:if test="${proposal.approval.adminStatus == 'pending'}">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+                    <div class="bg-primary-600 text-white px-6 py-4 rounded-t-lg">
+                        <h3 class="text-lg font-semibold flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i>
+                            Admin Approval
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <form action="${pageContext.request.contextPath}/AdminUpdateProposalServlet" method="post" onsubmit="return validateForm()">
+                            <input type="hidden" name="proposalId" value="${proposal.proposalId}">
+                            <input type="hidden" name="adminApproverId" value="${sessionScope.userId}">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Admin Status</label>
+                                    <select name="adminStatus" id="adminStatus" 
+                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
+                                            required>
+                                        <option value="approved">Approved</option>
+                                        <option value="rejected">Rejected</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="adminNote" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Admin Note</label>
+                                    <textarea class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" 
+                                              name="adminNote" id="adminNote" rows="3" 
+                                              placeholder="Enter your notes (required if rejected)"></textarea>
+                                    <small id="noteError" class="text-red-500 mt-1 hidden">Note is required when rejecting</small>
+                                </div>
+                            </div>
+                            <div class="flex justify-end gap-3 mt-6">
+                                <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
+                                    <i class="fas fa-save mr-2"></i>Submit Decision
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <script>
+                    function validateForm() {
+                        const status = document.getElementById('adminStatus').value;
+                        const note = document.getElementById('adminNote').value.trim();
+                        const noteError = document.getElementById('noteError');
+                        
+                        if (status === 'rejected' && note === '') {
+                            noteError.classList.remove('hidden');
+                            return false;
+                        }
+                        noteError.classList.add('hidden');
+                        return true;
+                    }
+                    
+                    // Show/hide note requirement based on status selection
+                    document.getElementById('adminStatus').addEventListener('change', function() {
+                        const noteLabel = document.querySelector('label[for="adminNote"]');
+                        if (this.value === 'rejected') {
+                            noteLabel.innerHTML = 'Admin Note <span class="text-red-500">*</span>';
+                        } else {
+                            noteLabel.innerHTML = 'Admin Note';
+                        }
+                    });
+                </script>
+            </c:if>
+
+            <!-- Messages -->
+            <c:if test="${not empty message}">
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <p class="success">${message}</p>
+                    </div>
+                </div>
+            </c:if>
+            <c:if test="${not empty error}">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+                        <p class="error">${error}</p>
+                    </div>
+                </div>
+            </c:if>
+
+            <!-- Back to Dashboard Button -->
+            <div class="flex justify-center">
+                <jsp:include page="/view/backToDashboardButton.jsp" />
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
+</body>
 </html>
