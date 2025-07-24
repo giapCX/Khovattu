@@ -30,11 +30,20 @@ public class InventoryServlet extends HttpServlet {
         String toDateStr = request.getParameter("toDate");
         String pageParam = request.getParameter("page");
         String sortOrder = request.getParameter("sortOrder");
+        String quantityThresholdParam = request.getParameter("quantityThreshold");
+        int quantityThreshold = -1;
+        if (quantityThresholdParam != null && !quantityThresholdParam.trim().isEmpty()) {
+            try {
+                quantityThreshold = Integer.parseInt(quantityThresholdParam);
+            } catch (NumberFormatException e) {
+                quantityThreshold = -1;
+            }
+        }
 
         // Debugging: Log parameters
         System.out.println("Received parameters: materialId=" + materialId + ", materialName=" + materialName
                 + ", condition=" + condition + ", fromDate=" + fromDateStr + ", toDate=" + toDateStr
-                + ", page=" + pageParam + ", sortOrder=" + sortOrder);
+                + ", page=" + pageParam + ", sortOrder=" + sortOrder + ", quantityThreshold=" + quantityThreshold);
 
         // Set up pagination
         int page = (pageParam != null && !pageParam.trim().isEmpty()) ? Integer.parseInt(pageParam) : 1;
@@ -65,12 +74,13 @@ public class InventoryServlet extends HttpServlet {
             if ((materialId != null && !materialId.trim().isEmpty())
                     || (materialName != null && !materialName.trim().isEmpty())
                     || (condition != null && !condition.trim().isEmpty())
-                    || (fromDate != null || toDate != null)) {
-                inventoryList = dao.searchInventory(materialId, materialName, condition, fromDate, toDate, page, pageSize, sortOrder);
-                totalRecords = dao.countInventory(materialId, materialName, condition, fromDate, toDate);
+                    || (fromDate != null || toDate != null)
+                    || quantityThreshold > 0) {
+                inventoryList = dao.searchInventory(materialId, materialName, condition, fromDate, toDate, page, pageSize, sortOrder, quantityThreshold);
+                totalRecords = dao.countInventory(materialId, materialName, condition, fromDate, toDate, quantityThreshold);
             } else {
-                inventoryList = dao.searchInventory(null, null, null, null, null, page, pageSize, sortOrder);
-                totalRecords = dao.countInventory(null, null, null, null, null);
+                inventoryList = dao.searchInventory(null, null, null, null, null, page, pageSize, sortOrder, -1);
+                totalRecords = dao.countInventory(null, null, null, null, null, -1);
             }
 
             // Calculate total pages
@@ -86,6 +96,7 @@ public class InventoryServlet extends HttpServlet {
             request.setAttribute("fromDate", fromDateStr);
             request.setAttribute("toDate", toDateStr);
             request.setAttribute("sortOrder", sortOrder);
+            request.setAttribute("quantityThreshold", quantityThresholdParam);
 
             // Debugging: Log results
             System.out.println("Inventory list size: " + inventoryList.size() + ", Total pages: " + totalPages);

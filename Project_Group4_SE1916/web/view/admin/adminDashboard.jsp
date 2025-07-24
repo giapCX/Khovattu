@@ -406,7 +406,7 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="#" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
+                        <a href="${pageContext.request.contextPath}/ListMaterialController" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-100">
@@ -421,7 +421,7 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="#" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Kiểm tra ngay</a>
+                        <a href="${pageContext.request.contextPath}/inventory?sortOrder=ASC&quantityThreshold=10" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Kiểm tra ngay</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-200">
@@ -436,7 +436,7 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/AdminApproveServlet" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Approve Request</a>
+                        <a href="${pageContext.request.contextPath}/AdminApproveServlet?status=pending" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Approve Request</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
@@ -450,9 +450,7 @@
                             <i class="fas fa-exchange-alt text-2xl"></i>
                         </div>
                     </div>
-                    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="#" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
-                    </div>
+                    
                 </div>
             </div>
 
