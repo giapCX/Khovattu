@@ -856,41 +856,29 @@ public class ProposalDAO {
         }
     }
 
-    public int countProposalsByTypeExecuteStatusFromStartDateToEndDate(String[] proposalTypes, String searchStatus, Timestamp searchStartDate, Timestamp searchEndDate) {
+    public int countProposalsByTypeAndSearch(String searchType, String searchSender) {
         int total = 0;
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM EmployeeProposals WHERE final_status IN ('approved_but_not_executed', 'executed')");
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) FROM EmployeeProposals ep "
+                + "LEFT JOIN Users u ON ep.proposer_id = u.user_id "
+                + "WHERE ep.final_status = 'approved_but_not_executed'"
+        );
 
         List<Object> parameters = new ArrayList<>();
 
-        // Filter by proposal types
-        if (proposalTypes != null && proposalTypes.length > 0) {
-            sql.append(" AND proposal_type IN (");
-            for (int i = 0; i < proposalTypes.length; i++) {
-                sql.append("?");
-                if (i < proposalTypes.length - 1) {
-                    sql.append(",");
-                }
-                parameters.add(proposalTypes[i]);
-            }
-            sql.append(")");
+        // Filter by proposal_type
+        if (searchType != null && !searchType.isEmpty()) {
+            sql.append(" AND ep.proposal_type = ?");
+            parameters.add(searchType);
         }
 
-        // Filter by status
-        if (searchStatus != null && !searchStatus.isEmpty()) {
-            sql.append(" AND final_status = ?");
-            parameters.add(searchStatus);
-        }
-
-        // Filter by start date
-        if (searchStartDate != null) {
-            sql.append(" AND proposal_sent_date >= ?");
-            parameters.add(searchStartDate);
-        }
-
-        // Filter by end date
-        if (searchEndDate != null) {
-            sql.append(" AND proposal_sent_date <= ?");
-            parameters.add(searchEndDate);
+        // Filter by sender name or note
+        if (searchSender != null && !searchSender.trim().isEmpty()) {
+            sql.append(" AND (u.full_name LIKE ? OR ep.note LIKE ?)");
+            String keyword = "%" + searchSender.trim() + "%";
+            parameters.add(keyword);
+            parameters.add(keyword);
         }
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -909,55 +897,34 @@ public class ProposalDAO {
         return total;
     }
 
-    public List<Proposal> searchProposalsByTypeExecuteStatusFromStartDateToEndDateWithPaging(
-            String[] proposalTypes, String searchStatus, Timestamp searchStartDate, Timestamp searchEndDate,
-            int offset, int recordsPerPage) {
+    public List<Proposal> searchProposalsByTypeAndSearchWithPaging(
+            String searchType, String searchSender, int offset, int recordsPerPage) {
 
         List<Proposal> list = new ArrayList<>();
+
         StringBuilder sql = new StringBuilder(
                 "SELECT ep.*, u.full_name AS sender_name "
                 + "FROM EmployeeProposals ep "
                 + "LEFT JOIN Users u ON ep.proposer_id = u.user_id "
-                + "WHERE ep.final_status IN ('approved_but_not_executed', 'executed') ");
+                + "WHERE ep.final_status = 'approved_but_not_executed'"
+        );
 
         List<Object> params = new ArrayList<>();
 
-        // Filter by proposal types
-        if (proposalTypes != null && proposalTypes.length > 0) {
-            sql.append(" AND ep.proposal_type IN (");
-            for (int i = 0; i < proposalTypes.length; i++) {
-                sql.append("?");
-                if (i < proposalTypes.length - 1) {
-                    sql.append(",");
-                }
-                params.add(proposalTypes[i]);
-            }
-            sql.append(")");
+        // Filter by proposal_type
+        if (searchType != null && !searchType.isEmpty()) {
+            sql.append(" AND ep.proposal_type = ?");
+            params.add(searchType);
         }
 
-        // Filter by status
-        if (searchStatus != null && !searchStatus.isEmpty()) {
-            if (searchStatus.equals("approved_but_not_executed") || searchStatus.equals("executed")) {
-                sql.append(" AND ep.final_status = ?");
-                params.add(searchStatus);
-            } else {
-                return list; // Return empty list if invalid status
-            }
+        // Filter by full_name or note
+        if (searchSender != null && !searchSender.trim().isEmpty()) {
+            sql.append(" AND (u.full_name LIKE ? OR ep.note LIKE ?)");
+            String keyword = "%" + searchSender.trim() + "%";
+            params.add(keyword);
+            params.add(keyword);
         }
 
-        // Filter by start date
-        if (searchStartDate != null) {
-            sql.append(" AND ep.proposal_sent_date >= ?");
-            params.add(searchStartDate);
-        }
-
-        // Filter by end date
-        if (searchEndDate != null) {
-            sql.append(" AND ep.proposal_sent_date <= ?");
-            params.add(searchEndDate);
-        }
-
-        // Pagination
         sql.append(" ORDER BY ep.proposal_sent_date DESC LIMIT ? OFFSET ?");
         params.add(recordsPerPage);
         params.add(offset);
@@ -966,6 +933,7 @@ public class ProposalDAO {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Proposal p = new Proposal();
@@ -979,16 +947,19 @@ public class ProposalDAO {
                 p.setExecuteDate(rs.getTimestamp("executed_date"));
                 list.add(p);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return list;
     }
+
     public void updateProposalStatusToExecuted(int proposalId) throws SQLException {
-    String sql = "UPDATE EmployeeProposals SET final_status = 'executed' WHERE proposal_id = ?";
-    try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, proposalId);
-        ps.executeUpdate();
+        String sql = "UPDATE EmployeeProposals SET final_status = 'executed' WHERE proposal_id = ?";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, proposalId);
+            ps.executeUpdate();
+        }
     }
-}
 }

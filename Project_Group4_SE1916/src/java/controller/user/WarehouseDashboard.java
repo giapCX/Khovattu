@@ -71,7 +71,7 @@ public class WarehouseDashboard extends HttpServlet {
             ProposalDAO proposalDAO = new ProposalDAO(conn);
             // Filter proposals by import_from_supplier and import_returned types
             String[] proposalTypes = new String[]{"import_from_supplier", "import_returned"};
-            int totalToBeExecute = proposalDAO.countProposalsByTypeExecuteStatusFromStartDateToEndDate(proposalTypes, "approved_but_not_executed", null, null);
+            int totalToBeExecute = proposalDAO.countProposalsByTypeAndSearch("", "");
             int totalMaterials = dao.countTotalMaterials();
             int lowStock = dao.countLowStockMaterials(10);
             int todayTransactions = dao.countTodayTransactions();

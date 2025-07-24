@@ -62,20 +62,7 @@ public class ListProposalExecute extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String searchType = request.getParameter("searchType");
-        String filter = request.getParameter("filter"); // Get the filter parameter
-        String searchStatus = "approved_but_not_executed";
-        String searchStartDateStr = request.getParameter("searchStartDate");
-        String searchEndDateStr = request.getParameter("searchEndDate");
-
-        Timestamp searchStartDate = null;
-        Timestamp searchEndDate = null;
-
-        if (searchStartDateStr != null && !searchStartDateStr.isEmpty()) {
-            searchStartDate = Timestamp.valueOf(searchStartDateStr + " 00:00:00");
-        }
-        if (searchEndDateStr != null && !searchEndDateStr.isEmpty()) {
-            searchEndDate = Timestamp.valueOf(searchEndDateStr + " 23:59:59");
-        }
+        String searchSender = request.getParameter("searchSender");
 
         String pageParam = request.getParameter("page");
    
@@ -104,18 +91,9 @@ public class ListProposalExecute extends HttpServlet {
         try (Connection conn = DBContext.getConnection()) {
             ProposalDAO proposalDAO = new ProposalDAO(conn);
 
-            // If filter=import_only, restrict to import_from_supplier and import_returned
-            String[] proposalTypes = null;
-            if ("import_only".equals(filter)) {
-                proposalTypes = new String[]{"import_from_supplier", "import_returned"};
-            } else if (searchType != null && !searchType.isEmpty()) {
-                proposalTypes = new String[]{searchType};
-            } else {
-                proposalTypes = new String[]{"import_from_supplier", "import_returned", "export"};
-            }
 
             // Count total records with the filtered proposal types
-            int totalRecords = proposalDAO.countProposalsByTypeExecuteStatusFromStartDateToEndDate(proposalTypes, searchStatus, searchStartDate, searchEndDate);
+            int totalRecords = proposalDAO.countProposalsByTypeAndSearch(searchType,searchSender);
 
             // Calculate total pages
             int totalPages = 1;
@@ -130,8 +108,8 @@ public class ListProposalExecute extends HttpServlet {
 
             int offset = (currentPage - 1) * recordsPerPage;
 
-            // Fetch proposals with the filtered proposal types
-            List<Proposal> proposals = proposalDAO.searchProposalsByTypeExecuteStatusFromStartDateToEndDateWithPaging(proposalTypes, searchStatus, searchStartDate, searchEndDate, offset, recordsPerPage);
+          
+            List<Proposal> proposals = proposalDAO.searchProposalsByTypeAndSearchWithPaging(searchType, searchSender, offset, recordsPerPage);
 
             if (proposals == null) {
                 proposals = new ArrayList<>();
@@ -139,10 +117,6 @@ public class ListProposalExecute extends HttpServlet {
 
             request.setAttribute("proposals", proposals);
             request.setAttribute("searchType", searchType);
-            request.setAttribute("filter", filter); // Pass filter to JSP if needed
-            request.setAttribute("searchStatus", searchStatus);
-            request.setAttribute("searchStartDate", searchStartDate);
-            request.setAttribute("searchEndDate", searchEndDate);
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("recordsPerPage", recordsPerPage);
