@@ -218,6 +218,7 @@
                                     <th class="p-4 text-left cursor-pointer" data-sort="proposalType">Proposal Type</th>
                                     <th class="p-4 text-left cursor-pointer" data-sort="sender">Sender</th>
                                     <th class="p-4 text-left cursor-pointer" data-sort="sendDate">Send Date</th>
+                                    <th class="p-4 text-left cursor-pointer" data-sort="note">Note</th>
                                     <th class="p-4 text-left cursor-pointer" data-sort="approvalDate">Approval Date</th>
                                     <th class="p-4 text-left cursor-pointer" data-sort="adminStatus">Admin Status</th>
                                     <th class="p-4 text-left cursor-pointer" data-sort="directorStatus">Director Status</th>
@@ -235,6 +236,7 @@
                                             <fmt:formatDate value="${proposal.proposalSentDate}" pattern="dd/MM/yyyy HH:mm" var="sendDateFormatted"/>
                                             ${not empty sendDateFormatted ? sendDateFormatted : 'N/A'}
                                         </td>
+                                        <td class="p-4">${not empty proposal.note ? proposal.note : 'N/A'}</td>
                                         <td class="p-4">
                                             <fmt:formatDate value="${proposal.approvalDate}" pattern="dd/MM/yyyy HH:mm" var="approvalDateFormatted"/>
                                             ${not empty approvalDateFormatted ? approvalDateFormatted : 'Not Approved'}
