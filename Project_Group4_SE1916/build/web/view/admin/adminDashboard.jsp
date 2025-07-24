@@ -400,7 +400,7 @@
             }
 
             // Inventory Chart - dữ liệu thật
-            const inventoryTrend = <%= new com.google.gson.Gson().toJson(request.getAttribute("inventoryTrend")) %>;
+            const inventoryTrend = JSON.parse('<%= new com.google.gson.Gson().toJson(request.getAttribute("inventoryTrend")) %>');
             const months = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
             const imported = inventoryTrend.map(item => item.imported);
             const exported = inventoryTrend.map(item => item.exported);
@@ -419,13 +419,27 @@
                 options: {responsive: true, plugins: {legend: {position: 'top', labels: {usePointStyle: true, padding: 20}}, tooltip: {enabled: true, mode: 'index', intersect: false}}, scales: {y: {beginAtZero: false, grid: {drawBorder: false}}, x: {grid: {display: false}}}}
             });
             // Distribution Chart - dữ liệu thật
-            const materialDistribution = <%= new com.google.gson.Gson().toJson(request.getAttribute("materialDistribution")) %>;
+            const materialDistribution = JSON.parse('<%= new com.google.gson.Gson().toJson(request.getAttribute("materialDistribution")) %>');
             const distLabels = Object.keys(materialDistribution);
             const distData = Object.values(materialDistribution);
+            // Hàm sinh màu HEX cho từng vật tư
+            function generateColors(count) {
+                const hexColors = [
+                    "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#46f0f0", "#f032e6",
+                    "#bcf60c", "#fabebe", "#008080", "#e6beff", "#9a6324", "#fffac8", "#800000", "#aaffc3",
+                    "#808000", "#ffd8b1", "#000075", "#808080"
+                ];
+                const colors = [];
+                for (let i = 0; i < count; i++) {
+                    colors.push(hexColors[i % hexColors.length]);
+                }
+                return colors;
+            }
+            const distColors = generateColors(distLabels.length);
             const distributionCtx = document.getElementById('distributionChart').getContext('2d');
             new Chart(distributionCtx, {
                 type: 'doughnut',
-                data: {labels: distLabels, datasets: [{data: distData, backgroundColor: ['#3b82f6', '#60a5fa', '#34d399', '#fbbf24', '#f87171'], borderWidth: 0}]},
+                data: {labels: distLabels, datasets: [{data: distData, backgroundColor: distColors, borderWidth: 0}]},
                 options: {responsive: true, cutout: '70%', plugins: {legend: {display: false}}}
             });
 
