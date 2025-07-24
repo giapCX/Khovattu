@@ -127,11 +127,9 @@ public class EditParentCategoryController extends HttpServlet {
             // Update category
             categoryDAO.updateParentCategory(categoryId, name, status);
             
-            // Get updated category to show new values
-            MaterialCategory updatedCategory = categoryDAO.getParentCategoryById(categoryId);
-            request.setAttribute("category", updatedCategory);
-            setSuccessMessage(request, "Parent category updated successfully!");
-            request.getRequestDispatcher("/view/material/editParentCategory.jsp").forward(request, response);
+            // Chuyển hướng về trang danh sách danh mục cha sau khi cập nhật thành công
+            response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
+            return;
             
         } catch (SQLException e) {
             setErrorMessage(request, "Error updating category: " + e.getMessage());

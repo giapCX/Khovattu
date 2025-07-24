@@ -66,8 +66,8 @@ public class AddCategoryController extends HttpServlet {
 
                 // Thêm danh mục cha
                 categoryDAO.addParentCategory(name.trim(), status);
-                request.setAttribute("successMessage", "Thêm danh mục cha thành công!");
-                
+                response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
+                return;
             } else {
                 // Xử lý trường hợp thêm danh mục con
                 int parentId;
@@ -96,10 +96,9 @@ public class AddCategoryController extends HttpServlet {
 
                 // Thêm danh mục con với trạng thái
                 categoryDAO.addChildCategory(name.trim(), parentId, status);
-                request.setAttribute("successMessage", "Thêm danh mục con thành công!");
+                response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
+                return;
             }
-
-            loadParentCategoriesAndForward(request, response);
             
         } catch (SQLException e) {
             request.setAttribute("errorMessage", "Lỗi khi thêm danh mục: " + e.getMessage());

@@ -4,7 +4,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -87,7 +87,7 @@
                         </div>
                         <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
                     </button>
-                    <!-- Menu con - ẩn mặc định -->
+                    <!-- Submenu - hidden by default -->
                     <div class="submenu hidden pl-6 space-y-1 mt-1">
                         <a href="${pageContext.request.contextPath}/ListConstructionSites" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
                             <i class="fas fa-list mr-2 w-4 text-center"></i>
@@ -104,7 +104,7 @@
                     <span class="text-lg">Material Category</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
-                <!-- Supplier - Menu cha -->
+                <!-- Supplier - Parent Menu -->
                 <div class="nav-item flex flex-col">
                     <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
                         <div class="flex items-center">
@@ -113,7 +113,7 @@
                         </div>
                         <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
                     </button>
-                    <!-- Menu con - ẩn mặc định -->
+                    <!-- Submenu - hidden by default -->
                     <div class="submenu hidden pl-6 space-y-1 mt-1">
                         <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
                             <i class="fas fa-list mr-2 w-4 text-center"></i>
@@ -141,20 +141,20 @@
                 </a>
                 <a href="${pageContext.request.contextPath}/listuser" class="nav-item flex items-center p-3">
                     <i class="fas fa-cog mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Danh sách người dùng</span>
+                    <span class="text-lg">User List</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
                 <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between">
                     <div class="flex items-center">
                         <i class="fas fa-history mr-2 w-5 text-center"></i>
-                        <span class="text-base">Lịch sử xuất kho</span>
+                        <span class="text-base">Export History</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
                 <a href="${pageContext.request.contextPath}/importhistory" class="nav-item flex items-center p-2 justify-between">
                     <div class="flex items-center">
                         <i class="fas fa-history mr-2 w-5 text-center"></i>
-                        <span class="text-base">Lịch sử nhập kho</span>
+                        <span class="text-base">Import History</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
@@ -190,13 +190,10 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-6">
-                    <div class="relative">
-                        <i class="fas fa-bell text-gray-500 hover:text-primary-600 cursor-pointer text-xl"></i>
-                        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-                    </div>
+                  
                     <div class="flex items-center">
                         <img src="https://ui-avatars.com/api/?name=<%= java.net.URLEncoder.encode(username, "UTF-8")%>&background=3b82f6&color=fff" 
-                             alt="Người dùng" class="w-10 h-10 rounded-full mr-3">
+                             alt="User" class="w-10 h-10 rounded-full mr-3">
                         <span class="font-medium text-gray-700 dark:text-white text-lg"><%= username%></span>
                     </div>
                     <button id="toggleDarkMode" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
@@ -210,7 +207,7 @@
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tổng vật tư</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Materials</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${totalMaterials}</h3>
                             <p class="text-sm text-green-500 mt-3"><i class="fas fa-arrow-up mr-1"></i></p>
                         </div>
@@ -219,30 +216,30 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/ListMaterialController" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
+                        <a href="${pageContext.request.contextPath}/ListMaterialController" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View Details</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-100">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Vật tư sắp hết</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Low Stock Materials</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${lowStockCount}</h3>
-                            <p class="text-sm text-red-500 mt-3"><i class="fas fa-exclamation-circle mr-1"></i>Cần bổ sung</p>
+                            <p class="text-sm text-red-500 mt-3"><i class="fas fa-exclamation-circle mr-1"></i>Need Restock</p>
                         </div>
                         <div class="p-4 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300">
                             <i class="fas fa-exclamation text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/inventory?sortOrder=ASC&quantityThreshold=10" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Kiểm tra ngay</a>
+                        <a href="${pageContext.request.contextPath}/inventory?sortOrder=ASC&quantityThreshold=10" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Check Now</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-200">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Đơn chờ duyệt</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Requests</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${pendingProposals}</h3>
-                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Đang chờ xử lý</p>
+                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Awaiting Processing</p>
                         </div>
                         <div class="p-4 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300">
                             <i class="fas fa-clipboard-list text-2xl"></i>
@@ -255,9 +252,9 @@
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Giao dịch hôm nay</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Today's Transactions</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${todayTransactions}</h3>
-                            <a href="" class="text-sm text-blue-500 mt-3 hover:underline"><i class="fas fa-sync-alt mr-1"></i>Cập nhật mới nhất</a>
+                            <a href="" class="text-sm text-blue-500 mt-3 hover:underline"><i class="fas fa-sync-alt mr-1"></i>Latest Update</a>
                         </div>
                         <div class="p-4 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
                             <i class="fas fa-exchange-alt text-2xl"></i>
@@ -272,16 +269,16 @@
                 <div class="lg:col-span-2 card bg-white dark:bg-gray-800 p-6">
                     <div class="flex justify-between items-center mb-4">
                         <div>
-                            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Xu hướng tồn kho</h2>
-                            <p class="text-sm text-gray-600 dark:text-gray-300">Theo dõi nhập/xuất kho theo thời gian</p>
+                            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Inventory Trends</h2>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">Track import/export warehouse over time</p>
                         </div>
                     </div>
                     <canvas id="inventoryChart" class="border rounded-lg"></canvas>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 p-6">
                     <div class="mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Phân bố vật tư</h2>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">Tỷ lệ các loại vật tư trong kho</p>
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Material Category Distribution</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Proportion of material categories in warehouse</p>
                     </div>
                     <canvas id="distributionChart" class="border rounded-lg"></canvas>
                 </div>
@@ -292,22 +289,22 @@
                 <div class="table-container bg-white dark:bg-gray-800">
                     <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                         <div>
-                            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Vật tư sắp hết</h2>
-                            <p class="text-sm text-gray-600 dark:text-gray-300">Danh sách vật tư cần bổ sung</p>
+                            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Low Stock Materials</h2>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">List of materials that need restocking</p>
                         </div>
-                        <a href="${pageContext.request.contextPath}/inventory?sortOrder=ASC&quantityThreshold=10"class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                        <a href="${pageContext.request.contextPath}/inventory?sortOrder=ASC&quantityThreshold=10"class="text-sm text-primary-600 dark:text-primary-400 hover:underline">View All</a>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full table-auto">
                             <thead>
                                 <tr class="bg-primary-600 text-white">
-                                    <th class="p-4 text-left">Tên vật tư</th>
-                                    <th class="p-4 text-left">Số lượng</th>
-                                    <th class="p-4 text-left">Trạng thái</th>
+                                    <th class="p-4 text-left">Material Name</th>
+                                    <th class="p-4 text-left">Quantity</th>
+                                    <th class="p-4 text-left">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <%-- Hiển thị danh sách vật tư sắp hết --%>
+                                <%-- Display list of low stock materials --%>
                                 <c:forEach var="item" items="${lowStockMaterials}">
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
                                         <td class="p-4">${item.materialName}</td>
@@ -315,13 +312,13 @@
                                         <td class="p-4">
                                             <c:choose>
                                                 <c:when test="${item.quantityInStock <= 5}">
-                                                    <span class="badge badge-danger">Cảnh báo</span>
+                                                    <span class="badge badge-danger">Critical</span>
                                                 </c:when>
                                                 <c:when test="${item.quantityInStock <= 10}">
-                                                    <span class="badge badge-warning">Sắp hết</span>
+                                                    <span class="badge badge-warning">Low Stock</span>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <span class="badge badge-success">Đủ dùng</span>
+                                                    <span class="badge badge-success">Sufficient</span>
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
@@ -336,7 +333,7 @@
 
         <!-- Footer -->
         <footer class="bg-gray-100 dark:bg-gray-800 text-center p-6 mt-8 border-t border-gray-200 dark:border-gray-700 transition-all duration-300">
-            <p class="text-gray-600 dark:text-gray-300 text-sm">Hệ thống Quản lý Vật tư - Phiên bản 2.0 © 2025 | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Liên hệ hỗ trợ</a></p>
+            <p class="text-gray-600 dark:text-gray-300 text-sm">Materials Management System - Version 2.0 © 2025 | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Contact Support</a></p>
         </footer>
 
         <!-- JavaScript -->
@@ -399,9 +396,9 @@
                 }).showToast();
             }
 
-            // Inventory Chart - dữ liệu thật
+            // Inventory Chart - real data
             const inventoryTrend = JSON.parse('<%= new com.google.gson.Gson().toJson(request.getAttribute("inventoryTrend")) %>');
-            const months = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const imported = inventoryTrend.map(item => item.imported);
             const exported = inventoryTrend.map(item => item.exported);
             const remaining = inventoryTrend.map(item => item.remaining);
@@ -411,18 +408,18 @@
                 data: {
                     labels: months,
                     datasets: [
-                        {label: 'Nhập kho', data: imported, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true},
-                        {label: 'Xuất kho', data: exported, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderWidth: 2, tension: 0.3, fill: true},
-                        {label: 'Tồn kho', data: remaining, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true}
+                        {label: 'Imported', data: imported, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true},
+                        {label: 'Exported', data: exported, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderWidth: 2, tension: 0.3, fill: true},
+                        {label: 'In Stock', data: remaining, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true}
                     ]
                 },
                 options: {responsive: true, plugins: {legend: {position: 'top', labels: {usePointStyle: true, padding: 20}}, tooltip: {enabled: true, mode: 'index', intersect: false}}, scales: {y: {beginAtZero: false, grid: {drawBorder: false}}, x: {grid: {display: false}}}}
             });
-            // Distribution Chart - dữ liệu thật
+            // Distribution Chart - real data
             const materialDistribution = JSON.parse('<%= new com.google.gson.Gson().toJson(request.getAttribute("materialDistribution")) %>');
             const distLabels = Object.keys(materialDistribution);
             const distData = Object.values(materialDistribution);
-            // Hàm sinh màu HEX cho từng vật tư
+            // Function to generate HEX colors for each material
             function generateColors(count) {
                 const hexColors = [
                     "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#46f0f0", "#f032e6",
