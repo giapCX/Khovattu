@@ -115,7 +115,7 @@
                                 <input type="hidden" name="unitId" value="${unit.unitId}" />
 
                             <label for="name">Unit Name:</label>
-                            <input type="text" id="name" name="name" placeholder="Enter unit name" required value="${unit.name}" />
+                            <input type="text" id="name" name="unitName" placeholder="Enter unit name" required value="${unit.name}" />
                             <label for="status">Status:</label>
                             <select id="status" name="status">
                                     <option value="active" ${unit.status == 'active' ? 'selected' : ''}>Active</option>
