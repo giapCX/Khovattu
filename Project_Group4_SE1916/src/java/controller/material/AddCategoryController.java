@@ -23,14 +23,14 @@ public class AddCategoryController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            // Lấy danh sách danh mục cha để hiển thị trong dropdown
+            // Get list of parent categories to display in dropdown
             List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories2();
             request.setAttribute("parentCategories", parentCategories);
             
-            // Chuyển đến trang JSP để hiển thị form thêm danh mục
+            // Forward to JSP page to display add category form
             request.getRequestDispatcher("/view/material/addCategory.jsp").forward(request, response);
         } catch (SQLException e) {
-            request.setAttribute("errorMessage", "Lỗi khi tải danh sách danh mục cha: " + e.getMessage());
+            request.setAttribute("errorMessage", "Error loading parent categories list: " + e.getMessage());
             request.getRequestDispatcher("/view/material/addCategory.jsp").forward(request, response);
         }
     }
@@ -41,67 +41,67 @@ public class AddCategoryController extends HttpServlet {
         String status = request.getParameter("status");
         String parentCategoryParam = request.getParameter("parentCategory");
 
-        // Kiểm tra dữ liệu đầu vào
+        // Validate input data
         if (name == null || name.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Tên danh mục không được để trống!");
+            request.setAttribute("errorMessage", "Category name cannot be empty!");
             loadParentCategoriesAndForward(request, response);
             return;
         }
 
         if (status == null || (!status.equals("active") && !status.equals("inactive"))) {
-            request.setAttribute("errorMessage", "Trạng thái không hợp lệ!");
+            request.setAttribute("errorMessage", "Invalid status!");
             loadParentCategoriesAndForward(request, response);
             return;
         }
 
         try {
-            // Xử lý trường hợp thêm danh mục cha
+            // Handle adding parent category
             if (parentCategoryParam == null || parentCategoryParam.trim().isEmpty()) {
-                // Kiểm tra danh mục cha đã tồn tại
+                // Check if parent category already exists
                 if (categoryDAO.categoryExistsByName(name.trim(), 0)) {
-                    request.setAttribute("errorMessage", "Danh mục cha đã tồn tại!");
+                    request.setAttribute("errorMessage", "Parent category already exists!");
                     loadParentCategoriesAndForward(request, response);
                     return;
                 }
 
-                // Thêm danh mục cha
+                // Add parent category
                 categoryDAO.addParentCategory(name.trim(), status);
                 response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
                 return;
             } else {
-                // Xử lý trường hợp thêm danh mục con
+                // Handle adding child category
                 int parentId;
                 try {
                     parentId = Integer.parseInt(parentCategoryParam);
                 } catch (NumberFormatException e) {
-                    request.setAttribute("errorMessage", "ID danh mục cha không hợp lệ!");
+                    request.setAttribute("errorMessage", "Invalid parent category ID!");
                     loadParentCategoriesAndForward(request, response);
                     return;
                 }
 
-                // Kiểm tra danh mục cha có tồn tại không
+                // Check if parent category exists
                 MaterialCategory parentCategory = categoryDAO.getParentCategoryById(parentId);
                 if (parentCategory == null) {
-                    request.setAttribute("errorMessage", "Danh mục cha không tồn tại!");
+                    request.setAttribute("errorMessage", "Parent category does not exist!");
                     loadParentCategoriesAndForward(request, response);
                     return;
                 }
 
-                // Kiểm tra danh mục con đã tồn tại trong cùng danh mục cha
+                // Check if child category already exists in the same parent category
                 if (categoryDAO.categoryExistsByName(name.trim(), parentId)) {
-                    request.setAttribute("errorMessage", "Danh mục con đã tồn tại trong danh mục cha này!");
+                    request.setAttribute("errorMessage", "Child category already exists in this parent category!");
                     loadParentCategoriesAndForward(request, response);
                     return;
                 }
 
-                // Thêm danh mục con với trạng thái
+                // Add child category with status
                 categoryDAO.addChildCategory(name.trim(), parentId, status);
                 response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
                 return;
             }
             
         } catch (SQLException e) {
-            request.setAttribute("errorMessage", "Lỗi khi thêm danh mục: " + e.getMessage());
+            request.setAttribute("errorMessage", "Error adding category: " + e.getMessage());
             loadParentCategoriesAndForward(request, response);
         }
     }
@@ -112,7 +112,7 @@ public class AddCategoryController extends HttpServlet {
             List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories2();
             request.setAttribute("parentCategories", parentCategories);
         } catch (SQLException e) {
-            request.setAttribute("errorMessage", "Lỗi khi tải danh sách danh mục cha: " + e.getMessage());
+            request.setAttribute("errorMessage", "Error loading parent categories list: " + e.getMessage());
         }
         request.getRequestDispatcher("/view/material/addCategory.jsp").forward(request, response);
     }
