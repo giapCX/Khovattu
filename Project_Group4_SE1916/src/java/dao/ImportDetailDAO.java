@@ -1,112 +1,112 @@
 package dao;
 
-import model.ImportDetailView;
 import Dal.DBContext;
+import static Dal.DBContext.getConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.ImportDetail;
 
 public class ImportDetailDAO {
-
-    private Connection conn;
+    private Connection connection;
 
     public ImportDetailDAO() {
-        conn = DBContext.getConnection();
+        this.connection = getConnection();
     }
 
-    // Get default by importId
-    public List<ImportDetailView> getByImportId(int importId, int page, int pageSize) {
-        String sql = baseSql() + " WHERE id.import_id = ? LIMIT ?, ?";
-        return getData(sql, importId, null, null, page, pageSize);
-    }
-
-    // Search by name
-    public List<ImportDetailView> searchByName(int importId, String keyword, int page, int pageSize) {
-        String sql = baseSql() + " WHERE id.import_id = ? AND m.name LIKE ? LIMIT ?, ?";
-        return getData(sql, importId, keyword, null, page, pageSize);
-    }
-
-    // Sort by price only
-    public List<ImportDetailView> sortByPrice(int importId, String sort, int page, int pageSize) {
-        String order = sort.equalsIgnoreCase("desc") ? "DESC" : "ASC";
-        String sql = baseSql() + " WHERE id.import_id = ? ORDER BY id.price_per_unit " + order + " LIMIT ?, ?";
-        return getData(sql, importId, null, order, page, pageSize);
-    }
-
-    // Search and sort
-    public List<ImportDetailView> searchAndSortByPrice(int importId, String keyword, String sort, int page, int pageSize) {
-        String order = sort.equalsIgnoreCase("desc") ? "DESC" : "ASC";
-        String sql = baseSql() + " WHERE id.import_id = ? AND m.name LIKE ? ORDER BY id.price_per_unit " + order + " LIMIT ?, ?";
-        return getData(sql, importId, keyword, order, page, pageSize);
-    }
-
-    // Count
-    public int countSearch(int importId, String keyword) {
-        String sql = """
-            SELECT COUNT(*) FROM ImportDetails id
-            JOIN Materials m ON id.material_id = m.material_id
-            WHERE id.import_id = ?
-        """;
-        if (keyword != null && !keyword.isEmpty()) {
-            sql += " AND m.name LIKE ?";
-        }
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+    public List<ImportDetail> getImportDetailsByImportId(int importId) {
+        List<ImportDetail> details = new ArrayList<>();
+        String sql = "SELECT id.import_id, id.material_id, id.quantity, id.price_per_unit, " +
+                     "id.material_condition, id.supplier_id, id.site_id, " +
+                     "m.name AS material_name, m.unit " +
+                     "FROM ImportDetails id " +
+                     "JOIN Materials m ON id.material_id = m.material_id " +
+                     "WHERE id.import_id = ?";
+        try (
+            PreparedStatement ps = connection.prepareStatement(sql)
+        ) {
             ps.setInt(1, importId);
-            if (keyword != null && !keyword.isEmpty()) {
-                ps.setString(2, "%" + keyword + "%");
-            }
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    // ==== Private reusable ====
-
-    private List<ImportDetailView> getData(String sql, int importId, String keyword, String sort, int page, int pageSize) {
-        List<ImportDetailView> list = new ArrayList<>();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            int index = 1;
-            ps.setInt(index++, importId);
-            if (keyword != null) {
-                ps.setString(index++, "%" + keyword + "%");
-            }
-            ps.setInt(index++, (page - 1) * pageSize);
-            ps.setInt(index++, pageSize);
-
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                ImportDetailView d = new ImportDetailView();
-                d.setMaterialId(rs.getInt("material_id"));
-                d.setMaterialName(rs.getString("material_name"));
-                d.setSupplierName(rs.getString("supplier_name"));
-                d.setQuantity(rs.getDouble("quantity"));
-                d.setPricePerUnit(rs.getDouble("price_per_unit"));
-                d.setTotalPrice(rs.getDouble("quantity") * rs.getDouble("price_per_unit"));
-                list.add(d);
+                ImportDetail detail = new ImportDetail();
+                detail.setImportId(rs.getInt("import_id"));
+                detail.setMaterialId(rs.getInt("material_id"));
+                detail.setQuantity(rs.getDouble("quantity"));
+                detail.setPrice(rs.getDouble("price_per_unit"));
+                detail.setMaterialCondition(rs.getString("material_condition"));
+                detail.setSupplierId(rs.getInt("supplier_id"));
+                
+                int siteId = rs.getInt("site_id");
+                if (!rs.wasNull()) {
+                    detail.setSiteId(siteId);
+                }
+
+                detail.setMaterialName(rs.getString("material_name"));
+                detail.setUnit(rs.getString("unit"));
+
+                details.add(detail);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return list;
+        return details;
+    }
+    public List<ImportDetail> getDetailsByImportIdWithFilter(int importId, String materialName, String condition) {
+    List<ImportDetail> list = new ArrayList<>();
+
+    StringBuilder sql = new StringBuilder(
+        "SELECT id.import_id, id.material_id, id.quantity, id.price_per_unit, id.material_condition, " +
+        "       i.supplier_id, i.site_id, " +
+        "       m.code AS material_code, m.name AS material_name, m.unit " +
+        "FROM ImportDetails id " +
+        "JOIN Materials m ON id.material_id = m.material_id " +
+        "JOIN ImportReceipts i ON id.import_id = i.import_id " +
+        "WHERE id.import_id = ? "
+    );
+
+    if (materialName != null && !materialName.trim().isEmpty()) {
+        sql.append(" AND m.name LIKE ? ");
     }
 
-    private String baseSql() {
-        return """
-            SELECT 
-                m.material_id,
-                m.name AS material_name,
-                s.name AS supplier_name,
-                id.quantity,
-                id.price_per_unit
-            FROM ImportDetails id
-            JOIN Materials m ON id.material_id = m.material_id
-            JOIN ImportReceipts ir ON id.import_id = ir.import_id
-            JOIN Suppliers s ON ir.supplier_id = s.supplier_id
-        """;
+    if (condition != null && !condition.trim().isEmpty()) {
+        sql.append(" AND id.condition = ? ");
     }
+
+    try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+        int paramIndex = 1;
+        stm.setInt(paramIndex++, importId);
+
+        if (materialName != null && !materialName.trim().isEmpty()) {
+            stm.setString(paramIndex++, "%" + materialName.trim() + "%");
+        }
+
+        if (condition != null && !condition.trim().isEmpty()) {
+            stm.setString(paramIndex++, condition.trim());
+        }
+
+        ResultSet rs = stm.executeQuery();
+        while (rs.next()) {
+            ImportDetail detail = new ImportDetail();
+            detail.setImportId(rs.getInt("import_id"));
+            detail.setMaterialId(rs.getInt("material_id"));
+            detail.setQuantity(rs.getDouble("quantity"));
+            detail.setPrice(rs.getDouble("price_per_unit"));
+            detail.setMaterialCondition(rs.getString("material_condition"));
+            detail.setSupplierId(rs.getObject("supplier_id") != null ? rs.getInt("supplier_id") : null);
+            detail.setSiteId(rs.getObject("site_id") != null ? rs.getInt("site_id") : null);
+            detail.setMaterialCode(rs.getString("material_code"));
+            detail.setMaterialName(rs.getString("material_name"));
+            detail.setUnit(rs.getString("unit"));
+
+            list.add(detail);
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+
 }

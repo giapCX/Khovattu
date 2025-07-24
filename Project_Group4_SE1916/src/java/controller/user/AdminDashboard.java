@@ -86,11 +86,11 @@ public class AdminDashboard extends HttpServlet {
             InventoryDAO inventoryDAO = new InventoryDAO(Dal.DBContext.getConnection());
             List<Inventory> lowStockMaterials = inventoryDAO.searchInventory(null, null, null, null, null, 1, 5, "ASC");
 
-            // 4. Bảng giao dịch gần đây (5 giao dịch nhập + 5 giao dịch xuất gần nhất)
-            ExportHistoryDAO exportHistoryDAO = new ExportHistoryDAO(Dal.DBContext.getConnection());
-            ImportReceiptDAO importReceiptDAO = new ImportReceiptDAO();
-            List<model.Export> recentExports = exportHistoryDAO.searchExportReceipts(null, null, null, 1, 5);
-            List<model.ImportReceipt> recentImports = importReceiptDAO.searchImportReceipts(null, null, null, 1, 5);
+//            // 4. Bảng giao dịch gần đây (5 giao dịch nhập + 5 giao dịch xuất gần nhất)
+//            ExportHistoryDAO exportHistoryDAO = new ExportHistoryDAO(Dal.DBContext.getConnection());
+//            ImportReceiptDAO importReceiptDAO = new ImportReceiptDAO();
+//            List<model.Export> recentExports = exportHistoryDAO.searchExportReceipts(null, null, null, 1, 5);
+//            List<model.ImportReceipt> recentImports = importReceiptDAO.searchImportReceipts(null, null, null, 1, 5);
 
             // Đưa dữ liệu lên request
             request.setAttribute("totalMaterials", totalMaterials);
@@ -100,8 +100,8 @@ public class AdminDashboard extends HttpServlet {
             request.setAttribute("inventoryTrend", inventoryTrend);
             request.setAttribute("materialDistribution", materialDistribution);
             request.setAttribute("lowStockMaterials", lowStockMaterials);
-            request.setAttribute("recentExports", recentExports);
-            request.setAttribute("recentImports", recentImports);
+//            request.setAttribute("recentExports", recentExports);
+//            request.setAttribute("recentImports", recentImports);
 
             // Forward sang JSP
             request.getRequestDispatcher("/view/admin/adminDashboard.jsp").forward(request, response);

@@ -6,10 +6,22 @@ public class ImportDetail {
     private double quantity;
     private Double price;
     private String materialCondition;
-    private Integer supplierId;
-    private Integer siteId;
+    private Integer supplierId; 
+    private Integer siteId;      
+    private String materialCode;
+    
+    private String materialName;
+    private String unit;
 
     public ImportDetail() {
+    }
+
+    public String getMaterialCode() {
+        return materialCode;
+    }
+
+    public void setMaterialCode(String materialCode) {
+        this.materialCode = materialCode;
     }
 
     public int getImportId() {
@@ -67,4 +79,21 @@ public class ImportDetail {
     public void setSiteId(Integer siteId) {
         this.siteId = siteId;
     }
+
+    public String getMaterialName() {
+        return materialName;
+    }
+
+    public void setMaterialName(String materialName) {
+        this.materialName = materialName;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+    
 }

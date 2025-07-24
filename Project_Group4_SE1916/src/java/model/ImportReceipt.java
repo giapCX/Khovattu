@@ -1,25 +1,26 @@
 package model;
 
 import java.sql.Date;
+import java.util.List;
 
 public class ImportReceipt {
     private int importId;
-    private String receiptId;
     private int proposalId;
     private String importType;
-    private Integer siteId;
-    private Integer returnedSiteId;
-    private int userId;
-    private Integer executorId;
+    private int responsibleId;
+    private String deliverySupplierName;
+    private String deliverySupplierPhone;
+    private int executorId;
     private Date importDate;
     private String note;
     private Integer supplierId;
-    private String importerName;
-    private String supplierName;
-    private double total;
+    private Integer siteId;
 
-    public ImportReceipt() {
-    }
+    private String executorName;
+    private String siteName;
+    private String supplierName;
+
+    private List<ImportDetail> details;
 
     public int getImportId() {
         return importId;
@@ -27,14 +28,6 @@ public class ImportReceipt {
 
     public void setImportId(int importId) {
         this.importId = importId;
-    }
-
-    public String getReceiptId() {
-        return receiptId;
-    }
-
-    public void setReceiptId(String receiptId) {
-        this.receiptId = receiptId;
     }
 
     public int getProposalId() {
@@ -53,35 +46,35 @@ public class ImportReceipt {
         this.importType = importType;
     }
 
-    public Integer getSiteId() {
-        return siteId;
+    public int getResponsibleId() {
+        return responsibleId;
     }
 
-    public void setSiteId(Integer siteId) {
-        this.siteId = siteId;
+    public void setResponsibleId(int responsibleId) {
+        this.responsibleId = responsibleId;
     }
 
-    public Integer getReturnedSiteId() {
-        return returnedSiteId;
+    public String getDeliverySupplierName() {
+        return deliverySupplierName;
     }
 
-    public void setReturnedSiteId(Integer returnedSiteId) {
-        this.returnedSiteId = returnedSiteId;
+    public void setDeliverySupplierName(String deliverySupplierName) {
+        this.deliverySupplierName = deliverySupplierName;
     }
 
-    public int getUserId() {
-        return userId;
+    public String getDeliverySupplierPhone() {
+        return deliverySupplierPhone;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setDeliverySupplierPhone(String deliverySupplierPhone) {
+        this.deliverySupplierPhone = deliverySupplierPhone;
     }
 
-    public Integer getExecutorId() {
+    public int getExecutorId() {
         return executorId;
     }
 
-    public void setExecutorId(Integer executorId) {
+    public void setExecutorId(int executorId) {
         this.executorId = executorId;
     }
 
@@ -109,12 +102,28 @@ public class ImportReceipt {
         this.supplierId = supplierId;
     }
 
-    public String getImporterName() {
-        return importerName;
+    public Integer getSiteId() {
+        return siteId;
     }
 
-    public void setImporterName(String importerName) {
-        this.importerName = importerName;
+    public void setSiteId(Integer siteId) {
+        this.siteId = siteId;
+    }
+
+    public String getExecutorName() {
+        return executorName;
+    }
+
+    public void setExecutorName(String executorName) {
+        this.executorName = executorName;
+    }
+
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
     }
 
     public String getSupplierName() {
@@ -125,11 +134,14 @@ public class ImportReceipt {
         this.supplierName = supplierName;
     }
 
-    public double getTotal() {
-        return total;
+    public List<ImportDetail> getDetails() {
+        return details;
     }
 
-    public void setTotal(double total) {
-        this.total = total;
+    public void setDetails(List<ImportDetail> details) {
+        this.details = details;
     }
+    
+
+   
 }
