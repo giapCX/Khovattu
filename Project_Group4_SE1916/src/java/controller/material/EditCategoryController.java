@@ -111,8 +111,8 @@ public class EditCategoryController extends HttpServlet {
 
                 // Cập nhật thành danh mục cha
                 categoryDAO.updateToParentCategory(categoryId, name.trim(), status);
-                request.setAttribute("successMessage", "Cập nhật danh mục cha thành công!");
-                
+                response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
+                return;
             } else {
                 // Xử lý trường hợp cập nhật danh mục con
                 int parentId;
@@ -157,11 +157,11 @@ public class EditCategoryController extends HttpServlet {
 
                 // Cập nhật thành danh mục con
                 categoryDAO.updateToChildCategory(categoryId, name.trim(), parentId, status);
-                request.setAttribute("successMessage", "Cập nhật danh mục con thành công!");
+                response.sendRedirect(request.getContextPath() + "/ListParentCategoryController");
+                return;
             }
 
-            loadDataAndForward(request, response, categoryId);
-
+            // Không cần load lại form khi đã chuyển hướng
         } catch (NumberFormatException e) {
             request.setAttribute("errorMessage", "ID danh mục không hợp lệ!");
             try {

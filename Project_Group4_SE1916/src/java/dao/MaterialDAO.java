@@ -686,4 +686,19 @@ public void addMaterial(Material material) throws SQLException {
     }
     return -1;
 }
+
+    // Kiểm tra trùng tên vật tư trong cùng một sub category
+    public boolean isMaterialNameExistsInSubCategory(String name, int subCategoryId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Materials WHERE name = ? AND category_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name.trim());
+            ps.setInt(2, subCategoryId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
 }

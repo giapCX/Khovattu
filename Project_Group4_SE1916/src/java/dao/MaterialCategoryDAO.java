@@ -1,6 +1,5 @@
 package dao;
 
-import model.MaterialCategory;
 import Dal.DBContext;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import model.MaterialCategory;
 
 public class MaterialCategoryDAO {
 
@@ -384,4 +384,24 @@ public void updateToChildCategory(int categoryId, String name, int parentId, Str
         ps.executeUpdate();
     }
 }
+
+    // Lấy tất cả sub category (child category) có trạng thái 'active'
+    public List<MaterialCategory> getAllActiveChildCategories() throws SQLException {
+        List<MaterialCategory> categories = new ArrayList<>();
+        String sql = "SELECT mc.category_id, mc.name, mc.parent_id, pc.name AS parent_category_name "
+                + "FROM MaterialCategories mc "
+                + "LEFT JOIN MaterialCategories pc ON mc.parent_id = pc.category_id "
+                + "WHERE mc.parent_id IS NOT NULL AND mc.status = 'active'";
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                MaterialCategory category = new MaterialCategory();
+                category.setCategoryId(rs.getInt("category_id"));
+                category.setName(rs.getString("name"));
+                category.setParentCategoryName(rs.getString("parent_category_name"));
+                category.setParentId(rs.getInt("parent_id"));
+                categories.add(category);
+            }
+        }
+        return categories;
+    }
 }

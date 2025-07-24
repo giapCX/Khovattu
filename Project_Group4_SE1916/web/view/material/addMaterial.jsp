@@ -127,15 +127,7 @@
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label for="parentCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Root Category</label>
-                            <div class="autocomplete-container">
-                                <input type="text" id="parentCategory" name="parentCategory" required autocomplete="off" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Select root category">
-                                <input type="hidden" id="parentCategoryId" name="parentCategoryId">
-                                <div class="autocomplete-dropdown" id="parentCategoryDropdown"></div>
-                            </div>
-                        </div>
-                        
+                        <!-- Đã xóa phần Root Category -->
                         <div class="space-y-2">
                             <label for="childCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sub Category</label>
                             <div class="autocomplete-container">
@@ -189,18 +181,12 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
             // Data from server
-            const parentCategories = [
-                <c:forEach var="cat" items="${parentCategories}" varStatus="status">
-                    {id: ${cat.categoryId}, name: "${cat.name}"}<c:if test="${!status.last}">,</c:if>
-                </c:forEach>
-            ];
-            
+            // Xóa parentCategories, chỉ giữ childCategories
             const childCategories = [
                 <c:forEach var="cat" items="${childCategories}" varStatus="status">
                     {id: ${cat.categoryId}, name: "${cat.name}", parentId: ${cat.parentId}}<c:if test="${!status.last}">,</c:if>
                 </c:forEach>
             ];
-            
             const units = [
                 <c:forEach var="unit" items="${units}" varStatus="status">
                     "${unit}"<c:if test="${!status.last}">,</c:if>
@@ -322,35 +308,14 @@
                 
                 // Setup autocomplete for units
                 setupAutocomplete('unit', 'unitDropdown', units, null, null, null);
-                
-                // Setup autocomplete for parent categories
-                setupAutocomplete('parentCategory', 'parentCategoryDropdown', parentCategories, 'name', 'id', function(item) {
-                    $('#parentCategoryId').val(item.id);
-                    // Filter child categories based on selected parent
-                    const filteredChildren = childCategories.filter(child => child.parentId === item.id);
-                    
-                    // Clear child category selection
-                    $('#childCategory').val('');
-                    $('#childCategoryId').val('');
-                    
-                    // Update child category autocomplete
-                    setupChildCategoryAutocomplete(filteredChildren);
+                // Setup autocomplete cho child categories
+                setupAutocomplete('childCategory', 'childCategoryDropdown', childCategories, 'name', 'id', function(item) {
+                    $('#childCategoryId').val(item.id);
                 });
-                
-                // Setup autocomplete for child categories
-                function setupChildCategoryAutocomplete(filteredChildren) {
-                    setupAutocomplete('childCategory', 'childCategoryDropdown', filteredChildren, 'name', 'id', function(item) {
-                        $('#childCategoryId').val(item.id);
-                    });
-                }
-                
-                // Initial setup for child categories (all categories)
-                setupChildCategoryAutocomplete(childCategories);
                 
                 // Reset form functionality
                 $('button[type="reset"]').click(function() {
                     setTimeout(function() {
-                        $('#parentCategoryId').val('');
                         $('#childCategoryId').val('');
                         $('#imagePreview').hide();
                         $('.autocomplete-dropdown').hide();
