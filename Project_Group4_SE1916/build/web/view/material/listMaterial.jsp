@@ -115,7 +115,7 @@
                 <!-- Search and Filter Form -->
                 <form action="ListMaterialController" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" id="searchInput" name="search" placeholder="Search by material code" 
+                        <input type="text" id="searchInput" name="search" placeholder="Search by material name" 
                                value="${param.search}" 
                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>

@@ -55,6 +55,7 @@ public class ListMaterialController extends HttpServlet {
         String filterParentCategory = request.getParameter("filterParentCategory");
         String filterChildCategory = request.getParameter("filterCategory");
         String search = request.getParameter("search");
+        if (search != null) search = search.trim();
         String pageParam = request.getParameter("page");
         String itemsPerPageParam = request.getParameter("itemsPerPage");
 
@@ -83,8 +84,8 @@ public class ListMaterialController extends HttpServlet {
         int totalRecords;
         
         if (search != null && !search.isEmpty()) {
-            materials = materialDAO.searchMaterialsByCode(search, page, itemsPerPage);
-            totalRecords = materialDAO.getTotalMaterialsByCode(search);
+            materials = materialDAO.searchMaterialsByName(search, page, itemsPerPage);
+            totalRecords = materialDAO.getTotalMaterialsByName(search);
         } else if (filterChildCategory != null && !filterChildCategory.isEmpty()) {
             try {
                 int childCategoryId = Integer.parseInt(filterChildCategory);
