@@ -74,9 +74,9 @@
                             </select>
                         </div>
 
-                    <div class="space-y-2 supplier-column hidden">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Supplier:</label>
-                        <input list="supplierList" id="supplierName" name="supplierName" value="${proposal.supplierName != null ? proposal.supplierName : ''}" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter supplier name">
+                        <div class="space-y-2 supplier-column hidden">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Supplier:</label>
+                            <input list="supplierList" id="supplierName" name="supplierName" value="${proposal.supplierName != null ? proposal.supplierName : ''}" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter supplier name">
                         <datalist id="supplierList">
                             <c:forEach var="supplier" items="${suppliers}">
                                 <option value="${supplier.supplierName}" data-id="${supplier.supplierId}">${supplier.supplierName}</option>
@@ -112,7 +112,7 @@
                                             <th class="p-2 text-left w-[7%]">Unit</th> 
                                             <th class="p-2 text-left w-[10%]">Quantity</th>
                                             <th class="p-2 text-left w-[9%]">Condition</th> 
-                                            <th class="p-2 text-left w-[12%] price-column">Price(VNĐ)</th>
+                                            <th class="p-2 text-left w-[12%] price-column hidden">Price(VNĐ)</th>
                                             <th class="p-2 text-left w-[5%]">Action</th>
                                         </tr>
                                     </thead>
@@ -127,7 +127,6 @@
                                                             <option 
                                                                 value="${cat.name}" 
                                                                 data-id="${cat.materialId}" 
-                                                                data-parent="${cat.category.categoryId}" 
                                                                 data-unit="${cat.unit}">
                                                                 ${cat.name}
                                                             </option>
@@ -210,198 +209,122 @@
             </div>
         </main>
         <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const proposalTypeSelect = document.getElementById('proposalType');
+                const supplierSection = document.querySelector('.supplier-column');
+                const siteSection = document.querySelector('.constructionSite-column');
+                const priceColumns = document.querySelectorAll('.price-column');
+
+                const supplierInput = document.getElementById('supplierName');
+                const siteInput = document.getElementById('siteName');
+                const supplierHidden = document.getElementById('supplierIdHidden');
+                const siteHidden = document.getElementById('siteIdHidden');
+
+                function updateVisibility() {
+                    const type = proposalTypeSelect.value;
+
+                    const isImport = type === 'import_from_supplier';
+                    const isImportReturned = type === 'import_returned';
+                    const isExport = type === 'export';
+
+                    // Supplier field
+                    supplierSection.classList.toggle('hidden', !isImport);
+                    supplierInput.required = isImport;
+
+                    // Site field
+                    siteSection.classList.toggle('hidden', !isImportReturned && !isExport);
+                    siteInput.required = isImportReturned || isExport;
+
+                    // Price column
+                    priceColumns.forEach(col => {
+                        col.classList.toggle('hidden', !isImport);
+                        const input = col.querySelector('input');
+                        if (input) {
+                            input.required = isImport;
+                            if (!isImport)
+                                input.value = ''; // reset if hidden
+                        }
+                    });
+                }
+
+                // Initial visibility
+                updateVisibility();
+                proposalTypeSelect.addEventListener('change', updateVisibility);
+
+                // Set hidden supplierId
+                supplierInput.addEventListener('input', () => {
+                    const value = supplierInput.value.trim();
+                    const options = document.querySelectorAll('#supplierList option');
+                    let matched = [...options].find(opt => opt.value === value);
+                    supplierHidden.value = matched ? matched.dataset.id : '';
+                });
+
+                // Set hidden siteId
+                siteInput.addEventListener('input', () => {
+                    const value = siteInput.value.trim();
+                    const options = document.querySelectorAll('#siteList option');
+                    let matched = [...options].find(opt => opt.value === value);
+                    siteHidden.value = matched ? matched.dataset.id : '';
+                });
+
+                // Handle materialId + unit when selecting material
+                document.getElementById('itemsBody').addEventListener('input', function (e) {
+                    if (e.target.matches('input[name="materialName[]"]')) {
+                        const row = e.target.closest('tr');
+                        const value = e.target.value.trim();
+                        const options = document.querySelectorAll('#materialList option');
+                        const matched = [...options].find(opt => opt.value === value);
+
+                        const materialIdInput = row.querySelector('.materialIdHidden');
+                        const unitInput = row.querySelector('.unitMaterial');
+
+                        if (matched) {
+                            materialIdInput.value = matched.dataset.id || '';
+                            unitInput.value = matched.dataset.unit || '';
+                        } else {
+                            materialIdInput.value = '';
+                            unitInput.value = '';
+                        }
+                    }
+                });
+            });
+
             function addRow() {
-                const tbody = document.getElementById('itemsBody');
-                const newRow = tbody.rows[0].cloneNode(true);
-                newRow.querySelectorAll('input').forEach(input => input.value = '');
-                newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
-                tbody.appendChild(newRow);
-                document.getElementById('itemCount').value = tbody.rows.length;
-                toggleMaterialConditionOptions(document.getElementById('proposalType').value);
-            }
-            toggleMaterialConditionOptions(document.getElementById('proposalType').value);
-            toggleFieldRequiredByType(document.getElementById('proposalType').value);
+                const tableBody = document.getElementById('itemsBody');
+                const firstRow = tableBody.querySelector('tr');
+                const newRow = firstRow.cloneNode(true);
 
-            function removeRow(btn) {
-                const tbody = document.getElementById('itemsBody');
-                if (tbody.rows.length > 1) {
-                    btn.closest('tr').remove();
-                    document.getElementById('itemCount').value = tbody.rows.length;
-                }
-            }
-            document.addEventListener('input', function (e) {
-                if (e.target.classList.contains('nameMaterialInput')) {
-                    const input = e.target;
-                    const value = input.value.trim();
-                    const row = input.closest('tr');
-                    const hiddenInput = row.querySelector('.materialIdHidden');
-                    const unitInput = row.querySelector('.unitMaterial');
-                    const datalist = document.getElementById('materialList');
-                    const options = datalist.options;
-
-                    let foundId = '';
-                    let foundUnit = '';
-
-                    for (let i = 0; i < options.length; i++) {
-                        if (options[i].value === value) {
-                            foundId = options[i].getAttribute('data-id');
-                            foundUnit = options[i].getAttribute('data-unit');
+                // Reset all input/select fields in the new row
+                newRow.querySelectorAll('input, select').forEach(input => {
+                    switch (input.name) {
+                        case 'unit[]':
+                        case 'materialId[]':
+                        case 'materialName[]':
+                        case 'quantity[]':
+                        case 'pricePerUnit[]':
+                            input.value = '';
                             break;
-                        }
-                    }
-
-                    hiddenInput.value = foundId;
-                    unitInput.value = foundUnit;
-                }
-                if (e.target.name === 'siteName[]') {
-                    const input = e.target;
-                    const value = input.value.trim();
-                    const row = input.closest('tr');
-                    const hiddenInput = row.querySelector('.siteIdHidden');
-                    const datalist = document.getElementById('siteList');
-                    const options = datalist.options;
-
-                    let foundId = '';
-
-                    for (let i = 0; i < options.length; i++) {
-                        if (options[i].value === value) {
-                            foundId = options[i].getAttribute('data-id');
+                        case 'materialCondition[]':
+                            input.value = 'new';
                             break;
-                        }
-                    }
-
-                    if (hiddenInput)
-                        hiddenInput.value = foundId;
-                }
-
-                if (e.target.name === 'supplierName[]') {
-                    const input = e.target;
-                    const value = input.value.trim();
-                    const row = input.closest('tr');
-                    const hiddenInput = row.querySelector('.supplierIdHidden');
-                    const datalist = document.getElementById('supplierList');
-
-                    const options = datalist.options;
-                    let foundId = '';
-
-                    for (let i = 0; i < options.length; i++) {
-                        if (options[i].value === value) {
-                            foundId = options[i].getAttribute('data-id');
-                            break;
-                        }
-                    }
-
-                    hiddenInput.value = foundId;
-                }
-
-            });
-
-
-            function toggleTableColumns(proposalType) {
-                const supplierCols = document.querySelectorAll('.supplier-column');
-                const priceCols = document.querySelectorAll('.price-column');
-                const constructionSiteCols = document.querySelectorAll('.constructionSite-column');
-
-                // Ẩn hết các cột trước
-                [...supplierCols, ...priceCols, ...constructionSiteCols].forEach(col => col.classList.add('hidden'));
-
-                // Hiển thị theo loại phiếu
-                if (proposalType === 'import_from_supplier') {
-                    supplierCols.forEach(col => col.classList.remove('hidden'));
-                    priceCols.forEach(col => col.classList.remove('hidden'));
-                } else if (proposalType === 'import_returned') {
-                    constructionSiteCols.forEach(col => col.classList.remove('hidden')); // công trình thu hồi
-                } else if (proposalType === 'export') {
-                    constructionSiteCols.forEach(col => col.classList.remove('hidden')); // công trình nhận
-                }
-            }
-
-// Kích hoạt khi thay đổi loại đề xuất
-            document.getElementById('proposalType').addEventListener('change', function () {
-                toggleTableColumns(this.value);
-                toggleMaterialConditionOptions(this.value); // THÊM
-                toggleFieldRequiredByType(this.value);
-            });
-
-
-// Gọi một lần ban đầu nếu cần
-            toggleTableColumns(document.getElementById('proposalType').value);
-
-            function toggleMaterialConditionOptions(proposalType) {
-                const allSelects = document.querySelectorAll('.conditionSelect');
-
-                allSelects.forEach(select => {
-                    const damagedOption = select.querySelector('option[value="damaged"]');
-                    if (!damagedOption)
-                        return;
-
-                    if (proposalType === 'import_from_supplier' || proposalType === 'export') {
-                        damagedOption.disabled = true;
-                        // Nếu đang chọn "damaged" thì reset về "new"
-                        if (select.value === 'damaged') {
-                            select.value = 'new';
-                        }
-                    } else {
-                        damagedOption.disabled = false;
                     }
                 });
+
+                tableBody.appendChild(newRow);
+
+                // Cập nhật số lượng dòng
+                document.getElementById('itemCount').value = tableBody.querySelectorAll('tr').length;
             }
-            function toggleFieldRequiredByType(proposalType) {
-                const rows = document.querySelectorAll('#itemsBody tr');
 
-                rows.forEach(row => {
-                    const supplierInput = row.querySelector('input[name="supplierName[]"]');
-                    const priceInput = row.querySelector('input[name="pricePerUnit[]"]');
-                    const siteInput = row.querySelector('input[name="siteName[]"]');
-
-                    // Reset all
-                    if (supplierInput)
-                        supplierInput.required = false;
-                    if (priceInput)
-                        priceInput.required = false;
-                    if (siteInput)
-                        siteInput.required = false;
-
-                    if (proposalType === 'import_from_supplier') {
-                        if (supplierInput)
-                            supplierInput.required = true;
-                        if (priceInput)
-                            priceInput.required = true;
-                    } else if (proposalType === 'import_returned' || proposalType === 'export') {
-                        if (siteInput)
-                            siteInput.required = true;
-                    }
-                });
+            function removeRow(button) {
+                const tableBody = document.getElementById('itemsBody');
+                if (tableBody.rows.length > 1) {
+                    button.closest('tr').remove();
+                }
+                document.getElementById('itemCount').value = tableBody.querySelectorAll('tr').length;
             }
         </script>
-        <!-- JavaScript xử lý kiểm tra -->
-        <script>
-            // Gán supplierId từ supplierName
-            document.getElementById('supplierName')?.addEventListener('input', function () {
-                const selectedName = this.value.trim();
-                const options = document.querySelectorAll('#supplierList option');
-                let foundId = '';
-                options.forEach(opt => {
-                    if (opt.value === selectedName) {
-                        foundId = opt.getAttribute('data-id');
-                    }
-                });
-                document.getElementById('supplierIdHidden').value = foundId;
-            });
 
-            // Gán siteId từ siteName
-            document.getElementById('siteName')?.addEventListener('input', function () {
-                const selectedName = this.value.trim();
-                const options = document.querySelectorAll('#siteList option');
-                let foundId = '';
-                options.forEach(opt => {
-                    if (opt.value === selectedName) {
-                        foundId = opt.getAttribute('data-id');
-                    }
-                });
-                document.getElementById('siteIdHidden').value = foundId;
-            });
-        </script>
 
         <!--JavaScript -->
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
