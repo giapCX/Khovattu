@@ -139,7 +139,7 @@ public class EditMaterialController extends HttpServlet {
                 request.setAttribute("message", "Please select a material image!");
                 request.setAttribute("messageType", "error");
                 
-                request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
+                request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
                 return;
             }
 
@@ -150,7 +150,7 @@ public class EditMaterialController extends HttpServlet {
                     request.setAttribute("message", "Please select a valid image file!");
                     request.setAttribute("messageType", "error");
                     
-                    request.getRequestDispatcher("/view/material/addMaterial.jsp").forward(request, response);
+                    request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
                     return;
                 }
 
@@ -181,7 +181,7 @@ public class EditMaterialController extends HttpServlet {
                     Path target = new File(sourceUploadDir, fileName).toPath();
                     Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                 } catch (Exception e) {
-                    Logger.getLogger(AddMaterialController.class.getName()).log(Level.WARNING, "Could not copy to source directory", e);
+                    Logger.getLogger(EditMaterialController.class.getName()).log(Level.WARNING, "Could not copy to source directory", e);
                 }
 
                 imageUrl = "uploads/" + fileName;
