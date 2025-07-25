@@ -1,5 +1,3 @@
-
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -96,7 +94,7 @@
                 display: block;
             }
 
-            .form-control, .form-select {
+            .form-control, .form-select, .form-file {
                 display: block;
                 width: 100%;
                 padding: 0.75rem 1rem;
@@ -109,7 +107,7 @@
                 transition: border-color 0.3s ease, box-shadow 0.3s ease;
             }
 
-            .form-control:focus, .form-select:focus {
+            .form-control:focus, .form-select:focus, .form-file:focus {
                 outline: none;
                 border-color: var(--primary-color);
                 box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
@@ -126,44 +124,6 @@
             textarea.form-control {
                 resize: vertical;
                 min-height: 100px;
-            }
-
-            /* Suppliers container */
-            .suppliers-container {
-                border: 1px solid var(--gray-300);
-                border-radius: var(--border-radius);
-                padding: 1rem;
-                max-height: 200px;
-                overflow-y: auto;
-                background-color: var(--light-color);
-            }
-
-            .supplier-item {
-                margin-bottom: 0.5rem;
-                padding: 0.5rem;
-                border-radius: 4px;
-                transition: background-color 0.2s;
-            }
-
-            .supplier-item:hover {
-                background-color: var(--gray-200);
-            }
-
-            .form-check {
-                display: flex;
-                align-items: center;
-                margin-bottom: 0.5rem;
-            }
-
-            .form-check-input {
-                width: 1.25rem;
-                height: 1.25rem;
-                margin-right: 0.5rem;
-                cursor: pointer;
-            }
-
-            .form-check-label {
-                cursor: pointer;
             }
 
             /* Buttons */
@@ -343,7 +303,6 @@
                             <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                                 <i class="fas fa-bars text-2xl"></i>
                             </button>
-                            <!--                            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Material</h2>-->
                         </div>
                         <div class="form-container">
                             <c:if test="${not empty message}">
@@ -357,11 +316,9 @@
                                 <i class="fas fa-edit me-2"></i>Edit Material
                             </h2>
 
-                            <form id="editMaterialForm" action="${pageContext.request.contextPath}/EditMaterialController" method="post">
+                            <form id="editMaterialForm" action="${pageContext.request.contextPath}/EditMaterialController" method="post" enctype="multipart/form-data">
                                 <input type="hidden" name="id" value="${material.materialId}" />
                                 <input type="hidden" name="origin" value="${origin}" />
-<!--                                <input type="hidden" name="supplierId" value="${supplierId}" />
-                                <input type="hidden" name="supplierName" value="${supplierName}" />-->
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="code" class="form-label">Material Code</label>
@@ -375,7 +332,7 @@
 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="category" class="form-label">Child Category</label>
+                                        <label for="category" class="form-label">Sub Category</label>
                                         <select class="form-select" id="category" name="category" required>
                                             <option value="">Select Category</option>
                                             <c:forEach var="cat" items="${categories}">
@@ -395,11 +352,15 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="imageUrl" class="form-label">Image URL</label>
-                                    <input type="url" class="form-control" id="imageUrl" name="imageUrl" value="${material.imageUrl}" placeholder="https://example.com/image.jpg">
+                                    <label for="imageFile" class="form-label">Image File</label>
+                                    <input type="file" class="form-file" id="imageFile" name="imageFile" accept="image/*">
+                                    <c:if test="${not empty material.imageUrl}">
+                                        <div class="mt-2">
+                                            <img src="${pageContext.request.contextPath}/${material.imageUrl}" alt="Current Material Image" style="max-width: 200px; max-height: 200px;" />
+                                            <p>Current Image</p>
+                                        </div>
+                                    </c:if>
                                 </div>
-
-
 
                                 <div class="d-flex justify-content-between">
                                     <div>
@@ -433,7 +394,6 @@
         </main>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
-            // Bootstrap-compatible alert dismissal (without Bootstrap JS dependency)
             document.querySelectorAll('.btn-close').forEach(button => {
                 button.addEventListener('click', () => {
                     const alert = button.closest('.alert');
@@ -445,7 +405,6 @@
             });
 
             $(document).ready(function () {
-                // Auto-dismiss alerts after 5 seconds
                 setTimeout(function () {
                     document.querySelectorAll('.alert').forEach(alert => {
                         alert.style.opacity = '0';
@@ -453,24 +412,16 @@
                     });
                 }, 5000);
 
-                // Preview image when URL changes
-                $('#imageUrl').on('change', function () {
-                    const url = $(this).val();
-                    if (url) {
-                        console.log('Image URL changed:', url);
+                $('#imageFile').on('change', function () {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            console.log('Image file selected:', e.target.result);
+                        };
+                        reader.readAsDataURL(file);
                     }
                 });
-
-//                // Validate at least one supplier is selected
-//                $('#editMaterialForm').on('submit', function (e) {
-//                    const checkedSuppliers = $('.supplier-checkbox:checked').length;
-//                    if (checkedSuppliers === 0) {
-//                        e.preventDefault();
-//                        $('#supplierError').show();
-//                    } else {
-//                        $('#supplierError').hide();
-//                    }
-//                });
             });
         </script>
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>

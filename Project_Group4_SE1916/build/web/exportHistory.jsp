@@ -260,7 +260,7 @@
                 <table class="table-container">
                     <tr>
                         <th>No.</th>
-                        <th>Code</th>
+<!--                        <th>Code</th>-->
                         <th>Date</th>
                         <th>Exporter</th>
                         <th>Receiver</th>
@@ -273,7 +273,7 @@
                             <c:forEach items="${historyData}" var="item" varStatus="loop">
                                 <tr>
                                     <td>${(currentPage - 1) * 10 + loop.index + 1}</td>
-                                    <td>${fn:escapeXml(item.receiptId)}</td>
+<!--                                    <td>${fn:escapeXml(item.receiptId)}</td>-->
                                     <td>${fn:escapeXml(item.exportDate)}</td>
                                     <td>${fn:escapeXml(item.exporterName)}</td>
                                     <td>${fn:escapeXml(item.receiverName)}</td>

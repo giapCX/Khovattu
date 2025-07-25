@@ -136,7 +136,7 @@
                                                 <td class="p-4 font-medium">
                                                     <c:choose>
                                                         <c:when test="${item.finalStatus == 'approved_but_not_executed' && item.proposalType == 'export'}">
-                                                            <a href="ExportServlet?proposalId=${item.proposalId}" class="text-primary-600 dark:text-primary-400 hover:underline">
+                                                            <a href="exportMaterial?proposalId=${item.proposalId}" class="text-primary-600 dark:text-primary-400 hover:underline">
                                                                 Execute
                                                             </a>
                                                         </c:when>

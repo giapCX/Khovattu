@@ -1,11 +1,11 @@
 <%@page import="dao.DashboardDirectorDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tổng quan Giám đốc - Hệ thống Quản lý Vật tư</title>
+        <title>Director Dashboard - Materials Management System</title>
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
@@ -261,7 +261,7 @@
                 <a href="${pageContext.request.contextPath}/userprofile" class="nav-item flex items-center p-2 justify-between">
                     <div class="flex items-center">
                         <i class="fas fa-user mr-2 w-5 text-center"></i>
-                        <span class="text-base">My Information</span>
+                        <span class="text-base">My Profile</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
@@ -279,7 +279,7 @@
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <!-- Supplier - Menu cha -->
+                <!-- Supplier - Parent Menu -->
                 <div class="nav-item flex flex-col">
                     <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
                         <div class="flex items-center">
@@ -288,8 +288,7 @@
                         </div>
                         <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
                     </button>
-
-                    <!-- Menu con - ẩn mặc định -->
+                    <!-- Submenu - hidden by default -->
                     <div class="submenu hidden pl-6 space-y-1 mt-1">
                         <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
                             <i class="fas fa-list mr-2 w-4 text-center"></i>
@@ -297,7 +296,7 @@
                         </a>
                         <a href="${pageContext.request.contextPath}/AddSupplierServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
                             <i class="fas fa-circle-plus mr-2 w-4 text-center"></i>
-                            <span class="text-sm">Create New Supplier </span>
+                            <span class="text-sm">Add New Supplier</span>
                         </a>
                     </div>
                 </div>
@@ -305,44 +304,43 @@
                     <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
                         <div class="flex items-center">
                             <i class="fas fa-building mr-2 w-5 text-center"></i>
-                            <span class="text-base">Construction Site</span>
+                            <span class="text-base">Construction Sites</span>
                         </div>
                         <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
                     </button>
-                    <!-- Menu con - ẩn mặc định -->
+                    <!-- Submenu - hidden by default -->
                     <div class="submenu hidden pl-6 space-y-1 mt-1">
                         <a href="${pageContext.request.contextPath}/ListConstructionSites" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
                             <i class="fas fa-list mr-2 w-4 text-center"></i>
-                            <span class="text-sm">List Construction Site</span>
+                            <span class="text-sm">Construction Sites List</span>
                         </a>
                         <a href="${pageContext.request.contextPath}/EditConstructionSiteServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
                             <i class="fas fa-circle-plus mr-2 w-4 text-center"></i>
-                            <span class="text-sm">Create New Site </span>
+                            <span class="text-sm">Add New Site</span>
                         </a>
                     </div>
                 </div>
-
                 <a href="${pageContext.request.contextPath}/DirectorProposalsServlet" class="nav-item active flex items-center p-3">
                     <i class="fas fa-clipboard-list mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Phê duyệt yêu cầu</span>
+                    <span class="text-lg">Approve Requests</span>
                     <span class="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full">3</span>
                 </a>
                 <a href="${pageContext.request.contextPath}/listuser" class="nav-item flex items-center p-3">
                     <i class="fas fa-users mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Danh sách nhân viên</span>
+                    <span class="text-lg">Employee List</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
                 <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between">
                     <div class="flex items-center">
                         <i class="fas fa-history mr-2 w-5 text-center"></i>
-                        <span class="text-base">Lịch sử xuất kho</span>
+                        <span class="text-base">Export History</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
                 <a href="${pageContext.request.contextPath}/importhistory" class="nav-item flex items-center p-2 justify-between">
                     <div class="flex items-center">
                         <i class="fas fa-history mr-2 w-5 text-center"></i>
-                        <span class="text-base">Lịch sử nhập kho</span>
+                        <span class="text-base">Import History</span>
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>    
@@ -350,7 +348,7 @@
             <div class="absolute bottom-0 left-0 right-0 p-6 bg-white bg-opacity-10">
                 <a href="${pageContext.request.contextPath}/forgetPassword/changePassword.jsp" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
                     <i class="fas fa-key mr-3"></i>
-                    <span class="text-lg">Change password</span>
+                    <span class="text-lg">Change Password</span>
                 </a>
                 <a href="${pageContext.request.contextPath}/logout" class="flex items-center p-3 rounded-lg hover:bg-white hover:bg-opacity-20">
                     <i class="fas fa-sign-out-alt mr-3"></i>
@@ -378,8 +376,8 @@
                         <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
                     </div>
                     <div class="flex items-center">
-                        <img src="https://ui-avatars.com/api/?name=Giám đốc&background=3b82f6&color=fff" 
-                             alt="Giám đốc" class="w-10 h-10 rounded-full mr-3">
+                        <img src="https://ui-avatars.com/api/?name=Director&background=3b82f6&color=fff" 
+                             alt="Director" class="w-10 h-10 rounded-full mr-3">
                         <span class="font-medium text-gray-700 dark:text-white text-lg"><%= username%></span>
                     </div>
                     <button id="toggleDarkMode" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
@@ -393,202 +391,172 @@
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tổng vật tư</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Materials</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= totalMaterials%></h3>
-
                         </div>
                         <div class="p-4 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300">
                             <i class="fas fa-boxes text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/ListMaterialController" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem báo cáo</a>
+                        <a href="${pageContext.request.contextPath}/ListMaterialController" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View Report</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-100">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Danh sách nhân viên</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Employee List</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= emp%></h3>
-                            <!--                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Đang chờ xử lý</p>-->
                         </div>
                         <div class="p-4 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300">
                             <i class="fas fa-users text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/listuser" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                        <a href="${pageContext.request.contextPath}/listuser" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View All</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-200">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Nhà cung cấp</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Suppliers</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= supplier%></h3>
-                            <!--                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">500M VND</h3>
-                                                        <p class="text-sm text-blue-500 mt-3"><i class="fas fa-dollar-sign mr-1"></i>Mua & Sửa chữa</p>-->
                         </div>
                         <div class="p-4 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
                             <i class="fas fa-building text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
+                        <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View Details</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tồn kho thấp </p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Low Inventory</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= lowInventory%></h3>
-                            <p class="text-sm text-red-500 mt-3"><i class="fas fa-exclamation-circle mr-1"></i>Cần bổ sung</p>
+                            <p class="text-sm text-red-500 mt-3"><i class="fas fa-exclamation-circle mr-1"></i>Needs Replenishment</p>
                         </div>
-                        <div class="p-4 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-red-300">
+                        <div class="p-4 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300">
                             <i class="fas fa-exclamation text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/inventory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
+                        <a href="${pageContext.request.contextPath}/inventory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View Details</a>
                     </div>
                 </div>
-
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Danh sách công trình</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Construction Sites</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= conSite%></h3>
-                            <p class="text-sm text-green-500 mt-3"><i class="fas  mr-1"></i>Đang hoạt động</p>
+                            <p class="text-sm text-green-500 mt-3"><i class="fas mr-1"></i>Active</p>
                         </div>
-                        <div class="p-4 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-red-red-300">
+                        <div class="p-4 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300">
                             <i class="fas fa-building text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/ListConstructionSites" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
+                        <a href="${pageContext.request.contextPath}/ListConstructionSites" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View Details</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
                     <div class="p-6 flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Yêu cầu chờ duyệt</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Requests</p>
                             <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= proPend %></h3>
-                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Đang chờ xử lý</p>
+                            <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Pending Approval</p>
                         </div>
                         <div class="p-4 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300">
                             <i class="fas fa-clipboard-list text-2xl"></i>
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/proposals" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                        <a href="${pageContext.request.contextPath}/proposals" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View All</a>
                     </div>
                 </div>
-<!--                <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
-                    <div class="p-6 flex items-start justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Lịch sử xuất kho</p>
-
-                        </div>
-                        <div class="p-4 rounded-full bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-red-red-300">
-                            <i class="fas fa-history text-2xl"></i>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/exportHistory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
-                    </div>
-                </div>
-                <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
-                    <div class="p-6 flex items-start justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Lịch sử nhập kho</p>
-
-                        </div>
-                        <div class="p-4 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-red-red-300">
-                            <i class="fas fa-history text-2xl"></i>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/importhistory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">Xem chi tiết</a>
-                    </div>
-                </div>-->
             </div>
-            <!--             Charts Row 
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                            <div class="lg:col-span-2 card bg-white dark:bg-gray-800 p-6">
-                                <div class="flex justify-between items-center mb-4">
-                                    <div>
-                                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Xu hướng Xuất - Nhập - Tồn</h2>
-                                        <p class="text-sm text-gray-600 dark:text-gray-300">Theo dõi nhập/xuất kho theo thời gian</p>
-                                    </div>
-                                    <div class="flex space-x-2">
-                                        <button class="chart-filter px-4 py-2 text-sm bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 rounded-full active">Tuần</button>
-                                        <button class="chart-filter px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Tháng</button>
-                                        <button class="chart-filter px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Năm</button>
-                                    </div>
-                                </div>
-                                <canvas id="inventoryChart" class="border rounded-lg"></canvas>
-                                <button onclick="exportToExcel('inventoryChart')" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Xuất Excel</button>
-                            </div>
-                            <div class="card bg-white dark:bg-gray-800 p-6">
-                                <div class="mb-4">
-                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Phân bố chi phí</h2>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300">Chi phí mua và sửa chữa vật tư</p>
-                                </div>
-                                <canvas id="costChart" class="border rounded-lg"></canvas>
-                                <button onclick="exportToExcel('costChart')" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Xuất Excel</button>
-                            </div>
-                        </div>-->
+            <!-- Charts Row -->
+            <!--
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <div class="lg:col-span-2 card bg-white dark:bg-gray-800 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Inventory Trends</h2>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">Track import/export over time</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="chart-filter px-4 py-2 text-sm bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 rounded-full active">Week</button>
+                            <button class="chart-filter px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Month</button>
+                            <button class="chart-filter px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Year</button>
+                        </div>
+                    </div>
+                    <canvas id="inventoryChart" class="border rounded-lg"></canvas>
+                    <button onclick="exportToExcel('inventoryChart')" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Export to Excel</button>
+                </div>
+                <div class="card bg-white dark:bg-gray-800 p-6">
+                    <div class="mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Cost Distribution</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Cost of purchasing and repairing materials</p>
+                    </div>
+                    <canvas id="costChart" class="border rounded-lg"></canvas>
+                    <button onclick="exportToExcel('costChart')" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Export to Excel</button>
+                </div>
+            </div>
+            -->
 
             <!-- Request Management Table -->
-<!--            <div class="table-container bg-white dark:bg-gray-800 mb-8">
+            <!--
+            <div class="table-container bg-white dark:bg-gray-800 mb-8">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Yêu cầu chờ duyệt</h2>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">Danh sách yêu cầu xuất/mua/sửa vật tư</p>
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Pending Requests</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">List of export/purchase/repair requests</p>
                     </div>
-                    <a href="${pageContext.request.contextPath}/proposals" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                    <a href="${pageContext.request.contextPath}/proposals" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">View All</a>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full table-auto">
                         <thead>
                             <tr class="bg-primary-600 text-white">
-                                <th class="p-4 text-left">Thời gian</th>
-                                <th class="p-4 text-left">Loại yêu cầu</th>
-                                <th class="p-4 text-left">Người yêu cầu</th>
-                                <th class="p-4 text-left">Nội dung</th>
-                                <th class="p-4 text-left">Hành động</th>
+                                <th class="p-4 text-left">Time</th>
+                                <th class="p-4 text-left">Request Type</th>
+                                <th class="p-4 text-left">Requester</th>
+                                <th class="p-4 text-left">Details</th>
+                                <th class="p-4 text-left">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                 <td class="p-4">10:30 23/05/2025</td>
-                                <td class="p-4">Yêu cầu xuất kho</td>
-                                <td class="p-4">Nguyễn Văn A</td>
-                                <td class="p-4">10 bàn gỗ cao cấp</td>
+                                <td class="p-4">Export Request</td>
+                                <td class="p-4">John Doe</td>
+                                <td class="p-4">10 high-quality wooden tables</td>
                                 <td class="p-4">
-                                    <button onclick="approveRequest(1)" class="btn-primary text-white px-3 py-1 rounded">Phê duyệt</button>
-                                    <button onclick="rejectRequest(1)" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Từ chối</button>
+                                    <button onclick="approveRequest(1)" class="btn-primary text-white px-3 py-1 rounded">Approve</button>
+                                    <button onclick="rejectRequest(1)" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Reject</button>
                                 </td>
                             </tr>
                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                 <td class="p-4">09:15 23/05/2025</td>
-                                <td class="p-4">Đề nghị mua vật tư</td>
-                                <td class="p-4">Phòng IT</td>
-                                <td class="p-4">5 màn hình LCD 24"</td>
+                                <td class="p-4">Purchase Request</td>
+                                <td class="p-4">IT Department</td>
+                                <td class="p-4">5 LCD monitors 24"</td>
                                 <td class="p-4">
-                                    <button onclick="approveRequest(2)" class="btn-primary text-white px-3 py-1 rounded">Phê duyệt</button>
-                                    <button onclick="rejectRequest(2)" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Từ chối</button>
+                                    <button onclick="approveRequest(2)" class="btn-primary text-white px-3 py-1 rounded">Approve</button>
+                                    <button onclick="rejectRequest(2)" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Reject</button>
                                 </td>
                             </tr>
                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                 <td class="p-4">08:45 23/05/2025</td>
-                                <td class="p-4">Đề nghị sửa chữa</td>
-                                <td class="p-4">Nguyễn Thị B</td>
-                                <td class="p-4">3 bàn phím cơ hỏng</td>
+                                <td class="p-4">Repair Request</td>
+                                <td class="p-4">Jane Smith</td>
+                                <td class="p-4">3 broken mechanical keyboards</td>
                                 <td class="p-4">
-                                    <button onclick="approveRequest(3)" class="btn-primary text-white px-3 py-1 rounded">Phê duyệt</button>
-                                    <button onclick="rejectRequest(3)" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Từ chối</button>
+                                    <button onclick="approveRequest(3)" class="btn-primary text-white px-3 py-1 rounded">Approve</button>
+                                    <button onclick="rejectRequest(3)" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Reject</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -596,50 +564,52 @@
                 </div>
             </div>
 
-             Request History Table 
+            <!-- Request History Table -->
+            <!--
             <div class="table-container bg-white dark:bg-gray-800">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Lịch sử yêu cầu</h2>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">Lịch sử yêu cầu xuất/mua/sửa vật tư</p>
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Request History</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">History of export/purchase/repair requests</p>
                     </div>
-                    <a href="${pageContext.request.contextPath}/proposals" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                    <a href="${pageContext.request.contextPath}/proposals" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">View All</a>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full table-auto">
                         <thead>
                             <tr class="bg-primary-600 text-white">
-                                <th class="p-4 text-left">Thời gian</th>
-                                <th class="p-4 text-left">Loại yêu cầu</th>
-                                <th class="p-4 text-left">Phòng ban</th>
-                                <th class="p-4 text-left">Nội dung</th>
-                                <th class="p-4 text-left">Trạng thái</th>
+                                <th class="p-4 text-left">Time</th>
+                                <th class="p-4 text-left">Request Type</th>
+                                <th class="p-4 text-left">Department</th>
+                                <th class="p-4 text-left">Details</th>
+                                <th class="p-4 text-left">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                 <td class="p-4">15:20 22/05/2025</td>
-                                <td class="p-4">Yêu cầu xuất kho</td>
-                                <td class="p-4">Phòng Kỹ thuật</td>
-                                <td class="p-4">20 ghế xoay</td>
-                                <td class="p-4"><span class="badge badge-success">Đã phê duyệt</span></td>
+                                <td class="p-4">Export Request</td>
+                                <td class="p-4">Technical Department</td>
+                                <td class="p-4">20 swivel chairs</td>
+                                <td class="p-4"><span class="badge badge-success">Approved</span></td>
                             </tr>
                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                 <td class="p-4">14:00 22/05/2025</td>
-                                <td class="p-4">Đề nghị mua vật tư</td>
-                                <td class="p-4">Phòng Hành chính</td>
-                                <td class="p-4">10 bàn họp</td>
-                                <td class="p-4"><span class="badge badge-danger">Bị từ chối</span></td>
+                                <td class="p-4">Purchase Request</td>
+                                <td class="p-4">Administrative Department</td>
+                                <td class="p-4">10 meeting tables</td>
+                                <td class="p-4"><span class="badge badge-danger">Rejected</span></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-            </div>-->
+            </div>
+            -->
         </main>
 
         <!-- Footer -->
         <footer class="bg-gray-100 dark:bg-gray-800 text-center p-6 mt-8 border-t border-gray-200 dark:border-gray-700 transition-all duration-300">
-            <p class="text-gray-600 dark:text-gray-300 text-sm">Hệ thống Quản lý Vật tư - Phiên bản 2.0 © 2025 | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Liên hệ hỗ trợ</a></p>
+            <p class="text-gray-600 dark:text-gray-300 text-sm">Materials Management System - Version 2.0 © 2025 | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Contact Support</a></p>
         </footer>
 
         <!-- JavaScript -->
@@ -703,21 +673,21 @@
 
             // Approve/Reject Request
             function approveRequest(id) {
-                showToast(`Yêu cầu #${id} đã được phê duyệt`, "#10b981");
+                showToast(`Request #${id} has been approved`, "#10b981");
                 // Backend API call to update request status
             }
 
             function rejectRequest(id) {
-                const reason = prompt('Lý do từ chối:');
+                const reason = prompt('Reason for rejection:');
                 if (reason) {
-                    showToast(`Yêu cầu #${id} đã bị từ chối: ${reason}`, "#ef4444");
+                    showToast(`Request #${id} has been rejected: ${reason}`, "#ef4444");
                     // Backend API call to update request status
                 }
             }
 
             // Export to Excel
             function exportToExcel(chartId) {
-                showToast(`Đang xuất báo cáo ra Excel...`);
+                showToast(`Exporting report to Excel...`);
                 // Backend call to generate Excel file
             }
 
@@ -726,10 +696,10 @@
             const inventoryChart = new Chart(inventoryCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'],
+                    labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
                     datasets: [
                         {
-                            label: 'Tồn kho',
+                            label: 'Inventory',
                             data: [1200, 1150, 1100, 1050, 1000, 950, 900],
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -738,7 +708,7 @@
                             fill: true
                         },
                         {
-                            label: 'Nhập kho',
+                            label: 'Imports',
                             data: [200, 150, 100, 80, 50, 30, 10],
                             borderColor: '#10b981',
                             backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -747,7 +717,7 @@
                             fill: true
                         },
                         {
-                            label: 'Xuất kho',
+                            label: 'Exports',
                             data: [50, 70, 90, 120, 150, 100, 80],
                             borderColor: '#ef4444',
                             backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -775,7 +745,7 @@
             new Chart(costCtx, {
                 type: 'pie',
                 data: {
-                    labels: ['Mua mới', 'Sửa chữa', 'Khác'],
+                    labels: ['Purchase', 'Repair', 'Other'],
                     datasets: [{
                             data: [60, 30, 10],
                             backgroundColor: ['#3b82f6', '#10b981', '#f87171'],
@@ -796,14 +766,14 @@
                     const period = button.textContent;
                     // Update inventory chart data based on period (Week/Month/Year)
                     let newData;
-                    if (period === 'Tuần') {
+                    if (period === 'Week') {
                         newData = {
-                            labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'],
+                            labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
                             datasets: inventoryChart.data.datasets
                         };
-                    } else if (period === 'Tháng') {
+                    } else if (period === 'Month') {
                         newData = {
-                            labels: ['T1', 'T2', 'T3', 'T4'],
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr'],
                             datasets: [
                                 {...inventoryChart.data.datasets[0], data: [1200, 1100, 1000, 900]},
                                 {...inventoryChart.data.datasets[1], data: [200, 150, 100, 50]},
@@ -822,7 +792,7 @@
                     }
                     inventoryChart.data = newData;
                     inventoryChart.update();
-                    showToast(`Đã cập nhật biểu đồ cho ${period}`);
+                    showToast(`Chart updated for ${period}`);
                 });
             });
 
@@ -833,7 +803,7 @@
                     const tbody = table.querySelector('tbody');
                     const rows = Array.from(tbody.querySelectorAll('tr'));
                     const columnIndex = th.cellIndex;
-                    const isNumeric = columnIndex === 0; // Only "Thời gian" is sortable as text for simplicity
+                    const isNumeric = columnIndex === 0; // Only "Time" is sortable as text for simplicity
                     const isAsc = th.classList.toggle('asc');
                     th.classList.toggle('desc', !isAsc);
                     table.querySelectorAll('th').forEach(header => {
