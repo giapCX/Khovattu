@@ -17,7 +17,7 @@
             .autocomplete-container {
                 position: relative;
             }
-            
+
             .autocomplete-dropdown {
                 position: absolute;
                 top: 100%;
@@ -33,31 +33,31 @@
                 display: none;
                 box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             }
-            
+
             .dark .autocomplete-dropdown {
                 background: #374151;
                 border-color: #4b5563;
             }
-            
+
             .autocomplete-item {
                 padding: 0.75rem 1rem;
                 cursor: pointer;
                 transition: background-color 0.2s;
             }
-            
+
             .autocomplete-item:hover {
                 background-color: #f3f4f6;
             }
-            
+
             .dark .autocomplete-item:hover {
                 background-color: #4b5563;
             }
-            
+
             .autocomplete-item.selected {
                 background-color: #3b82f6;
                 color: white;
             }
-            
+
             .image-preview {
                 max-width: 200px;
                 max-height: 200px;
@@ -107,13 +107,20 @@
                     <input type="hidden" name="id" value="${material.materialId}" />
                     <input type="hidden" name="origin" value="${origin}" />
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label for="code" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Material Code</label>
-                            <input type="text" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" id="code" name="code" value="${material.code}" required placeholder="Enter material code">
-                        </div>
+                        <!--                        <div class="space-y-2">
+                                                    <label for="code" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Material Code</label>
+                                                    <input type="text" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" id="code" name="code" value="${material.code}" required placeholder="Enter material code">
+                                                </div>-->
                         <div class="space-y-2">
                             <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Material Name</label>
                             <input type="text" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" id="name" name="name" value="${material.name}" required placeholder="Enter material name">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="unit" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Unit</label>
+                            <div class="autocomplete-container">
+                                <input type="text" id="unit" name="unit" required autocomplete="off" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" value="${material.unit}" placeholder="Enter unit">
+                                <div class="autocomplete-dropdown" id="unitDropdown"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -125,13 +132,7 @@
                                 <div class="autocomplete-dropdown" id="categoryDropdown"></div>
                             </div>
                         </div>
-                        <div class="space-y-2">
-                            <label for="unit" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Unit</label>
-                            <div class="autocomplete-container">
-                                <input type="text" id="unit" name="unit" required autocomplete="off" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white" value="${material.unit}" placeholder="Enter unit">
-                                <div class="autocomplete-dropdown" id="unitDropdown"></div>
-                            </div>
-                        </div>
+
                     </div>
                     <div class="space-y-2">
                         <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
@@ -175,19 +176,19 @@
         <script>
             // Data from server
             const categories = [
-                <c:forEach var="cat" items="${categories}" varStatus="status">
-                    {id: ${cat.categoryId}, name: "${cat.name}"}<c:if test="${!status.last}">,</c:if>
-                </c:forEach>
+            <c:forEach var="cat" items="${categories}" varStatus="status">
+            {id: ${cat.categoryId}, name: "${cat.name}"}<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
             ];
             const units = [
-                <c:forEach var="unit" items="${units}" varStatus="status">
-                    "${unit}"<c:if test="${!status.last}">,</c:if>
-                </c:forEach>
+            <c:forEach var="unit" items="${units}" varStatus="status">
+            "${unit}"<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
             ];
 
-            $(document).ready(function() {
+            $(document).ready(function () {
                 // AJAX form submission
-                $('#editMaterialForm').on('submit', function(e) {
+                $('#editMaterialForm').on('submit', function (e) {
                     e.preventDefault();
                     const formData = new FormData(this);
                     const origin = "${origin}";
@@ -200,14 +201,14 @@
                         data: formData,
                         processData: false,
                         contentType: false,
-                        success: function(response) {
+                        success: function (response) {
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Success',
                                 text: 'Material updated successfully!',
                                 showConfirmButton: false,
                                 timer: 2000,
-                                customClass: { popup: 'animated fadeInDown' }
+                                customClass: {popup: 'animated fadeInDown'}
                             }).then(() => {
                                 // Redirect based on origin
                                 if (origin === 'listMaterialOfSupplier') {
@@ -217,24 +218,24 @@
                                 }
                             });
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
                                 text: 'Failed to update material. Please try again.',
                                 showConfirmButton: true,
-                                customClass: { popup: 'animated fadeInDown' }
+                                customClass: {popup: 'animated fadeInDown'}
                             });
                         }
                     });
                 });
 
                 // Image preview functionality
-                $('#imageFile').change(function() {
+                $('#imageFile').change(function () {
                     const file = this.files[0];
                     if (file) {
                         const reader = new FileReader();
-                        reader.onload = function(e) {
+                        reader.onload = function (e) {
                             $('#imagePreview').attr('src', e.target.result).show();
                         };
                         reader.readAsDataURL(file);
@@ -257,7 +258,7 @@
                         filteredData.forEach((item, index) => {
                             const value = typeof item === 'string' ? item : item[displayField];
                             const div = $('<div class="autocomplete-item">').text(value);
-                            div.click(function() {
+                            div.click(function () {
                                 input.val(value);
                                 if (onSelect) {
                                     onSelect(item);
@@ -270,7 +271,7 @@
                         selectedIndex = -1;
                     }
 
-                    input.on('input', function() {
+                    input.on('input', function () {
                         const value = $(this).val().toLowerCase();
                         if (value.length === 0) {
                             dropdown.hide();
@@ -285,13 +286,13 @@
                         showDropdown(filteredData);
                     });
 
-                    input.on('click', function() {
+                    input.on('click', function () {
                         if ($(this).val().length === 0) {
                             showDropdown(data);
                         }
                     });
 
-                    input.on('keydown', function(e) {
+                    input.on('keydown', function (e) {
                         const items = dropdown.find('.autocomplete-item');
 
                         if (e.key === 'ArrowDown') {
@@ -319,7 +320,7 @@
                     });
 
                     // Hide dropdown when clicking outside
-                    $(document).on('click', function(e) {
+                    $(document).on('click', function (e) {
                         if (!input.is(e.target) && !dropdown.is(e.target) && dropdown.has(e.target).length === 0) {
                             dropdown.hide();
                         }
@@ -329,13 +330,13 @@
                 // Setup autocomplete for units
                 setupAutocomplete('unit', 'unitDropdown', units, null, null, null);
                 // Setup autocomplete for categories
-                setupAutocomplete('category', 'categoryDropdown', categories, 'name', 'id', function(item) {
+                setupAutocomplete('category', 'categoryDropdown', categories, 'name', 'id', function (item) {
                     $('#categoryId').val(item.id);
                 });
 
                 // Reset form functionality
-                $('button[type="reset"]').click(function() {
-                    setTimeout(function() {
+                $('button[type="reset"]').click(function () {
+                    setTimeout(function () {
                         $('#categoryId').val('');
                         $('#imagePreview').hide();
                         $('.autocomplete-dropdown').hide();

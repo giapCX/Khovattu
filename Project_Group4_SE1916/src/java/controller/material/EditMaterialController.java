@@ -70,7 +70,7 @@ public class EditMaterialController extends HttpServlet {
 
         try {
             String materialIdStr = request.getParameter("id");
-            String code = request.getParameter("code");
+            //String code = request.getParameter("code");
             String name = request.getParameter("name");
             String description = request.getParameter("description");
             String unit = request.getParameter("unit");
@@ -86,13 +86,13 @@ public class EditMaterialController extends HttpServlet {
             }
 
             // Validate code
-            if (code == null || code.trim().isEmpty()) {
-                errorMessage.append("Code is required. ");
-            } else if (code.length() > 50) {
-                errorMessage.append("Code must not exceed 50 characters. ");
-            } else if (!Pattern.matches("^[a-zA-Z0-9_.-]+$", code)) {
-                errorMessage.append("Code can only contain letters, numbers, underscores, dots, and hyphens. ");
-            }
+//            if (code == null || code.trim().isEmpty()) {
+//                errorMessage.append("Code is required. ");
+//            } else if (code.length() > 50) {
+//                errorMessage.append("Code must not exceed 50 characters. ");
+//            } else if (!Pattern.matches("^[a-zA-Z0-9_.-]+$", code)) {
+//                errorMessage.append("Code can only contain letters, numbers, underscores, dots, and hyphens. ");
+//            }
 
             // Validate name
             if (name == null || name.trim().isEmpty()) {
@@ -193,7 +193,7 @@ public class EditMaterialController extends HttpServlet {
             if (errorMessage.length() > 0) {
                 request.setAttribute("message", errorMessage.toString());
                 request.setAttribute("messageType", "danger");
-                reloadFormData(request, materialIdStr, code, name, description, unit, imageUrl);
+                reloadFormData(request, materialIdStr, name, description, unit, imageUrl);
                 request.setAttribute("origin", origin);
                 request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
                 return;
@@ -201,7 +201,7 @@ public class EditMaterialController extends HttpServlet {
 
             // Set material properties
             material.setMaterialId(Integer.parseInt(materialIdStr));
-            material.setCode(code.trim());
+            //material.setCode(code.trim());
             material.setName(name.trim());
             material.setDescription(description != null ? description.trim() : "");
             material.setUnit(unit.trim());
@@ -219,7 +219,7 @@ public class EditMaterialController extends HttpServlet {
             request.setAttribute("messageType", "success");
 
             // Reload form data
-            reloadFormData(request, materialIdStr, code, name, description, unit, imageUrl);
+            reloadFormData(request, materialIdStr, name, description, unit, imageUrl);
             Material updatedMaterial = materialDAO.getMaterialById(material.getMaterialId());
             request.setAttribute("material", updatedMaterial);
             request.setAttribute("origin", origin);
@@ -229,7 +229,7 @@ public class EditMaterialController extends HttpServlet {
         } catch (NumberFormatException e) {
             request.setAttribute("message", "Invalid input! Please check your data.");
             request.setAttribute("messageType", "danger");
-            reloadFormData(request, request.getParameter("id"), request.getParameter("code"),
+            reloadFormData(request, request.getParameter("id"),
                     request.getParameter("name"), request.getParameter("description"),
                     request.getParameter("unit"), material.getImageUrl());
             request.setAttribute("origin", origin);
@@ -237,7 +237,7 @@ public class EditMaterialController extends HttpServlet {
         } catch (SQLException e) {
             request.setAttribute("message", "Error updating material: " + e.getMessage());
             request.setAttribute("messageType", "danger");
-            reloadFormData(request, request.getParameter("id"), request.getParameter("code"),
+            reloadFormData(request, request.getParameter("id"),
                     request.getParameter("name"), request.getParameter("description"),
                     request.getParameter("unit"), material.getImageUrl());
             request.setAttribute("origin", origin);
@@ -245,7 +245,7 @@ public class EditMaterialController extends HttpServlet {
         }
     }
 
-    private void reloadFormData(HttpServletRequest request, String materialId, String code,
+    private void reloadFormData(HttpServletRequest request, String materialId,
             String name, String description, String unit, String imageUrl)
             throws ServletException {
         try {
@@ -256,7 +256,7 @@ public class EditMaterialController extends HttpServlet {
             if (materialId != null && materialId.matches("\\d+")) {
                 material.setMaterialId(Integer.parseInt(materialId));
             }
-            material.setCode(code != null ? code : "");
+            //material.setCode(code != null ? code : "");
             material.setName(name != null ? name : "");
             material.setDescription(description != null ? description : "");
             material.setUnit(unit != null ? unit : "");
