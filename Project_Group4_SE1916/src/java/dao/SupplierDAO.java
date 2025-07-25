@@ -109,83 +109,82 @@ public class SupplierDAO {
         }
     }
 
-   public int countSuppliersBySearchAndStatus(String search, String status) throws SQLException {
-    StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Suppliers WHERE 1=1 ");
-    List<Object> params = new ArrayList<>();
+    public int countSuppliersBySearchAndStatus(String search, String status) throws SQLException {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Suppliers WHERE 1=1 ");
+        List<Object> params = new ArrayList<>();
 
-    if (search != null && !search.trim().isEmpty()) {
-        sql.append(" AND (name LIKE ? OR phone LIKE ? OR address LIKE ?) ");
-        String likeSearch = "%" + search.trim() + "%";
-        params.add(likeSearch);
-        params.add(likeSearch);
-        params.add(likeSearch);
-    }
-
-    if (status != null && !status.trim().isEmpty()) {
-        sql.append(" AND status = ? ");
-        params.add(status.trim());
-    }
-
-    try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-        for (int i = 0; i < params.size(); i++) {
-            stmt.setObject(i + 1, params.get(i));
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND (name LIKE ? OR phone LIKE ? OR address LIKE ?) ");
+            String likeSearch = "%" + search.trim() + "%";
+            params.add(likeSearch);
+            params.add(likeSearch);
+            params.add(likeSearch);
         }
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1);
+
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND status = ? ");
+            params.add(status.trim());
+        }
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
         }
+        return 0;
     }
-    return 0;
-}
-
 
     public List<Supplier> searchSuppliersBySearchAndStatusWithPaging(
-        String search, String status, int offset, int limit) throws SQLException {
+            String search, String status, int offset, int limit) throws SQLException {
 
-    StringBuilder sql = new StringBuilder("SELECT * FROM Suppliers WHERE 1=1 ");
-    List<Object> params = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM Suppliers WHERE 1=1 ");
+        List<Object> params = new ArrayList<>();
 
-    if (search != null && !search.trim().isEmpty()) {
-        sql.append(" AND (name LIKE ? OR phone LIKE ? OR address LIKE ?) ");
-        String likeSearch = "%" + search.trim() + "%";
-        params.add(likeSearch);
-        params.add(likeSearch);
-        params.add(likeSearch);
-    }
-
-    if (status != null && !status.trim().isEmpty()) {
-        sql.append(" AND status = ? ");
-        params.add(status.trim());
-    }
-
-    sql.append(" ORDER BY supplier_id DESC LIMIT ? OFFSET ? ");
-    params.add(limit);
-    params.add(offset);
-
-    List<Supplier> list = new ArrayList<>();
-
-    try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-        for (int i = 0; i < params.size(); i++) {
-            stmt.setObject(i + 1, params.get(i));
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND (name LIKE ? OR phone LIKE ? OR address LIKE ?) ");
+            String likeSearch = "%" + search.trim() + "%";
+            params.add(likeSearch);
+            params.add(likeSearch);
+            params.add(likeSearch);
         }
 
-        try (ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                Supplier supplier = new Supplier();
-                supplier.setSupplierId(rs.getInt("supplier_id"));
-                supplier.setSupplierName(rs.getString("name"));
-                supplier.setSupplierPhone(rs.getString("phone"));
-                supplier.setSupplierAddress(rs.getString("address"));
-                supplier.setSupplierEmail(rs.getString("email"));
-                supplier.setSupplierStatus(rs.getString("status"));
-                list.add(supplier);
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND status = ? ");
+            params.add(status.trim());
+        }
+
+        sql.append(" ORDER BY supplier_id DESC LIMIT ? OFFSET ? ");
+        params.add(limit);
+        params.add(offset);
+
+        List<Supplier> list = new ArrayList<>();
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Supplier supplier = new Supplier();
+                    supplier.setSupplierId(rs.getInt("supplier_id"));
+                    supplier.setSupplierName(rs.getString("name"));
+                    supplier.setSupplierPhone(rs.getString("phone"));
+                    supplier.setSupplierAddress(rs.getString("address"));
+                    supplier.setSupplierEmail(rs.getString("email"));
+                    supplier.setSupplierStatus(rs.getString("status"));
+                    list.add(supplier);
+                }
             }
         }
-    }
 
-    return list;
-}
+        return list;
+    }
 
     // Thêm phương thức thêm nhà cung cấp và trả về supplierId
     public int addSupplierWithId(Supplier supplier) throws SQLException {
@@ -209,7 +208,25 @@ public class SupplierDAO {
 
     public List<Supplier> getAllSuppliers() throws SQLException {
         List<Supplier> suppliers = new ArrayList<>();
-        String sql = "SELECT supplier_id, name, phone, address, email, status FROM Suppliers";
+        String sql = "SELECT supplier_id, name, phone, address, email, status FROM Suppliers ";
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Supplier supplier = new Supplier();
+                supplier.setSupplierId(rs.getInt("supplier_id"));
+                supplier.setSupplierName(rs.getString("name"));
+                supplier.setSupplierPhone(rs.getString("phone"));
+                supplier.setSupplierAddress(rs.getString("address"));
+                supplier.setSupplierEmail(rs.getString("email"));
+                supplier.setSupplierStatus(rs.getString("status"));
+                suppliers.add(supplier);
+            }
+        }
+        return suppliers;
+    }
+
+    public List<Supplier> getSuppliersActive() throws SQLException {
+        List<Supplier> suppliers = new ArrayList<>();
+        String sql = "SELECT supplier_id, name, phone, address, email, status FROM Suppliers WHERE status = 'active'";
         try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Supplier supplier = new Supplier();

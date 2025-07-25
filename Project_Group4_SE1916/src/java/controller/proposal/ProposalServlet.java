@@ -57,19 +57,15 @@ public class ProposalServlet extends HttpServlet {
         try {
             MaterialCategoryDAO categoryDAO = new MaterialCategoryDAO();
             MaterialDAO materialDAO = new MaterialDAO();
-            List<MaterialCategory> parentCategories = categoryDAO.getAllParentCategories();
-            List<MaterialCategory> childCategories = categoryDAO.getAllChildCategories();
-            List<Material> material = materialDAO.getAllMaterials();
+            List<Material> material = materialDAO.getActiveMaterialBasicInfo();
             Connection conn = DBContext.getConnection();
             SupplierDAO supplierDAO = new SupplierDAO(conn);
-            List<Supplier> suppliers = supplierDAO.getAllSuppliers();
+            List<Supplier> suppliers = supplierDAO.getSuppliersActive();
             ConstructionSiteDAO constructionSiteDAO = new ConstructionSiteDAO(conn);
             List<ConstructionSite> constructionSites = constructionSiteDAO.getAllConstructionSites();
             request.setAttribute("constructionSites", constructionSites);
             request.setAttribute("suppliers", suppliers);
             request.setAttribute("material", material);
-            request.setAttribute("parentCategories", parentCategories);
-            request.setAttribute("childCategories", childCategories);
             request.getRequestDispatcher("/view/proposal/proposalOfEmployee.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new ServletException("Error " + e.getMessage(), e);

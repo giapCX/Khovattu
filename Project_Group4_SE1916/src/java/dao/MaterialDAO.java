@@ -77,6 +77,26 @@ public class MaterialDAO {
         }
         return materials;
     }
+    public List<Material> getActiveMaterialBasicInfo() throws SQLException {
+    List<Material> materials = new ArrayList<>();
+    String sql = "SELECT material_id, name, unit FROM Materials WHERE status = 'active'";
+
+    try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            Material material = new Material();
+            material.setMaterialId(rs.getInt("material_id"));
+            material.setName(rs.getString("name"));
+            material.setUnit(rs.getString("unit"));
+            materials.add(material);
+        }
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error in getActiveMaterialBasicInfo: ", e);
+        throw e;
+    }
+
+    return materials;
+}
+
 
     public List<Material> getMaterialsByParentCategory(int parentCategoryId) throws SQLException {
         List<Material> materials = new ArrayList<>();

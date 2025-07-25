@@ -116,7 +116,6 @@
                                                         <option 
                                                             value="${cat.name}" 
                                                             data-id="${cat.materialId}" 
-                                                            data-parent="${cat.category.categoryId}" 
                                                             data-unit="${cat.unit}">
                                                             ${cat.name}
                                                         </option>
@@ -134,7 +133,6 @@
                                                 <select name="materialCondition[]" class="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md conditionSelect" required>
                                                     <option value="new">New</option>
                                                     <option value="used">Used</option>
-                                                    <option value="damaged" class="damaged-option">Damaged</option>
                                                 </select>
                                             </td>
                                             <td class="price-column hidden">
@@ -197,9 +195,9 @@
                 newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
                 tbody.appendChild(newRow);
                 document.getElementById('itemCount').value = tbody.rows.length;
-                toggleMaterialConditionOptions(document.getElementById('proposalType').value);
+               
             }
-            toggleMaterialConditionOptions(document.getElementById('proposalType').value);
+
             toggleFieldRequiredByType(document.getElementById('proposalType').value);
 
             function removeRow(btn) {
@@ -307,25 +305,7 @@
 // Gọi một lần ban đầu nếu cần
             toggleTableColumns(document.getElementById('proposalType').value);
 
-            function toggleMaterialConditionOptions(proposalType) {
-                const allSelects = document.querySelectorAll('.conditionSelect');
-
-                allSelects.forEach(select => {
-                    const damagedOption = select.querySelector('option[value="damaged"]');
-                    if (!damagedOption)
-                        return;
-
-                    if (proposalType === 'import_from_supplier' || proposalType === 'export') {
-                        damagedOption.disabled = true;
-                        // Nếu đang chọn "damaged" thì reset về "new"
-                        if (select.value === 'damaged') {
-                            select.value = 'new';
-                        }
-                    } else {
-                        damagedOption.disabled = false;
-                    }
-                });
-            }
+           
             function toggleFieldRequiredByType(proposalType) {
                 const rows = document.querySelectorAll('#itemsBody tr');
 

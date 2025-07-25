@@ -51,15 +51,12 @@ public class ConstructionSiteDAO {
         return sites;
     }
 
-    public int countConstructionSiteByNameAddressStatus(String name, String address, String status) {
+    public int countConstructionSiteBySearchAndStatus(String search, String status) {
         int count = 0;
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM ConstructionSites WHERE 1=1");
 
-        if (name != null && !name.trim().isEmpty()) {
-            sql.append(" AND site_name LIKE ?");
-        }
-        if (address != null && !address.trim().isEmpty()) {
-            sql.append(" AND address LIKE ?");
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND (site_name LIKE ? OR address LIKE ?)");
         }
         if (status != null && !status.trim().isEmpty()) {
             sql.append(" AND status = ?");
@@ -67,11 +64,10 @@ public class ConstructionSiteDAO {
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int index = 1;
-            if (name != null && !name.trim().isEmpty()) {
-                ps.setString(index++, "%" + name.trim() + "%");
-            }
-            if (address != null && !address.trim().isEmpty()) {
-                ps.setString(index++, "%" + address.trim() + "%");
+            if (search != null && !search.trim().isEmpty()) {
+                String keyword = "%" + search.trim() + "%";
+                ps.setString(index++, keyword);
+                ps.setString(index++, keyword);
             }
             if (status != null && !status.trim().isEmpty()) {
                 ps.setString(index++, status.trim());
@@ -85,24 +81,24 @@ public class ConstructionSiteDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return count;
     }
 
-    public List<ConstructionSite> searchConstructionSiteByNameAddressStatusWithPaging(
-            String name, String address, String status, int offset, int limit) {
+    public List<ConstructionSite> searchConstructionSiteBySearchAndStatusWithPaging(
+            String search, String status, int offset, int limit) {
 
         List<ConstructionSite> sites = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM ConstructionSites WHERE 1=1");
         List<Object> params = new ArrayList<>();
 
-        if (name != null && !name.trim().isEmpty()) {
-            sql.append(" AND site_name LIKE ?");
-            params.add("%" + name.trim() + "%");
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND (site_name LIKE ? OR address LIKE ?)");
+            String keyword = "%" + search.trim() + "%";
+            params.add(keyword);
+            params.add(keyword);
         }
-        if (address != null && !address.trim().isEmpty()) {
-            sql.append(" AND address LIKE ?");
-            params.add("%" + address.trim() + "%");
-        }
+
         if (status != null && !status.trim().isEmpty()) {
             sql.append(" AND status = ?");
             params.add(status.trim());

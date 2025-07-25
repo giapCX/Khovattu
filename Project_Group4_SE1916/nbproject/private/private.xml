@@ -3,11 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/supplier/listSupplier.jsp</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/ProposalDAO.java</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/model/Proposal.java</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/ListProposalExecute.java</file>
-            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/warehouse/listProposalExecute.jsp</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/MaterialDAO.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/proposal/proposalOfEmployee.jsp</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/SupplierDAO.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/ProposalServlet.java</file>
         </group>
     </open-files>
 </project-private>

@@ -59,8 +59,7 @@ public class ListConstructionSites extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        String searchName = request.getParameter("searchName");
-        String searchAddress = request.getParameter("searchAddress");
+        String search= request.getParameter("search");
         String searchStatus = request.getParameter("searchStatus");
       
         String pageParam = request.getParameter("page");
@@ -90,7 +89,7 @@ public class ListConstructionSites extends HttpServlet {
         try (Connection conn = DBContext.getConnection()) {
             ConstructionSiteDAO constructionSiteDAO = new ConstructionSiteDAO(conn);
 
-            int totalRecords = constructionSiteDAO.countConstructionSiteByNameAddressStatus(searchName,searchAddress, searchStatus);
+            int totalRecords = constructionSiteDAO.countConstructionSiteBySearchAndStatus(search, searchStatus);
 
             // Nếu không có bản ghi nào, set totalPages tối thiểu là 1
             int totalPages = 1;
@@ -105,7 +104,7 @@ public class ListConstructionSites extends HttpServlet {
 
             int offset = (currentPage - 1) * recordsPerPage;
 
-            List<ConstructionSite> constructionSites = constructionSiteDAO.searchConstructionSiteByNameAddressStatusWithPaging(searchName,searchAddress, searchStatus, offset, recordsPerPage);
+            List<ConstructionSite> constructionSites = constructionSiteDAO.searchConstructionSiteBySearchAndStatusWithPaging(search, searchStatus, offset, recordsPerPage);
 
             // Đảm bảo suppliers không null, nếu null thì khởi tạo list rỗng
             if (constructionSites == null) {
@@ -113,9 +112,8 @@ public class ListConstructionSites extends HttpServlet {
             }
 
             request.setAttribute("constructionSites", constructionSites);
-            request.setAttribute("searchName", searchName);
+            request.setAttribute("search", search);
             request.setAttribute("searchStatus", searchStatus);
-            request.setAttribute("searchAddress", searchAddress);
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("recordsPerPage", recordsPerPage);
