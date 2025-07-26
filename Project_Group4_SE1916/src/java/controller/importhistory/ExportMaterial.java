@@ -83,6 +83,7 @@ public class ExportMaterial extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+    
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
@@ -198,7 +199,7 @@ public class ExportMaterial extends HttpServlet {
             if (exportId > 0) {
                 exportDAO.exportMaterial(exportId, exportDetails);
                 exportDAO.updateProposalStatusToExecuted(proposalId);
-                response.sendRedirect(request.getContextPath() + "/view/warehouse/exportMaterial.jsp?success=Export%20successfully%20saved&exportId=" + exportId + "&proposalId=" + proposalId);
+                response.sendRedirect(request.getContextPath() + "/view/warehouse/exportMaterial.jsp?success=Save successfully");
             } else {
                 request.setAttribute("error", "Failed to save export.");
                 request.getRequestDispatcher("/view/warehouse/exportMaterial.jsp").forward(request, response);

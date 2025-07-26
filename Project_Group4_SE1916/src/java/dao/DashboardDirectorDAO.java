@@ -88,7 +88,7 @@ public class DashboardDirectorDAO {
     }
      
      public int countPendingDirectorProposals() throws SQLException {
-        String sql = "SELECT COUNT(*) FROM ProposalApprovals WHERE director_status = 'pending'";
+        String sql = "SELECT COUNT(*) FROM ProposalApprovals WHERE director_status = 'pending' AND admin_status = 'approved'";
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {

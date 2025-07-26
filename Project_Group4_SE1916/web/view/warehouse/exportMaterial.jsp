@@ -16,13 +16,11 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
-
-        <!-- Custom CSS -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
         <style>
             body {
                 font-family: 'Segoe UI', Arial, sans-serif;
-                background-color: #f0f2f5; /* Matches bg-gray-50 */
+                background-color: #f0f2f5;
                 color: #1a1a1a;
                 min-height: 100vh;
                 display: flex;
@@ -31,14 +29,14 @@
                 margin: 0 auto;
                 background-color: #fff;
                 padding: 20px;
-                border-radius: 0 0 0.5rem 0.5rem; /* Rounded corners at the bottom */
+                border-radius: 0 0 0.5rem 0.5rem;
                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
                 width: 100%;
                 max-width: 1200px;
             }
             h1 {
                 text-align: center;
-                color: #1f2937; /* Matches text-gray-800 */
+                color: #1f2937;
                 margin-bottom: 20px;
             }
             form {
@@ -46,18 +44,14 @@
                 flex-direction: column;
                 gap: 15px;
             }
-            /*            label {
-                            font-weight: bold;
-                            color: #374151;  Matches text-gray-700 
-                        }*/
             input[type="text"],
             input[type="number"],
             input[type="datetime-local"],
             select,
             textarea {
                 padding: 8px;
-                border: 1px solid #d1d5db; /* Matches border-gray-300 */
-                border-radius: 0.5rem; /* Rounded corners */
+                border: 1px solid #d1d5db;
+                border-radius: 0.5rem;
                 font-size: 14px;
                 width: 100%;
                 background-color: #fff;
@@ -69,11 +63,11 @@
             select:focus,
             textarea:focus {
                 outline: none;
-                border-color: #2563eb; /* Matches focus:ring-primary-500 */
+                border-color: #2563eb;
                 box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
             }
             input[readonly] {
-                background-color: #e5e7eb; /* Matches bg-gray-200 */
+                background-color: #e5e7eb;
                 cursor: not-allowed;
             }
             textarea {
@@ -82,7 +76,7 @@
             }
             button[type="submit"] {
                 padding: 8px 16px;
-                background-color: #2563eb; /* Matches bg-primary-600 */
+                background-color: #2563eb;
                 color: #fff;
                 border: none;
                 border-radius: 0.5rem;
@@ -90,11 +84,11 @@
                 transition: background-color 0.3s;
             }
             button[type="submit"]:hover {
-                background-color: #1d4ed8; /* Darker shade of primary-600 */
+                background-color: #1d4ed8;
             }
             .table-container {
                 background-color: #fff;
-                border-radius: 0 0 0.5rem 0.5rem; /* Rounded corners at the bottom */
+                border-radius: 0 0 0.5rem 0.5rem;
                 overflow: hidden;
             }
             table {
@@ -104,22 +98,22 @@
             th, td {
                 padding: 12px;
                 text-align: left;
-                border-bottom: 1px solid #e5e7eb; /* Matches border-gray-200 */
+                border-bottom: 1px solid #e5e7eb;
             }
             th {
-                background-color: #0284C7; /* Matches bg-primary-600 */
+                background-color: #0284C7;
                 color: #fff;
                 font-weight: bold;
             }
             tr:nth-child(even) {
-                background-color: #f9fafb; /* Matches bg-gray-50 */
+                background-color: #f9fafb;
             }
             tr:hover {
-                background-color: #f3f4f6; /* Matches hover:bg-gray-100 */
+                background-color: #f3f4f6;
             }
             .no-data {
                 text-align: center;
-                color: #6b7280; /* Matches text-gray-500 */
+                color: #6b7280;
                 padding: 20px;
             }
             .error-message, .success-message {
@@ -129,21 +123,20 @@
                 text-align: center;
             }
             .error-message {
-                background-color: #fee2e2; /* Matches bg-red-100 */
-                border: 1px solid #f87171; /* Matches border-red-400 */
-                color: #991b1b; /* Matches text-red-700 */
+                background-color: #fee2e2;
+                border: 1px solid #f87171;
+                color: #991b1b;
             }
             .success-message {
-                background-color: #dcfce7; /* Matches bg-green-100 */
-                border: 1px solid #86efac; /* Matches border-green-400 */
-                color: #15803d; /* Matches text-green-700 */
+                background-color: #dcfce7;
+                border: 1px solid #86efac;
+                color: #15803d;
             }
-
             .link-execute {
                 display: inline-block;
                 margin-top: 20px;
                 text-align: center;
-                background-color: #2563eb; /* Matches bg-primary-600 */
+                background-color: #2563eb;
                 color: #fff;
                 text-decoration: none;
                 font-weight: bold;
@@ -185,6 +178,7 @@
             String role = (String) session.getAttribute("role");
             Integer userId = (Integer) session.getAttribute("userId");
             String userFullName = (String) session.getAttribute("fullName");
+            String success = request.getParameter("success");
             if (userFullName == null && userId != null) {
                 UserDAO userDAO = new UserDAO();
                 User user = userDAO.getUserById(userId);
@@ -232,7 +226,7 @@
 
         <main class="flex-1 p-8 transition-all duration-300">
             <div class="container">
-                <form action="${pageContext.request.contextPath}/exportMaterial" method="post" class="space-y-6">
+                <form id="exportForm" action="${pageContext.request.contextPath}/exportMaterial" method="post" class="space-y-6">
                     <input type="hidden" name="exporterId" value="<%= userId%>" />
                     <input type="hidden" name="proposalId" value="${proposalId}" />
 
@@ -336,34 +330,41 @@
             document.addEventListener("DOMContentLoaded", function () {
                 // Fetch employees and populate receiver dropdown
                 fetch('${pageContext.request.contextPath}/exportMaterial?action=getEmployees')
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Fetched employees:', data);
-                            const receiverSelect = document.getElementById('receiverId');
-                            data.forEach(employee => {
-                                const option = document.createElement('option');
-                                option.value = employee.userId;
-                                option.textContent = employee.fullName || 'Unknown User';
-                                receiverSelect.appendChild(option);
-                            });
-                            console.log('Final receiver select:', receiverSelect.outerHTML);
-                        })
-                        .catch(error => {
-                            console.error('Error fetching employees:', error);
-                            const receiverSelect = document.getElementById('receiverId');
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Fetched employees:', data);
+                        const receiverSelect = document.getElementById('receiverId');
+                        data.forEach(employee => {
                             const option = document.createElement('option');
-                            option.textContent = 'Error loading employees';
+                            option.value = employee.userId;
+                            option.textContent = employee.fullName || 'Unknown User';
                             receiverSelect.appendChild(option);
                         });
+                        console.log('Final receiver select:', receiverSelect.outerHTML);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching employees:', error);
+                        const receiverSelect = document.getElementById('receiverId');
+                        const option = document.createElement('option');
+                        option.textContent = 'Error loading employees';
+                        receiverSelect.appendChild(option);
+                    });
+
+                // Check for success message and redirect
+                const success = "<%= success != null ? success : "" %>";
+                if (success === "Save successfully") {
+                    alert("Save successfully");
+                    window.location.href = "${pageContext.request.contextPath}/exportHistory";
+                }
             });
         </script>
 
-        <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/sidebar_darkmode.js"></script>
         <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
     </body>
 </html>
