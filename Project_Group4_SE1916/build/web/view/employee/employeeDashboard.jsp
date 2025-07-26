@@ -301,7 +301,7 @@
                     <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
                         <div class="flex items-center">
                             <i class="fas fas fa-file-alt mr-2 w-5 text-center"></i>
-                            <span class="text-base">Proposals</span>
+                            <span class="text-base">Request List</span>
                         </div>
                         <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
                     </button>
