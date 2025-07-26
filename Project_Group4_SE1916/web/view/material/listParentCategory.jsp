@@ -286,11 +286,12 @@
                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Category List</h2>
                     </div>
                     <div class="flex gap-4">
-                        <a href="${pageContext.request.contextPath}/AddCategoryController" 
-                           class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
-                            <i class="fas fa-plus-circle mr-2"></i> Add Category
-                        </a>
-                     
+                        <c:if test="${role == 'admin' || role == 'warehouse'}">
+                            <a href="${pageContext.request.contextPath}/AddCategoryController" 
+                               class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
+                                <i class="fas fa-plus-circle mr-2"></i> Add Category
+                            </a>
+                        </c:if>
                     </div>
                 </div>
 
@@ -382,11 +383,13 @@
                             <i class="fas fa-eye"></i>
                             <span>View</span>
                         </a>
-                        <a href="${pageContext.request.contextPath}/EditChildCategoryController?id=${childCat.categoryId}"
-                           class="action-btn edit-btn">
-                            <i class="fas fa-edit"></i>
-                            <span>Edit</span>
-                        </a>
+                        <c:if test="${role == 'admin' || role == 'warehouse'}">
+                            <a href="${pageContext.request.contextPath}/EditChildCategoryController?id=${childCat.categoryId}"
+                               class="action-btn edit-btn">
+                                <i class="fas fa-edit"></i>
+                                <span>Edit</span>
+                            </a>
+                        </c:if>
                     </div>
                 </div>
             </c:forEach>
@@ -410,8 +413,10 @@
                                                     </c:choose>
                                                 </td>
                                                 <td class="p-4 font-medium">
-                                                    <a href="${pageContext.request.contextPath}/EditParentCategoryController?categoryId=${cat.categoryId}"
-                                                       class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
+                                                    <c:if test="${role == 'admin' || role == 'warehouse'}">
+                                                        <a href="${pageContext.request.contextPath}/EditParentCategoryController?categoryId=${cat.categoryId}"
+                                                           class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
+                                                    </c:if>
                                                 </td>
                                             </tr>
                                         </c:forEach>

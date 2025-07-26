@@ -105,10 +105,12 @@
                            class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
                             <i class="fas fa-arrow-left mr-2"></i> Back to Categories
                         </a>
-                        <a href="${pageContext.request.contextPath}/AddMaterialController" 
-                           class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
-                            <i class="fas fa-plus-circle mr-2"></i> Add Material
-                        </a>
+                        <c:if test="${role == 'admin' || role == 'warehouse'}">
+                            <a href="${pageContext.request.contextPath}/AddMaterialController" 
+                               class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
+                                <i class="fas fa-plus-circle mr-2"></i> Add Material
+                            </a>
+                        </c:if>
                     </div>
                 </div>
 
@@ -206,16 +208,18 @@
                                                     <img src="${mat.imageUrl}" class="thumbnail" alt="Material image">
                                                 </td>
                                                 <td class="p-4 font-medium">
-                                                    <a href="${pageContext.request.contextPath}/EditMaterialController?id=${mat.materialId}&origin=listMaterial"
-                                                       class="text-primary-600 dark:text-primary-400 hover:underline mr-2">Edit</a>
-                                                    <form action="${pageContext.request.contextPath}/ListMaterialController" method="post" style="display:inline;">
-                                                        <input type="hidden" name="action" value="delete"/>
-                                                        <input type="hidden" name="id" value="${mat.materialId}"/>
-                                                        <button type="submit" class="text-red-600 dark:text-red-400 hover:underline" 
-                                                                onclick="return confirm('Are you sure you want to disable this item?')">
-                                                            Disable
-                                                        </button>
-                                                    </form>
+                                                    <c:if test="${role == 'admin' || role == 'warehouse'}">
+                                                        <a href="${pageContext.request.contextPath}/EditMaterialController?id=${mat.materialId}&origin=listMaterial"
+                                                           class="text-primary-600 dark:text-primary-400 hover:underline mr-2">Edit</a>
+                                                        <form action="${pageContext.request.contextPath}/ListMaterialController" method="post" style="display:inline;">
+                                                            <input type="hidden" name="action" value="delete"/>
+                                                            <input type="hidden" name="id" value="${mat.materialId}"/>
+                                                            <button type="submit" class="text-red-600 dark:text-red-400 hover:underline" 
+                                                                    onclick="return confirm('Are you sure you want to disable this item?')">
+                                                                Disable
+                                                            </button>
+                                                        </form>
+                                                    </c:if>
                                                 </td>
                                             </tr>
                                         </c:forEach>
