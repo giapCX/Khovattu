@@ -18,6 +18,7 @@ import java.util.List;
 import java.sql.Connection;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Import;
@@ -64,61 +65,67 @@ public class ImportHistoryServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    HttpSession session = request.getSession(false);
+    if (session == null || session.getAttribute("userId") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
 
-        String role = (String) session.getAttribute("role");
-        String userFullName = (String) session.getAttribute("userFullName");
-        request.setAttribute("role", role);
-        request.setAttribute("userFullName", userFullName);
-        int page = 1;
-        int recordsPerPage = 10;
+    String role = (String) session.getAttribute("role");
+    String userFullName = (String) session.getAttribute("userFullName");
+    request.setAttribute("role", role);
+    request.setAttribute("userFullName", userFullName);
+    int page = 1;
+    int recordsPerPage = 10;
 
-        String pageParam = request.getParameter("page");
-        if (pageParam != null) {
-            try {
-                page = Integer.parseInt(pageParam);
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        if (page < 1) {
+    String pageParam = request.getParameter("page");
+    if (pageParam != null) {
+        try {
+            page = Integer.parseInt(pageParam);
+        } catch (NumberFormatException e) {
             page = 1;
         }
-
-        int offset = (page - 1) * recordsPerPage;
-
-        String type = request.getParameter("type");
-        String executor = request.getParameter("executor");
-        String fromDate = request.getParameter("fromDate");
-        String toDate = request.getParameter("toDate");
-
-        try (Connection conn = DBContext.getConnection()) {
-            ImportDAO dao = new ImportDAO(conn);
-            List<Import> importList = dao.searchImportsWithPagination(type, executor, fromDate, toDate, offset, recordsPerPage);
-            int totalRecords = dao.countSearchImports(type, executor, fromDate, toDate);
-            int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
-
-            request.setAttribute("importList", importList);
-            request.setAttribute("totalPages", totalPages);
-            request.setAttribute("currentPage", page);
-            request.setAttribute("type", type);
-            request.setAttribute("executor", executor);
-            request.setAttribute("fromDate", fromDate);
-            request.setAttribute("toDate", toDate);
-
-            request.getRequestDispatcher("importHistory.jsp").forward(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(ImportHistoryServlet.class.getName()).log(Level.SEVERE, null, ex);
-            throw new ServletException("Database error while loading import history", ex);
-        }
-
     }
+    if (page < 1) {
+        page = 1;
+    }
+
+    int offset = (page - 1) * recordsPerPage;
+
+    String type = request.getParameter("type");
+    String executor = request.getParameter("executor");
+    String fromDate = request.getParameter("fromDate");
+    String toDate = request.getParameter("toDate");
+
+    System.out.println("Params - type: " + type + ", executor: " + executor + ", fromDate: " + fromDate + ", toDate: " + toDate);
+
+    try (Connection conn = DBContext.getConnection()) {
+        ImportDAO dao = new ImportDAO(conn);
+        List<Import> importList = dao.searchImportsWithPagination(type, executor, fromDate, toDate, offset, recordsPerPage);
+        int totalRecords = dao.countSearchImports(type, executor, fromDate, toDate);
+
+        System.out.println("ImportList: " + (importList != null ? importList.size() : "null"));
+        System.out.println("Total Records: " + totalRecords);
+
+        request.setAttribute("importList", importList != null ? importList : Collections.emptyList());
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("type", type);
+        request.setAttribute("executor", executor);
+        request.setAttribute("fromDate", fromDate);
+        request.setAttribute("toDate", toDate);
+
+        request.getRequestDispatcher("importHistory.jsp").forward(request, response);
+    } catch (SQLException ex) {
+        Logger.getLogger(ImportHistoryServlet.class.getName()).log(Level.SEVERE, null, ex);
+        request.setAttribute("error", "Database error while loading import history. Please try again later.");
+        request.getRequestDispatcher("error.jsp").forward(request, response);
+        return;
+    }
+}
 
     /**
      * Handles the HTTP <code>POST</code> method.

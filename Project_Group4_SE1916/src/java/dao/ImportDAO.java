@@ -217,44 +217,57 @@ public class ImportDAO {
     }
 
     public int countSearchImports(String proposalType, String executor, String fromDate, String toDate) throws SQLException {
-        StringBuilder sql = new StringBuilder(
-            "SELECT COUNT(*) FROM ImportReceipts i " +
-            "JOIN Users u ON i.executor_id = u.user_id WHERE 1=1"
-        );
+    StringBuilder sql = new StringBuilder(
+        "SELECT COUNT(*) FROM ImportReceipts i " +
+        "JOIN Users u ON i.executor_id = u.user_id WHERE 1=1"
+    );
 
-        List<Object> params = new ArrayList<>();
+    List<Object> params = new ArrayList<>();
 
-        if (proposalType != null && !proposalType.isEmpty()) {
-            sql.append(" AND i.import_type LIKE ?");
-            params.add("%" + proposalType + "%");
-        }
+    if (proposalType != null && !proposalType.isEmpty()) {
+        sql.append(" AND i.import_type LIKE ?");
+        params.add("%" + proposalType + "%");
+    }
 
-        if (executor != null && !executor.isEmpty()) {
-            sql.append(" AND u.full_name LIKE ?");
-            params.add("%" + executor + "%");
-        }
+    if (executor != null && !executor.isEmpty()) {
+        sql.append(" AND u.full_name LIKE ?");
+        params.add("%" + executor + "%");
+    }
 
-        if (fromDate != null && !fromDate.isEmpty()) {
+    if (fromDate != null && !fromDate.isEmpty()) {
+        try {
             sql.append(" AND DATE(i.import_date) >= ?");
             params.add(Date.valueOf(fromDate));
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid fromDate: " + fromDate + ", error: " + e.getMessage());
+            // Bỏ qua điều kiện nếu ngày không hợp lệ
         }
+    }
 
-        if (toDate != null && !toDate.isEmpty()) {
+    if (toDate != null && !toDate.isEmpty()) {
+        try {
             sql.append(" AND DATE(i.import_date) <= ?");
             params.add(Date.valueOf(toDate));
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid toDate: " + toDate + ", error: " + e.getMessage());
+            // Bỏ qua điều kiện nếu ngày không hợp lệ
         }
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) {
-                stmt.setObject(i + 1, params.get(i));
-            }
-
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        }
-
-        return 0;
     }
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+        for (int i = 0; i < params.size(); i++) {
+            stmt.setObject(i + 1, params.get(i));
+        }
+
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        System.out.println("SQLException in countSearchImports: " + e.getMessage());
+        throw e;
+    }
+
+    return 0; 
+}
 }

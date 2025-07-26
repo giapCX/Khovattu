@@ -187,6 +187,7 @@
                 </form>
 
                 <!-- Table -->
+
                 <div class="table-container bg-white dark:bg-gray-800">
                     <div class="overflow-x-auto">
                         <table class="w-full table-auto">
@@ -202,7 +203,14 @@
                             </thead>
                             <tbody>
                                 <c:choose>
-                                    <c:when test="${not empty importList}">
+                                    <c:when test="${importList == null or empty importList}">
+                                        <tr>
+                                            <td colspan="6" class="p-4 text-center text-gray-500 dark:text-gray-400">
+                                                No import history found
+                                            </td>
+                                        </tr>
+                                    </c:when>
+                                    <c:otherwise>
                                         <c:forEach var="imp" items="${importList}">
                                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                                 <td class="p-4 font-medium">${imp.importId}</td>
@@ -224,13 +232,6 @@
                                                 </td>
                                             </tr>
                                         </c:forEach>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <tr>
-                                            <td colspan="6" class="p-4 text-center text-gray-500 dark:text-gray-400">
-                                                No import history found
-                                            </td>
-                                        </tr>
                                     </c:otherwise>
                                 </c:choose>
                             </tbody>
