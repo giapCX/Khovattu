@@ -1,7 +1,6 @@
-﻿-- 1. Tạo database
+ -- 1. Tạo database
 CREATE DATABASE IF NOT EXISTS quan_ly_vat_tu;
 USE quan_ly_vat_tu;
-
 
 -- 2. Roles & Users
 CREATE TABLE Roles (
@@ -9,23 +8,21 @@ CREATE TABLE Roles (
     role_name VARCHAR(50) NOT NULL UNIQUE
 );
 
-
 CREATE TABLE Users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
-    code VARCHAR(50) UNIQUE NOT NULL,           -- Mã user có ý nghĩa
+    code VARCHAR(50) UNIQUE NOT NULL,         
     username VARCHAR(50) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
     address VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL,
     phone_number VARCHAR(20),
-    imageUrl VARCHAR(255) NOT NULL,
+    imageUrl VARCHAR(255),
     date_of_birth DATE,
     status ENUM('active', 'inactive') DEFAULT 'active',
     role_id INT, 
     FOREIGN KEY (role_id) REFERENCES Roles(role_id) ON DELETE SET NULL 
 );
-
 
 -- 3. Nhà cung cấp
 CREATE TABLE Suppliers (
@@ -38,32 +35,36 @@ CREATE TABLE Suppliers (
 );
 
 
--- 4. Phân cấp vật tư (3 cấp)
+
+-- 4. Phân cấp vật tư 
 CREATE TABLE MaterialCategories (
     category_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL
-);
-
-
-CREATE TABLE MaterialBrands (
-    brand_id INT AUTO_INCREMENT PRIMARY KEY,
-    category_id INT NOT NULL,
     name VARCHAR(100) NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES MaterialCategories(category_id)
+    parent_id INT DEFAULT NULL,
+   status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+
+    FOREIGN KEY (parent_id) REFERENCES    MaterialCategories(category_id)
 );
 
+CREATE TABLE Units (
+    unit_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    status ENUM('active', 'inactive') NOT NULL DEFAULT 'active'
+);
 
 CREATE TABLE Materials (
     material_id INT AUTO_INCREMENT PRIMARY KEY,
-    code VARCHAR(50) UNIQUE NOT NULL,            -- Mã vật tư có ý nghĩa
-    brand_id INT NOT NULL,
+    code VARCHAR(50) UNIQUE NOT NULL,       
+    category_id INT NOT NULL,
     name VARCHAR(100) NOT NULL,
     description TEXT,
-    unit VARCHAR(20) NOT NULL,
+    unit VARCHAR(20) ,
+    unit_id INT NOT NULL,
     image_url VARCHAR(255),
-    FOREIGN KEY (brand_id) REFERENCES MaterialBrands(brand_id)
+    status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',  
+    FOREIGN KEY (category_id) REFERENCES MaterialCategories(category_id),
+	FOREIGN KEY (unit_id) REFERENCES Units(unit_id)
 );
-
 
 -- 5. Nhà cung cấp cung cấp vật tư
 CREATE TABLE SupplierMaterials (
@@ -75,39 +76,114 @@ CREATE TABLE SupplierMaterials (
 );
 
 
--- 6. Phiếu nhập kho
-CREATE TABLE ImportReceipts (
-    import_id INT AUTO_INCREMENT PRIMARY KEY,
-    supplier_id INT,
-    user_id INT,
-    import_date DATE NOT NULL,
+-- Bảng công trình
+CREATE TABLE ConstructionSites (
+    site_id INT AUTO_INCREMENT PRIMARY KEY,
+    site_name VARCHAR(100) NOT NULL,
+    address TEXT,
+    manager_id INT DEFAULT NULL,
+    start_date DATE,
+    end_date DATE,
+    status ENUM('ongoing', 'cancel', 'completed', 'paused') DEFAULT 'ongoing',
     note TEXT,
-    FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id),
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (manager_id) REFERENCES Users(user_id)
 );
 
+-- Phiếu đề nghị
+CREATE TABLE EmployeeProposals (
+    proposal_id INT AUTO_INCREMENT PRIMARY KEY,
+    proposal_type ENUM('import_from_supplier', 'import_returned','export') NOT NULL,
+    proposer_id INT NOT NULL,
+    executor_id INT DEFAULT NULL,
+    note TEXT,
+    proposal_sent_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ executed_date DATETIME,
+  supplier_id INT,
+  site_id INT,
+    final_status ENUM('pending', 'approved_by_admin', 'approved_but_not_executed', 'executed', 'rejected') DEFAULT 'pending',
+  FOREIGN KEY (proposer_id) REFERENCES Users(user_id),
+  FOREIGN KEY (executor_id) REFERENCES Users(user_id),
+  FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id),
+  FOREIGN KEY (site_id) REFERENCES ConstructionSites(site_id)
+);
+
+CREATE TABLE ProposalDetails (
+    proposal_detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    proposal_id INT NOT NULL,
+    material_id INT NOT NULL,
+    quantity DECIMAL(10,2) NOT NULL,
+    price_per_unit DECIMAL(15,2) DEFAULT NULL,
+    material_condition ENUM('new', 'used', 'damaged') NOT NULL DEFAULT 'new',
+    FOREIGN KEY (proposal_id) REFERENCES EmployeeProposals(proposal_id),
+    FOREIGN KEY (material_id) REFERENCES Materials(material_id)
+);
+
+CREATE TABLE ProposalApprovals (
+    approval_id INT AUTO_INCREMENT PRIMARY KEY,
+    proposal_id INT NOT NULL,
+    admin_approver_id INT,
+    director_approver_id INT,
+    admin_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    director_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    admin_approval_date DATETIME,
+    admin_reason TEXT,
+    admin_note TEXT,
+    director_approval_date DATETIME,
+    director_reason TEXT,
+    director_note TEXT,
+    FOREIGN KEY (proposal_id) REFERENCES EmployeeProposals(proposal_id),
+    FOREIGN KEY (admin_approver_id) REFERENCES Users(user_id),
+    FOREIGN KEY (director_approver_id) REFERENCES Users(user_id),
+    UNIQUE (proposal_id)
+);
+
+-- Phiếu nhập kho thực tế
+CREATE TABLE ImportReceipts (
+    import_id INT AUTO_INCREMENT PRIMARY KEY,
+    proposal_id INT UNIQUE,
+    import_type ENUM('import_from_supplier', 'import_returned') NOT NULL DEFAULT 'import_from_supplier',
+    responsible_id INT,
+    delivery_supplier_name VARCHAR(50) DEFAULT NULL,
+    delivery_supplier_phone VARCHAR(20) DEFAULT NULL,
+    executor_id INT DEFAULT NULL,
+    import_date DATE NOT NULL,
+    note TEXT,
+   supplier_id INT DEFAULT NULL,
+   site_id INT DEFAULT NULL,
+    FOREIGN KEY (proposal_id) REFERENCES EmployeeProposals(proposal_id),
+    FOREIGN KEY (responsible_id ) REFERENCES Users(user_id),
+    FOREIGN KEY (executor_id) REFERENCES Users(user_id),
+    FOREIGN KEY (site_id) REFERENCES ConstructionSites(site_id),
+    FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id)
+
+);
 
 CREATE TABLE ImportDetails (
     import_detail_id INT AUTO_INCREMENT PRIMARY KEY,
     import_id INT NOT NULL,
     material_id INT NOT NULL,
     quantity DECIMAL(10,2) NOT NULL,
-    price_per_unit DECIMAL(15,2) NOT NULL,
+    price_per_unit DECIMAL(15,2),
     material_condition ENUM('new', 'used', 'damaged') NOT NULL DEFAULT 'new',
     FOREIGN KEY (import_id) REFERENCES ImportReceipts(import_id),
     FOREIGN KEY (material_id) REFERENCES Materials(material_id)
 );
 
-
--- 7. Phiếu xuất kho
+-- Phiếu xuất kho thực tế
 CREATE TABLE ExportReceipts (
     export_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
+    proposal_id INT UNIQUE,
+     receiver_id INT DEFAULT NULL,
+    executor_id INT DEFAULT NULL,
     export_date DATE NOT NULL,
     note TEXT,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
-);
+site_id INT NOT NULL,
+    FOREIGN KEY (proposal_id) REFERENCES EmployeeProposals(proposal_id),
+    FOREIGN KEY (executor_id) REFERENCES Users(user_id),
+    FOREIGN KEY (receiver_id) REFERENCES Users(user_id),
+ FOREIGN KEY (site_id) REFERENCES ConstructionSites(site_id)
 
+);
 
 CREATE TABLE ExportDetails (
     export_detail_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -115,39 +191,11 @@ CREATE TABLE ExportDetails (
     material_id INT NOT NULL,
     quantity DECIMAL(10,2) NOT NULL,
     material_condition ENUM('new', 'used', 'damaged') NOT NULL DEFAULT 'new',
-    reason VARCHAR(255),
     FOREIGN KEY (export_id) REFERENCES ExportReceipts(export_id),
     FOREIGN KEY (material_id) REFERENCES Materials(material_id)
 );
 
-
--- 8. Yêu cầu
-CREATE TABLE Requests (
-    request_id INT AUTO_INCREMENT PRIMARY KEY,
-    request_type ENUM('export','import','repair') NOT NULL,
-    requester_id INT NOT NULL,
-    request_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('pending','approved','rejected') DEFAULT 'pending',
-    approver_id INT,
-    approval_date DATETIME,
-    reason TEXT,
-    note TEXT,
-    FOREIGN KEY (requester_id) REFERENCES Users(user_id),
-    FOREIGN KEY (approver_id) REFERENCES Users(user_id)
-);
-
-
-CREATE TABLE RequestDetails (
-    request_detail_id INT AUTO_INCREMENT PRIMARY KEY,
-    request_id INT NOT NULL,
-    material_id INT NOT NULL,
-    quantity DECIMAL(10,2) NOT NULL,
-    FOREIGN KEY (request_id) REFERENCES Requests(request_id),
-    FOREIGN KEY (material_id) REFERENCES Materials(material_id)
-);
-
-
--- 9. Tồn kho
+-- Tồn kho trung tâm
 CREATE TABLE Inventory (
     material_id INT NOT NULL,
     material_condition ENUM('new', 'used', 'damaged') NOT NULL DEFAULT 'new',
@@ -158,30 +206,60 @@ CREATE TABLE Inventory (
 );
 
 
--- 10. Chi phí sửa chữa
-CREATE TABLE RepairCosts (
-    repair_id INT AUTO_INCREMENT PRIMARY KEY,
-    material_id INT NOT NULL,
-    request_id INT NOT NULL,
-    cost DECIMAL(15,2) NOT NULL,
-    repair_date DATE NOT NULL,
-    note TEXT,
-    FOREIGN KEY (material_id) REFERENCES Materials(material_id),
-    FOREIGN KEY (request_id) REFERENCES Requests(request_id)
-);
 
 
 
 
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE Materials
+SET status = 'active';
+
+SET SQL_SAFE_UPDATES = 1; -- Bật lại chế độ an toàn
+
+-- Thêm trigger để đồng bộ trạng thái từ danh mục cha sang danh mục con và vật tư
+DELIMITER //
+
+CREATE PROCEDURE UpdateCategoryAndChildren(
+    IN p_category_id INT,
+    IN p_new_name VARCHAR(100),
+    IN p_new_status ENUM('active', 'inactive')
+)
+BEGIN
+    START TRANSACTION;
+    -- Cập nhật danh mục cha
+    UPDATE MaterialCategories
+    SET name = p_new_name,
+        status = p_new_status
+    WHERE category_id = p_category_id AND parent_id IS NULL;
+
+    -- Cập nhật danh mục con
+    UPDATE MaterialCategories
+    SET status = p_new_status
+    WHERE parent_id = p_category_id;
+
+    COMMIT;
+END //
+
+DELIMITER ;
 
 
+-- Update quantity when create new material 
+DELIMITER $$
 
+CREATE TRIGGER after_material_insert
+AFTER INSERT ON Materials
+FOR EACH ROW
+BEGIN
+  INSERT INTO Inventory (material_id, material_condition, quantity_in_stock)
+  VALUES (NEW.material_id, 'new', 0);
+END$$
+
+DELIMITER ;
 
 
 
 -- Thêm dữ liệu
-
-
 INSERT INTO Roles (role_name) VALUES
 ('admin'),
 ('direction'),
@@ -189,71 +267,378 @@ INSERT INTO Roles (role_name) VALUES
 ('employee');
 
 
-
-
 -- Thêm dữ liệu Users (có cột code)
 INSERT INTO Users (code, username, password_hash, full_name, address, email, phone_number, imageUrl, date_of_birth, status, role_id) VALUES
 ('admin001', 'admin1', '123456', 'Admin One', '123 Admin St', 'admin1@example.com', '0123456789', 'images/admin1.jpg', '1990-01-01', 'active', 1),
 ('admin002', 'admin2', '123456', 'Admin Two', '124 Admin St', 'admin2@example.com', '0123456790', 'images/admin2.jpg', '1991-02-02', 'active', 1),
 
-
 ('dir001', 'dir1', '123456', 'Direction One', '10 Dir Ave', 'dir1@example.com', '0111111111', 'images/dir1.jpg', '1985-05-05', 'active', 2),
 ('dir002', 'dir2', '123456', 'Direction Two', '11 Dir Ave', 'dir2@example.com', '0111111112', 'images/dir2.jpg', '1986-06-06', 'active', 2),
 
-
 ('ware001', 'ware1', '123456', 'Warehouse One', '20 Ware Rd', 'ware1@example.com', '0222222222', 'images/ware1.jpg', '1987-07-07', 'active', 3),
 ('ware002', 'ware2', '123456', 'Warehouse Two', '21 Ware Rd', 'ware2@example.com', '0222222223', 'images/ware2.jpg', '1988-08-08', 'active', 3),
-
 
 ('emp001', 'emp1', '123456', 'Employee One', '30 Emp Blvd', 'emp1@example.com', '0333333333', 'images/emp1.jpg', '1992-03-03', 'active', 4),
 ('emp002', 'emp2', '123456', 'Employee Two', '31 Emp Blvd', 'emp2@example.com', '0333333334', 'images/emp2.jpg', '1993-04-04', 'active', 4);
 
 
-
-
-
-
-
-
+-- Thêm dữ liệu nhà cung cấp với số điện thoại khác nhau
 INSERT INTO Suppliers (name, phone, address, email, status) VALUES
 ('Công ty VLXD Minh Hạnh', '0901234567', 'Hà Nội', 'minhhanh@example.com', 'active'),
 ('Công ty TNHH Điện Tr', '0902345678', 'TP.HCM', 'dientr@example.com', 'active'),
 ('Công ty TNHH Sơn DULUX', '0903456789', 'Đà Nẵng', 'dulux@example.com', 'active'),
-('Công ty Gạch Prime', '0904567890', 'Cần Thơ', 'prime@example.com', 'active'),
-('Công ty Cơ Điện Hải Âu', '0905678901', 'Hải Phòng', 'haiau@example.com', 'active');
+('Công ty Gạch Prime', '0904567891', 'Cần Thơ', 'prime@example.com', 'active'),
+('Công ty Cơ Điện Hải Âu', '0905678902', 'Hải Phòng', 'haiau@example.com', 'active'),
+('Công ty VLXD Nam Long', '0906789013', 'Hà Nội', 'namlong@example.com', 'active'),
+('Công ty TNHH Điện Thoại Hưng Thịnh', '0907890124', 'TP.HCM', 'hungthinh@example.com', 'active'),
+('Công ty Cổ phần Sơn Maxilite', '0908901235', 'Đà Nẵng', 'maxilite@example.com', 'active'),
+('Công ty Gạch Đồng Tâm', '0909012346', 'Cần Thơ', 'dongtam@example.com', 'active'),
+('Công ty Thiết Bị Xây Dựng Hòa Bình', '0900123457', 'Hải Phòng', 'hoabinh@example.com', 'active'),
+('Công ty Vật Liệu Xây Dựng Bình Minh', '0901234568', 'Bình Dương', 'binhminh@example.com', 'active'),
+('Công ty TNHH Gạch Men Hoàng Gia', '0902345679', 'Hà Nội', 'hoanggia@example.com', 'active'),
+('Công ty Cổ phần Xây Dựng Kiến Hòa', '0903456790', 'TP.HCM', 'kienhoa@example.com', 'active'),
+('Công ty Sơn O7', '0904567892', 'Đà Nẵng', 'sno7@example.com', 'active'),
+('Công ty Vật Liệu Xây Dựng Tín Nghĩa', '0905678903', 'Bình Dương', 'tinnhgia@example.com', 'active'),
+('Công ty Cổ phần Điện Tử Minh Phú', '0906789014', 'Hải Phòng', 'minhphu@example.com', 'active'),
+('Công ty TNHH Vật Liệu Xây Dựng Hưng Phát', '0907890125', 'Cần Thơ', 'hungphat@example.com', 'active'),
+('Công ty Cổ phần Thiết Bị Xây Dựng Đại Dương', '0908901236', 'Hà Nội', 'daiduong@example.com', 'active'),
+('Công ty TNHH Cơ Điện Phương Đông', '0909012347', 'TP.HCM', 'phuongdong@example.com', 'active'),
+('Công ty Cổ phần Vật Liệu Xây Dựng Thành An', '0900123458', 'Đà Nẵng', 'thangan@example.com', 'active'),
+('Công ty TNHH Vật Liệu Xây Dựng Hoàng Minh', '0901234569', 'Hải Phòng', 'hoangminh@example.com', 'active');
+
+INSERT INTO Units (name) VALUES
+('viên'),
+('bao'),
+('m³'),
+('thùng'),
+('cuộn'),
+('cái'),
+('bóng'),
+('tấm'),
+('kg'),
+('m'),
+('m²'),
+('chiếc'),
+('bộ');
 
 
-INSERT INTO MaterialCategories (name) VALUES
-('Xi măng'),
-('Ống nhựa'),
-('Sơn'),
-('Gạch'),
-('Dây điện');
+INSERT INTO MaterialCategories (name, parent_id) VALUES 
+('Gạch', NULL),
+('Xi măng', NULL),
+('Cát', NULL),
+('Đá', NULL),
+('Sơn', NULL),
+('Vật liệu điện', NULL),
+('Vật liệu gỗ', NULL),
+('Kim loại', NULL),
+('Thiết bị xây dựng', NULL);
+
+-- 1. Gạch (ID = 1)
+INSERT INTO MaterialCategories (name, parent_id) VALUES
+('Gạch đỏ 2 lỗ', 1),
+('Gạch không nung', 1),
+('Gạch thẻ', 1),
+('Gạch block', 1),
+('Gạch bông', 1);
+
+-- 2. Xi măng (ID = 2)
+INSERT INTO MaterialCategories (name, parent_id) VALUES
+('Xi măng Hà Tiên', 2),
+('Xi măng Nghi Sơn', 2),
+('Xi măng Holcim', 2),
+('Xi măng INSEE', 2),
+('Xi măng đa dụng', 2);
+
+-- 3. Cát (ID = 3)
+INSERT INTO MaterialCategories (name, parent_id) VALUES
+('Cát vàng', 3),
+('Cát đen', 3),
+('Cát xây tô', 3),
+('Cát san lấp', 3),
+('Cát bê tông', 3);
+
+-- 4. Đá (ID = 4)
+INSERT INTO MaterialCategories (name, parent_id) VALUES
+('Đá 1x2', 4),
+('Đá 0x4', 4),
+('Đá mi bụi', 4),
+('Đá hộc', 4),
+('Đá base', 4);
+
+-- 5. Sơn (ID = 5)
+INSERT INTO MaterialCategories (name, parent_id) VALUES
+('Sơn nước nội thất', 5),
+('Sơn nước ngoại thất', 5),
+('Sơn chống thấm', 5),
+('Sơn lót', 5),
+('Sơn dầu', 5);
+
+-- 6. Vật liệu điện (ID = 6)
+INSERT INTO MaterialCategories (name, parent_id) VALUES
+('Dây điện', 6),
+('Công tắc - ổ cắm', 6),
+('Bóng đèn', 6),
+('Cầu dao - CB', 6),
+('Ống luồn dây', 6);
+
+-- 7. Vật liệu gỗ (ID = 7)
+INSERT INTO MaterialCategories (name, parent_id) VALUES
+('Gỗ thông', 7),
+('Gỗ keo', 7),
+('Gỗ công nghiệp MDF', 7),
+('Gỗ plywood', 7),
+('Gỗ ghép thanh', 7);
+
+-- 8. Kim loại (ID = 8)
+INSERT INTO MaterialCategories (name, parent_id) VALUES
+('Thép hộp', 8),
+('Thép I', 8),
+('Thép cuộn', 8),
+('Sắt V', 8),
+('Tôn mạ kẽm', 8);
+
+-- 9. Thiết bị xây dựng (ID = 9)
+INSERT INTO MaterialCategories (name, parent_id) VALUES
+('Máy trộn bê tông', 9),
+('Giàn giáo', 9),
+('Thang xây dựng', 9),
+('Cốt pha', 9),
+('Xe rùa', 9);
+
+-- 1. Gạch
+INSERT INTO Materials (code, category_id, name, description, unit_id, image_url) VALUES
+('GC-GD-01', 10, 'Gạch đỏ 2 lỗ loại A', 'Gạch nung chất lượng cao dùng xây tường', 1, 'images/gach_do_2_lo.jpg'),
+('GC-GD-02', 10, 'Gạch đỏ 2 lỗ loại B', 'Gạch nung chất lượng cao dùng cho tường chịu lực', 1, 'images/gach_do_2_lo_b.jpg'),
+('GC-GD-03', 10, 'Gạch đỏ 2 lỗ loại C', 'Gạch đỏ thông dụng, sử dụng phổ biến', 1, 'images/gach_do_2_lo_c.jpg'),
+
+('GC-GKN-M100', 11, 'Gạch không nung M100', 'Gạch thân thiện môi trường', 1, 'images/gach_khong_nung.jpg'),
+('GC-GKN-M101', 11, 'Gạch không nung M150', 'Gạch không nung cường độ cao', 1, 'images/gach_khong_nung_m150.jpg'),
+
+('GC-GT-01', 12, 'Gạch thẻ trang trí', 'Gạch nhỏ dùng ốp mặt tiền', 1, 'images/gach_the.jpg'),
+('GC-GT-02', 12, 'Gạch thẻ trang trí loại A', 'Gạch thẻ với màu sắc đa dạng', 1, 'images/gach_the_loai_a.jpg'),
+
+('GC-GB-04', 13, 'Gạch block 4 lỗ', 'Gạch block dùng xây tường chắn', 1, 'images/gach_block.jpg'),
+('GC-GB-05', 13, 'Gạch block 6 lỗ', 'Gạch block 6 lỗ dùng cho tường chịu lực', 1, 'images/gach_block_6_lo.jpg'),
+
+('GC-GB-01', 14, 'Gạch bông hoa văn', 'Gạch cổ điển, lát nền', 1, 'images/gach_bong.jpg'),
+('GC-GB-02', 14, 'Gạch bông hoa văn xanh', 'Gạch bông hoa văn màu xanh', 1, 'images/gach_bong_hoa_van_xanh.jpg'),
+
+-- 2. Xi măng
+('XM-HT-01', 15, 'Xi măng Hà Tiên PCB40', 'Xi măng chất lượng cao cho bê tông', 2, 'images/ximang_ha_tien.jpg'),
+('XM-HT-02', 15, 'Xi măng Hà Tiên PCB30', 'Xi măng bền vững cho xây dựng', 2, 'images/ximang_ha_tien_pcb30.jpg'),
+
+('XM-NS-01', 16, 'Xi măng Nghi Sơn', 'Xi măng xây tô', 2, 'images/ximang_nghi_son.jpg'),
+('XM-NS-02', 16, 'Xi măng Nghi Sơn M200', 'Xi măng chuyên dụng cho bê tông cường độ cao', 2, 'images/ximang_nghi_son_m200.jpg'),
+
+('XM-HC-01', 17, 'Xi măng Holcim Đa dụng', 'Xi măng phổ thông', 2, 'images/ximang_holcim.jpg'),
+('XM-HC-02', 17, 'Xi măng Holcim M300', 'Xi măng chịu nhiệt cao', 2, 'images/ximang_holcim_m300.jpg'),
+
+('XM-IS-01', 18, 'Xi măng INSEE', 'Xi măng thân thiện môi trường', 2, 'images/ximang_insee.jpg'),
+('XM-IS-02', 18, 'Xi măng INSEE CEM II', 'Xi măng chất lượng cao cho các công trình xây dựng', 2, 'images/ximang_insee_cem_ii.jpg'),
+
+('XM-XD-01', 19, 'Xi măng xây dựng', 'Xi măng thông dụng', 2, 'images/ximang_da_dung.jpg'),
+('XM-XD-02', 19, 'Xi măng xây dựng loại tốt', 'Xi măng chất lượng tốt cho các công trình nhỏ', 2, 'images/ximang_xd_loai_tot.jpg'),
+
+-- 3. Cát
+('CT-VH-01', 20, 'Cát vàng hạt lớn', 'Cát đổ bê tông', 3, 'images/cat_vang.jpg'),
+('CT-VH-02', 20, 'Cát vàng hạt nhỏ', 'Cát dùng cho trát tường', 3, 'images/cat_vang_nho.jpg'),
+
+('CT-D-01', 21, 'Cát đen', 'Cát san lấp', 3, 'images/cat_den.jpg'),
+('CT-D-02', 21, 'Cát đen hạt lớn', 'Cát sử dụng cho công trình lớn', 3, 'images/cat_den_lg.jpg'),
+
+('CT-XT-01', 22, 'Cát xây tô mịn', 'Dùng trát tường', 3, 'images/cat_xay_to.jpg'),
+('CT-XT-02', 22, 'Cát xây tô mịn loại 2', 'Cát dùng cho công trình nhà ở', 3, 'images/cat_xay_to_loai2.jpg'),
+
+('CT-SL-B-01', 23, 'Cát san lấp loại B', 'Dùng làm nền móng', 3, 'images/cat_san_lap.jpg'),
+('CT-SL-B-02', 23, 'Cát san lấp loại A', 'Cát san lấp chất lượng cao', 3, 'images/cat_san_lap_a.jpg'),
+
+('CT-BT-01', 24, 'Cát bê tông sạch', 'Ít tạp chất', 3, 'images/cat_be_tong.jpg'),
+('CT-BT-02', 24, 'Cát bê tông cường độ cao', 'Cát phù hợp với các công trình bê tông yêu cầu cường độ cao', 3, 'images/cat_be_tong_cao.jpg'),
+
+-- 4. Đá
+('DA-1X2X-01', 25, 'Đá 1x2 xanh', 'Dùng làm bê tông', 3, 'images/da_1x2.jpg'),
+('DA-1X2X-02', 25, 'Đá 1x2 trắng', 'Đá 1x2 chất lượng cao', 3, 'images/da_1x2_trang.jpg'),
+('DA-1X2X-03', 25, 'Đá 1x2 đen', 'Đá 1x2 đen cho công trình', 3, 'images/da_1x2_den.jpg'),
+
+('DA-0X4-01', 26, 'Đá 0x4', 'Làm móng, nền đường', 3, 'images/da_0x4.jpg'),
+('DA-0X4-02', 26, 'Đá 0x4 loại 2', 'Đá 0x4 chất lượng tốt', 3, 'images/da_0x4_loai2.jpg'),
+
+('DA-MI-01', 27, 'Đá mi bụi', 'Làm nền', 3, 'images/da_mi_bui.jpg'),
+('DA-MI-02', 27, 'Đá mi bụi loại A', 'Đá mi bụi chất lượng cao', 3, 'images/da_mi_bui_loai_a.jpg'),
+
+('DA-HL-01', 28, 'Đá hộc lớn', 'Kè móng, kè sông', 3, 'images/da_hoc.jpg'),
+('DA-HL-02', 28, 'Đá hộc nhỏ', 'Đá hộc nhỏ cho công trình vừa và nhỏ', 3, 'images/da_hoc_nho.jpg'),
+
+('DA-BA-01', 29, 'Đá base A', 'Dùng nền đường', 3, 'images/da_base.jpg'),
+('DA-BA-02', 29, 'Đá base B', 'Đá nền chất lượng cao', 3, 'images/da_base_b.jpg'),
+
+-- 5. Sơn
+('SN-NT-JT01', 30, 'Sơn nội thất Joton', 'Dùng cho phòng khách, phòng ngủ', 4, 'images/son_noi_that.jpg'),
+('SN-NT-JT02', 30, 'Sơn nội thất Joton loại 2', 'Sơn nội thất có độ bền cao', 4, 'images/son_noi_that_jt2.jpg'),
+('SN-NT-JT03', 30, 'Sơn nội thất Joton loại 3', 'Sơn nội thất chất lượng cao', 4, 'images/son_noi_that_jt3.jpg'),
+
+('SN-NT-DX-01', 31, 'Sơn ngoại thất Dulux', 'Chống nắng mưa', 4, 'images/son_ngoai_that.jpg'),
+('SN-NT-DX-02', 31, 'Sơn ngoại thất Dulux loại 2', 'Sơn ngoại thất chống mưa nắng', 4, 'images/son_ngoai_that_dx2.jpg'),
+
+('SN-CT-KOVA-01', 32, 'Sơn chống thấm Kova', 'Chống thấm sân thượng', 4, 'images/son_chong_tham.jpg'),
+('SN-CT-KOVA-02', 32, 'Sơn chống thấm Kova loại 2', 'Chống thấm mạnh mẽ', 4, 'images/son_chong_tham_kova_2.jpg'),
+
+('SN-LK-01', 33, 'Sơn lót kháng kiềm', 'Tăng độ bám', 4, 'images/son_lot.jpg'),
+('SN-LK-02', 33, 'Sơn lót kháng kiềm loại 2', 'Sơn lót bền bỉ, dễ sử dụng', 4, 'images/son_lot_loai2.jpg'),
+
+('SN-DT-BT-01', 34, 'Sơn dầu Bạch Tuyết', 'Sơn gỗ, kim loại', 4, 'images/son_dau.jpg'),
+('SN-DT-BT-02', 34, 'Sơn dầu Bạch Tuyết loại 2', 'Sơn dầu bảo vệ gỗ, kim loại', 4, 'images/son_dau_bach_tuyet_2.jpg'),
+
+-- 6. Vật liệu điện
+('VL-DT-01', 35, 'Dây điện Cadivi CV 2.5', 'Dây dẫn điện dân dụng', 10, 'images/day_dien.jpg'),
+('VL-DT-02', 35, 'Dây điện Cadivi CV 4', 'Dây dẫn điện cho công trình lớn', 10, 'images/day_dien_4.jpg'),
+
+('VL-CT-PAN-01', 36, 'Công tắc điện Panasonic', 'Loại âm tường', 6, 'images/cong_tac.jpg'),
+('VL-CT-PAN-02', 36, 'Công tắc điện Panasonic loại 2', 'Công tắc điện cao cấp', 6, 'images/cong_tac_2.jpg'),
+
+('VL-BD-LED-01', 37, 'Bóng đèn LED 12W', 'Chiếu sáng tiết kiệm điện', 7, 'images/bong_den.jpg'),
+('VL-BD-LED-02', 37, 'Bóng đèn LED 20W', 'Bóng đèn LED cho phòng lớn', 7, 'images/bong_den_led_20w.jpg'),
+
+('VL-CB-1P-20A', 38, 'CB 1 pha 20A', 'Ngắt mạch tự động', 6, 'images/cb_dien.jpg'),
+('VL-CB-1P-30A', 38, 'CB 1 pha 30A', 'CB 1 pha 30A cho các công trình lớn', 6, 'images/cb_dien_30a.jpg'),
+
+('VL-OL-01', 39, 'Ống luồn dây D20', 'Bảo vệ dây điện', 10, 'images/ong_luon.jpg'),
+('VL-OL-02', 39, 'Ống luồn dây D25', 'Ống luồn dây cho công trình lớn', 10, 'images/ong_luon_d25.jpg'),
+
+-- 7. Vật liệu gỗ
+('VL-GO-TH-01', 40, 'Gỗ thông nhập khẩu', 'Làm nội thất', 3, 'images/go_thong.jpg'),
+('VL-GO-TH-02', 40, 'Gỗ thông nhập khẩu loại 2', 'Gỗ thông nhập khẩu chất lượng tốt', 3, 'images/go_thong_2.jpg'),
+
+('VL-GO-KEO-01', 41, 'Gỗ keo', 'Làm đồ gỗ dân dụng', 3, 'images/go_keo.jpg'),
+('VL-GO-KEO-02', 41, 'Gỗ keo loại 2', 'Gỗ keo chất lượng cao', 3, 'images/go_keo_2.jpg'),
+
+('VL-GO-MDF-01', 42, 'Gỗ MDF phủ Melamine', 'Làm tủ bếp', 8, 'images/go_mdf.jpg'),
+('VL-GO-MDF-02', 42, 'Gỗ MDF phủ Melamine loại 2', 'Gỗ MDF chất lượng cao', 8, 'images/go_mdf_2.jpg'),
+
+('VL-GO-PW-18MM', 43, 'Gỗ plywood 18mm', 'Chống ẩm', 8, 'images/go_plywood.jpg'),
+('VL-GO-PW-19MM', 43, 'Gỗ plywood 19mm', 'Gỗ plywood 19mm chống ẩm', 8, 'images/go_plywood_19mm.jpg'),
+
+('VL-GO-GT-01', 44, 'Gỗ ghép thanh', 'Giá rẻ, nhẹ', 8, 'images/go_ghep.jpg'),
+('VL-GO-GT-02', 44, 'Gỗ ghép thanh loại 2', 'Gỗ ghép thanh cao cấp',8, 'images/go_ghep_2.jpg'),
+
+-- 8. Kim loại
+('KM-TH-HP-50X50', 45, 'Thép hộp 50x50', 'Kết cấu mái', 10, 'images/thep_hop.jpg'),
+('KM-TH-HP-60X60', 45, 'Thép hộp 60x60', 'Thép hộp cho công trình lớn', 10, 'images/thep_hop_60x60.jpg'),
+
+('KM-TH-I-200', 46, 'Thép I 200', 'Khung nhà tiền chế', 10, 'images/thep_i.jpg'),
+('KM-TH-I-250', 46, 'Thép I 250', 'Thép I 250 cho công trình lớn', 10, 'images/thep_i_250.jpg'),
+
+('KM-TH-CUON-P6', 47, 'Thép cuộn phi 6', 'Gia cố móng', 9, 'images/thep_cuon.jpg'),
+('KM-TH-CUON-P8', 47, 'Thép cuộn phi 8', 'Thép cuộn phi 8 gia cố móng', 9, 'images/thep_cuon_p8.jpg'),
+
+('KM-SAT-V-63X63', 48, 'Sắt V 63x63', 'Làm khung, giằng', 10, 'images/sat_v.jpg'),
+('KM-SAT-V-70X70', 48, 'Sắt V 70x70', 'Sắt V cho các công trình lớn', 10, 'images/sat_v_70x70.jpg'),
+
+('KM-TON-MK-0.5MM', 49, 'Tôn mạ kẽm 0.5mm', 'Lợp mái', 11, 'images/ton_ma_kem.jpg'),
+('KM-TON-MK-0.6MM', 49, 'Tôn mạ kẽm 0.6mm', 'Tôn mạ kẽm chất lượng cao', 11, 'images/ton_ma_kem_0.6mm.jpg'),
+
+-- 9. Thiết bị xây dựng
+('TB-TBBT-250L', 50, 'Máy trộn bê tông 250L', 'Trộn bê tông tại chỗ', 12, 'images/may_tron.jpg'),
+('TB-TBBT-300L', 50, 'Máy trộn bê tông 300L', 'Máy trộn bê tông công suất lớn', 12, 'images/may_tron_300l.jpg'),
+
+('TB-GG-CH-H', 51, 'Giàn giáo khung chữ H', 'Giàn thi công', 13, 'images/gian_giao.jpg'),
+('TB-GG-CH-I', 51, 'Giàn giáo khung chữ I', 'Giàn giáo cho công trình xây dựng', 13, 'images/gian_giao_2.jpg'),
+
+('TB-TNXD-5M', 52, 'Thang nhôm xây dựng 5m', 'Dùng ngoài trời', 6, 'images/thang_xay_dung.jpg'),
+('TB-TNXD-6M', 52, 'Thang nhôm xây dựng 6m', 'Thang nhôm cho công trình cao',6 , 'images/thang_xay_dung_6m.jpg'),
+
+('TB-CPNH-1220X2440', 53, 'Cốt pha nhựa 1220x2440', 'Tái sử dụng', 8, 'images/cot_pha.jpg'),
+('TB-CPNH-1220X3000', 53, 'Cốt pha nhựa 1220x3000', 'Cốt pha nhựa cho công trình lớn', 8, 'images/cot_pha_1220x3000.jpg'),
+
+('TB-XRD-01', 54, 'Xe rùa bánh đặc', 'Vận chuyển vật liệu', 12, 'images/xe_rua.jpg'),
+('TB-XRD-02', 54, 'Xe rùa bánh đặc loại 2', 'Xe rùa cho công trình lớn', 12, 'images/xe_rua_2.jpg');
 
 
-INSERT INTO MaterialBrands (category_id, name) VALUES
-(1, 'Xuân Thành'),
-(2, 'Vanlock'),
-(3, 'DULUX'),
-(4, 'Prime'),
-(5, 'Cadivi');
+UPDATE Materials m
+JOIN Units u ON m.unit_id = u.unit_id
+SET m.unit = u.name;
+
+INSERT INTO ConstructionSites (site_name, address, manager_id, start_date, end_date, status, note)
+VALUES
+-- 1
+('Chung cư Green Park',
+ 'Số 15 Nguyễn Văn Cừ, Long Biên, Hà Nội',
+ 3,
+ '2025-01-10', NULL, 'ongoing',
+ 'Dự án nhà ở cao tầng 20 tầng, kết hợp trung tâm thương mại'),
+
+-- 2
+('Nhà máy điện mặt trời SolarOne',
+ 'Xã Phước Hữu, Ninh Thuận',
+ 4,
+ '2024-11-01', NULL, 'ongoing',
+ 'Công trình năng lượng tái tạo công suất 100MW'),
+
+-- 3
+('Trường Tiểu học Kim Đồng',
+ 'Thị xã Sa Pa, Lào Cai',
+ 3,
+ '2023-09-01', '2024-08-30', 'completed',
+ 'Đã bàn giao và đưa vào sử dụng'),
+
+-- 4
+('Cầu vượt quốc lộ 13',
+ 'Bình Dương',
+ 4,
+ '2024-06-15', NULL, 'paused',
+ 'Tạm ngừng do thiếu mặt bằng thi công'),
+
+-- 5
+('Resort Hồ Tràm Paradise',
+ 'Xã Phước Thuận, Bà Rịa – Vũng Tàu',
+ 3,
+ '2025-02-20', NULL, 'ongoing',
+ 'Khu nghỉ dưỡng 5 sao ven biển'),
+
+-- 6
+('Kho hàng lạnh SmartLogistics',
+ 'KCN Hiệp Phước, Nhà Bè, TP.HCM',
+ 4,
+ '2024-03-10', '2024-12-01', 'cancel',
+ 'Hủy do thay đổi định hướng đầu tư'),
+
+-- 7
+('Tòa nhà văn phòng Grand Central',
+ 'Quận 3, TP.HCM',
+ 3,
+ '2025-04-01', NULL, 'ongoing',
+ 'Tòa nhà 18 tầng, văn phòng cho thuê hạng B+'),
+
+-- 8
+('Khu công nghiệp VSIP Bắc Ninh mở rộng',
+ 'Yên Phong, Bắc Ninh',
+ 4,
+ '2025-03-15', NULL, 'ongoing',
+ 'Mở rộng thêm 120ha cho các nhà máy mới'),
+
+-- 9
+('Trung tâm thương mại MegaMall',
+ 'Ngã Tư Sở, Hà Nội',
+ 3,
+ '2024-09-10', NULL, 'paused',
+ 'Chờ phê duyệt điều chỉnh giấy phép xây dựng'),
+
+-- 10
+('Ký túc xá Đại học Cần Thơ - Khu B',
+ 'Quận Ninh Kiều, TP. Cần Thơ',
+ 4,
+ '2023-10-01', '2025-06-01', 'completed',
+ 'Hoàn thành 6 tòa nhà, sức chứa 3.000 sinh viên');
+
+INSERT INTO Inventory (material_id, material_condition, quantity_in_stock)
+SELECT material_id, 'new', 100
+FROM Materials
+WHERE material_id BETWEEN 1 AND 93;
 
 
-INSERT INTO Materials (code, brand_id, name, description, unit, image_url) VALUES
-('XM-XT-001', 1, 'Xi măng Xuân Thành PCB40', 'Xi măng chất lượng cao', 'bao', 'images/ximang_xuanthanh.jpg'),
-('ON-VL-001', 2, 'Ống nhựa PVC D20 Vanlock VL9020', 'Ống nhựa PVC D20', 'mét', 'images/ong_nhua_pvc.jpg'),
-('S-DL-001', 3, 'Sơn DULUX EASYCLEAN', 'Sơn nội thất cao cấp', 'lít', 'images/son_dulux_easyclean.jpg'),
-('G-PR-001', 4, 'Gạch Prime 30x30 Ce2703', 'Gạch lát nền 30x30', 'viên', 'images/gach_prime_30x30.jpg'),
-('DD-CD-001', 5, 'Dây cáp điện Cadivi CVV-2x1.5', 'Dây cáp điện 2 lõi', 'mét', 'images/day_cap_dien_cadivi.jpg');
 
 
 
 
 
 
-INSERT INTO SupplierMaterials (supplier_id, material_id) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5);
