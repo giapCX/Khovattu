@@ -159,7 +159,7 @@
                 <!-- Filter form -->
                 <form action="importhistory" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
                     <div class="flex-1 min-w-[200px]">
-                        <label class="block text-sm font-medium text-gray-700">Proposal Type</label>
+                        <label class="block text-sm font-medium text-gray-700">Import Type</label>
                         <select name="type" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                             <option value="">All</option>
                             <option value="import_from_supplier" ${param.type == 'import_from_supplier' ? 'selected' : ''}>Purchase</option>
@@ -194,7 +194,7 @@
                             <thead>
                                 <tr class="bg-primary-600 text-white">
                                     <th class="p-4 text-left">ID</th>
-                                    <th class="p-4 text-left">Proposal Type</th>
+                                    <th class="p-4 text-left">Import Type</th>
                                     <th class="p-4 text-left">Executor</th>
                                     <th class="p-4 text-left">Import Date</th>
                                     <th class="p-4 text-left">Note</th>
