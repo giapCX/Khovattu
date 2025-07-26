@@ -58,7 +58,7 @@
             <!-- General Info -->
             <div class="row mb-3">
                 <div class="col-md-6"><strong>Import ID:</strong> ${receipt.importId}</div>
-                <div class="col-md-6"><strong>Proposal ID:</strong> ${receipt.proposalId}</div>
+                <div class="col-md-6"><strong>Request ID:</strong> ${receipt.proposalId}</div>
                 <div class="col-md-6"><strong>Import Type:</strong>
                     <c:choose>
                         <c:when test="${receipt.importType == 'import_from_supplier'}">Purchase</c:when>
