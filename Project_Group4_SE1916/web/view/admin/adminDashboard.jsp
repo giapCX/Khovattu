@@ -99,31 +99,11 @@
                         </a>
                     </div>
                 </div>
-
-                <div class="nav-item flex flex-col">
-                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
-                        <div class="flex items-center">
-                            <i class="fas fa-box-open mr-2 w-5 text-center"></i>
-                            <span class="text-base">Material Category</span>
-                        </div>
-                        <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
-                    </button>
-                    <!-- Submenu - hidden by default -->
-                    <div class="submenu hidden pl-6 space-y-1 mt-1">
-                        <a href = "${pageContext.request.contextPath}/ListParentCategoryController" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                            <i class="fas fa-folder-tree mr-2 w-4 text-center"></i>
-                            <span class="text-sm">Categories</span>
-                        </a>
-                        <a href="${pageContext.request.contextPath}/ListMaterialController" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                            <i class="fas fa-cubes mr-2 w-4 text-center"></i>
-                            <span class="text-sm">Material </span>
-                        </a>
-                        <a href="${pageContext.request.contextPath}/unit" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                            <i class="fas fa-clipboard-list mr-2 w-4 text-center"></i>
-                            <span class="text-sm">Unit List </span>
-                        </a>
-                    </div>
-                </div> 
+                <a href="${pageContext.request.contextPath}/ListParentCategoryController" class="nav-item flex items-center p-3">
+                    <i class="fas fa-box-open mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Material Category</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
+                </a>
                 <!-- Supplier - Parent Menu -->
                 <div class="nav-item flex flex-col">
                     <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
@@ -145,60 +125,42 @@
                         </a>
                     </div>
                 </div>
-             
-             
-               
-                  <div class="nav-item flex flex-col">
-                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
-                        <div class="flex items-center">
-                            <i class="fas fas fa-users mr-2 w-5 text-center"></i>
-                            <span class="text-base">Users</span>
-                        </div>
-                        <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
-                    </button>
-                    <!-- Submenu - hidden by default -->
-                    <div class="submenu hidden pl-6 space-y-1 mt-1">
-                        <a href="${pageContext.request.contextPath}/listuser" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                            <i class="fas fa-list mr-2 w-4 text-center"></i>
-                            <span class="text-sm">User List</span>
-                        </a>
-                        <a href="${pageContext.request.contextPath}/adduser" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                            <i class="fas fa-user-plus  mr-2 w-4 text-center"></i>
-                            <span class="text-sm"> Add User </span>
-                        </a>
+                <a href="${pageContext.request.contextPath}/inventory" class="nav-item flex items-center p-2 justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-boxes mr-2 w-5 text-center"></i>
+                        <span class="text-base">Inventory List</span>
                     </div>
-                </div> 
-               
-
-                <div class="nav-item flex flex-col">
-                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
-                        <div class="flex items-center">
-                            <i class="fas fa-box-open mr-2 w-5 text-center"></i>
-                            <span class="text-base">Inventory Management</span>
-                        </div>
-                        <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
-                    </button>
-                    <!-- Submenu - hidden by default -->
-                    <div class="submenu hidden pl-6 space-y-1 mt-1">
-                        <a href="${pageContext.request.contextPath}/exportHistory" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                            <i class="fas fa-history mr-2 w-4 text-center"></i>
-                            <span class="text-sm">Export History</span>
-                        </a>
-                        <a href="${pageContext.request.contextPath}/importhistory" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                            <i class="fas fa-history mr-2 w-4 text-center"></i>
-                            <span class="text-sm"> Import History </span>
-                        </a>
-                        <a href="${pageContext.request.contextPath}/inventory" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
-                            <i class="fas fa-boxes mr-2 w-4 text-center"></i>
-                            <span class="text-sm"> Inventory List </span>
-                        </a>
+                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
+                </a>
+                <a href="${pageContext.request.contextPath}/unit" class="nav-item flex items-center p-2 justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-clipboard-list mr-2 w-5 text-center"></i>
+                        <span class="text-base">Unit List</span>
                     </div>
-                </div> 
-
-
+                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
+                </a>
+                <a href="${pageContext.request.contextPath}/listuser" class="nav-item flex items-center p-3">
+                    <i class="fas fa-cog mr-3 w-6 text-center"></i>
+                    <span class="text-lg">User List</span>
+                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
+                </a>
+                <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-history mr-2 w-5 text-center"></i>
+                        <span class="text-base">Export History</span>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
+                </a>
+                <a href="${pageContext.request.contextPath}/importhistory" class="nav-item flex items-center p-2 justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-history mr-2 w-5 text-center"></i>
+                        <span class="text-base">Import History</span>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
+                </a>
                 <a href="${pageContext.request.contextPath}/AdminApproveServlet" class="nav-item flex items-center p-3">
-                    <i class="fas fa-check-circle mr-2 w-5 text-center"></i>
-                    <span class="text-base">Approve Request</span>
+                    <i class="fas fa-check-circle mr-3 w-6 text-center"></i>
+                    <span class="text-lg">Approve Request</span>
                     <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
                 </a>
             </nav>
@@ -228,7 +190,7 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-6">
-
+                  
                     <div class="flex items-center">
                         <img src="https://ui-avatars.com/api/?name=<%= java.net.URLEncoder.encode(username, "UTF-8")%>&background=3b82f6&color=fff" 
                              alt="User" class="w-10 h-10 rounded-full mr-3">
@@ -298,7 +260,7 @@
                             <i class="fas fa-exchange-alt text-2xl"></i>
                         </div>
                     </div>
-
+                    
                 </div>
             </div>
 
@@ -366,7 +328,7 @@
                         </table>
                     </div>
                 </div>
-
+            
         </main>
 
         <!-- Footer -->
@@ -435,7 +397,7 @@
             }
 
             // Inventory Chart - real data
-            const inventoryTrend = JSON.parse('<%= new com.google.gson.Gson().toJson(request.getAttribute("inventoryTrend"))%>');
+            const inventoryTrend = JSON.parse('<%= new com.google.gson.Gson().toJson(request.getAttribute("inventoryTrend")) %>');
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const imported = inventoryTrend.map(item => item.imported);
             const exported = inventoryTrend.map(item => item.exported);
@@ -454,7 +416,7 @@
                 options: {responsive: true, plugins: {legend: {position: 'top', labels: {usePointStyle: true, padding: 20}}, tooltip: {enabled: true, mode: 'index', intersect: false}}, scales: {y: {beginAtZero: false, grid: {drawBorder: false}}, x: {grid: {display: false}}}}
             });
             // Distribution Chart - real data
-            const materialDistribution = JSON.parse('<%= new com.google.gson.Gson().toJson(request.getAttribute("materialDistribution"))%>');
+            const materialDistribution = JSON.parse('<%= new com.google.gson.Gson().toJson(request.getAttribute("materialDistribution")) %>');
             const distLabels = Object.keys(materialDistribution);
             const distData = Object.values(materialDistribution);
             // Function to generate HEX colors for each material
