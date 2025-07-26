@@ -15,9 +15,170 @@
         <title>Export Material</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_add_edit.css">      
         <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
+
+        <!-- Custom CSS -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style_list.css">
+        <style>
+            body {
+                font-family: 'Segoe UI', Arial, sans-serif;
+                background-color: #f0f2f5; /* Matches bg-gray-50 */
+                color: #1a1a1a;
+                min-height: 100vh;
+                display: flex;
+            }
+            .container {
+                margin: 0 auto;
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 0 0 0.5rem 0.5rem; /* Rounded corners at the bottom */
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                max-width: 1200px;
+            }
+            h1 {
+                text-align: center;
+                color: #1f2937; /* Matches text-gray-800 */
+                margin-bottom: 20px;
+            }
+            form {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+            /*            label {
+                            font-weight: bold;
+                            color: #374151;  Matches text-gray-700 
+                        }*/
+            input[type="text"],
+            input[type="number"],
+            input[type="datetime-local"],
+            select,
+            textarea {
+                padding: 8px;
+                border: 1px solid #d1d5db; /* Matches border-gray-300 */
+                border-radius: 0.5rem; /* Rounded corners */
+                font-size: 14px;
+                width: 100%;
+                background-color: #fff;
+                transition: border-color 0.2s, box-shadow 0.2s;
+            }
+            input[type="text"]:focus,
+            input[type="number"]:focus,
+            input[type="datetime-local"]:focus,
+            select:focus,
+            textarea:focus {
+                outline: none;
+                border-color: #2563eb; /* Matches focus:ring-primary-500 */
+                box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+            }
+            input[readonly] {
+                background-color: #e5e7eb; /* Matches bg-gray-200 */
+                cursor: not-allowed;
+            }
+            textarea {
+                resize: vertical;
+                min-height: 80px;
+            }
+            button[type="submit"] {
+                padding: 8px 16px;
+                background-color: #2563eb; /* Matches bg-primary-600 */
+                color: #fff;
+                border: none;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+            button[type="submit"]:hover {
+                background-color: #1d4ed8; /* Darker shade of primary-600 */
+            }
+            .table-container {
+                background-color: #fff;
+                border-radius: 0 0 0.5rem 0.5rem; /* Rounded corners at the bottom */
+                overflow: hidden;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #e5e7eb; /* Matches border-gray-200 */
+            }
+            th {
+                background-color: #0284C7; /* Matches bg-primary-600 */
+                color: #fff;
+                font-weight: bold;
+            }
+            tr:nth-child(even) {
+                background-color: #f9fafb; /* Matches bg-gray-50 */
+            }
+            tr:hover {
+                background-color: #f3f4f6; /* Matches hover:bg-gray-100 */
+            }
+            .no-data {
+                text-align: center;
+                color: #6b7280; /* Matches text-gray-500 */
+                padding: 20px;
+            }
+            .error-message, .success-message {
+                padding: 12px;
+                border-radius: 0.5rem;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            .error-message {
+                background-color: #fee2e2; /* Matches bg-red-100 */
+                border: 1px solid #f87171; /* Matches border-red-400 */
+                color: #991b1b; /* Matches text-red-700 */
+            }
+            .success-message {
+                background-color: #dcfce7; /* Matches bg-green-100 */
+                border: 1px solid #86efac; /* Matches border-green-400 */
+                color: #15803d; /* Matches text-green-700 */
+            }
+
+            .link-execute {
+                display: inline-block;
+                margin-top: 20px;
+                text-align: center;
+                background-color: #2563eb; /* Matches bg-primary-600 */
+                color: #fff;
+                text-decoration: none;
+                font-weight: bold;
+                padding: 8px 16px;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+            .link-execute:hover {
+                background-color: #1d4ed8;
+            }
+            @media (max-width: 768px) {
+                .container {
+                    padding: 15px;
+                }
+                .grid-cols-1.md\:grid-cols-2 {
+                    grid-template-columns: 1fr;
+                }
+                input[type="text"],
+                input[type="number"],
+                input[type="datetime-local"],
+                select,
+                textarea {
+                    margin-bottom: 10px;
+                }
+                button[type="submit"],
+                .link-execute {
+                    width: 100%;
+                    text-align: center;
+                }
+                table {
+                    font-size: 14px;
+                }
+            }
+        </style>
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
         <%
@@ -43,13 +204,13 @@
 
         <!-- Error/Success Messages -->
         <c:if test="${not empty error}">
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 mx-auto max-w-6xl">
-                <span class="block sm:inline">${error}</span>
+            <div class="error-message max-w-6xl mx-auto">
+                <span>${error}</span>
             </div>
         </c:if>
         <c:if test="${not empty success}">
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 mx-auto max-w-6xl">
-                <span class="block sm:inline">${success}</span>
+            <div class="success-message max-w-6xl mx-auto">
+                <span>${success}</span>
             </div>
         </c:if>
 
@@ -70,7 +231,7 @@
         </c:choose>
 
         <main class="flex-1 p-8 transition-all duration-300">
-            <div class="max-w-6xl mx-auto">
+            <div class="container">
                 <form action="${pageContext.request.contextPath}/exportMaterial" method="post" class="space-y-6">
                     <input type="hidden" name="exporterId" value="<%= userId%>" />
                     <input type="hidden" name="proposalId" value="${proposalId}" />
@@ -81,82 +242,79 @@
                             <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                                 <i class="fas fa-bars text-2xl"></i>
                             </button>
-                            <h2 class="text-2xl font-bold text-gray-800">Export Material</h2>
+                            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Export Material</h2>
                         </div>
                     </div>
 
                     <!-- Exporter -->
                     <div class="bg-white shadow-md rounded-lg p-4">
-                        <label class="block text-sm font-medium text-gray-700">Exporter</label>
-                        <p class="mt-1 text-gray-900"><%= userFullName%></p>
+                        <label class="block text-sm font-medium">Exporter</label>
+                        <p class="mt-1"><%= userFullName%></p>
                     </div>
 
                     <!-- Form Inputs -->
                     <div class="bg-white shadow-md rounded-lg p-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Proposal ID</label>
-                                <input type="number" name="proposalId" value="${proposalId}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" readonly>
+                                <label class="block text-sm font-medium">Proposal ID</label>
+                                <input type="number" name="proposalId" value="${proposalId}" class="mt-1 block w-full" readonly>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Receiver</label>
-                                <select name="receiverId" id="receiverId" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                <label class="block text-sm font-medium">Receiver</label>
+                                <select name="receiverId" id="receiverId" class="mt-1 block w-full p-2" required>
                                     <option value="">Select Receiver</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Construction Site</label>
-                                <p class="mt-1 text-gray-900">${not empty proposal.siteName ? fn:escapeXml(proposal.siteName) : 'N/A'}</p>
+                                <label class="block text-sm font-medium">Construction Site</label>
+                                <p class="mt-1">${not empty proposal.siteName ? fn:escapeXml(proposal.siteName) : 'N/A'}</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Export Date</label>
-                                <input type="datetime-local" name="exportDate" value="<%= currentDateTime%>" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                <label class="block text-sm font-medium">Export Date</label>
+                                <input type="datetime-local" name="exportDate" value="<%= currentDateTime%>" class="mt-1 block w-full" required>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Proposal Type</label>
-                                <input type="text" name="proposalType" value="${proposal.proposalType}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" readonly>
+                                <label class="block text-sm font-medium">Proposal Type</label>
+                                <input type="text" name="proposalType" value="${proposal.proposalType}" class="mt-1 block w-full" readonly>
                                 <input type="hidden" name="proposalType" value="${proposal.proposalType}">
                             </div>
-
-
-
                             <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700">Note</label>
-                                <textarea name="note" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" rows="3" required></textarea>
+                                <label class="block text-sm font-medium">Note</label>
+                                <textarea name="note" class="mt-1 block w-full" rows="3" required></textarea>
                             </div>
                         </div>
-                        <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit Export</button>
+                        <button type="submit" class="mt-4">Submit Export</button>
                     </div>
 
                     <!-- Proposal Details -->
                     <c:if test="${not empty proposal}">
-                        <div class="bg-white shadow-md rounded-lg overflow-hidden mt-6">
+                        <div class="table-container mt-6">
                             <h3 class="text-lg font-medium text-gray-700 p-4">Proposal Details</h3>
-                            <table class="w-full text-sm text-left text-gray-500">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <table>
+                                <thead>
                                     <tr>
-                                        <th class="px-6 py-3">No</th>
-                                        <th class="px-6 py-3">Material</th>
-                                        <th class="px-6 py-3">Unit</th>
-                                        <th class="px-6 py-3">Quantity</th>
-                                        <th class="px-6 py-3">Condition</th>
+                                        <th>No</th>
+                                        <th>Material</th>
+                                        <th>Unit</th>
+                                        <th>Quantity</th>
+                                        <th>Condition</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <c:choose>
                                         <c:when test="${empty proposal.proposalDetails}">
-                                            <tr><td colspan="5" class="px-6 py-4 text-center">No details available.</td></tr>
+                                            <tr><td colspan="5" class="no-data">No details available.</td></tr>
                                         </c:when>
                                         <c:otherwise>
                                             <c:forEach var="detail" items="${proposal.proposalDetails}" varStatus="status">
-                                                <tr class="border-b border-gray-200">
-                                                    <td class="px-6 py-4">${status.index + 1}</td>
-                                                    <td class="px-6 py-4">${not empty detail.materialName ? fn:escapeXml(detail.materialName) : 'N/A'}</td>
-                                                    <td class="px-6 py-4">${not empty detail.unit ? fn:escapeXml(detail.unit) : 'N/A'}</td>
-                                                    <td class="px-6 py-4">
+                                                <tr>
+                                                    <td>${status.index + 1}</td>
+                                                    <td>${not empty detail.materialName ? fn:escapeXml(detail.materialName) : 'N/A'}</td>
+                                                    <td>${not empty detail.unit ? fn:escapeXml(detail.unit) : 'N/A'}</td>
+                                                    <td>
                                                         <fmt:formatNumber value="${not empty detail.quantity ? detail.quantity : 0}" type="number" minFractionDigits="2" maxFractionDigits="2" />
                                                     </td>
-                                                    <td class="px-6 py-4">${not empty detail.materialCondition ? fn:escapeXml(detail.materialCondition) : 'N/A'}</td>
+                                                    <td>${not empty detail.materialCondition ? fn:escapeXml(detail.materialCondition) : 'N/A'}</td>
                                                 </tr>
                                             </c:forEach>
                                         </c:otherwise>
@@ -169,15 +327,13 @@
 
                 <!-- Link to List Execute -->
                 <div class="mt-6 text-center">
-                    <a href="${pageContext.request.contextPath}/ListProposalExecute?filter=export_only" class="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Go to Execute List</a>
+                    <a href="${pageContext.request.contextPath}/ListProposalExecute?filter=export_only" class="link-execute">Go to Execute List</a>
                 </div>
             </div>
         </main>
 
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-               
-
                 // Fetch employees and populate receiver dropdown
                 fetch('${pageContext.request.contextPath}/exportMaterial?action=getEmployees')
                         .then(response => {
@@ -206,7 +362,7 @@
                         });
             });
         </script>
-        
+
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
         <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
     </body>

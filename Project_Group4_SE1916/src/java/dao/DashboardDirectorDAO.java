@@ -9,6 +9,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import model.ImportPrice;
 
 /**
  *
@@ -99,5 +102,53 @@ public class DashboardDirectorDAO {
             throw e;
         }
         return 0;
+    }
+     
+    public List<ImportPrice> getImportPrices() throws SQLException {
+        List<ImportPrice> importPrices = new ArrayList<>();
+        String sql = "SELECT id.material_id, m.name, id.price_per_unit " +
+                     "FROM ImportDetails id JOIN Materials m ON id.material_id = m.material_id " +
+                     "WHERE id.price_per_unit IS NOT NULL";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                ImportPrice importPrice = new ImportPrice();
+                importPrice.setMaterialId(rs.getInt("material_id"));
+                importPrice.setMaterialName(rs.getString("name"));
+                importPrice.setPricePerUnit(rs.getBigDecimal("price_per_unit"));
+                importPrices.add(importPrice);
+            }
+            System.out.println("Retrieved import prices count: " + importPrices.size());
+            return importPrices;
+        } catch (SQLException e) {
+            System.err.println("SQL Error in getImportPrices: " + e.getMessage());
+            throw e;
+        }
+    }
+    
+     public List<ImportPrice> getAverageImportPricesByMonth(int year) throws SQLException {
+        List<ImportPrice> averagePrices = new ArrayList<>();
+        String sql = "SELECT MONTH(ir.import_date) AS month, AVG(id.price_per_unit) AS avg_price " +
+                     "FROM ImportDetails id JOIN ImportReceipts ir ON id.import_id = ir.import_id " +
+                     "WHERE YEAR(ir.import_date) = ? AND id.price_per_unit IS NOT NULL " +
+                     "GROUP BY MONTH(ir.import_date) ORDER BY MONTH(ir.import_date)";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, year);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ImportPrice importPrice = new ImportPrice();
+                    importPrice.setMaterialName("Month " + rs.getInt("month"));
+                    importPrice.setPricePerUnit(rs.getBigDecimal("avg_price"));
+                    averagePrices.add(importPrice);
+                }
+                System.out.println("Retrieved average import prices for year " + year + ": " + averagePrices.size());
+                return averagePrices;
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error in getAverageImportPricesByMonth: " + e.getMessage());
+            throw e;
+        }
     }
 }

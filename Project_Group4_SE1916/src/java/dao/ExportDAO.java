@@ -114,14 +114,7 @@ public class ExportDAO {
                         throw new SQLException("Cannot update inventory for material ID " + detail.getMaterialId() + " with condition " + detail.getMaterialCondition());
                     }
                 }
-                String insertDetailSql = "INSERT INTO ExportDetails (export_id, material_id, quantity, material_condition) VALUES (?, ?, ?, ?)";
-                try (PreparedStatement insertStmt = conn.prepareStatement(insertDetailSql)) {
-                    insertStmt.setInt(1, exportId);
-                    insertStmt.setInt(2, detail.getMaterialId());
-                    insertStmt.setDouble(3, detail.getQuantity());
-                    insertStmt.setString(4, detail.getMaterialCondition());
-                    insertStmt.executeUpdate();
-                }
+
             }
             conn.commit();
         } catch (SQLException e) {
