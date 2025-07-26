@@ -241,7 +241,7 @@
             </header>
 
             <!-- Dashboard Stats -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp">
                     <div class="p-6 flex items-start justify-between">
                         <div>
