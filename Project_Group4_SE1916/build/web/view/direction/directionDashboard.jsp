@@ -1,5 +1,9 @@
 <%@page import="dao.DashboardDirectorDAO"%>
+<%@ page import="java.sql.*" %>
+<%@ page import="Dal.DBContext" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -38,6 +42,9 @@
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+       
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/adminDashboard.css">
+        
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -245,6 +252,13 @@
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            // Set attributes for JSTL
+            request.setAttribute("totalMaterials", totalMaterials);
+            request.setAttribute("lowInventory", lowInventory);
+            request.setAttribute("conSite", conSite);
+            request.setAttribute("supplier", supplier);
+            request.setAttribute("emp", emp);
+            request.setAttribute("proPend", proPend);
         %>
         <!-- Sidebar -->
         <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50 hidden">
@@ -325,11 +339,6 @@
                     <span class="text-lg">Approve Requests</span>
                     <span class="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full">3</span>
                 </a>
-                <a href="${pageContext.request.contextPath}/listuser" class="nav-item flex items-center p-3">
-                    <i class="fas fa-users mr-3 w-6 text-center"></i>
-                    <span class="text-lg">Employee List</span>
-                    <i class="fas fa-chevron-right ml-auto text-sm opacity-50"></i>
-                </a>
                 <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between">
                     <div class="flex items-center">
                         <i class="fas fa-history mr-2 w-5 text-center"></i>
@@ -371,10 +380,7 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-6">
-                    <div class="relative">
-                        <i class="fas fa-bell text-gray-500 hover:text-primary-600 cursor-pointer text-xl"></i>
-                        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-                    </div>
+                    
                     <div class="flex items-center">
                         <img src="https://ui-avatars.com/api/?name=Director&background=3b82f6&color=fff" 
                              alt="Director" class="w-10 h-10 rounded-full mr-3">
@@ -392,7 +398,7 @@
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Materials</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= totalMaterials%></h3>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${totalMaterials}</h3>
                         </div>
                         <div class="p-4 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300">
                             <i class="fas fa-boxes text-2xl"></i>
@@ -402,25 +408,12 @@
                         <a href="${pageContext.request.contextPath}/ListMaterialController" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View Report</a>
                     </div>
                 </div>
-                <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-100">
-                    <div class="p-6 flex items-start justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Employee List</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= emp%></h3>
-                        </div>
-                        <div class="p-4 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300">
-                            <i class="fas fa-users text-2xl"></i>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/listuser" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View All</a>
-                    </div>
-                </div>
+
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-200">
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Suppliers</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= supplier%></h3>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${supplier}</h3>
                         </div>
                         <div class="p-4 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
                             <i class="fas fa-building text-2xl"></i>
@@ -434,7 +427,7 @@
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Low Inventory</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= lowInventory%></h3>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${lowInventory}</h3>
                             <p class="text-sm text-red-500 mt-3"><i class="fas fa-exclamation-circle mr-1"></i>Needs Replenishment</p>
                         </div>
                         <div class="p-4 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300">
@@ -442,16 +435,14 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
-                        <a href="${pageContext.request.contextPath}/inventory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View Details</a>
+                        <a href="${pageContext.request.contextPath}/inventory?sortOrder=ASC&quantityThreshold=10" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View Details</a>
                     </div>
                 </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-                <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
+                    <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Construction Sites</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= conSite%></h3>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${conSite}</h3>
                             <p class="text-sm text-green-500 mt-3"><i class="fas mr-1"></i>Active</p>
                         </div>
                         <div class="p-4 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300">
@@ -462,11 +453,14 @@
                         <a href="${pageContext.request.contextPath}/ListConstructionSites" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View Details</a>
                     </div>
                 </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-300">
                     <div class="p-6 flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Requests</p>
-                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white"><%= proPend %></h3>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${proPend}</h3>
                             <p class="text-sm text-yellow-500 mt-3"><i class="fas fa-clock mr-1"></i>Pending Approval</p>
                         </div>
                         <div class="p-4 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300">
@@ -479,132 +473,25 @@
                 </div>
             </div>
             <!-- Charts Row -->
-            <!--
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
                 <div class="lg:col-span-2 card bg-white dark:bg-gray-800 p-6">
                     <div class="flex justify-between items-center mb-4">
                         <div>
                             <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Inventory Trends</h2>
-                            <p class="text-sm text-gray-600 dark:text-gray-300">Track import/export over time</p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button class="chart-filter px-4 py-2 text-sm bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 rounded-full active">Week</button>
-                            <button class="chart-filter px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Month</button>
-                            <button class="chart-filter px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Year</button>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">Track import/export warehouse over time</p>
                         </div>
                     </div>
                     <canvas id="inventoryChart" class="border rounded-lg"></canvas>
-                    <button onclick="exportToExcel('inventoryChart')" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Export to Excel</button>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 p-6">
                     <div class="mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Cost Distribution</h2>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">Cost of purchasing and repairing materials</p>
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Material Category Distribution</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Proportion of material categories in warehouse</p>
                     </div>
-                    <canvas id="costChart" class="border rounded-lg"></canvas>
-                    <button onclick="exportToExcel('costChart')" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Export to Excel</button>
-                </div>
-            </div>
-            -->
-
-            <!-- Request Management Table -->
-            <!--
-            <div class="table-container bg-white dark:bg-gray-800 mb-8">
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Pending Requests</h2>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">List of export/purchase/repair requests</p>
-                    </div>
-                    <a href="${pageContext.request.contextPath}/proposals" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">View All</a>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full table-auto">
-                        <thead>
-                            <tr class="bg-primary-600 text-white">
-                                <th class="p-4 text-left">Time</th>
-                                <th class="p-4 text-left">Request Type</th>
-                                <th class="p-4 text-left">Requester</th>
-                                <th class="p-4 text-left">Details</th>
-                                <th class="p-4 text-left">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <td class="p-4">10:30 23/05/2025</td>
-                                <td class="p-4">Export Request</td>
-                                <td class="p-4">John Doe</td>
-                                <td class="p-4">10 high-quality wooden tables</td>
-                                <td class="p-4">
-                                    <button onclick="approveRequest(1)" class="btn-primary text-white px-3 py-1 rounded">Approve</button>
-                                    <button onclick="rejectRequest(1)" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Reject</button>
-                                </td>
-                            </tr>
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <td class="p-4">09:15 23/05/2025</td>
-                                <td class="p-4">Purchase Request</td>
-                                <td class="p-4">IT Department</td>
-                                <td class="p-4">5 LCD monitors 24"</td>
-                                <td class="p-4">
-                                    <button onclick="approveRequest(2)" class="btn-primary text-white px-3 py-1 rounded">Approve</button>
-                                    <button onclick="rejectRequest(2)" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Reject</button>
-                                </td>
-                            </tr>
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <td class="p-4">08:45 23/05/2025</td>
-                                <td class="p-4">Repair Request</td>
-                                <td class="p-4">Jane Smith</td>
-                                <td class="p-4">3 broken mechanical keyboards</td>
-                                <td class="p-4">
-                                    <button onclick="approveRequest(3)" class="btn-primary text-white px-3 py-1 rounded">Approve</button>
-                                    <button onclick="rejectRequest(3)" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Reject</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <canvas id="distributionChart" class="border rounded-lg"></canvas>
                 </div>
             </div>
 
-            <!-- Request History Table -->
-            <!--
-            <div class="table-container bg-white dark:bg-gray-800">
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Request History</h2>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">History of export/purchase/repair requests</p>
-                    </div>
-                    <a href="${pageContext.request.contextPath}/proposals" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">View All</a>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full table-auto">
-                        <thead>
-                            <tr class="bg-primary-600 text-white">
-                                <th class="p-4 text-left">Time</th>
-                                <th class="p-4 text-left">Request Type</th>
-                                <th class="p-4 text-left">Department</th>
-                                <th class="p-4 text-left">Details</th>
-                                <th class="p-4 text-left">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <td class="p-4">15:20 22/05/2025</td>
-                                <td class="p-4">Export Request</td>
-                                <td class="p-4">Technical Department</td>
-                                <td class="p-4">20 swivel chairs</td>
-                                <td class="p-4"><span class="badge badge-success">Approved</span></td>
-                            </tr>
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <td class="p-4">14:00 22/05/2025</td>
-                                <td class="p-4">Purchase Request</td>
-                                <td class="p-4">Administrative Department</td>
-                                <td class="p-4">10 meeting tables</td>
-                                <td class="p-4"><span class="badge badge-danger">Rejected</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            -->
         </main>
 
         <!-- Footer -->
@@ -658,13 +545,13 @@
             }
 
             // Toast Notification
-            function showToast(message, bgColor = "#3b82f6") {
+            function showToast(message, backgroundColor = "#3b82f6") {
                 Toastify({
                     text: message,
                     duration: 3000,
                     gravity: "top",
                     position: "right",
-                    backgroundColor: bgColor,
+                    backgroundColor: backgroundColor,
                     stopOnFocus: true,
                     className: "rounded-lg shadow-lg",
                     style: {borderRadius: "0.5rem"}
@@ -692,24 +579,32 @@
             }
 
             // Inventory Chart
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const imported = [];
+            const exported = [];
+            const remaining = [];
+            <c:forEach var="item" items="${inventoryTrend}">
+                imported.push(${item.imported != null ? item.imported : 0});
+                exported.push(${item.exported != null ? item.exported : 0});
+                remaining.push(${item.remaining != null ? item.remaining : 0});
+            </c:forEach>
+            // Fallback if no data
+            if (imported.length === 0) {
+                imported.push(...Array(12).fill(0));
+                exported.push(...Array(12).fill(0));
+                remaining.push(...Array(12).fill(0));
+            }
+            console.log('Inventory Trend Data:', { imported, exported, remaining });
+
             const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
-            const inventoryChart = new Chart(inventoryCtx, {
+            new Chart(inventoryCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                    labels: months,
                     datasets: [
                         {
-                            label: 'Inventory',
-                            data: [1200, 1150, 1100, 1050, 1000, 950, 900],
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: true
-                        },
-                        {
-                            label: 'Imports',
-                            data: [200, 150, 100, 80, 50, 30, 10],
+                            label: 'Imported',
+                            data: imported,
                             borderColor: '#10b981',
                             backgroundColor: 'rgba(16, 185, 129, 0.1)',
                             borderWidth: 2,
@@ -717,10 +612,19 @@
                             fill: true
                         },
                         {
-                            label: 'Exports',
-                            data: [50, 70, 90, 120, 150, 100, 80],
+                            label: 'Exported',
+                            data: exported,
                             borderColor: '#ef4444',
                             backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'In Stock',
+                            data: remaining,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             borderWidth: 2,
                             tension: 0.3,
                             fill: true
@@ -730,70 +634,64 @@
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: {position: 'top', labels: {usePointStyle: true, padding: 20}},
-                        tooltip: {enabled: true, mode: 'index', intersect: false}
+                        legend: {
+                            position: 'top',
+                            labels: { usePointStyle: true, padding: 20 }
+                        },
+                        tooltip: { enabled: true, mode: 'index', intersect: false }
                     },
                     scales: {
-                        y: {beginAtZero: false, grid: {drawBorder: false}},
-                        x: {grid: {display: false}}
+                        y: { beginAtZero: true, grid: { drawBorder: false } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
 
-            // Cost Chart
-            const costCtx = document.getElementById('costChart').getContext('2d');
-            new Chart(costCtx, {
-                type: 'pie',
+            // Distribution Chart
+            const distLabels = [];
+            const distData = [];
+            <c:forEach var="entry" items="${materialDistribution}">
+                distLabels.push('${entry.key}');
+                distData.push(${entry.value != null ? entry.value : 0});
+            </c:forEach>
+            // Fallback if no data
+            if (distLabels.length === 0) {
+                distLabels.push('No Data');
+                distData.push(1);
+            }
+            console.log('Material Distribution Data:', { distLabels, distData });
+
+            function generateColors(count) {
+                const hexColors = [
+                    "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231", 
+                    "#911eb4", "#46f0f0", "#f032e6", "#bcf60c", "#fabebe"
+                ];
+                const colors = [];
+                for (let i = 0; i < count; i++) {
+                    colors.push(hexColors[i % hexColors.length]);
+                }
+                return colors;
+            }
+
+            const distColors = generateColors(distLabels.length);
+            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+            new Chart(distributionCtx, {
+                type: 'doughnut',
                 data: {
-                    labels: ['Purchase', 'Repair', 'Other'],
+                    labels: distLabels,
                     datasets: [{
-                            data: [60, 30, 10],
-                            backgroundColor: ['#3b82f6', '#10b981', '#f87171'],
-                            borderWidth: 0
-                        }]
+                        data: distData,
+                        backgroundColor: distColors,
+                        borderWidth: 0
+                    }]
                 },
                 options: {
                     responsive: true,
-                    plugins: {legend: {position: 'bottom', labels: {usePointStyle: true}}}
-                }
-            });
-
-            // Chart Filter
-            document.querySelectorAll('.chart-filter').forEach(button => {
-                button.addEventListener('click', () => {
-                    document.querySelectorAll('.chart-filter').forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    const period = button.textContent;
-                    // Update inventory chart data based on period (Week/Month/Year)
-                    let newData;
-                    if (period === 'Week') {
-                        newData = {
-                            labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-                            datasets: inventoryChart.data.datasets
-                        };
-                    } else if (period === 'Month') {
-                        newData = {
-                            labels: ['Jan', 'Feb', 'Mar', 'Apr'],
-                            datasets: [
-                                {...inventoryChart.data.datasets[0], data: [1200, 1100, 1000, 900]},
-                                {...inventoryChart.data.datasets[1], data: [200, 150, 100, 50]},
-                                {...inventoryChart.data.datasets[2], data: [50, 70, 90, 120]}
-                            ]
-                        };
-                    } else {
-                        newData = {
-                            labels: ['2023', '2024', '2025'],
-                            datasets: [
-                                {...inventoryChart.data.datasets[0], data: [1300, 1250, 1200]},
-                                {...inventoryChart.data.datasets[1], data: [300, 250, 200]},
-                                {...inventoryChart.data.datasets[2], data: [100, 80, 60]}
-                            ]
-                        };
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false }
                     }
-                    inventoryChart.data = newData;
-                    inventoryChart.update();
-                    showToast(`Chart updated for ${period}`);
-                });
+                }
             });
 
             // Table Sorting
@@ -803,7 +701,7 @@
                     const tbody = table.querySelector('tbody');
                     const rows = Array.from(tbody.querySelectorAll('tr'));
                     const columnIndex = th.cellIndex;
-                    const isNumeric = columnIndex === 0; // Only "Time" is sortable as text for simplicity
+                    const isNumeric = columnIndex === 2 || columnIndex === 3;
                     const isAsc = th.classList.toggle('asc');
                     th.classList.toggle('desc', !isAsc);
                     table.querySelectorAll('th').forEach(header => {
@@ -814,8 +712,8 @@
                         let aValue = a.cells[columnIndex].textContent;
                         let bValue = b.cells[columnIndex].textContent;
                         if (isNumeric) {
-                            aValue = new Date(aValue).getTime();
-                            bValue = new Date(bValue).getTime();
+                            aValue = parseFloat(aValue) || 0;
+                            bValue = parseFloat(bValue) || 0;
                             return isAsc ? aValue - bValue : bValue - aValue;
                         }
                         return isAsc ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
