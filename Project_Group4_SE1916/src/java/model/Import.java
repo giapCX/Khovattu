@@ -16,14 +16,16 @@ public class Import {
     private List<ImportDetail> importDetail;
     private User executor;
     private Proposal proposal;
-    private String deliverySupplierName; // New field
-    private String deliverySupplierPhone; // New field
-    
+    private String deliverySupplierName;
+    private String deliverySupplierPhone;
+    private Integer supplierId; // Thêm trường supplierId
+
     public Import() {
     }
 
     public Import(int importId, String receiptId, int proposalId, String importType, Integer responsibleId, Integer executorId, 
-                  String note, Timestamp importDate, List<ImportDetail> importDetail, String deliverySupplierName, String deliverySupplierPhone) {
+                  String note, Timestamp importDate, List<ImportDetail> importDetail, String deliverySupplierName, 
+                  String deliverySupplierPhone, Integer supplierId) {
         this.importId = importId;
         this.receiptId = receiptId;
         this.proposalId = proposalId;
@@ -35,9 +37,10 @@ public class Import {
         this.importDetail = importDetail;
         this.deliverySupplierName = deliverySupplierName;
         this.deliverySupplierPhone = deliverySupplierPhone;
+        this.supplierId = supplierId;
     }
 
-    // Getters and Setters for existing fields
+    // Getters and Setters
     public User getExecutor() {
         return executor;
     }
@@ -126,7 +129,6 @@ public class Import {
         this.importDetail = importDetail;
     }
 
-    // New getters and setters for deliverySupplierName and deliverySupplierPhone
     public String getDeliverySupplierName() {
         return deliverySupplierName;
     }
@@ -141,5 +143,13 @@ public class Import {
 
     public void setDeliverySupplierPhone(String deliverySupplierPhone) {
         this.deliverySupplierPhone = deliverySupplierPhone;
+    }
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
     }
 }

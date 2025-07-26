@@ -222,6 +222,23 @@
                             <p><strong>Phone:</strong> <span id="userPhone"></span></p>
                         </div>
                     </div>
+                    <div class="form-group" id="supplierIdDiv" style="display: ${proposalType == 'import_from_supplier' ? 'block' : 'none'}">
+                        <label for="supplierId">Supplier</label>
+                        <c:choose>
+                            <c:when test="${not empty proposal.supplierId}">
+                                <input type="hidden" name="supplierId" value="${proposal.supplierId}">
+                                <input type="text" class="form-control" value="${fn:escapeXml(proposal.supplierName)}" readonly>
+                            </c:when>
+                            <c:otherwise>
+                                <select class="form-control" id="supplierId" name="supplierId" <c:if test="${proposalType == 'import_from_supplier'}">required</c:if>>
+                                    <option value="">Select Supplier</option>
+                                    <c:forEach var="supplier" items="${suppliers}">
+                                        <option value="${supplier.supplierId}">${fn:escapeXml(supplier.supplierName)}</option>
+                                    </c:forEach>
+                                </select>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
                     <div class="form-group" id="deliverySupplierNameDiv" style="display: ${proposalType == 'import_from_supplier' ? 'block' : 'none'}">
                         <label for="deliverySupplierName">Delivery Supplier Name</label>
                         <input type="text" class="form-control" id="deliverySupplierName" name="deliverySupplierName" <c:if test="${proposalType == 'import_from_supplier'}">required</c:if>>
@@ -356,12 +373,17 @@
 
             const proposalType = "${proposalType}";
             const responsibleDiv = document.getElementById("responsibleIdDiv");
+            const supplierIdDiv = document.getElementById("supplierIdDiv");
             const supplierNameDiv = document.getElementById("deliverySupplierNameDiv");
             const supplierPhoneDiv = document.getElementById("deliverySupplierPhoneDiv");
             responsibleDiv.style.display = proposalType === 'import_returned' ? 'block' : 'none';
+            supplierIdDiv.style.display = proposalType === 'import_from_supplier' ? 'block' : 'none';
             supplierNameDiv.style.display = proposalType === 'import_from_supplier' ? 'block' : 'none';
             supplierPhoneDiv.style.display = proposalType === 'import_from_supplier' ? 'block' : 'none';
             responsibleDiv.querySelector("input").required = proposalType === 'import_returned';
+            if (supplierIdDiv.querySelector("select")) {
+                supplierIdDiv.querySelector("select").required = proposalType === 'import_from_supplier';
+            }
             supplierNameDiv.querySelector("input").required = proposalType === 'import_from_supplier';
             supplierPhoneDiv.querySelector("input").required = proposalType === 'import_from_supplier';
 
