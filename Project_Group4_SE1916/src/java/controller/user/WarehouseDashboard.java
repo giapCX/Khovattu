@@ -6,6 +6,7 @@ package controller.user;
 
 import Dal.DBContext;
 import dao.DashboardWarehouseDAO;
+import dao.InventoryDAO;
 import dao.ProposalDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,6 +16,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.sql.Connection;
+import java.time.Year;
+import java.util.List;
+import java.util.Map;
+import model.Inventory;
+import model.InventoryTrendDTO;
 
 /**
  *
@@ -75,10 +81,23 @@ public class WarehouseDashboard extends HttpServlet {
             int totalMaterials = dao.countTotalMaterials();
             int lowStock = dao.countLowStockMaterials(10);
             int todayTransactions = dao.countTodayTransactions();
+            
+            // 2. Biểu đồ
+            int year = Year.now().getValue();
+            List<InventoryTrendDTO> inventoryTrend = dao.getInventoryTrendByMonth(year);
+            Map<String, Integer> materialDistribution = dao.getMaterialDistributionByParentCategory();
+
+            // 3. Bảng vật tư sắp hết (lấy 5 vật tư tồn kho thấp nhất)
+            InventoryDAO inventoryDAO = new InventoryDAO(Dal.DBContext.getConnection());
+            List<Inventory> lowStockMaterials = inventoryDAO.searchInventory(null, null, null, null, null, 1, 5, "ASC");
+            
             request.setAttribute("totalMaterials", totalMaterials);
             request.setAttribute("lowStock", lowStock);
             request.setAttribute("todayTransactions", todayTransactions);
             request.setAttribute("totalToBeExecute", totalToBeExecute);
+            request.setAttribute("inventoryTrend", inventoryTrend);
+            request.setAttribute("materialDistribution", materialDistribution);
+            request.setAttribute("lowStockMaterials", lowStockMaterials);
             request.getRequestDispatcher("/view/warehouse/warehouseDashboard.jsp").forward(request, response);
         } catch (Exception e) {
             throw new ServletException("Lỗi khi tải dashboard nhân viên: " + e.getMessage(), e);

@@ -213,8 +213,8 @@
                         <table class="w-full table-auto">
                             <thead>
                                 <tr class="bg-primary-600 text-white">
-                                    <th class="p-4 text-left cursor-pointer" data-sort="proposalId">Proposal ID</th>
-                                    <th class="p-4 text-left cursor-pointer" data-sort="proposalType">Proposal Type</th>
+                                    <th class="p-4 text-left cursor-pointer" data-sort="proposalId">Request ID</th>
+                                    <th class="p-4 text-left cursor-pointer" data-sort="proposalType">Request Type</th>
                                     <th class="p-4 text-left cursor-pointer" data-sort="sender">Sender</th>
                                     <th class="p-4 text-left cursor-pointer" data-sort="sendDate">Send Date</th>
                                     <th class="p-4 text-left cursor-pointer" data-sort="note">Note</th>

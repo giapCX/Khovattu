@@ -211,7 +211,12 @@
                   <c:forEach var="proposal" items="${requests}" varStatus="loop">
                     <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td class="p-4 font-bold">${proposal.proposalId}</td>
-                      <td class="p-4">${proposal.proposalType}</td>
+                      <td class="p-4"> <c:choose>
+                                                <c:when test="${proposal.proposalType == 'import_from_supplier'}">Purchase</c:when>
+                                                <c:when test="${proposal.proposalType == 'import_returned'}">Retrieve</c:when>
+                                                <c:when test="${proposal.proposalType == 'export'}">Export</c:when>
+                                                <c:otherwise>${not empty proposal.proposalType ? proposal.proposalType : 'N/A'}</c:otherwise>
+                                            </c:choose></td>
                       <td class="p-4">${proposal.senderName}</td>
                       <td class="p-4"><fmt:formatDate value="${proposal.proposalSentDate}" pattern="yyyy-MM-dd"/></td>
                       <td class="p-4">${proposal.note}</td>
