@@ -100,14 +100,18 @@
             top: 0;
             bottom: 0;
             left: 0;
-            z-index: 50;
+            z-index: 9999;
         }
         .sidebar.active {
             transform: translateX(0);
         }
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
         .nav-item {
             transition: all 0.2s ease;
             border-radius: 0.5rem;
+            cursor: pointer;
         }
         .nav-item:hover {
             background: linear-gradient(to right, #3b82f6, #8b5cf6);
@@ -116,6 +120,22 @@
         .nav-item.active {
             background-color: rgba(255, 255, 255, 0.2);
             font-weight: 600;
+        }
+        .nav-item a {
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            width: 100%;
+            pointer-events: auto;
+        }
+        .sidebar a {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+        .sidebar button {
+            pointer-events: auto;
+            cursor: pointer;
         }
         @media (max-width: 768px) {
             .sidebar {
@@ -348,34 +368,6 @@
     <!-- JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const toggleButton = document.getElementById('toggleSidebarMobile');
-            const closeButton = document.getElementById('toggleSidebar');
-            const sidebar = document.querySelector('.sidebar');
-
-            // Toggle sidebar visibility
-            if (toggleButton && sidebar) {
-                toggleButton.addEventListener('click', () => {
-                    sidebar.classList.toggle('active');
-                });
-            } else {
-                console.error('Toggle button or sidebar not found');
-            }
-            if (closeButton && sidebar) {
-                closeButton.addEventListener('click', () => {
-                    sidebar.classList.toggle('active');
-                });
-            } else {
-                console.error('Close button or sidebar not found');
-            }
-
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', (event) => {
-                if (window.innerWidth <= 768 && sidebar.classList.contains('active') && 
-                    !sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
-                    sidebar.classList.remove('active');
-                }
-            });
-
             // Table Sorting
             document.querySelectorAll('.table th[data-sort]').forEach(th => {
                 th.addEventListener('click', () => {
@@ -438,7 +430,7 @@
             }
         });
     </script>
-    <script src="${pageContext.request.contextPath}/assets/js/sidebar_darkmode.js"></script>
+     <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
 </body>
 </html>
