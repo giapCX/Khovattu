@@ -220,7 +220,7 @@
         <%
             String username = (String) session.getAttribute("username");
             if (username == null) {
-                response.sendRedirect("Login.jsp");
+                response.sendRedirect("login.jsp");
                 return;
             }
         %>
@@ -345,10 +345,7 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-6">
-                    <div class="relative">
-                        <i class="fas fa-bell text-gray-500 hover:text-primary-600 cursor-pointer text-xl"></i>
-                        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">2</span>
-                    </div>
+                   
                     <div class="flex items-center">
                         <img src="https://ui-avatars.com/api/?name=<%= java.net.URLEncoder.encode(username, "UTF-8")%>&background=0ea5e9&color=fff"
                              alt="Avatar" class="w-10 h-10 rounded-full border border-white shadow" />
