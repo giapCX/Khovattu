@@ -262,27 +262,30 @@
                     </div>
                     <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
                 </a>
-                <a href="${pageContext.request.contextPath}/ListMaterialController" class="nav-item flex items-center p-2 justify-between">
-                    <div class="flex items-center">
-                        <i class="fas fa-box-open mr-2 w-5 text-center"></i>
-                        <span class="text-base">Materials List</span>
+                <div class="nav-item flex flex-col">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                        <div class="flex items-center">
+                            <i class="fas fa-box-open mr-2 w-5 text-center"></i>
+                            <span class="text-base">Material Category</span>
+                        </div>
+                        <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
+                    </button>
+                    <!-- Submenu - hidden by default -->
+                    <div class="submenu hidden pl-6 space-y-1 mt-1">
+                        <a href = "${pageContext.request.contextPath}/ListParentCategoryController" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-folder-tree mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Categories</span>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/ListMaterialController" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-cubes mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Material </span>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/unit" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-clipboard-list mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Unit List </span>
+                        </a>
                     </div>
-                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/inventory" class="nav-item flex items-center p-2 justify-between">
-                    <div class="flex items-center">
-                        <i class="fas fa-boxes mr-2 w-5 text-center"></i>
-                        <span class="text-base">Inventory List</span>
-                    </div>
-                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/unit" class="nav-item flex items-center p-2 justify-between">
-                    <div class="flex items-center">
-                        <i class="fas fa-clipboard-list mr-2 w-5 text-center"></i>
-                        <span class="text-base">Unit List</span>
-                    </div>
-                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
-                </a>
+                </div>
                 <!-- Supplier - Menu cha -->
                 <div class="nav-item flex flex-col">
                     <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
@@ -292,17 +295,19 @@
                         </div>
                         <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
                     </button>
-
-                    <!-- Menu con - ẩn mặc định -->
+                    <!-- Submenu - hidden by default -->
                     <div class="submenu hidden pl-6 space-y-1 mt-1">
                         <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
                             <i class="fas fa-list mr-2 w-4 text-center"></i>
                             <span class="text-sm">Suppliers List</span>
                         </a>
-                        
+                        <a href="${pageContext.request.contextPath}/AddSupplierServlet" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-circle-plus mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Create New Supplier </span>
+                        </a>
                     </div>
                 </div>
-                  <div class="nav-item flex flex-col">
+                <div class="nav-item flex flex-col">
                     <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
                         <div class="flex items-center">
                             <i class="fas fa-building mr-2 w-5 text-center"></i>
@@ -316,7 +321,7 @@
                             <i class="fas fa-list mr-2 w-4 text-center"></i>
                             <span class="text-sm">List Construction Site</span>
                         </a>
-                       
+
                     </div>
                 </div>
 
@@ -338,35 +343,66 @@
                         </a>
                     </div>
                 </div>
-                <div class="border-t border-white border-opacity-20 my-2"></div>
-                <a href="${pageContext.request.contextPath}/view/warehouse/importData.jsp" class="nav-item flex items-center p-2 justify-between">
-                    <div class="flex items-center">
-                        <i class="fas fa-arrow-down mr-2 w-5 text-center"></i>
-                        <span class="text-base">Import Materials</span>
+                <!-- IMPORT - Menu cha -->
+                <div class="nav-item flex flex-col">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                        <div class="flex items-center">
+                            <i class="fas fa-arrow-down mr-2 w-5 text-center"></i>
+                            <span class="text-base">Import</span>
+                        </div>
+                        <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
+                    </button>
+                    <!-- Menu con -->
+                    <div class="submenu hidden pl-6 space-y-1 mt-1">
+                        <a href="${pageContext.request.contextPath}/view/warehouse/importData.jsp" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-plus mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Import Materials</span>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/importhistory" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-history mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Import History</span>
+                        </a>
                     </div>
-                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/importhistory" class="nav-item flex items-center p-2 justify-between">
-                    <div class="flex items-center">
-                        <i class="fas fa-history mr-2 w-5 text-center"></i>
-                        <span class="text-base">Import History</span>
+                </div>
+
+                <!-- EXPORT - Menu cha -->
+                <div class="nav-item flex flex-col">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                        <div class="flex items-center">
+                            <i class="fas fa-arrow-up mr-2 w-5 text-center"></i>
+                            <span class="text-base">Export</span>
+                        </div>
+                        <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
+                    </button>
+                    <!-- Menu con -->
+                    <div class="submenu hidden pl-6 space-y-1 mt-1">
+                        <a href="${pageContext.request.contextPath}/exportMaterial" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-plus mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Export Materials</span>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/exportHistory" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-history mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Export History</span>
+                        </a>
                     </div>
-                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/exportMaterial" class="nav-item flex items-center p-2 justify-between">
-                    <div class="flex items-center">
-                        <i class="fas fa-arrow-up mr-2 w-5 text-center"></i>
-                        <span class="text-base">Export Materials</span>
+                </div>
+                <div class="nav-item flex flex-col">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                        <div class="flex items-center">
+                            <i class="fas fa-boxes mr-2 w-5 text-center"></i>
+                            <span class="text-base">Inventory</span>
+                        </div>
+                        <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
+                    </button>
+
+                    <!-- Menu con -->
+                    <div class="submenu hidden pl-6 space-y-1 mt-1">
+                        <a href="${pageContext.request.contextPath}/inventory" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-list mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Inventory List</span>
+                        </a>
                     </div>
-                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
-                </a>
-                <a href="${pageContext.request.contextPath}/exportHistory" class="nav-item flex items-center p-2 justify-between">
-                    <div class="flex items-center">
-                        <i class="fas fa-history mr-2 w-5 text-center"></i>
-                        <span class="text-base">Export History</span>
-                    </div>
-                    <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
-                </a>
+                </div>
             </nav>
             <div class="absolute bottom-0 left-0 right-0 p-4 bg-white bg-opacity-10">
                 <a href="${pageContext.request.contextPath}/forgetPassword/changePassword.jsp" class="flex items-center p-2 rounded-lg hover:bg-white hover:bg-opacity-20">
@@ -394,10 +430,10 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-6">
-                    <div class="relative">
+<!--                    <div class="relative">
                         <i class="fas fa-bell text-gray-500 hover:text-primary-600 cursor-pointer text-xl"></i>
                         <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-                    </div>
+                    </div>-->
                     <div class="flex items-center">
                         <img src="https://ui-avatars.com/api/?name=Nhân+viên&background=3b82f6&color=fff" 
                              alt="Người dùng" class="w-10 h-10 rounded-full mr-3">
@@ -484,316 +520,316 @@
                     <i class="fas fa-arrow-up text-3xl mb-3"></i>
                     <span class="text-lg">Export</span>
                 </button>
-                
+
             </div>
 
             <!-- Charts Row -->
-<!--            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                <div class="lg:col-span-2 card bg-white dark:bg-gray-800 p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <div>
-                            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Xu hướng tồn kho</h2>
-                            <p class="text-sm text-gray-600 dark:text-gray-300">Theo dõi nhập/xuất kho theo thời gian</p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button class="px-4 py-2 text-sm bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 rounded-full">Tuần</button>
-                            <button class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Tháng</button>
-                            <button class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Năm</button>
-                        </div>
-                    </div>
-                    <canvas id="inventoryChart" class="border rounded-lg"></canvas>
-                </div>
-                <div class="card bg-white dark:bg-gray-800 p-6">
-                    <div class="mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Phân bố vật tư</h2>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">Tỷ lệ các loại vật tư trong kho</p>
-                    </div>
-                    <canvas id="distributionChart" class="border rounded-lg"></canvas>
-                    <div class="mt-6 grid grid-cols-2 gap-3">
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-primary-500 rounded-full mr-2"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư A (35%)</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-blue-400 rounded-full mr-2"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư B (25%)</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-green-400 rounded-full mr-2"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư C (20%)</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-yellow-400 rounded-full mr-2"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư D (15%)</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-red-400 rounded-full mr-2"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư E (5%)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>-->
+            <!--            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                            <div class="lg:col-span-2 card bg-white dark:bg-gray-800 p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <div>
+                                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Xu hướng tồn kho</h2>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">Theo dõi nhập/xuất kho theo thời gian</p>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button class="px-4 py-2 text-sm bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 rounded-full">Tuần</button>
+                                        <button class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Tháng</button>
+                                        <button class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">Năm</button>
+                                    </div>
+                                </div>
+                                <canvas id="inventoryChart" class="border rounded-lg"></canvas>
+                            </div>
+                            <div class="card bg-white dark:bg-gray-800 p-6">
+                                <div class="mb-4">
+                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Phân bố vật tư</h2>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300">Tỷ lệ các loại vật tư trong kho</p>
+                                </div>
+                                <canvas id="distributionChart" class="border rounded-lg"></canvas>
+                                <div class="mt-6 grid grid-cols-2 gap-3">
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-primary-500 rounded-full mr-2"></div>
+                                        <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư A (35%)</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-blue-400 rounded-full mr-2"></div>
+                                        <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư B (25%)</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-green-400 rounded-full mr-2"></div>
+                                        <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư C (20%)</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-yellow-400 rounded-full mr-2"></div>
+                                        <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư D (15%)</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-red-400 rounded-full mr-2"></div>
+                                        <span class="text-sm text-gray-600 dark:text-gray-300">Vật tư E (5%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
 
             <!-- Tables Row -->
-<!--            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="table-container bg-white dark:bg-gray-800">
-                    <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <div>
-                            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Vật tư sắp hết</h2>
-                            <p class="text-sm text-gray-600 dark:text-gray-300">Danh sách vật tư cần bổ sung</p>
-                        </div>
-                        <a href="#" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full table-auto">
-                            <thead>
-                                <tr class="bg-primary-600 text-white">
-                                    <th class="p-4 text-left">Mã vật tư</th>
-                                    <th class="p-4 text-left">Tên vật tư</th>
-                                    <th class="p-4 text-left">Số lượng</th>
-                                    <th class="p-4 text-left">Trạng thái</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4 font-medium">VT001</td>
-                                    <td class="p-4">Bàn gỗ cao cấp</td>
-                                    <td class="p-4">5</td>
-                                    <td class="p-4"><span class="badge badge-warning">Sắp hết</span></td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4 font-medium">VT005</td>
-                                    <td class="p-4">Ghế xoay văn phòng</td>
-                                    <td class="p-4">3</td>
-                                    <td class="p-4"><span class="badge badge-danger">Cảnh báo</span></td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4 font-medium">VT012</td>
-                                    <td class="p-4">Màn hình LCD 24"</td>
-                                    <td class="p-4">2</td>
-                                    <td class="p-4"><span class="badge badge-danger">Cảnh báo</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="p-4 font-medium">VT018</td>
-                                    <td class="p-4">Bàn phím cơ</td>
-                                    <td class="p-4">7</td>
-                                    <td class="p-4"><span class="badge badge-success">Đủ dùng</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>-->
-<!--                <div class="table-container bg-white dark:bg-gray-800">
-                    <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <div>
-                            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Giao dịch gần đây</h2>
-                            <p class="text-sm text-gray-600 dark:text-gray-300">Lịch sử nhập/xuất kho mới nhất</p>
-                        </div>
-                        <a href="#" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full table-auto">
-                            <thead>
-                                <tr class="bg-primary-600 text-white">
-                                    <th class="p-4 text-left">Thời gian</th>
-                                    <th class="p-4 text-left">Loại</th>
-                                    <th class="p-4 text-left">Mã vật tư</th>
-                                    <th class="p-4 text-left">Số lượng</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4">10:30 23/05/2025</td>
-                                    <td class="p-4"><span class="text-green-500"><i class="fas fa-arrow-down mr-1"></i>Nhập kho</span></td>
-                                    <td class="p-4">VT001</td>
-                                    <td class="p-4">50</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4">09:15 23/05/2025</td>
-                                    <td class="p-4"><span class="text-red-500"><i class="fas fa-arrow-up mr-1"></i>Xuất kho</span></td>
-                                    <td class="p-4">VT002</td>
-                                    <td class="p-4">20</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="p-4">08:45 23/05/2025</td>
-                                    <td class="p-4"><span class="text-green-500"><i class="fas fa-arrow-down mr-1"></i>Nhập kho</span></td>
-                                    <td class="p-4">VT003</td>
-                                    <td class="p-4">30</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-4">15:20 22/05/2025</td>
-                                    <td class="p-4"><span class="text-red-500"><i class="fas fa-arrow-up mr-1"></i>Xuất kho</span></td>
-                                    <td class="p-4">VT005</td>
-                                    <td class="p-4">15</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>-->
-            </div>
-        </main>
+            <!--            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div class="table-container bg-white dark:bg-gray-800">
+                                <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                    <div>
+                                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Vật tư sắp hết</h2>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">Danh sách vật tư cần bổ sung</p>
+                                    </div>
+                                    <a href="#" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full table-auto">
+                                        <thead>
+                                            <tr class="bg-primary-600 text-white">
+                                                <th class="p-4 text-left">Mã vật tư</th>
+                                                <th class="p-4 text-left">Tên vật tư</th>
+                                                <th class="p-4 text-left">Số lượng</th>
+                                                <th class="p-4 text-left">Trạng thái</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                                <td class="p-4 font-medium">VT001</td>
+                                                <td class="p-4">Bàn gỗ cao cấp</td>
+                                                <td class="p-4">5</td>
+                                                <td class="p-4"><span class="badge badge-warning">Sắp hết</span></td>
+                                            </tr>
+                                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                                <td class="p-4 font-medium">VT005</td>
+                                                <td class="p-4">Ghế xoay văn phòng</td>
+                                                <td class="p-4">3</td>
+                                                <td class="p-4"><span class="badge badge-danger">Cảnh báo</span></td>
+                                            </tr>
+                                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                                <td class="p-4 font-medium">VT012</td>
+                                                <td class="p-4">Màn hình LCD 24"</td>
+                                                <td class="p-4">2</td>
+                                                <td class="p-4"><span class="badge badge-danger">Cảnh báo</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="p-4 font-medium">VT018</td>
+                                                <td class="p-4">Bàn phím cơ</td>
+                                                <td class="p-4">7</td>
+                                                <td class="p-4"><span class="badge badge-success">Đủ dùng</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>-->
+            <!--                <div class="table-container bg-white dark:bg-gray-800">
+                                <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                    <div>
+                                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Giao dịch gần đây</h2>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">Lịch sử nhập/xuất kho mới nhất</p>
+                                    </div>
+                                    <a href="#" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Xem tất cả</a>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full table-auto">
+                                        <thead>
+                                            <tr class="bg-primary-600 text-white">
+                                                <th class="p-4 text-left">Thời gian</th>
+                                                <th class="p-4 text-left">Loại</th>
+                                                <th class="p-4 text-left">Mã vật tư</th>
+                                                <th class="p-4 text-left">Số lượng</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                                <td class="p-4">10:30 23/05/2025</td>
+                                                <td class="p-4"><span class="text-green-500"><i class="fas fa-arrow-down mr-1"></i>Nhập kho</span></td>
+                                                <td class="p-4">VT001</td>
+                                                <td class="p-4">50</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                                <td class="p-4">09:15 23/05/2025</td>
+                                                <td class="p-4"><span class="text-red-500"><i class="fas fa-arrow-up mr-1"></i>Xuất kho</span></td>
+                                                <td class="p-4">VT002</td>
+                                                <td class="p-4">20</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                                <td class="p-4">08:45 23/05/2025</td>
+                                                <td class="p-4"><span class="text-green-500"><i class="fas fa-arrow-down mr-1"></i>Nhập kho</span></td>
+                                                <td class="p-4">VT003</td>
+                                                <td class="p-4">30</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="p-4">15:20 22/05/2025</td>
+                                                <td class="p-4"><span class="text-red-500"><i class="fas fa-arrow-up mr-1"></i>Xuất kho</span></td>
+                                                <td class="p-4">VT005</td>
+                                                <td class="p-4">15</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>-->
+        </div>
+    </main>
 
-        <!-- Footer -->
-        <footer class="bg-gray-100 dark:bg-gray-800 text-center p-6 mt-8 border-t border-gray-200 dark:border-gray-700 transition-all duration-300">
-            <p class="text-gray-600 dark:text-gray-300 text-sm">Hệ thống Quản lý Vật tư - Phiên bản 2.0 © 2025 | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Liên hệ hỗ trợ</a></p>
-        </footer>
+    <!-- Footer -->
+    <footer class="bg-gray-100 dark:bg-gray-800 text-center p-6 mt-8 border-t border-gray-200 dark:border-gray-700 transition-all duration-300">
+        <p class="text-gray-600 dark:text-gray-300 text-sm">Hệ thống Quản lý Vật tư - Phiên bản 2.0 © 2025 | <a href="mailto:support@company.com" class="text-primary-600 dark:text-primary-400 hover:underline text-base">Liên hệ hỗ trợ</a></p>
+    </footer>
 
-        <!-- JavaScript -->
-        <script>
-            // Toggle Sidebar
-            const sidebar = document.getElementById('sidebar');
-            const toggleSidebar = document.getElementById('toggleSidebar');
-            const toggleSidebarMobile = document.getElementById('toggleSidebarMobile');
+    <!-- JavaScript -->
+    <script>
+        // Toggle Sidebar
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const toggleSidebarMobile = document.getElementById('toggleSidebarMobile');
 
-            function toggleSidebarVisibility() {
-                sidebar.classList.toggle('active');
-                sidebar.classList.toggle('hidden');
-            }
+        function toggleSidebarVisibility() {
+            sidebar.classList.toggle('active');
+            sidebar.classList.toggle('hidden');
+        }
 
-            toggleSidebar.addEventListener('click', toggleSidebarVisibility);
-            toggleSidebarMobile.addEventListener('click', toggleSidebarVisibility);
+        toggleSidebar.addEventListener('click', toggleSidebarVisibility);
+        toggleSidebarMobile.addEventListener('click', toggleSidebarVisibility);
 
-            document.addEventListener('DOMContentLoaded', () => {
-                const toggles = document.querySelectorAll('.toggle-submenu');
-                toggles.forEach(toggle => {
-                    toggle.addEventListener('click', () => {
-                        const submenu = toggle.parentElement.querySelector('.submenu');
-                        submenu.classList.toggle('hidden');
-                        const icon = toggle.querySelector('.fa-chevron-down');
-                        icon.classList.toggle('rotate-180');
-                    });
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggles = document.querySelectorAll('.toggle-submenu');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const submenu = toggle.parentElement.querySelector('.submenu');
+                    submenu.classList.toggle('hidden');
+                    const icon = toggle.querySelector('.fa-chevron-down');
+                    icon.classList.toggle('rotate-180');
                 });
             });
+        });
 
-            // Initialize sidebar as hidden
-            sidebar.classList.add('hidden');
+        // Initialize sidebar as hidden
+        sidebar.classList.add('hidden');
 
-            // Dark Mode Toggle
-            const toggleDarkMode = document.getElementById('toggleDarkMode');
-            toggleDarkMode.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode');
-                const icon = toggleDarkMode.querySelector('i');
-                icon.classList.toggle('fa-moon');
-                icon.classList.toggle('fa-sun');
-                localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-            });
+        // Dark Mode Toggle
+        const toggleDarkMode = document.getElementById('toggleDarkMode');
+        toggleDarkMode.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const icon = toggleDarkMode.querySelector('i');
+            icon.classList.toggle('fa-moon');
+            icon.classList.toggle('fa-sun');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        });
 
-            // Load Dark Mode Preference
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-                toggleDarkMode.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-            }
+        // Load Dark Mode Preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            toggleDarkMode.querySelector('i').classList.replace('fa-moon', 'fa-sun');
+        }
 
-            // Toast Notification
-            function showToast(message) {
-                Toastify({
-                    text: message,
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: "#3b82f6",
-                    stopOnFocus: true,
-                    className: "rounded-lg shadow-lg",
-                    style: {borderRadius: "0.5rem"}
-                }).showToast();
-            }
+        // Toast Notification
+        function showToast(message) {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#3b82f6",
+                stopOnFocus: true,
+                className: "rounded-lg shadow-lg",
+                style: {borderRadius: "0.5rem"}
+            }).showToast();
+        }
 
-            // Inventory Chart
-            const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
-            new Chart(inventoryCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'],
-                    datasets: [
-                        {
-                            label: 'Tồn kho',
-                            data: [1200, 1150, 1100, 1050, 1000, 950, 900],
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: true
-                        },
-                        {
-                            label: 'Nhập kho',
-                            data: [200, 150, 100, 80, 50, 30, 10],
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: true
-                        },
-                        {
-                            label: 'Xuất kho',
-                            data: [50, 70, 90, 120, 150, 100, 80],
-                            borderColor: '#ef4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: true
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {position: 'top', labels: {usePointStyle: true, padding: 20}},
-                        tooltip: {enabled: true, mode: 'index', intersect: false}
+        // Inventory Chart
+        const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
+        new Chart(inventoryCtx, {
+            type: 'line',
+            data: {
+                labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'],
+                datasets: [
+                    {
+                        label: 'Tồn kho',
+                        data: [1200, 1150, 1100, 1050, 1000, 950, 900],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
                     },
-                    scales: {
-                        y: {beginAtZero: false, grid: {drawBorder: false}},
-                        x: {grid: {display: false}}
+                    {
+                        label: 'Nhập kho',
+                        data: [200, 150, 100, 80, 50, 30, 10],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Xuất kho',
+                        data: [50, 70, 90, 120, 150, 100, 80],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
                     }
-                }
-            });
-
-            // Distribution Chart
-            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
-            new Chart(distributionCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Vật tư A', 'Vật tư B', 'Vật tư C', 'Vật tư D', 'Vật tư E'],
-                    datasets: [{
-                            data: [35, 25, 20, 15, 5],
-                            backgroundColor: ['#3b82f6', '#60a5fa', '#34d399', '#fbbf24', '#f87171'],
-                            borderWidth: 0
-                        }]
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {position: 'top', labels: {usePointStyle: true, padding: 20}},
+                    tooltip: {enabled: true, mode: 'index', intersect: false}
                 },
-                options: {
-                    responsive: true,
-                    cutout: '70%',
-                    plugins: {legend: {display: false}}
+                scales: {
+                    y: {beginAtZero: false, grid: {drawBorder: false}},
+                    x: {grid: {display: false}}
                 }
-            });
+            }
+        });
 
-            // Table Sorting
-            document.querySelectorAll('th').forEach(th => {
-                th.addEventListener('click', () => {
-                    const table = th.closest('table');
-                    const tbody = table.querySelector('tbody');
-                    const rows = Array.from(tbody.querySelectorAll('tr'));
-                    const columnIndex = th.cellIndex;
-                    const isNumeric = columnIndex === 2 || columnIndex === 3;
-                    const isAsc = th.classList.toggle('asc');
-                    th.classList.toggle('desc', !isAsc);
-                    table.querySelectorAll('th').forEach(header => {
-                        if (header !== th)
-                            header.classList.remove('asc', 'desc');
-                    });
-                    rows.sort((a, b) => {
-                        let aValue = a.cells[columnIndex].textContent;
-                        let bValue = b.cells[columnIndex].textContent;
-                        if (isNumeric) {
-                            aValue = parseFloat(aValue) || 0;
-                            bValue = parseFloat(bValue) || 0;
-                            return isAsc ? aValue - bValue : bValue - aValue;
-                        }
-                        return isAsc ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-                    });
-                    tbody.innerHTML = '';
-                    rows.forEach(row => tbody.appendChild(row));
+        // Distribution Chart
+        const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+        new Chart(distributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Vật tư A', 'Vật tư B', 'Vật tư C', 'Vật tư D', 'Vật tư E'],
+                datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: ['#3b82f6', '#60a5fa', '#34d399', '#fbbf24', '#f87171'],
+                        borderWidth: 0
+                    }]
+            },
+            options: {
+                responsive: true,
+                cutout: '70%',
+                plugins: {legend: {display: false}}
+            }
+        });
+
+        // Table Sorting
+        document.querySelectorAll('th').forEach(th => {
+            th.addEventListener('click', () => {
+                const table = th.closest('table');
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const columnIndex = th.cellIndex;
+                const isNumeric = columnIndex === 2 || columnIndex === 3;
+                const isAsc = th.classList.toggle('asc');
+                th.classList.toggle('desc', !isAsc);
+                table.querySelectorAll('th').forEach(header => {
+                    if (header !== th)
+                        header.classList.remove('asc', 'desc');
                 });
+                rows.sort((a, b) => {
+                    let aValue = a.cells[columnIndex].textContent;
+                    let bValue = b.cells[columnIndex].textContent;
+                    if (isNumeric) {
+                        aValue = parseFloat(aValue) || 0;
+                        bValue = parseFloat(bValue) || 0;
+                        return isAsc ? aValue - bValue : bValue - aValue;
+                    }
+                    return isAsc ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                });
+                tbody.innerHTML = '';
+                rows.forEach(row => tbody.appendChild(row));
             });
-        </script>
-    </body>
+        });
+    </script>
+</body>
 </html>
