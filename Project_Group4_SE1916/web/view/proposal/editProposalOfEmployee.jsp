@@ -179,7 +179,7 @@
                             <i class="fas fa-plus-circle mr-2"></i> Submit 
                         </button>
 
-                        <a href="${pageContext.request.contextPath}/ProposalServlet" onclick="event.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg inline-flex items-center">
+                        <a href="${pageContext.request.contextPath}/EditProposalServlet?proposalId=${proposal.proposalId}" onclick="event.preventDefault(); document.querySelector('form').reset(); window.location.href = this.href;" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg inline-flex items-center">
                             <i class="fas fa-undo mr-2"></i> Reset form
                         </a>
                     </div>
