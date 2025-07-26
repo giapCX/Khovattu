@@ -71,7 +71,7 @@
                         </button>
                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">List Supplier</h2>
                     </div>
-                    <c:if test="${role == 'admin' || role == 'direction'}">
+                    <c:if test="${role == 'admin' || role == 'warehouse'}">
                         <a href="${pageContext.request.contextPath}/AddSupplierServlet" 
                            class="btn-primary text-white px-6 py-3 rounded-lg flex items-center">
                             <i class="fas fa-plus-circle mr-2"></i> Create new supplier
@@ -123,7 +123,7 @@
                                     <th class="p-4 text-left">Address</th>
                                     <th class="p-4 text-left">Status</th>
                                     <th class="p-4 text-left">Details</th>
-                                        <c:if test="${role == 'admin' || role == 'direction'}">
+                                        <c:if test="${role == 'admin' || role == 'warehouse'}">
                                         <th class="p-4 text-left">Action</th>
                                         </c:if>
                                 </tr>
@@ -150,7 +150,7 @@
                                                 <td class="p-4 font-medium">
                                                     <a href="FilterSupplierServlet?supplierId=${item.supplierId}&supplierName=${item.supplierName}" class="text-primary-600 dark:text-primary-400 hover:underline">View </a>
                                                 </td>
-                                                <c:if test="${role == 'admin' || role == 'direction'}">
+                                                <c:if test="${role == 'admin' || role == 'warehouse'}">
                                                     <td class="p-4 font-medium">
                                                         <a href="EditSupplierServlet?supplierId=${item.supplierId}"
                                                            class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>

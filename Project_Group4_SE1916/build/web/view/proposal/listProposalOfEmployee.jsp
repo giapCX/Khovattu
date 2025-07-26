@@ -114,7 +114,9 @@
                             <option value="rejected" ${param.searchStatus == 'rejected' ? 'selected' : ''}>Rejected</option>
                         </select>                 
                     </div>
+                     From :
                     <div class="flex-1 min-w-[200px]">
+            
                         <input type="date" name="searchStartDate" id="searchStartDate"
                                value="${param.searchStartDate}"
                                max="<%= java.time.LocalDate.now()%>"
@@ -122,6 +124,7 @@
                                focus:outline-none focus:ring-2 focus:ring-primary-500
                                dark:bg-gray-700 dark:text-white" />       
                     </div>
+                     To :
                     <div class="flex-1 min-w-[150px]">
                         <input type="date" name="searchEndDate" id="searchEndDate"
                                value="${param.searchEndDate}"

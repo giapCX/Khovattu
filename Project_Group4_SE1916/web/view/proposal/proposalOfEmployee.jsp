@@ -174,7 +174,7 @@
                 <div class="w-1/3">
                     <a href="${pageContext.request.contextPath}/ListProposalServlet" 
                        class="btn-secondary text-white px-6 py-3 rounded-lg">
-                        Back to list proposal
+                        Back to list request
                     </a>
                 </div>
                 <div class="w-1/2">
@@ -271,7 +271,6 @@
                 const firstRow = tableBody.querySelector('tr');
                 const newRow = firstRow.cloneNode(true);
 
-                // Reset all input/select fields in the new row
                 newRow.querySelectorAll('input, select').forEach(input => {
                     switch (input.name) {
                         case 'unit[]':
@@ -282,7 +281,7 @@
                             input.value = '';
                             break;
                         case 'materialCondition[]':
-                            input.value = 'new'; // ✅ Set mặc định "New"
+                            input.value = 'new';
                             break;
                     }
                 });
@@ -291,6 +290,7 @@
 
                 // Cập nhật số lượng dòng
                 document.getElementById('itemCount').value = tableBody.querySelectorAll('tr').length;
+                
             }
 
 
@@ -301,8 +301,46 @@
                 }
                 document.getElementById('itemCount').value = tableBody.querySelectorAll('tr').length;
             }
-        </script>
+            document.querySelector('form').addEventListener('submit', function (e) {
+                const supplierSectionVisible = !document.querySelector('.supplier-column').classList.contains('hidden');
+                const siteSectionVisible = !document.querySelector('.constructionSite-column').classList.contains('hidden');
 
+                let valid = true;
+                let errorMessage = '';
+
+                if (supplierSectionVisible) {
+                    const supplierId = document.getElementById('supplierIdHidden').value;
+                    if (!supplierId) {
+                        valid = false;
+                        errorMessage = 'Please select a valid supplier from the list.';
+                    }
+                }
+
+                if (siteSectionVisible) {
+                    const siteId = document.getElementById('siteIdHidden').value;
+                    if (!siteId) {
+                        valid = false;
+                        errorMessage = 'Please select a valid construction site from the list.';
+                    }
+                }
+
+                const rows = document.querySelectorAll('#itemsBody tr');
+                rows.forEach((row, index) => {
+                    const materialName = row.querySelector('input[name="materialName[]"]').value.trim();
+                    const materialId = row.querySelector('input[name="materialId[]"]').value.trim();
+                    if (materialName && !materialId) {
+                        valid = false;
+                        errorMessage = `Please select a valid material in company manager.`;
+                    }
+                });
+
+                if (!valid) {
+                    e.preventDefault();
+                    alert(errorMessage);
+                }
+            });
+
+        </script>
 
         <!--JavaScript -->
         <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>

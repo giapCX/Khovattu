@@ -17,7 +17,7 @@
 
         <%
             String role = (String) session.getAttribute("role");
-            if (role == null || (!role.equals("admin") && !role.equals("direction"))) {
+            if (role == null || (!role.equals("admin") && !role.equals("warehouse"))) {
                 response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
                 return;
             }

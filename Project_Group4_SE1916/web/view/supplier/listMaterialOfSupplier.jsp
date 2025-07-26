@@ -88,7 +88,7 @@
                                 </c:choose>
                             </div>
                         </div>
-                        <c:if test="${role == 'admin' || role == 'direction'}">
+                        <c:if test="${role == 'admin' || role == 'warehouse'}">
                             <div class="mt-4">
                                 <a href="EditSupplierServlet?supplierId=${supplierId}" 
                                    class="btn-secondary text-white px-5 py-2 rounded w-fit inline-block flex items-center">
@@ -145,7 +145,6 @@
                                 <thead>
                                     <tr class="bg-primary-600 text-white">
                                         <th class="p-4 text-left">Category</th>
-                                        <th class="p-4 text-left">Code</th>
                                         <th class="p-4 text-left">Material Name</th>
                                         <th class="p-4 text-left">Description</th>
                                         <th class="p-4 text-left">Image</th>
@@ -158,7 +157,6 @@
                                             <c:forEach var="item" items="${materials}">
                                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                                     <td class="p-4 font-medium">${item.category.name}</td>
-                                                    <td class="p-4 font-medium">${item.code}</td>
                                                     <td class="p-4 font-medium">${item.name}</td>
                                                     <td class="p-4 font-medium">${item.description}</td>
                                                     <td class="p-4 font-medium">
@@ -253,20 +251,7 @@
 
         <div class="mt-6 flex justify-center space-x-4">
             <a href="${pageContext.request.contextPath}/ListSupplierServlet" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to list supplier</a>
-            <c:choose>
-                <c:when test="${role == 'admin'}">
-                    <a href="${pageContext.request.contextPath}/view/admin/adminDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                </c:when>
-                <c:when test="${role == 'direction'}">
-                    <a href="${pageContext.request.contextPath}/view/direction/directionDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                </c:when>
-                <c:when test="${role == 'warehouse'}">
-                    <a href="${pageContext.request.contextPath}/view/warehouse/warehouseDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                </c:when>
-                <c:when test="${role == 'employee'}">
-                    <a href="${pageContext.request.contextPath}/view/employee/employeeDashboard.jsp" class="btn-secondary text-white px-6 py-3 rounded-lg">Back to home</a>
-                </c:when>
-            </c:choose>
+            <jsp:include page="/view/backToDashboardButton.jsp" />
         </div>
     </div>
 </main>

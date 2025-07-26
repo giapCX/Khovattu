@@ -69,53 +69,16 @@
                                 <span class="font-semibold">Sender note:</span> ${proposal.note}
                             </div>
                             <div>
-                                <span class="font-semibold">Type of request:</span> 
-                                <c:choose>
-                                    <c:when test="${proposal.proposalType == 'import_from_supplier'}">
-                                        <span class="underline">Purchase</span> 
-                                    </c:when>
-                                    <c:when test="${proposal.proposalType == 'import_returned'}">
-                                        <span class="underline">Retrieve</span> 
-                                    </c:when>
-                                    <c:when test="${proposal.proposalType == 'export'}">
-                                        <span class="underline">Export</span> 
-                                    </c:when>
-                                </c:choose>
+                                <span class="font-semibold">Executor proposal:</span> ${proposal.executorName}
                             </div>
                             <div>
                                 <span class="font-semibold">Admin note:</span> ${proApp.adminNote}
                             </div>
                             <div>
-                                <span class="font-semibold">Status:</span> 
-                                <c:choose>
-                                    <c:when test="${proposal.finalStatus == 'rejected'}">
-                                        <span class="underline">Rejected</span> 
-                                    </c:when>
-                                    <c:when test="${proposal.finalStatus == 'pending'}">
-                                        <span class="underline">Pending</span> 
-                                    </c:when>
-                                    <c:when test="${proposal.finalStatus == 'approved_by_admin'}">
-                                        <span class="underline">Approved by admin</span> 
-                                    </c:when>
-                                    <c:when test="${proposal.finalStatus == 'approved_but_not_executed'}">
-                                        <span class="underline">To Be Execute</span> 
-                                    </c:when>
-                                    <c:when test="${proposal.finalStatus == 'executed'}">
-                                        <span class="underline">Executed</span> 
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="text-gray-500 font-semibold underline">Unknown</span>
-                                    </c:otherwise>
-                                </c:choose>
+                                <span class="font-semibold">Time execute:</span> ${proposal.executeDate}
                             </div>
                             <div>
                                 <span class="font-semibold">Direction note:</span> ${proApp.directorNote}
-                            </div>
-                            <div>
-                                <span class="font-semibold">Executor proposal:</span> ${proposal.executorName}
-                            </div>
-                            <div>
-                                <span class="font-semibold">Time execute:</span> ${proposal.executeDate}
                             </div>
                         </div>
                     </div>
