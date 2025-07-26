@@ -73,7 +73,7 @@ public class EditUserServlet extends HttpServlet {
 
             User user = userDAO.getUserById(userId);
             List<Role> roles = roleDAO.getAllRoles();
-
+            roles.removeIf(role -> role.getRoleId() == 1);
             request.setAttribute("user", user);
             request.setAttribute("roles", roles);
             request.getRequestDispatcher("/view/admin/editUser.jsp").forward(request, response);

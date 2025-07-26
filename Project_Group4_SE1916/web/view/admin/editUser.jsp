@@ -83,11 +83,36 @@
             border-color: #4a5568;
         }
     </style>
+    <%
+            String username = (String) session.getAttribute("username");
+            if (username == null) {
+                response.sendRedirect("login.jsp");
+                return;
+            }
+            String role = (String) session.getAttribute("role");
+            if (role == null || !role.equals("admin")) {
+                response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
+                return;
+            }
+        %>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans antialiased">
     
     <!-- Main Content -->
     <main class="flex-1 p-8">
+        <%
+                String usernameDisplay = (String) session.getAttribute("username");
+
+                if (usernameDisplay == null) {
+                    out.println("<div class='user-info'>Username not found</div>");
+                } else {
+            %>
+            <div class="flex justify-end mb-4">
+                <div class="text-gray-700 dark:text-white font-semibold">
+                    Welcome, <%= usernameDisplay%>
+                </div>
+            </div>
+            <% }%>
         <div class="max-w-md mx-auto card bg-white dark:bg-gray-800 p-6">
             <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">Edit user</h2>
 

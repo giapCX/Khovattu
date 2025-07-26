@@ -54,8 +54,13 @@
     </head>
     <body class="bg-gray-50 min-h-screen font-sans antialiased">
         <%
+            String username = (String) session.getAttribute("username");
+            if (username == null) {
+                response.sendRedirect("login.jsp");
+                return;
+            }
             String role = (String) session.getAttribute("role");
-            if (role == null) {
+            if (role == null || !role.equals("admin")) {
                 response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
                 return;
             }
