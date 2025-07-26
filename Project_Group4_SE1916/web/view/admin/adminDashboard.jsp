@@ -241,7 +241,7 @@
             </header>
 
             <!-- Dashboard Stats -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp">
                     <div class="p-6 flex items-start justify-between">
                         <div>
@@ -255,6 +255,21 @@
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
                         <a href="${pageContext.request.contextPath}/ListMaterialController" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View Details</a>
+                    </div>
+                </div>
+                <div class="card bg-white dark:bg-gray-800 animate-fadeInUp">
+                    <div class="p-6 flex items-start justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Current Stock</p>
+                            <h3 class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">${currentTotalStock}</h3>
+                            <p class="text-sm text-blue-500 mt-3"><i class="fas fa-warehouse mr-1"></i>Total Quantity</p>
+                        </div>
+                        <div class="p-4 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
+                            <i class="fas fa-warehouse text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4">
+                        <a href="${pageContext.request.contextPath}/inventory" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View Inventory</a>
                     </div>
                 </div>
                 <div class="card bg-white dark:bg-gray-800 animate-fadeInUp delay-100">
@@ -298,8 +313,36 @@
                             <i class="fas fa-exchange-alt text-2xl"></i>
                         </div>
                     </div>
-
                 </div>
+            </div>
+
+            <!-- Monthly Statistics -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
+                <div class="card bg-white dark:bg-gray-800 animate-fadeInUp">
+                    <div class="p-6 flex items-start justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Import This Month</p>
+                            <h3 class="text-3xl font-bold mt-2 text-green-600 dark:text-green-400">${totalImportThisMonth}</h3>
+                            <p class="text-sm text-green-500 mt-3"><i class="fas fa-arrow-down mr-1"></i>Materials In</p>
+                        </div>
+                        <div class="p-4 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300">
+                            <i class="fas fa-download text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card bg-white dark:bg-gray-800 animate-fadeInUp">
+                    <div class="p-6 flex items-start justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Export This Month</p>
+                            <h3 class="text-3xl font-bold mt-2 text-red-600 dark:text-red-400">${totalExportThisMonth}</h3>
+                            <p class="text-sm text-red-500 mt-3"><i class="fas fa-arrow-up mr-1"></i>Materials Out</p>
+                        </div>
+                        <div class="p-4 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300">
+                            <i class="fas fa-upload text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Charts Row -->
@@ -434,7 +477,7 @@
                 }).showToast();
             }
 
-            // Inventory Chart - real data
+            // Inventory Chart - real data with accurate stock calculation
             const inventoryTrend = JSON.parse('<%= new com.google.gson.Gson().toJson(request.getAttribute("inventoryTrend"))%>');
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const imported = inventoryTrend.map(item => item.imported);
@@ -448,10 +491,44 @@
                     datasets: [
                         {label: 'Imported', data: imported, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true},
                         {label: 'Exported', data: exported, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderWidth: 2, tension: 0.3, fill: true},
-                        {label: 'In Stock', data: remaining, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true}
+                        {label: 'Stock Level', data: remaining, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true}
                     ]
                 },
-                options: {responsive: true, plugins: {legend: {position: 'top', labels: {usePointStyle: true, padding: 20}}, tooltip: {enabled: true, mode: 'index', intersect: false}}, scales: {y: {beginAtZero: false, grid: {drawBorder: false}}, x: {grid: {display: false}}}}
+                options: {
+                    responsive: true, 
+                    plugins: {
+                        legend: {position: 'top', labels: {usePointStyle: true, padding: 20}}, 
+                        tooltip: {
+                            enabled: true, 
+                            mode: 'index', 
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat().format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }, 
+                    scales: {
+                        y: {
+                            beginAtZero: false, 
+                            grid: {drawBorder: false},
+                            ticks: {
+                                callback: function(value) {
+                                    return new Intl.NumberFormat().format(value);
+                                }
+                            }
+                        }, 
+                        x: {grid: {display: false}}
+                    }
+                }
             });
             // Distribution Chart - real data
             const materialDistribution = JSON.parse('<%= new com.google.gson.Gson().toJson(request.getAttribute("materialDistribution"))%>');
