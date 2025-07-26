@@ -13,8 +13,6 @@
 %>
 <!-- Sidebar -->
 
-
-        <!-- Sidebar -->
         <aside id="sidebar" class="sidebar w-72 text-white p-6 fixed h-full z-50">
             <div class="flex items-center mb-8">
                 <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
