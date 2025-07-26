@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Edit Parent Category</title>
+        <title>Edit Root Category</title>
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="${pageContext.request.contextPath}/assets/js/tailwind_config.js"></script>
@@ -55,7 +55,7 @@
                     <button id="toggleSidebarMobile" class="text-gray-700 hover:text-primary-600">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Parent Category</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Root Category</h2>
                 </div>
 
                 <!-- Current Category Info -->
