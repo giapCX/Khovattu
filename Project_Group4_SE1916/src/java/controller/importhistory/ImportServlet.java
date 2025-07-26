@@ -4,6 +4,7 @@ import Dal.DBContext;
 import dao.ImportDAO;
 import dao.ProposalDAO;
 import dao.UserDAO;
+import dao.SupplierDAO;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -21,6 +22,7 @@ import model.Import;
 import model.ImportDetail;
 import model.Proposal;
 import model.User;
+import model.Supplier;
 
 public class ImportServlet extends HttpServlet {
 
@@ -40,6 +42,7 @@ public class ImportServlet extends HttpServlet {
 
         try (Connection conn = DBContext.getConnection()) {
             ProposalDAO proposalDAO = new ProposalDAO(conn);
+            SupplierDAO supplierDAO = new SupplierDAO(conn);
             Proposal proposal = null;
             if (proposalIdStr != null) {
                 try {
@@ -54,8 +57,10 @@ public class ImportServlet extends HttpServlet {
 
             UserDAO userDAO = new UserDAO();
             List<User> activeUsers = userDAO.getAllActiveUsers() != null ? userDAO.getAllActiveUsers() : new ArrayList<>();
-            System.out.println("ImportServlet.doGet: activeUsers.size=" + activeUsers.size());
+            List<Supplier> suppliers = supplierDAO.getAllSuppliers();
+            System.out.println("ImportServlet.doGet: activeUsers.size=" + activeUsers.size() + ", suppliers.size=" + suppliers.size());
             request.setAttribute("activeUsers", activeUsers);
+            request.setAttribute("suppliers", suppliers);
             request.setAttribute("proposal", proposal);
             request.setAttribute("proposalId", proposalId);
             request.setAttribute("proposalType", proposal != null ? proposal.getProposalType() : request.getParameter("proposalType"));
@@ -127,11 +132,24 @@ public class ImportServlet extends HttpServlet {
         String deliverySupplierName = request.getParameter("deliverySupplierName");
         String deliverySupplierPhone = request.getParameter("deliverySupplierPhone");
         String proposalType = request.getParameter("proposalType");
-        System.out.println("ImportServlet.doPost: proposalId=" + proposalId + ", proposalType=" + proposalType + ", responsibleId=" + responsibleId + ", deliverySupplierName=" + deliverySupplierName + ", deliverySupplierPhone=" + deliverySupplierPhone);
+        String supplierIdStr = request.getParameter("supplierId");
+        Integer supplierId = null;
+        try {
+            if (supplierIdStr != null && !supplierIdStr.isEmpty()) {
+                supplierId = Integer.parseInt(supplierIdStr);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("ImportServlet.doPost: Invalid supplier ID: " + supplierIdStr);
+            request.setAttribute("error", "Invalid supplier ID: " + supplierIdStr);
+            request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
+            return;
+        }
+        System.out.println("ImportServlet.doPost: proposalId=" + proposalId + ", proposalType=" + proposalType + ", responsibleId=" + responsibleId + ", deliverySupplierName=" + deliverySupplierName + ", deliverySupplierPhone=" + deliverySupplierPhone + ", supplierId=" + supplierId);
 
         try (Connection conn = DBContext.getConnection()) {
             ProposalDAO proposalDAO = new ProposalDAO(conn);
             ImportDAO importDAO = new ImportDAO(conn);
+            SupplierDAO supplierDAO = new SupplierDAO(conn);
             Proposal proposal = null;
             if (proposalId != null) {
                 proposal = proposalDAO.getProposalWithDetailsById(proposalId);
@@ -169,6 +187,12 @@ public class ImportServlet extends HttpServlet {
                     request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
                     return;
                 }
+                if (supplierId != null && !supplierDAO.supplierExists(supplierId)) {
+                    System.out.println("ImportServlet.doPost: Supplier ID does not exist: " + supplierId);
+                    request.setAttribute("error", "Supplier ID does not exist.");
+                    request.getRequestDispatcher("/view/warehouse/importData.jsp").forward(request, response);
+                    return;
+                }
             } else if ("import_returned".equals(proposalType)) {
                 if (responsibleId == null) {
                     System.out.println("ImportServlet.doPost: Responsible ID required for import_returned");
@@ -194,6 +218,7 @@ public class ImportServlet extends HttpServlet {
             importOb.setDeliverySupplierName(deliverySupplierName);
             importOb.setDeliverySupplierPhone(deliverySupplierPhone);
             importOb.setResponsibleId(responsibleId);
+            importOb.setSupplierId(supplierId != null ? supplierId : (proposal != null ? proposal.getSupplierId() : null));
 
             if (proposal != null) {
                 importOb.setProposal(proposal);

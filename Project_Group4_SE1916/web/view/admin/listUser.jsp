@@ -128,13 +128,15 @@
                 response.sendRedirect("login.jsp");
                 return;
             }
+            String role = (String) session.getAttribute("role");
+            if (role == null || !role.equals("admin")) {
+                response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
+                return;
+            }
             if (request.getAttribute("data") == null && request.getParameter("fromServlet") == null) {
                 response.sendRedirect("${pageContext.request.contextPath}/user?fromServlet=true");
                 return;
             }
-        %>
-        <%
-            String role = (String) session.getAttribute("role");
         %>
         <!-- Sidebar -->
         <c:choose>

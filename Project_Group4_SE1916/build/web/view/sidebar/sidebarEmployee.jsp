@@ -37,13 +37,27 @@
             </div>
             <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
         </a>
-        <a href="${pageContext.request.contextPath}/ListMaterialController" class="nav-item flex items-center p-2 justify-between">
-            <div class="flex items-center">
-                <i class="fas fa-box-open mr-2 w-5 text-center"></i>
-                <span class="text-base">Materials List</span>
-            </div>
-            <i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>
-        </a>
+         <div class="nav-item flex flex-col">
+                    <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
+                        <div class="flex items-center">
+                            <i class="fas fa-box-open mr-2 w-5 text-center"></i>
+                            <span class="text-base">Material Category</span>
+                        </div>
+                        <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
+                    </button>
+                    <!-- Submenu - hidden by default -->
+                    <div class="submenu hidden pl-6 space-y-1 mt-1">
+                        <a href = "${pageContext.request.contextPath}/ListParentCategoryController" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-folder-tree mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Categories</span>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/ListMaterialController" class="flex items-center p-2 hover:bg-white hover:bg-opacity-20 rounded-lg">
+                            <i class="fas fa-cubes mr-2 w-4 text-center"></i>
+                            <span class="text-sm">Material </span>
+                        </a>
+                        
+                    </div>
+                </div> 
         <div class="nav-item flex flex-col">
             <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
                 <div class="flex items-center">
@@ -83,7 +97,7 @@
             <button type="button" class="flex items-center p-2 justify-between w-full text-left toggle-submenu">
                 <div class="flex items-center">
                     <i class="fas fas fa-file-alt mr-2 w-5 text-center"></i>
-                    <span class="text-base">Proposals</span>
+                    <span class="text-base">Request List</span>
                 </div>
                 <i class="fas fa-chevron-down ml-auto text-xs opacity-50"></i>
             </button>

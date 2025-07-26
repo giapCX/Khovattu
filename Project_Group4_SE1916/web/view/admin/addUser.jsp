@@ -19,6 +19,10 @@
                 return;
             }
             String role = (String) session.getAttribute("role");
+            if (role == null || !role.equals("admin")) {
+                response.sendRedirect(request.getContextPath() + "/view/accessDenied.jsp");
+                return;
+            }
         %>
 
         <c:choose>
@@ -37,9 +41,22 @@
         </c:choose>
 
         <main class="p-8 lg:ml-72 transition-all duration-300">
+            <%
+                String usernameDisplay = (String) session.getAttribute("username");
+
+                if (usernameDisplay == null) {
+                    out.println("<div class='user-info'>Username not found</div>");
+                } else {
+            %>
+           <div class="flex justify-end mb-4">
+                <div class="text-gray-700 dark:text-white font-semibold">
+                    Welcome, <%= usernameDisplay%>
+                </div>
+            </div>
+            <% }%>
             <div class="max-w-3xl mx-auto card bg-white p-6">
                 <div class="flex items-center gap-4 mb-6">
-                    <button id="toggleSidebarMobile" class="text-gray-700"><i class="fas fa-bars text-2xl"></i></button>
+<!--                    <button id="toggleSidebarMobile" class="text-gray-700"><i class="fas fa-bars text-2xl"></i></button>-->
                     <h2 class="text-2xl font-bold">Add New User</h2>
                 </div>
 
