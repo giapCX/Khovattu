@@ -26,6 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.sql.Connection;
+import java.math.BigDecimal;
 
 /**
  *
@@ -77,16 +78,24 @@ public class AdminDashboard extends HttpServlet {
             int pendingProposals = proposalDAO.getPendingProposalsCount(null, null, null, "pending");
             int todayTransactions = dashboardDAO.countTodayTransactions();
 
-            // 2. Biểu đồ
+            // 2. Lấy tồn kho thực tế hiện tại
+            BigDecimal currentTotalStock = dashboardDAO.getCurrentTotalStock();
+
+            // 3. Biểu đồ xuất nhập tồn chính xác
             int year = Year.now().getValue();
             List<InventoryTrendDTO> inventoryTrend = dashboardDAO.getInventoryTrendByMonth(year);
             Map<String, Integer> materialDistribution = dashboardDAO.getMaterialDistributionByParentCategory();
 
-            // 3. Bảng vật tư sắp hết (lấy 5 vật tư tồn kho thấp nhất)
+            // 4. Thống kê tổng nhập xuất trong tháng hiện tại
+            Map<String, BigDecimal> monthlyStats = dashboardDAO.getCurrentMonthImportExport();
+            BigDecimal totalImportThisMonth = monthlyStats.getOrDefault("totalImport", BigDecimal.ZERO);
+            BigDecimal totalExportThisMonth = monthlyStats.getOrDefault("totalExport", BigDecimal.ZERO);
+
+            // 5. Bảng vật tư sắp hết (lấy 5 vật tư tồn kho thấp nhất)
             InventoryDAO inventoryDAO = new InventoryDAO(Dal.DBContext.getConnection());
             List<Inventory> lowStockMaterials = inventoryDAO.searchInventory(null, null, null, null, null, 1, 5, "ASC");
 
-//            // 4. Bảng giao dịch gần đây (5 giao dịch nhập + 5 giao dịch xuất gần nhất)
+//            // 6. Bảng giao dịch gần đây (5 giao dịch nhập + 5 giao dịch xuất gần nhất)
 //            ExportHistoryDAO exportHistoryDAO = new ExportHistoryDAO(Dal.DBContext.getConnection());
 //            ImportReceiptDAO importReceiptDAO = new ImportReceiptDAO();
 //            List<model.Export> recentExports = exportHistoryDAO.searchExportReceipts(null, null, null, 1, 5);
@@ -97,6 +106,9 @@ public class AdminDashboard extends HttpServlet {
             request.setAttribute("lowStockCount", lowStockCount);
             request.setAttribute("pendingProposals", pendingProposals);
             request.setAttribute("todayTransactions", todayTransactions);
+            request.setAttribute("currentTotalStock", currentTotalStock);
+            request.setAttribute("totalImportThisMonth", totalImportThisMonth);
+            request.setAttribute("totalExportThisMonth", totalExportThisMonth);
             request.setAttribute("inventoryTrend", inventoryTrend);
             request.setAttribute("materialDistribution", materialDistribution);
             request.setAttribute("lowStockMaterials", lowStockMaterials);
