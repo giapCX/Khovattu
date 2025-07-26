@@ -68,7 +68,7 @@ public class AddUserServlet extends HttpServlet {
             RoleDAO roleDAO = new RoleDAO(conn);
 
             List<Role> roles = roleDAO.getAllRoles();
-
+            roles.removeIf(role -> role.getRoleId() == 1);
             request.setAttribute("roles", roles);
             request.getRequestDispatcher("/view/admin/addUser.jsp").forward(request, response);
 
@@ -105,18 +105,45 @@ public class AddUserServlet extends HttpServlet {
                 || email == null || email.trim().isEmpty()
                 || status == null || status.trim().isEmpty()
                 || roleIdParam == null || roleIdParam.trim().isEmpty()) {
-            request.setAttribute("error", "Vui lòng điền đầy đủ thông tin bắt buộc.");
+            request.setAttribute("error", "Please fill in all required information.");
+            retainFormInputs(request, code, username, fullName, address, email, phone, dob, status, code);
+            try (Connection conn = DBContext.getConnection()) {
+                RoleDAO roleDAO = new RoleDAO(conn);
+                List<Role> roles = roleDAO.getAllRoles();
+                roles.removeIf(role -> role.getRoleId() == 1);
+                request.setAttribute("roles", roles);
+            } catch (Exception ex) {
+                throw new ServletException(ex);
+            }
             request.getRequestDispatcher("view/admin/addUser.jsp").forward(request, response);
             return;
         }
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         if (!email.matches(emailRegex)) {
-            request.setAttribute("error", "Email không hợp lệ.");
+            request.setAttribute("error", "Invalid email.");
+            retainFormInputs(request, code, username, fullName, address, email, phone, dob, status, code);
+            try (Connection conn = DBContext.getConnection()) {
+                RoleDAO roleDAO = new RoleDAO(conn);
+                List<Role> roles = roleDAO.getAllRoles();
+                roles.removeIf(role -> role.getRoleId() == 1);
+                request.setAttribute("roles", roles);
+            } catch (Exception ex) {
+                throw new ServletException(ex);
+            }
             request.getRequestDispatcher("view/admin/addUser.jsp").forward(request, response);
             return;
         }
         if (phone != null && !phone.trim().isEmpty() && !phone.matches("^\\d{10}$")) {
-            request.setAttribute("error", "Số điện thoại phải gồm đúng 10 chữ số.");
+            request.setAttribute("error", "The phone number must contain exactly 10 digits.");
+            retainFormInputs(request, code, username, fullName, address, email, phone, dob, status, code);
+            try (Connection conn = DBContext.getConnection()) {
+                RoleDAO roleDAO = new RoleDAO(conn);
+                List<Role> roles = roleDAO.getAllRoles();
+                roles.removeIf(role -> role.getRoleId() == 1);
+                request.setAttribute("roles", roles);
+            } catch (Exception ex) {
+                throw new ServletException(ex);
+            }
             request.getRequestDispatcher("view/admin/addUser.jsp").forward(request, response);
             return;
         }
@@ -124,7 +151,16 @@ public class AddUserServlet extends HttpServlet {
         try {
             roleId = Integer.parseInt(roleIdParam);
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "Role ID không hợp lệ.");
+            request.setAttribute("error", "Invlaid role Id");
+            retainFormInputs(request, code, username, fullName, address, email, phone, dob, status, code);
+            try (Connection conn = DBContext.getConnection()) {
+                RoleDAO roleDAO = new RoleDAO(conn);
+                List<Role> roles = roleDAO.getAllRoles();
+                roles.removeIf(role -> role.getRoleId() == 1);
+                request.setAttribute("roles", roles);
+            } catch (Exception ex) {
+                throw new ServletException(ex);
+            }
             request.getRequestDispatcher("view/admin/addUser.jsp").forward(request, response);
             return;
         }
@@ -133,6 +169,11 @@ public class AddUserServlet extends HttpServlet {
             boolean exists = userDAO.isUsernameOrEmailExists(username, email);
             if (exists) {
                 request.setAttribute("error", "Username or Email existed.");
+                retainFormInputs(request, code, username, fullName, address, email, phone, dob, status, code);
+                RoleDAO roleDAO = new RoleDAO(conn);
+                List<Role> roles = roleDAO.getAllRoles();
+                roles.removeIf(role -> role.getRoleId() == 1);
+                request.setAttribute("roles", roles);
                 request.getRequestDispatcher("view/admin/addUser.jsp").forward(request, response);
                 return;
             }
@@ -153,13 +194,25 @@ public class AddUserServlet extends HttpServlet {
 
             // Gọi DAO thêm user và gán role
             userDAO.insertUserWithRole(user, roleId);
-
+            
             response.sendRedirect("listuser");
         } catch (Exception e) {
             throw new ServletException(e);
         }
     }
-
+private void retainFormInputs(HttpServletRequest request, String code, String username, String fullName,
+                              String address, String email, String phone, String dob, String status, String roleId) {
+    request.setAttribute("code", code);
+    request.setAttribute("username", username);
+    request.setAttribute("fullName", fullName);
+    request.setAttribute("address", address);
+    request.setAttribute("email", email);
+    request.setAttribute("phone", phone);
+    request.setAttribute("dob", dob);
+    request.setAttribute("status", status);
+    request.setAttribute("roleId", roleId);
+}
+    
     /**
      * Returns a short description of the servlet.
      *

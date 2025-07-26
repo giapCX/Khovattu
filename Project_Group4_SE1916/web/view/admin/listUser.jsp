@@ -45,8 +45,13 @@
             }
 
             thead {
-                background-color: #2563eb;
-                color: white;
+                background-color: #2563eb !important;
+                color: white !important;
+            }
+
+            thead th {
+                background-color: #2563eb !important;
+                color: white !important;
             }
 
             th {
@@ -105,10 +110,10 @@
                 position: absolute;
                 top: 1rem;
                 right: 3rem;
-/*                color: #ffffff;*/
+                /*                color: #ffffff;*/
                 font-size: 1rem;
                 font-weight: 500;
-/*                background-color: #2563eb;*/
+                /*                background-color: #2563eb;*/
                 padding: 0.5rem 1rem;
                 border-radius: 0.375rem;
                 z-index: 10;
@@ -150,17 +155,17 @@
         <!-- Main Content -->
         <main class="flex-1 p-8 transition-all duration-300 relative">
             <!-- User Info at Top Right -->
-            <% 
+            <%
                 String usernameDisplay = (String) session.getAttribute("username");
-                
+
                 if (usernameDisplay == null) {
                     out.println("<div class='user-info'>Username not found</div>");
                 } else {
             %>
             <div class="user-info">
-                Welcome, <%= usernameDisplay %>
+                Welcome, <%= usernameDisplay%>
             </div>
-            <% } %>
+            <% }%>
 
             <div class="max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
@@ -178,7 +183,7 @@
                 <!-- Search and Filter Form -->
                 <form action="${pageContext.request.contextPath}/user" method="get" class="mb-6 flex flex-wrap gap-4 items-center">
                     <div class="flex-1 min-w-[200px]">
-                        <input type="text" name="search" placeholder="Tìm kiếm theo tên người dùng hoặc họ tên" value="${param.search}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
+                        <input type="text" name="search" placeholder="Enter user name" value="${param.search}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                     <div class="flex-1 min-w-[150px]">
                         <select name="roleId" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
@@ -196,7 +201,7 @@
                         </select>
                     </div>
                     <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg flex items-center">
-                        <i class="fas fa-search mr-2"></i> Tìm kiếm
+                        <i class="fas fa-search mr-2"></i> Search
                     </button>
                 </form>
 
@@ -204,7 +209,7 @@
                 <div class="table-container bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full table-auto">
-                            <thead>
+                            <thead class="sticky top-0 bg-primary-600 text-white z-10">
                                 <tr class="bg-primary-600 text-white">
                                     <th class="p-4 text-left">Username</th>
                                     <th class="p-4 text-left">Full Name</th>

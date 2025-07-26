@@ -162,8 +162,8 @@
                         <label class="block text-sm font-medium text-gray-700">Proposal Type</label>
                         <select name="type" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                             <option value="">All</option>
-                            <option value="import_from_supplier" ${param.type == 'import_from_supplier' ? 'selected' : ''}>From Supplier</option>
-                            <option value="import_returned" ${param.type == 'import_returned' ? 'selected' : ''}>Returned</option>
+                            <option value="import_from_supplier" ${param.type == 'import_from_supplier' ? 'selected' : ''}>Purchase</option>
+                            <option value="import_returned" ${param.type == 'import_returned' ? 'selected' : ''}>Retrieve</option>
                         </select>
                     </div>
                     <div class="flex-1 min-w-[200px]">
@@ -209,10 +209,10 @@
                                                 <td class="p-4 font-medium">
                                                     <c:choose>
                                                         <c:when test="${imp.importType == 'import_from_supplier'}">
-                                                            <span class="badge badge-success">From Supplier</span>
+                                                            <span class="badge badge-success">Purchase</span>
                                                         </c:when>
                                                         <c:when test="${imp.importType == 'import_returned'}">
-                                                            <span class="badge badge-success-bg-subtle">Returned</span>
+                                                            <span class="badge badge-success-bg-subtle">Retrieve</span>
                                                         </c:when>
                                                     </c:choose>
                                                 </td>
