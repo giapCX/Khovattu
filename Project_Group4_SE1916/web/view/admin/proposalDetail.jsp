@@ -101,7 +101,11 @@
                         <i class="fas fa-arrow-left mr-2"></i>Back to Requests History
                     </a>
                 </div>
-
+                <c:if test="${not empty errorMessage}">
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        <strong>Error:</strong> ${errorMessage}
+                    </div>
+                </c:if>
                 <!-- Information Proposal Card -->
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
                     <div class="bg-primary-600 text-white px-6 py-4 rounded-t-lg">
@@ -194,11 +198,7 @@
                                     </c:choose>
                                 </div>
                             </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Admin Note</label>
-                                <textarea class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
-                                          rows="2" readonly>${proposal.approval.adminNote}</textarea>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -233,6 +233,15 @@
                                                 <i class="fas fa-money-bill-wave mr-1"></i>Price (VNĐ)
                                             </th>
                                         </c:if>
+                                        <c:if test="${proposal.proposalType eq 'export'}">
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                <i class="fas fa-truck-loading mr-1"></i>Pending Export
+                                            </th>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                <i class="fas fa-warehouse mr-1"></i>Available Stock
+                                            </th>
+                                            
+                                        </c:if>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -240,20 +249,32 @@
                                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                             <td class="px-4 py-3 text-gray-900 dark:text-gray-100">${detail.materialName}</td>
                                             <td class="px-4 py-3 text-gray-900 dark:text-gray-100">${detail.unit}</td>
-                                            <td class="px-4 py-3 text-gray-900 dark:text-gray-100">${detail.quantity}</td>
+                                            <td class="px-4 py-3 text-gray-900 dark:text-gray-100">
+                                                <fmt:formatNumber value="${detail.quantity}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                            </td>
                                             <td class="px-4 py-3 text-gray-900 dark:text-gray-100">${detail.materialCondition}</td>
                                             <c:if test="${proposal.proposalType == 'import_from_supplier'}">
                                                 <td class="px-4 py-3 text-gray-900 dark:text-gray-100">
                                                     <fmt:formatNumber value="${detail.price}" type="number" minFractionDigits="0" maxFractionDigits="2" />
                                                 </td>
                                             </c:if>
+                                            <c:if test="${proposal.proposalType eq 'export'}">
+                                                <td class="px-4 py-3 text-gray-900 dark:text-gray-100">
+                                                    <fmt:formatNumber value="${detail.pendingExportQuantity != null ? detail.pendingExportQuantity : 0}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                                </td>
+                                                <td class="px-4 py-3 text-gray-900 dark:text-gray-100">
+                                                    <fmt:formatNumber value="${detail.currentStock != null ? detail.currentStock : 0}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                                </td>
+                                                
+                                            </c:if>
                                         </tr>
+                                        
                                     </c:forEach>
                                     <c:if test="${empty proposal.proposalDetails}">
                                         <tr>
-                                            <td colspan="5" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                                            <td colspan="${proposal.proposalType eq 'export' ? 7 : 5}" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                                                 <i class="fas fa-inbox text-3xl mb-2"></i>
-                                                <p>No materials proposed.</p>
+                                                <p>No material.</p>
                                             </td>
                                         </tr>
                                     </c:if>

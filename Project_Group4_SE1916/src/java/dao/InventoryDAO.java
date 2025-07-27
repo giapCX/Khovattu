@@ -285,7 +285,64 @@ public class InventoryDAO {
         }
         return count;
     }
+    public double getReservedQuantity(int materialId) throws SQLException {
+    String sql = """
+        SELECT SUM(pd.quantity)
+        FROM ProposalDetails pd
+        JOIN EmployeeProposals ep ON pd.proposal_id = ep.proposal_id
+        WHERE pd.material_id = ?
+          AND ep.final_status = 'approved'
+          AND NOT EXISTS (
+              SELECT 1 FROM ExportReceipts er WHERE er.proposal_id = ep.proposal_id
+          )
+    """;
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, materialId);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            double reserved = rs.getDouble(1);
+            return rs.wasNull() ? 0.0 : reserved;
+        }
+        return 0.0;
+    }
+}
 
+public double getReservedQuantityExcludingProposal(int materialId, int excludeProposalId) throws SQLException {
+        String sql = """
+            SELECT SUM(pd.quantity)
+            FROM ProposalDetails pd
+            JOIN EmployeeProposals ep ON pd.proposal_id = ep.proposal_id
+            LEFT JOIN ExportReceipts er ON er.proposal_id = ep.proposal_id
+            WHERE pd.material_id = ? 
+              AND ep.proposal_id != ?
+              AND ep.final_status IN ('approved_by_admin', 'approved_but_not_executed')
+              AND er.proposal_id IS NULL
+        """;
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, materialId);
+            stmt.setInt(2, excludeProposalId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next() && !rs.wasNull()) {
+                    return rs.getDouble(1);
+                }
+                return 0.0;
+            }
+        }
+    }
+
+    public double getCurrentStock(int materialId, String materialCondition) throws SQLException {
+        String sql = "SELECT quantity_in_stock FROM Inventory WHERE material_id = ? AND material_condition = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, materialId);
+            stmt.setString(2, materialCondition);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next() && !rs.wasNull()) {
+                    return rs.getDouble(1);
+                }
+                return 0.0;
+            }
+        }
+    }
     public List<Inventory> getAllInventory() throws SQLException {
         return searchInventory(null, null, null, null, null, 1, Integer.MAX_VALUE, null);
     }

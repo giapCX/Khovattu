@@ -3,15 +3,25 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/SWP391_Project/SWP391-Project-Group4-SE1916/Project_Group4_SE1916/web/view/admin/adminDashboard.jsp</file>
-            <file>file:/D:/SWP391_Project/SWP391-Project-Group4-SE1916/Project_Group4_SE1916/src/java/dal/DBContext.java</file>
-            <file>file:/D:/SWP391_Project/SWP391-Project-Group4-SE1916/Project_Group4_SE1916/web/assets/js/idebar_darkmode.js</file>
-            <file>file:/D:/SWP391_Project/SWP391-Project-Group4-SE1916/Project_Group4_SE1916/web/view/direction/directorApproveProposal.jsp</file>
-            <file>file:/D:/SWP391_Project/SWP391-Project-Group4-SE1916/Project_Group4_SE1916/web/view/direction/directorProposalsHistory.jsp</file>
-            <file>file:/D:/SWP391_Project/SWP391-Project-Group4-SE1916/Project_Group4_SE1916/src/java/dao/DashboardWarehouseDAO.java</file>
-            <file>file:/D:/SWP391_Project/SWP391-Project-Group4-SE1916/Project_Group4_SE1916/web/view/admin/editUser.jsp</file>
-            <file>file:/D:/SWP391_Project/SWP391-Project-Group4-SE1916/Project_Group4_SE1916/web/view/admin/adminApprove.jsp</file>
-            <file>file:/D:/SWP391_Project/SWP391-Project-Group4-SE1916/Project_Group4_SE1916/src/java/password/PasswordMigration.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/WEB-INF/web.xml</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/exportHistory.jsp</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/AdminUpdateProposalServlet.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/ProposalDAO.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/password/PasswordMigration.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/ImportDAO.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ExportHistoryDetailServlet.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/ExportDAO.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/unitList.jsp</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ImportHistoryServlet.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/importHistory.jsp</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/InventoryDAO.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dal/DBContext.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/admin/proposalDetail.jsp</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/web/view/constructionSites/editConstructionSite.jsp</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/dao/ExportHistoryDAO.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/importhistory/ExportMaterial.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/model/ProposalDetails.java</file>
+            <file>file:/D:/5.Su25/SWP391/SWP391_Project/Khovattu/Project_Group4_SE1916/src/java/controller/proposal/AdminApproveServlet.java</file>
         </group>
     </open-files>
 </project-private>

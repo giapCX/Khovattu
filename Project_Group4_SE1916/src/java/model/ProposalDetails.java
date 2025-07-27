@@ -13,8 +13,10 @@ public class ProposalDetails {
     private double quantity;
     private String materialCondition;
     private String unit;
-    private Double  price;
-   
+    private Double price;
+    private double pendingExportQuantity;
+    private double currentStock;
+    private String stockStatus;
 
     public ProposalDetails() {
     }
@@ -28,6 +30,30 @@ public class ProposalDetails {
         this.materialCondition = materialCondition;
         this.unit = unit;
         this.price = price;
+    }
+
+    public double getPendingExportQuantity() {
+        return pendingExportQuantity;
+    }
+
+    public void setPendingExportQuantity(double pendingExportQuantity) {
+        this.pendingExportQuantity = pendingExportQuantity;
+    }
+
+    public double getCurrentStock() {
+        return currentStock;
+    }
+
+    public void setCurrentStock(double currentStock) {
+        this.currentStock = currentStock;
+    }
+
+    public String getStockStatus() {
+        return this.stockStatus;
+    }
+
+    public void setStockStatus(String stockStatus) {
+        this.stockStatus = stockStatus;
     }
 
     public int getProposalDetailId() {
@@ -93,8 +119,5 @@ public class ProposalDetails {
     public void setPrice(Double price) {
         this.price = price;
     }
-    
-   
-    
 
 }

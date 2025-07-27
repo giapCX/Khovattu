@@ -21,7 +21,17 @@ public class ProposalDAO {
     public ProposalDAO(Connection conn) {
         this.conn = conn;
     }
-
+    public String getProposalType(int proposalId) throws SQLException {
+    String sql = "SELECT proposal_type FROM EmployeeProposals WHERE proposal_id = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, proposalId);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getString("proposal_type");
+        }
+    }
+    return null;
+}
     public boolean addProposal(Proposal proposal) throws SQLException {
         String insertProposalSQL = "INSERT INTO EmployeeProposals (proposal_type, proposer_id, note, proposal_sent_date, final_status,supplier_id, site_id) VALUES (?, ?, ?, ?, ?,?,?)";
         conn.setAutoCommit(false);
@@ -510,7 +520,45 @@ public class ProposalDAO {
         }
         return list;
     }
+public List<ProposalDetails> getProposalDetailsByProposal(int proposalId) throws SQLException {
+        List<ProposalDetails> details = new ArrayList<>();
+        String sql = """
+            SELECT pd.proposal_detail_id, pd.material_id, pd.quantity, 
+                   pd.price_per_unit, pd.material_condition, m.name AS material_name, u.name AS unit
+            FROM ProposalDetails pd
+            LEFT JOIN Materials m ON pd.material_id = m.material_id
+            LEFT JOIN Units u ON m.unit_id = u.unit_id
+            WHERE pd.proposal_id = ?
+        """;
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, proposalId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    ProposalDetails detail = new ProposalDetails();
+                    detail.setProposalDetailId(rs.getInt("proposal_detail_id"));
+                    detail.setMaterialId(rs.getInt("material_id"));
+                    detail.setQuantity(rs.getDouble("quantity"));
+                    detail.setPrice(rs.getDouble("price_per_unit"));
+                    detail.setMaterialCondition(rs.getString("material_condition"));
+                    detail.setMaterialName(rs.getString("material_name"));
+                    detail.setUnit(rs.getString("unit"));
+                    details.add(detail);
 
+                    System.out.println("Proposal ID: " + proposalId +
+                                       ", Detail ID: " + detail.getProposalDetailId() +
+                                       ", Material ID: " + detail.getMaterialId() +
+                                       ", Material: " + detail.getMaterialName() +
+                                       ", Quantity: " + detail.getQuantity() +
+                                       ", Condition: " + detail.getMaterialCondition() +
+                                       ", Unit: " + detail.getUnit());
+                }
+            }
+        }
+        if (details.isEmpty()) {
+            System.out.println("No details found for Proposal ID: " + proposalId);
+        }
+        return details;
+    }
     public ProposalApprovals getApprovalByProposalId(int proposalId) {
         ProposalApprovals approval = null;
         String sql = "SELECT approval_id, proposal_id, admin_approver_id, director_approver_id, "

@@ -5,6 +5,7 @@ package controller.proposal;
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 import Dal.DBContext;
+import dao.InventoryDAO;
 import dao.ProposalDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,6 +15,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
+import model.Proposal;
+import model.ProposalDetails;
 
 /**
  *
@@ -59,7 +64,71 @@ public class AdminUpdateProposalServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        System.out.println("Entering AdminProposalDetailServlet.doGet");
+        try (Connection conn = new DBContext().getConnection()) {
+            // Lấy proposalId từ request
+            String rawProposalId = request.getParameter("proposalId");
+            System.out.println("Received proposalId: " + rawProposalId);
+            if (rawProposalId == null || !rawProposalId.matches("\\d+")) {
+                System.out.println("Invalid proposalId: " + rawProposalId);
+                request.setAttribute("errorMessage", "ID đề xuất không hợp lệ.");
+                request.getRequestDispatcher("/view/admin/proposalDetail.jsp").forward(request, response);
+                return;
+            }
+
+            int proposalId = Integer.parseInt(rawProposalId);
+            ProposalDAO proposalDAO = new ProposalDAO(conn);
+            InventoryDAO inventoryDAO = new InventoryDAO(conn);
+
+            // Lấy thông tin đề xuất
+            Proposal proposal = proposalDAO.getProposalById(proposalId);
+            if (proposal == null) {
+                System.out.println("Proposal not found for ID: " + proposalId);
+                request.setAttribute("errorMessage", "Không tìm thấy đề xuất với ID: " + proposalId);
+                request.getRequestDispatcher("/view/admin/proposalDetail.jsp").forward(request, response);
+                return;
+            }
+            System.out.println("Proposal ID: " + proposalId + ", Type: " + proposal.getProposalType());
+
+            // Cập nhật chi tiết đề xuất cho export
+            if ("export".equalsIgnoreCase(proposal.getProposalType())) {
+                List<ProposalDetails> details = proposalDAO.getProposalDetailsByProposalId(proposalId);
+                System.out.println("Number of details: " + details.size());
+                for (ProposalDetails detail : details) {
+                    int materialId = detail.getMaterialId();
+                    double requestedQuantity = detail.getQuantity();
+                    String materialCondition = detail.getMaterialCondition();
+                    double pendingExportQty = inventoryDAO.getReservedQuantityExcludingProposal(materialId, proposalId);
+                    double currentStock = inventoryDAO.getCurrentStock(materialId, materialCondition);
+                    double available = currentStock - pendingExportQty;
+
+                    detail.setPendingExportQuantity(pendingExportQty);
+                    detail.setCurrentStock(currentStock);
+                    detail.setStockStatus(available >= requestedQuantity ? "enough" : "not enough");
+
+                    
+                }
+                proposal.setProposalDetails(details);
+            } else {
+                System.out.println("Proposal is not of type 'export', skipping details processing");
+            }
+
+            // Gửi proposal tới JSP
+            request.setAttribute("proposal", proposal);
+            System.out.println("Forwarding to proposalDetail.jsp with proposal: " + proposal.getProposalId());
+            request.getRequestDispatcher("/view/admin/proposalDetail.jsp").forward(request, response);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("SQLException: " + e.getMessage());
+            request.setAttribute("errorMessage", "Lỗi cơ sở dữ liệu: " + e.getMessage());
+            request.getRequestDispatcher("/view/admin/proposalDetail.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Exception: " + e.getMessage());
+            request.setAttribute("errorMessage", "Lỗi không xác định: " + e.getMessage());
+            request.getRequestDispatcher("/view/admin/proposalDetail.jsp").forward(request, response);
+        }
     }
 
     /**
@@ -74,57 +143,91 @@ public class AdminUpdateProposalServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try (Connection conn = new DBContext().getConnection()) {
-            String adminStatus = request.getParameter("adminStatus");
-            String adminReason = request.getParameter("adminReason");
-            String adminNote = request.getParameter("adminNote");
+            // 1. Lấy và kiểm tra dữ liệu đầu vào
             String rawProposalId = request.getParameter("proposalId");
             String rawAdminApproverId = request.getParameter("adminApproverId");
+            String adminStatus = request.getParameter("adminStatus");
+            String adminReason = Optional.ofNullable(request.getParameter("adminReason")).orElse("");
+            String adminNote = Optional.ofNullable(request.getParameter("adminNote")).orElse("");
 
-            if (rawProposalId == null || !rawProposalId.matches("\\d+")
-                    || rawAdminApproverId == null || !rawAdminApproverId.matches("\\d+")) {
-                System.err.println("Invalid input format: proposalId=" + rawProposalId + ", adminApproverId=" + rawAdminApproverId);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid input format.");
+            // Kiểm tra định dạng đầu vào
+            if (!rawProposalId.matches("\\d+") || !rawAdminApproverId.matches("\\d+")) {
+                request.getSession().setAttribute("errorMessage", "Định dạng ID đề xuất hoặc người phê duyệt không hợp lệ.");
+                response.sendRedirect(request.getContextPath() + "/AdminApproveServlet?proposalId=" + rawProposalId);
                 return;
             }
 
             int proposalId = Integer.parseInt(rawProposalId);
             int adminApproverId = Integer.parseInt(rawAdminApproverId);
 
-            // Validate status
+            // Kiểm tra trạng thái phê duyệt
             if (adminStatus == null || !adminStatus.matches("approved|rejected")) {
-                System.err.println("Invalid admin status: " + adminStatus);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid status provided.");
+                request.getSession().setAttribute("errorMessage", "Trạng thái phê duyệt không hợp lệ.");
+                response.sendRedirect(request.getContextPath() + "/AdminApproveServlet?proposalId=" + proposalId);
                 return;
             }
 
-            // Default value if null
-            if (adminReason == null) {
-                adminReason = "";
-            }
-            if (adminNote == null) {
-                adminNote = "";
+            // 2. Chuẩn bị DAO
+            ProposalDAO proposalDAO = new ProposalDAO(conn);
+            InventoryDAO inventoryDAO = new InventoryDAO(conn);
+            String proposalType = proposalDAO.getProposalType(proposalId);
+
+            // 3. Lấy và cập nhật chi tiết đề xuất
+            List<ProposalDetails> proposalDetailsList = proposalDAO.getProposalDetailsByProposalId(proposalId);
+            boolean allEnough = true;
+            StringBuilder insufficientMsg = new StringBuilder("Không đủ tồn kho cho: ");
+
+            if ("export".equalsIgnoreCase(proposalType)) {
+                for (ProposalDetails detail : proposalDetailsList) {
+                    int materialId = detail.getMaterialId();
+                    double requestedQuantity = detail.getQuantity();
+                    String materialCondition = detail.getMaterialCondition(); // Lấy material_condition
+                    double pendingExportQty = inventoryDAO.getReservedQuantityExcludingProposal(materialId, proposalId);
+                    double currentStock = inventoryDAO.getCurrentStock(materialId, materialCondition); // Hoặc sử dụng getCurrentStock(materialId, materialCondition)
+                    double available = currentStock - pendingExportQty;
+
+                    // Thiết lập giá trị
+                    detail.setPendingExportQuantity(pendingExportQty);
+                    detail.setCurrentStock(currentStock);
+                    detail.setStockStatus(available >= requestedQuantity ? "enough" : "not enough");
+
+                    
+                    if ("approved".equals(adminStatus) && available < requestedQuantity) {
+                        allEnough = false;
+                        insufficientMsg.append(detail.getMaterialName())
+                                .append(" (available: ").append(available)
+                                .append(", request: ").append(requestedQuantity).append("), ");
+                    }
+                }
             }
 
-            ProposalDAO dao = new ProposalDAO(conn);
-            dao.adminUpdateProposal(proposalId, adminStatus, adminReason, adminNote, adminApproverId);
+            // 4. Nếu không đủ kho khi phê duyệt
+            if ("export".equalsIgnoreCase(proposalType) && "approved".equals(adminStatus) && !allEnough) {
+                Proposal proposal = proposalDAO.getProposalById(proposalId);
+                proposal.setProposalDetails(proposalDetailsList);
+                request.setAttribute("proposal", proposal);
+                request.setAttribute("errorMessage", insufficientMsg.substring(0, insufficientMsg.length() - 2));
+                request.getRequestDispatcher("/view/admin/proposalDetail.jsp").forward(request, response);
+                return;
+            }
 
-            request.getSession().setAttribute("successMessage", "Proposal updated successfully.");
-            response.sendRedirect(request.getContextPath() + "/AdminApproveServlet");
+            // 5. Cập nhật đề xuất nếu đủ kho hoặc là import/rejected
+            proposalDAO.adminUpdateProposal(proposalId, adminStatus, adminReason, adminNote, adminApproverId);
+            request.getSession().setAttribute("successMessage", "Đề xuất đã được cập nhật thành công.");
+            response.sendRedirect(request.getContextPath() + "/AdminApproveServlet?proposalId=" + proposalId);
 
         } catch (NumberFormatException e) {
-            System.err.println("Invalid input format for proposalId or adminApproverId");
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid input format.");
-
+            request.setAttribute("errorMessage", "Định dạng đầu vào không hợp lệ: " + e.getMessage());
+            request.getRequestDispatcher("/view/admin/proposalDetail.jsp").forward(request, response);
         } catch (SQLException e) {
-            System.err.println("Database error updating proposal ID: " + request.getParameter("proposalId"));
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error updating proposal.");
-
+            request.setAttribute("errorMessage", "Lỗi cơ sở dữ liệu: " + e.getMessage());
+            request.getRequestDispatcher("/view/admin/proposalDetail.jsp").forward(request, response);
         } catch (Exception e) {
-            System.err.println("Unexpected error updating proposal");
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unexpected error occurred.");
+            request.setAttribute("errorMessage", "Lỗi không xác định: " + e.getMessage());
+            request.getRequestDispatcher("/view/admin/proposalDetail.jsp").forward(request, response);
         }
     }
 
