@@ -130,18 +130,12 @@ public class EditMaterialController extends HttpServlet {
 //                errorMessage.append("Material name already exists in this sub category! ");
 //            }
             // Handle image upload
-            // Handle image upload
             Part filePart = request.getPart("imageFile");
             String imageUrl = "";
 
-            // If no image selected, show error
-            if (filePart == null || filePart.getSize() == 0) {
-                request.setAttribute("message", "Please select a material image!");
-                request.setAttribute("messageType", "error");
-                
-                request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
-                return;
-            }
+            // Get the current material to preserve existing image if no new image is uploaded
+            Material currentMaterial = materialDAO.getMaterialById(Integer.parseInt(materialIdStr));
+            String currentImageUrl = currentMaterial.getImageUrl();
 
             if (filePart != null && filePart.getSize() > 0) {
                 // Validate file type
@@ -185,6 +179,9 @@ public class EditMaterialController extends HttpServlet {
                 }
 
                 imageUrl = "uploads/" + fileName;
+            } else {
+                // Keep the existing image if no new image is uploaded
+                imageUrl = currentImageUrl;
             }
 
             material.setImageUrl(imageUrl);
@@ -201,7 +198,7 @@ public class EditMaterialController extends HttpServlet {
 
             // Set material properties
             material.setMaterialId(Integer.parseInt(materialIdStr));
-            //material.setCode(code.trim());
+            // Don't update code field since it's not editable in the form
             material.setName(name.trim());
             material.setDescription(description != null ? description.trim() : "");
             material.setUnit(unit.trim());
@@ -231,7 +228,7 @@ public class EditMaterialController extends HttpServlet {
             request.setAttribute("messageType", "danger");
             reloadFormData(request, request.getParameter("id"),
                     request.getParameter("name"), request.getParameter("description"),
-                    request.getParameter("unit"), material.getImageUrl());
+                    request.getParameter("unit"), "");
             request.setAttribute("origin", origin);
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
         } catch (SQLException e) {
@@ -239,7 +236,7 @@ public class EditMaterialController extends HttpServlet {
             request.setAttribute("messageType", "danger");
             reloadFormData(request, request.getParameter("id"),
                     request.getParameter("name"), request.getParameter("description"),
-                    request.getParameter("unit"), material.getImageUrl());
+                    request.getParameter("unit"), "");
             request.setAttribute("origin", origin);
             request.getRequestDispatcher("/view/material/editMaterial.jsp").forward(request, response);
         }
@@ -255,12 +252,21 @@ public class EditMaterialController extends HttpServlet {
             Material material = new Material();
             if (materialId != null && materialId.matches("\\d+")) {
                 material.setMaterialId(Integer.parseInt(materialId));
+                // Get the current material to preserve its category
+                Material currentMaterial = materialDAO.getMaterialById(Integer.parseInt(materialId));
+                material.setCategory(currentMaterial.getCategory());
+            } else {
+                // Set a default category if material ID is invalid
+                MaterialCategory defaultCategory = new MaterialCategory();
+                defaultCategory.setCategoryId(1);
+                material.setCategory(defaultCategory);
             }
-            //material.setCode(code != null ? code : "");
+            // Don't set code since it's not editable in the form
             material.setName(name != null ? name : "");
             material.setDescription(description != null ? description : "");
             material.setUnit(unit != null ? unit : "");
             material.setImageUrl(imageUrl != null ? imageUrl : "");
+            
             request.setAttribute("material", material);
         } catch (SQLException e) {
             throw new ServletException("Failed to reload data for form", e);

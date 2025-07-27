@@ -222,15 +222,14 @@ public class MaterialDAO {
     }
 
     public void updateMaterial(Material material) throws SQLException {
-        String sqlMaterial = "UPDATE Materials SET code = ?, category_id = ?, name = ?, description = ?, unit = ?, image_url = ? WHERE material_id = ?";
+        String sqlMaterial = "UPDATE Materials SET category_id = ?, name = ?, description = ?, unit = ?, image_url = ? WHERE material_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sqlMaterial)) {
-            ps.setString(1, material.getCode());
-            ps.setInt(2, material.getCategory().getCategoryId());
-            ps.setString(3, material.getName());
-            ps.setString(4, material.getDescription());
-            ps.setString(5, material.getUnit());
-            ps.setString(6, material.getImageUrl());
-            ps.setInt(7, material.getMaterialId());
+            ps.setInt(1, material.getCategory().getCategoryId());
+            ps.setString(2, material.getName());
+            ps.setString(3, material.getDescription());
+            ps.setString(4, material.getUnit());
+            ps.setString(5, material.getImageUrl());
+            ps.setInt(6, material.getMaterialId());
             ps.executeUpdate();
         }
     }
