@@ -364,7 +364,7 @@
             });
         </script>
 
-        <script src="${pageContext.request.contextPath}/assets/js/sidebar_darkmode.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/idebar_darkmode.js"></script>
         <script src="${pageContext.request.contextPath}/assets/js/tablesort.js"></script>
     </body>
 </html>
