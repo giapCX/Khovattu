@@ -28,7 +28,7 @@ public class ExportHistoryDAO {
     public List<Export> searchExportReceipts(Date fromDate, Date toDate, String keyword, int page, int pageSize) {
         List<Export> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT DISTINCT er.export_id, er.receipt_id, er.export_date, er.note, "
+                "SELECT DISTINCT er.export_id, er.export_date, er.note, "
                 + "u1.full_name AS exporter_name, u2.full_name AS receiver_name, "
                 + "cs.site_name, "
                 + "er.executor_id, er.receiver_id, er.proposal_id "
@@ -79,8 +79,7 @@ public class ExportHistoryDAO {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Export receipt = new Export();
-                receipt.setExportId(rs.getInt("export_id"));
-                receipt.setReceiptId(rs.getString("receipt_id"));
+                receipt.setExportId(rs.getInt("export_id"));                
                 receipt.setExportDate(rs.getTimestamp("export_date"));
                 receipt.setNote(rs.getString("note"));
                 receipt.setExporterId(rs.getInt("executor_id"));
@@ -151,7 +150,7 @@ public class ExportHistoryDAO {
 
     public List<Export> searchByExporterName(String exporter) {
         List<Export> list = new ArrayList<>();
-        String sql = "SELECT er.export_id, er.receipt_id, er.export_date, er.note, "
+        String sql = "SELECT er.export_id, er.export_date, er.note, "
                 + "u1.full_name AS exporter_name, u2.full_name AS receiver_name, "
                 + "cs.site_name, "
                 + "er.executor_id, er.receiver_id, er.proposal_id "
@@ -170,8 +169,7 @@ public class ExportHistoryDAO {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Export receipt = new Export();
-                receipt.setExportId(rs.getInt("export_id"));
-                receipt.setReceiptId(rs.getString("receipt_id"));
+                receipt.setExportId(rs.getInt("export_id"));               
                 receipt.setExportDate(rs.getTimestamp("export_date"));
                 receipt.setNote(rs.getString("note"));
                 receipt.setExporterId(rs.getInt("executor_id"));
@@ -193,7 +191,6 @@ public class ExportHistoryDAO {
         String sql = """
             SELECT 
                 er.export_id, 
-                er.receipt_id, 
                 er.export_date, 
                 er.note, 
                 u1.full_name AS exporter_name,
@@ -214,8 +211,7 @@ public class ExportHistoryDAO {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 receipt = new Export();
-                receipt.setExportId(rs.getInt("export_id"));
-                receipt.setReceiptId(rs.getString("receipt_id"));
+                receipt.setExportId(rs.getInt("export_id"));                
                 receipt.setExportDate(rs.getTimestamp("export_date"));
                 receipt.setNote(rs.getString("note"));
                 receipt.setExporterId(rs.getInt("executor_id"));

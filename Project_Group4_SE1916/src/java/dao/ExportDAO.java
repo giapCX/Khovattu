@@ -42,14 +42,14 @@ public class ExportDAO {
     }
 
     public int saveExport(Export export) throws SQLException {
-        String sql = "INSERT INTO ExportReceipts (proposal_id, executor_id, receiver_id, export_date, note, site_id) "
+        String sql = "INSERT INTO ExportReceipts (proposal_id, receiver_id, executor_id, export_date, note, site_id) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
         conn.setAutoCommit(false);
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, export.getProposalId());
-            ps.setInt(2, export.getExporterId());
-            ps.setInt(3, export.getReceiverId());
-            ps.setTimestamp(4, export.getExportDate());
+            ps.setInt(2, export.getReceiverId());
+            ps.setInt(3, export.getExporterId());
+            ps.setDate(4, new java.sql.Date(export.getExportDate().getTime()));
             ps.setString(5, export.getNote());
             ps.setInt(6, export.getSiteId());
             int rows = ps.executeUpdate();
